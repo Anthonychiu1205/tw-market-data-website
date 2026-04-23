@@ -85,58 +85,6 @@ const nextCards = [
 
 export function QuickStartContent() {
   const [openItemId, setOpenItemId] = useState<string>(exploreItems[0]?.id ?? "");
-  const [demoSymbol, setDemoSymbol] = useState("2330");
-  const [demoLoading, setDemoLoading] = useState(false);
-  const [demoError, setDemoError] = useState("");
-  const [demoRows, setDemoRows] = useState<Array<{ symbol: string; date: string; close: string | number }>>([]);
-  const [demoRaw, setDemoRaw] = useState<unknown>(null);
-
-  const handleFetchDemo = async () => {
-    const symbol = demoSymbol.trim();
-    if (!symbol) {
-      setDemoError("請先輸入 symbol。");
-      setDemoRows([]);
-      setDemoRaw(null);
-      return;
-    }
-
-    setDemoLoading(true);
-    setDemoError("");
-    try {
-      const url = `http://127.0.0.1:8011/v2/datasets/twse-daily-price?symbol=${encodeURIComponent(symbol)}&limit=5`;
-      const res = await fetch(url, {
-        method: "GET",
-        headers: {
-          "X-API-Key": "free_key",
-        },
-      });
-      const data = await res.json();
-      setDemoRaw(data);
-
-      if (!res.ok) {
-        setDemoRows([]);
-        setDemoError(typeof data?.detail === "string" ? data.detail : "API 請求失敗。");
-        return;
-      }
-
-      const rows = Array.isArray(data?.rows) ? data.rows : [];
-      const normalized = rows.map((row: unknown) => {
-        const r = (row ?? {}) as Record<string, unknown>;
-        return {
-          symbol: String(r.symbol ?? ""),
-          date: String(r.date ?? ""),
-          close: (r.close as string | number | undefined) ?? "",
-        };
-      });
-      setDemoRows(normalized);
-    } catch {
-      setDemoRows([]);
-      setDemoRaw(null);
-      setDemoError("無法連線到本機 API（http://127.0.0.1:8011）。");
-    } finally {
-      setDemoLoading(false);
-    }
-  };
 
   return (
     <div className="space-y-8 py-8">
@@ -162,57 +110,7 @@ export function QuickStartContent() {
       </section>
 
       <section className="space-y-3 border-b border-slate-200 pb-8">
-        <SectionHeading id="live-demo">3. Live Demo（TWSE Daily Price）</SectionHeading>
-        <p className="text-sm leading-7 text-slate-600">輸入股票代碼後，直接呼叫本機 API：<code className="rounded bg-slate-100 px-1 py-0.5 text-xs">GET /v2/datasets/twse-daily-price</code></p>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <input
-            type="text"
-            value={demoSymbol}
-            onChange={(e) => setDemoSymbol(e.target.value)}
-            placeholder="例如 2330"
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-500 sm:max-w-[220px]"
-          />
-          <button
-            type="button"
-            onClick={handleFetchDemo}
-            disabled={demoLoading}
-            className="inline-flex items-center justify-center rounded-md border border-slate-800 bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {demoLoading ? "Loading..." : "Fetch Data"}
-          </button>
-        </div>
-        {demoError ? <p className="text-sm text-rose-600">{demoError}</p> : null}
-        {demoRows.length > 0 ? (
-          <div className="overflow-x-auto rounded-lg border border-slate-200">
-            <table className="min-w-full divide-y divide-slate-200 bg-white text-sm">
-              <thead className="bg-slate-50">
-                <tr>
-                  <th className="px-3 py-2 text-left font-medium text-slate-700">symbol</th>
-                  <th className="px-3 py-2 text-left font-medium text-slate-700">date</th>
-                  <th className="px-3 py-2 text-left font-medium text-slate-700">close</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {demoRows.map((row, idx) => (
-                  <tr key={`${row.symbol}-${row.date}-${idx}`}>
-                    <td className="px-3 py-2 text-slate-700">{row.symbol}</td>
-                    <td className="px-3 py-2 text-slate-700">{row.date}</td>
-                    <td className="px-3 py-2 text-slate-700">{row.close}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : null}
-        {demoRaw ? (
-          <pre className="overflow-x-auto rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-6 text-slate-700">
-            {JSON.stringify(demoRaw, null, 2)}
-          </pre>
-        ) : null}
-      </section>
-
-      <section className="space-y-3 border-b border-slate-200 pb-8">
-        <SectionHeading id="explore-more">4. Explore More</SectionHeading>
+        <SectionHeading id="explore-more">3. Explore More</SectionHeading>
         <p className="text-sm leading-7 text-slate-600">完成基本請求後，可以繼續嘗試其他常用資料。</p>
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
           {exploreItems.map((item, index) => {
@@ -253,7 +151,7 @@ export function QuickStartContent() {
       </section>
 
       <section className="space-y-4">
-        <SectionHeading id="whats-next">5. What&apos;s Next</SectionHeading>
+        <SectionHeading id="whats-next">4. What&apos;s Next</SectionHeading>
         <div className="grid gap-3 md:grid-cols-2">
           {nextCards.map((card) => (
             <Link

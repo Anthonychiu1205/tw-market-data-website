@@ -6,6 +6,7 @@ import { ApiSidePanel } from "@/src/components/docs/api-side-panel";
 import { DocsPageShell } from "@/src/components/docs/docs-page-shell";
 import { QuickStartContent } from "@/src/components/docs/quick-start-content";
 import { SectionHeading } from "@/src/components/docs/section-heading";
+import { TwseDailyPriceLiveDemo } from "@/src/components/docs/twse-daily-price-live-demo";
 import { buttonClass } from "@/src/components/ui/button";
 import { docsPages, getDocsPageBySlug, resolveDocsGroupTargetHref } from "@/src/content/docs-pages";
 
@@ -338,7 +339,10 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
   if (page.slug.join("/") === "quick-start") {
     return (
       <DocsPageShell page={page} pageLabel="文件總覽">
-        <QuickStartContent />
+        <div className="space-y-8">
+          <QuickStartContent />
+          <TwseDailyPriceLiveDemo />
+        </div>
       </DocsPageShell>
     );
   }
