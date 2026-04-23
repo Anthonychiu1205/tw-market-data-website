@@ -132,6 +132,9 @@ type AgentWorkflowDemoProps = {
   config?: AgentWorkflowDemoConfig;
 };
 
+const TIMING_SCALE = 0.65;
+const scaleMs = (ms: number) => Math.round(ms * TIMING_SCALE);
+
 export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemoProps) {
   const { elementRef, isVisible } = useReplayOnVisible<HTMLDivElement>({
     threshold: 0.4,
@@ -181,7 +184,7 @@ export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemo
     timersRef.current.push(
       window.setTimeout(() => {
         setQueryVisible(true);
-      }, 120),
+      }, scaleMs(120)),
     );
 
     timersRef.current.push(
@@ -194,40 +197,40 @@ export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemo
             window.clearInterval(typingIntervalRef.current);
             typingIntervalRef.current = null;
           }
-        }, 42);
-      }, 260),
+        }, scaleMs(42));
+      }, scaleMs(260)),
     );
 
     timersRef.current.push(
       window.setTimeout(() => {
         setAgentVisible(true);
-      }, 1080),
+      }, scaleMs(1080)),
     );
 
     timersRef.current.push(
       window.setTimeout(() => {
         setSearchComplete(true);
-      }, 1600),
+      }, scaleMs(1600)),
     );
 
     timersRef.current.push(
       window.setTimeout(() => {
         setHeaderVisible(true);
-      }, 1880),
+      }, scaleMs(1880)),
     );
 
     config.tableRows.forEach((_, index) => {
       timersRef.current.push(
         window.setTimeout(() => {
           setVisibleRows((current) => Math.max(current, index + 1));
-        }, 2100 + index * 150),
+        }, scaleMs(2100) + index * scaleMs(150)),
       );
     });
 
     timersRef.current.push(
       window.setTimeout(() => {
         setAnalysisComplete(true);
-      }, 3100),
+      }, scaleMs(3100)),
     );
 
     return () => {
@@ -244,7 +247,7 @@ export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemo
     >
       <div
         className={cn(
-          "rounded-xl border border-slate-300 bg-white px-4 py-2 font-mono text-[14px] tracking-tight text-slate-800 transition duration-500",
+          "rounded-xl border border-slate-300 bg-white px-4 py-2 font-mono text-[14px] tracking-tight text-slate-800 transition duration-300",
           queryVisible ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
         )}
       >
@@ -259,7 +262,7 @@ export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemo
 
       <div
         className={cn(
-          "mt-3 flex items-center justify-between font-mono text-[13px] leading-normal text-slate-700 transition duration-500",
+          "mt-3 flex items-center justify-between font-mono text-[13px] leading-normal text-slate-700 transition duration-300",
           agentVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
         )}
       >
@@ -269,7 +272,7 @@ export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemo
         </div>
         <span
           className={cn(
-            "inline-flex h-5 w-5 items-center justify-center transition duration-300",
+            "inline-flex h-5 w-5 items-center justify-center transition duration-200",
             searchComplete ? "opacity-100" : "opacity-0",
           )}
         >
@@ -278,7 +281,7 @@ export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemo
       </div>
 
       <div className="mt-3 w-full overflow-hidden rounded-xl border border-slate-300 bg-white">
-        <div className={cn("border-b border-slate-200 transition duration-500", headerVisible ? "opacity-100" : "opacity-0")}>
+        <div className={cn("border-b border-slate-200 transition duration-300", headerVisible ? "opacity-100" : "opacity-0")}>
           <div className="grid w-full font-mono text-xs font-semibold tracking-wide text-slate-600" style={{ gridTemplateColumns: config.tableGridTemplateColumns }}>
             {config.tableHeaders.map((head, index) => (
               <div key={head} className={cn("px-3.5 py-2", index > 0 ? "border-l border-slate-200" : "")}>
@@ -293,7 +296,7 @@ export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemo
             <div
               key={`${row[0]}-${index}`}
               className={cn(
-                "grid w-full border-b border-slate-200 font-mono text-[13px] text-slate-700 transition duration-300 last:border-b-0",
+                "grid w-full border-b border-slate-200 font-mono text-[13px] text-slate-700 transition duration-200 last:border-b-0",
                 visibleRows > index ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0",
               )}
               style={{ gridTemplateColumns: config.tableGridTemplateColumns }}
@@ -323,7 +326,7 @@ export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemo
 
       <div
         className={cn(
-          "mt-2 flex items-center gap-2 font-mono text-xs leading-normal text-slate-700 transition duration-500",
+          "mt-2 flex items-center gap-2 font-mono text-xs leading-normal text-slate-700 transition duration-300",
           analysisComplete ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
         )}
       >

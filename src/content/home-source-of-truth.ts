@@ -36,8 +36,8 @@ export const HOME_SOURCE_OF_TRUTH_ITEMS = [
   },
   {
     id: "financial_statements",
-    title: "財報三大表",
-    description: "損益表、資產負債表、現金流量表，統一 schema 輸出",
+    title: "財報三表",
+    description: "損益表、資產負債表、現金流量表，支援完整財報分析",
     responseLabel: "financial_statements",
     status: "200 OK",
     responseTitle: "2330",
@@ -136,6 +136,36 @@ export const HOME_SOURCE_OF_TRUTH_ITEMS = [
 }`,
   },
   {
+    id: "technical_indicators",
+    title: "技術指標",
+    description: "MA、RSI、MACD 等常用技術指標，適合策略研究",
+    responseLabel: "technical_indicators",
+    status: "200 OK",
+    responseTitle: "2330",
+    code: `{
+  "dataset": "technical_indicators",
+  "source_role": "canonical",
+  "freshness": "T+0",
+  "lineage": {
+    "provider": "TWSE",
+    "as_of_date": "2026-04-18"
+  },
+  "data": [
+    {
+      "ticker": "2330",
+      "date": "2026-04-18",
+      "ma_5": 842.4,
+      "ma_20": 819.2,
+      "ma_60": 788.3,
+      "rsi_14": 61.8,
+      "macd": 12.7,
+      "macd_signal": 10.9,
+      "macd_hist": 1.8
+    }
+  ]
+}`,
+  },
+  {
     id: "valuation_metrics",
     title: "PER / PBR / 殖利率",
     description: "估值相關指標，適合篩選與估值流程",
@@ -168,7 +198,7 @@ export const HOME_SOURCE_OF_TRUTH_ITEMS = [
   {
     id: "institutional_flows",
     title: "籌碼與法人",
-    description: "三大法人、持股變化與市場結構觀察",
+    description: "三大法人買賣超，適合觀察市場資金方向",
     responseLabel: "institutional_flows",
     status: "200 OK",
     responseTitle: "2330",
@@ -203,36 +233,30 @@ export const HOME_SOURCE_OF_TRUTH_ITEMS = [
 }`,
   },
   {
-    id: "corporate_events",
-    title: "事件資料",
-    description: "除權息、停復牌、重大公告與公司事件整理",
-    responseLabel: "corporate_events",
+    id: "margin_short",
+    title: "融資融券",
+    description: "融資餘額、融券餘額與變化，適合籌碼分析",
+    responseLabel: "margin_short",
     status: "200 OK",
     responseTitle: "2330",
     code: `{
-  "dataset": "corporate_events",
+  "dataset": "margin_short",
   "source_role": "canonical",
+  "freshness": "T+0",
   "lineage": {
-    "provider": "MOPS"
+    "provider": "TWSE"
   },
   "data": [
     {
       "ticker": "2330",
-      "event_type": "cash_dividend",
-      "announcement_date": "2026-03-12",
-      "ex_dividend_date": "2026-06-18",
-      "cash_dividend_per_share": 4.5,
-      "currency": "TWD",
-      "status": "scheduled"
-    },
-    {
-      "ticker": "2330",
-      "event_type": "trading_halt",
-      "announcement_date": "2026-02-09",
-      "effective_time": "2026-02-10T09:00:00+08:00",
-      "resume_time": "2026-02-10T11:30:00+08:00",
-      "reason": "重大訊息待公布",
-      "status": "closed"
+      "date": "2026-04-18",
+      "margin_balance": 1245000,
+      "margin_buy": 84200,
+      "margin_sell": 75500,
+      "short_balance": 315000,
+      "short_sell": 18200,
+      "short_cover": 16900,
+      "margin_short_ratio": 0.253
     }
   ]
 }`,

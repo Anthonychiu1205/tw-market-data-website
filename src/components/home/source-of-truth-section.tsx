@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { cn } from "@/src/lib/cn";
 import { HOME_SOURCE_OF_TRUTH_ITEMS } from "@/src/content/home-source-of-truth";
@@ -89,25 +89,69 @@ function tokenClass(type: TokenType) {
 
 export function SourceOfTruthSection() {
   const [activeId, setActiveId] = useState<string>(DEFAULT_ACTIVE_ID);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const [isScrollable, setIsScrollable] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
+  const [isAtBottom, setIsAtBottom] = useState(false);
 
   const activeItem = useMemo(
     () => HOME_SOURCE_OF_TRUTH_ITEMS.find((item) => item.id === activeId) ?? HOME_SOURCE_OF_TRUTH_ITEMS[0],
     [activeId],
   );
 
+  const updateScrollState = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const threshold = 3;
+    const maxScrollTop = container.scrollHeight - container.clientHeight;
+    const nextIsScrollable = maxScrollTop > threshold;
+    const nextIsAtTop = container.scrollTop <= threshold;
+    const nextIsAtBottom = !nextIsScrollable || maxScrollTop - container.scrollTop <= threshold;
+
+    setIsScrollable(nextIsScrollable);
+    setIsAtTop(nextIsAtTop);
+    setIsAtBottom(nextIsAtBottom);
+  }, []);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    updateScrollState();
+
+    const handleResize = () => updateScrollState();
+    container.addEventListener("scroll", updateScrollState, { passive: true });
+    window.addEventListener("resize", handleResize);
+
+    const observer = new ResizeObserver(() => {
+      updateScrollState();
+    });
+    observer.observe(container);
+    if (container.firstElementChild) {
+      observer.observe(container.firstElementChild);
+    }
+
+    return () => {
+      container.removeEventListener("scroll", updateScrollState);
+      window.removeEventListener("resize", handleResize);
+      observer.disconnect();
+    };
+  }, [updateScrollState]);
+
   return (
-    <section className="bg-white py-14">
-      <MarketingContainer className="space-y-10">
+    <section className="bg-white py-10">
+      <MarketingContainer className="space-y-7">
         <div>
           <h2 className="text-3xl font-semibold tracking-tight text-slate-900">單一可信資料來源</h2>
-          <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-            以下回應為資料模型展示樣例，僅 issuer-profile 與 issuer-announcements 已正式 live；其餘主題依頁面標示為 coming soon / beta。
+          <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
+            以下展示目前已上線的台股資料能力，涵蓋營運、財報、估值、價格、技術指標與籌碼分析，資料經標準化處理後可直接透過 API 使用。
           </p>
         </div>
 
         <div className="grid gap-0 border border-slate-200 bg-white lg:grid-cols-[42%_58%]">
           <div className="relative lg:border-r lg:border-slate-200">
-            <div className="h-[380px] overflow-y-auto lg:h-[680px]">
+            <div ref={scrollContainerRef} className="h-[320px] overflow-y-auto lg:h-[520px]">
               <div className="divide-y divide-slate-200">
                 {HOME_SOURCE_OF_TRUTH_ITEMS.map((item) => (
                   <button
@@ -115,7 +159,7 @@ export function SourceOfTruthSection() {
                     type="button"
                     onClick={() => setActiveId(item.id)}
                     className={cn(
-                      "relative w-full px-5 py-4 text-left transition-colors",
+                      "relative w-full px-4 py-3 text-left transition-colors",
                       activeItem.id === item.id ? "bg-slate-50" : "hover:bg-slate-50/70",
                     )}
                   >
@@ -134,12 +178,22 @@ export function SourceOfTruthSection() {
                 ))}
               </div>
             </div>
-            <div className="pointer-events-none absolute inset-x-0 top-0 hidden h-10 bg-gradient-to-b from-white via-white/85 to-transparent lg:block" />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-10 bg-gradient-to-t from-white via-white/85 to-transparent lg:block" />
+            <div
+              className={cn(
+                "pointer-events-none absolute inset-x-0 top-0 hidden h-8 bg-gradient-to-b from-white via-white/85 to-transparent transition-opacity duration-150 lg:block",
+                isScrollable && !isAtTop ? "opacity-100" : "opacity-0",
+              )}
+            />
+            <div
+              className={cn(
+                "pointer-events-none absolute inset-x-0 bottom-0 hidden h-8 bg-gradient-to-t from-white via-white/85 to-transparent transition-opacity duration-150 lg:block",
+                isScrollable && !isAtBottom ? "opacity-100" : "opacity-0",
+              )}
+            />
           </div>
 
-          <div className="min-h-[680px]">
-            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3.5">
+          <div className="min-h-[520px]">
+            <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <span className="font-semibold tracking-[0.08em] text-slate-500">RESPONSE</span>
                 <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700">{activeItem.status}</span>
@@ -157,7 +211,7 @@ export function SourceOfTruthSection() {
                 ⧉
               </button>
             </div>
-            <pre className="h-[628px] overflow-x-auto overflow-y-auto bg-slate-50 px-5 py-4 text-xs leading-6">
+            <pre className="h-[468px] overflow-x-auto overflow-y-auto bg-slate-50 px-4 py-3 text-xs leading-6">
               <code>
                 {activeItem.code.split("\n").map((line, lineIndex) => (
                   <span key={`${activeItem.id}-${lineIndex}`} className="block">

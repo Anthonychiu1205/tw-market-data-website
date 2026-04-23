@@ -14,6 +14,9 @@ const RESULT_ROWS = [
   { year: "2022", source: "年報", summary: "製程升級帶動毛利改善" },
 ];
 
+const TIMING_SCALE = 0.65;
+const scaleMs = (ms: number) => Math.round(ms * TIMING_SCALE);
+
 function SearchIcon() {
   return (
     <svg
@@ -97,7 +100,7 @@ export function AgentDocumentsDemo() {
     clearAllTimers();
     resetStages();
 
-    timersRef.current.push(window.setTimeout(() => setQueryVisible(true), 120));
+    timersRef.current.push(window.setTimeout(() => setQueryVisible(true), scaleMs(120)));
     timersRef.current.push(
       window.setTimeout(() => {
         let index = 0;
@@ -108,23 +111,23 @@ export function AgentDocumentsDemo() {
             window.clearInterval(typingIntervalRef.current);
             typingIntervalRef.current = null;
           }
-        }, 40);
-      }, 240),
+        }, scaleMs(40));
+      }, scaleMs(240)),
     );
-    timersRef.current.push(window.setTimeout(() => setPullingVisible(true), 980));
+    timersRef.current.push(window.setTimeout(() => setPullingVisible(true), scaleMs(980)));
 
     DOCUMENTS.forEach((_, index) => {
-      timersRef.current.push(window.setTimeout(() => setVisibleDocs((current) => Math.max(current, index + 1)), 1360 + index * 120));
+      timersRef.current.push(window.setTimeout(() => setVisibleDocs((current) => Math.max(current, index + 1)), scaleMs(1360) + index * scaleMs(120)));
     });
 
-    timersRef.current.push(window.setTimeout(() => setExtractVisible(true), 2120));
-    timersRef.current.push(window.setTimeout(() => setTableHeaderVisible(true), 2360));
+    timersRef.current.push(window.setTimeout(() => setExtractVisible(true), scaleMs(2120)));
+    timersRef.current.push(window.setTimeout(() => setTableHeaderVisible(true), scaleMs(2360)));
 
     RESULT_ROWS.forEach((_, index) => {
-      timersRef.current.push(window.setTimeout(() => setVisibleRows((current) => Math.max(current, index + 1)), 2520 + index * 150));
+      timersRef.current.push(window.setTimeout(() => setVisibleRows((current) => Math.max(current, index + 1)), scaleMs(2520) + index * scaleMs(150)));
     });
 
-    timersRef.current.push(window.setTimeout(() => setAnalysisComplete(true), 3340));
+    timersRef.current.push(window.setTimeout(() => setAnalysisComplete(true), scaleMs(3340)));
 
     return () => {
       clearAllTimers();
@@ -140,7 +143,7 @@ export function AgentDocumentsDemo() {
     >
       <div
         className={cn(
-          "rounded-xl border border-slate-300 bg-white px-4 py-2 font-mono text-[14px] tracking-tight text-slate-800 transition duration-500",
+          "rounded-xl border border-slate-300 bg-white px-4 py-2 font-mono text-[14px] tracking-tight text-slate-800 transition duration-300",
           queryVisible ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
         )}
       >
@@ -155,7 +158,7 @@ export function AgentDocumentsDemo() {
 
       <div
         className={cn(
-          "mt-3 flex items-center justify-between font-mono text-[13px] leading-normal text-slate-700 transition duration-500",
+          "mt-3 flex items-center justify-between font-mono text-[13px] leading-normal text-slate-700 transition duration-300",
           pullingVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
         )}
       >
@@ -168,7 +171,7 @@ export function AgentDocumentsDemo() {
           <div
             key={doc}
             className={cn(
-              "rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-[12px] text-slate-700 transition duration-300",
+              "rounded-lg border border-slate-200 bg-white px-3 py-2 font-mono text-[12px] text-slate-700 transition duration-200",
               visibleDocs > index ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0",
             )}
           >
@@ -179,7 +182,7 @@ export function AgentDocumentsDemo() {
 
       <div
         className={cn(
-          "mt-3 flex items-center justify-between font-mono text-[13px] leading-normal text-slate-700 transition duration-500",
+          "mt-3 flex items-center justify-between font-mono text-[13px] leading-normal text-slate-700 transition duration-300",
           extractVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
         )}
       >
@@ -188,7 +191,7 @@ export function AgentDocumentsDemo() {
       </div>
 
       <div className="mt-3 w-full overflow-hidden rounded-xl border border-slate-300 bg-white">
-        <div className={cn("border-b border-slate-200 transition duration-500", tableHeaderVisible ? "opacity-100" : "opacity-0")}>
+        <div className={cn("border-b border-slate-200 transition duration-300", tableHeaderVisible ? "opacity-100" : "opacity-0")}>
           <div className="grid w-full grid-cols-[0.8fr_0.9fr_2.2fr] font-mono text-xs font-semibold tracking-wide text-slate-600">
             {["年度", "來源", "摘要"].map((head, index) => (
               <div key={head} className={cn("px-3.5 py-2", index > 0 ? "border-l border-slate-200" : "")}>
@@ -203,7 +206,7 @@ export function AgentDocumentsDemo() {
             <div
               key={`${row.year}-${row.source}`}
               className={cn(
-                "grid w-full grid-cols-[0.8fr_0.9fr_2.2fr] border-b border-slate-200 font-mono text-[13px] text-slate-700 transition duration-300 last:border-b-0",
+                "grid w-full grid-cols-[0.8fr_0.9fr_2.2fr] border-b border-slate-200 font-mono text-[13px] text-slate-700 transition duration-200 last:border-b-0",
                 visibleRows > index ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0",
               )}
             >
@@ -219,7 +222,7 @@ export function AgentDocumentsDemo() {
 
       <div
         className={cn(
-          "mt-2 flex items-center gap-2 font-mono text-xs leading-normal text-slate-700 transition duration-500",
+          "mt-2 flex items-center gap-2 font-mono text-xs leading-normal text-slate-700 transition duration-300",
           analysisComplete ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
         )}
       >
@@ -229,4 +232,3 @@ export function AgentDocumentsDemo() {
     </div>
   );
 }
-

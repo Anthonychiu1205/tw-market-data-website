@@ -199,26 +199,26 @@ export function PricingShell() {
   return (
     <div className="space-y-10">
       <div className="flex justify-center">
-        <div className="inline-flex rounded-lg border border-slate-300 bg-white p-1">
+        <div className="inline-flex rounded-full border border-slate-200 bg-slate-50 p-1.5 shadow-sm">
           <button
             className={cn(
-              "h-11 rounded-xl px-6 text-sm font-medium transition",
-              mode === "monthly" ? "bg-slate-950 text-white hover:text-white" : "text-slate-600 hover:bg-slate-100",
+              "h-10 rounded-full px-7 text-sm font-medium transition",
+              mode === "monthly" ? "bg-slate-900 text-white shadow-sm hover:text-white" : "text-slate-600 hover:text-slate-800",
             )}
             onClick={() => setMode("monthly")}
             type="button"
           >
-            月付
+            月繳
           </button>
           <button
             className={cn(
-              "h-11 rounded-xl px-6 text-sm font-medium transition",
-              mode === "yearly" ? "bg-slate-950 text-white hover:text-white" : "text-slate-600 hover:bg-slate-100",
+              "h-10 rounded-full px-7 text-sm font-medium transition",
+              mode === "yearly" ? "bg-slate-900 text-white shadow-sm hover:text-white" : "text-slate-600 hover:text-slate-800",
             )}
             onClick={() => setMode("yearly")}
             type="button"
           >
-            年付
+            年繳
           </button>
         </div>
       </div>

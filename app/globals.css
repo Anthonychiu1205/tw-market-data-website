@@ -35,6 +35,18 @@ code {
   font-family: var(--font-mono);
 }
 
+.docs-sidebar ul,
+.docs-sidebar li {
+  list-style: none !important;
+  margin: 0;
+  padding: 0;
+}
+
+.docs-sidebar li::marker {
+  display: none;
+  content: "";
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .fade-in {
     animation: fadeIn 0.45s ease-out both;

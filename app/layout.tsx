@@ -1,22 +1,9 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Noto_Sans_TC } from "next/font/google";
 
 import { SiteShell } from "@/src/components/layout/site-shell";
 import { siteConfig } from "@/src/config/site";
 
 import "./globals.css";
-
-const sans = Noto_Sans_TC({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const mono = JetBrains_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -45,7 +32,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-Hant" className={`${sans.variable} ${mono.variable}`}>
+    <html lang="zh-Hant">
       <body className="min-h-screen font-sans antialiased">
         <SiteShell>{children}</SiteShell>
       </body>

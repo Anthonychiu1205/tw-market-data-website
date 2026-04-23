@@ -3,16 +3,13 @@ import Link from "next/link";
 import { AgentDocumentsShowcase } from "@/src/components/home/agent-documents-showcase";
 import { AgentWorkflowShowcase } from "@/src/components/home/agent-workflow-showcase";
 import { MarketCoverageShowcase } from "@/src/components/home/market-coverage-showcase";
+import { AiAgentWorkflowSection } from "@/src/components/home/ai-agent-workflow-section";
 import { buttonClass } from "@/src/components/ui/button";
 import { SourceOfTruthSection } from "@/src/components/home/source-of-truth-section";
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 import { Tag } from "@/src/components/ui/tag";
-import { datasetProducts } from "@/src/content/site";
 
 export default function HomePage() {
-  const liveTopics = datasetProducts.filter((item) => item.readiness === "available_now");
-  const upcomingTopics = datasetProducts.filter((item) => item.readiness !== "available_now");
-
   return (
     <>
       <section className="border-b border-slate-200 bg-white">
@@ -50,16 +47,17 @@ export default function HomePage() {
 
           <div className="grid gap-0 border-y border-slate-200 md:grid-cols-2 xl:grid-cols-4">
             {[
-              ["2 個已上線主題", "issuer-profile、issuer-announcements"],
-              ["官方來源", "TWSE、TPEx、MOPS"],
-              ["結構一致", "統一 schema 與欄位設計"],
-              ["可追溯", "lineage 與來源可審計"],
-            ].map(([title, description], index) => (
+              ["3", "個已上線資料集", "TWSE daily price、TPEx daily price、monthly revenue"],
+              ["3", "個官方來源", "TWSE、TPEx、MOPS"],
+              ["3", "API endpoints", "twse-daily-price、tpex-daily-price、monthly-revenue"],
+              ["1", "canonical schema", "統一 schema 與欄位設計"],
+            ].map(([value, label, description], index) => (
               <div
-                key={title}
+                key={`${value}-${label}`}
                 className={`py-5 ${index % 2 === 1 ? "md:pl-6" : "md:pr-6"} ${index >= 2 ? "md:border-t md:border-slate-200 xl:border-t-0" : ""} ${index > 0 ? "xl:border-l xl:border-slate-200 xl:pl-6" : ""}`}
               >
-                <p className="text-lg font-semibold text-slate-900">{title}</p>
+                <p className="text-4xl font-semibold leading-none tracking-tight text-slate-900 sm:text-5xl">{value}</p>
+                <p className="mt-2 text-base font-semibold text-slate-900">{label}</p>
                 <p className="mt-2 text-sm text-slate-600">{description}</p>
               </div>
             ))}
@@ -67,62 +65,11 @@ export default function HomePage() {
         </MarketingContainer>
       </section>
 
-      <section className="border-b border-slate-200 bg-white py-14">
-        <MarketingContainer className="space-y-8">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Datasets Overview</h2>
-            <p className="mt-2 max-w-3xl text-sm text-slate-600">目前正式可用主題僅限兩個 live topics；其餘主題維持 coming soon / beta，不做超額宣稱。</p>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="rounded-lg border border-emerald-200 bg-emerald-50/40 p-5">
-              <p className="text-sm font-semibold text-emerald-800">Available now / 已可用</p>
-              <div className="mt-4 space-y-3">
-                {liveTopics.map((topic) => (
-                  <div key={topic.id} className="rounded-md border border-emerald-200 bg-white px-3 py-2">
-                    <p className="text-sm font-semibold text-slate-900">{topic.name}</p>
-                    <p className="mt-1 text-xs text-slate-600">{topic.shortUseCase}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-5">
-              <p className="text-sm font-semibold text-slate-800">Coming soon / Beta</p>
-              <div className="mt-4 space-y-3">
-                {upcomingTopics.map((topic) => (
-                  <div key={topic.id} className="rounded-md border border-slate-200 bg-white px-3 py-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-semibold text-slate-900">{topic.name}</p>
-                      <span className="rounded-full border border-slate-200 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-slate-600">
-                        {topic.readiness === "beta" ? "beta" : "coming soon"}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-xs text-slate-600">{topic.shortUseCase}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4 border-t border-slate-200 pt-5">
-            <Link href="/docs/quick-start" className={buttonClass("primary")}>
-              前往快速開始
-            </Link>
-            <Link href="/docs" className="text-sm font-medium text-slate-900 underline-offset-4 hover:underline">
-              查看文件
-            </Link>
-            <Link href="/datasets" className="text-sm font-medium text-slate-900 underline-offset-4 hover:underline">
-              查看資料主題目錄
-            </Link>
-          </div>
-        </MarketingContainer>
-      </section>
-
-      <SourceOfTruthSection />
       <MarketCoverageShowcase />
       <AgentWorkflowShowcase />
       <AgentDocumentsShowcase />
+      <SourceOfTruthSection />
+      <AiAgentWorkflowSection />
 
       <section className="bg-white py-14">
         <MarketingContainer className="space-y-8">
