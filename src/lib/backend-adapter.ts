@@ -27,6 +27,20 @@ export type UsageSummary = {
   integrationMode: IntegrationMode;
 };
 
+export type UsageRequestRow = {
+  requestTimestamp: string;
+  dataset: string;
+  endpoint: string;
+  statusCode: number | null;
+  rowCount: number | null;
+  planCode: string;
+};
+
+export type UsageRequestsSummary = {
+  rows: UsageRequestRow[];
+  integrationMode: IntegrationMode;
+};
+
 export type ApiKeyItem = {
   id: string;
   name: string;
@@ -56,9 +70,11 @@ function getBase() {
 
 function getHeaders(email: string) {
   const token = process.env.BACKEND_API_TOKEN;
+  const selfServeToken = process.env.BACKEND_SELF_SERVE_TOKEN;
   return {
     "X-Account-Email": email,
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...(selfServeToken ? { "x-self-serve-token": selfServeToken } : {}),
   };
 }
 
@@ -237,6 +253,43 @@ export async function getBillingSummary(email: string): Promise<BillingSummary> 
 }
 
 export async function getUsageSummary(email: string): Promise<UsageSummary> {
+  const selfServeSummary = await fetchFromCandidates<Record<string, unknown>>(email, [
+    "/v2/self-serve/usage-summary",
+  ]);
+
+  if (selfServeSummary?.data) {
+    const payload = selfServeSummary.data;
+    const profile =
+      (payload.current_rate_limit_profile && typeof payload.current_rate_limit_profile === "object"
+        ? payload.current_rate_limit_profile
+        : {}) as Record<string, unknown>;
+    const top = Array.isArray(payload.top_endpoints_used) ? payload.top_endpoints_used : [];
+    const topEndpoints = top
+      .map((item) => (item && typeof item === "object" ? getString((item as Record<string, unknown>).endpoint) : ""))
+      .filter(Boolean)
+      .slice(0, 8);
+
+    const today = new Date().toISOString().slice(0, 10);
+    const dailyUsageCount = getNumber(payload.daily_quota_usage, 0);
+    const fallbackDailyUsage = Array.from({ length: 35 }, (_, index) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (34 - index));
+      return {
+        date: date.toISOString().slice(0, 10),
+        count: date.toISOString().slice(0, 10) === today ? dailyUsageCount : 0,
+      };
+    });
+
+    return {
+      monthlyUsed: getNumber(payload.recent_request_count, 0),
+      monthlyQuota: Math.max(getNumber(profile.quota_daily_limit, 0), 1),
+      rateLimitPerMin: getNumber(profile.rate_limit_rpm, 60),
+      topEndpoints,
+      dailyUsage: fallbackDailyUsage,
+      integrationMode: "live",
+    };
+  }
+
   const liveSummary = await fetchFromCandidates<Record<string, unknown>>(email, [
     "/v1/usage/summary",
     "/usage/summary",
@@ -295,6 +348,52 @@ export async function getUsageSummary(email: string): Promise<UsageSummary> {
     rateLimitPerMin: 60,
     topEndpoints: [],
     dailyUsage: fallbackDailyUsage,
+    integrationMode: "fallback",
+  };
+}
+
+function normalizeUsageRequestRow(item: unknown): UsageRequestRow | null {
+  const row = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
+  const requestTimestamp = getString(row.request_ts || row.requestTimestamp || row.timestamp || row.created_at, "-");
+  const dataset = getString(row.dataset, "");
+  const endpoint = getString(row.endpoint, "");
+  const statusCode = Number.isFinite(getNumber(row.status_code ?? row.status, Number.NaN))
+    ? getNumber(row.status_code ?? row.status, Number.NaN)
+    : Number.NaN;
+  const rowCount = Number.isFinite(getNumber(row.row_count ?? row.response_rows, Number.NaN))
+    ? getNumber(row.row_count ?? row.response_rows, Number.NaN)
+    : Number.NaN;
+  const planCode = getString(row.plan_code || row.plan || row.current_plan_id, "");
+
+  if (!endpoint) return null;
+
+  return {
+    requestTimestamp,
+    dataset: dataset || "-",
+    endpoint,
+    statusCode: Number.isFinite(statusCode) ? statusCode : null,
+    rowCount: Number.isFinite(rowCount) ? rowCount : null,
+    planCode: planCode || "-",
+  };
+}
+
+export async function getUsageRequestRows(email: string): Promise<UsageRequestsSummary> {
+  const direct = await fetchFromCandidates<Record<string, unknown> | Array<Record<string, unknown>>>(email, [
+    "/v2/self-serve/usage-events",
+  ]);
+
+  if (direct?.data) {
+    const rows = pickArray(direct.data)
+      .map(normalizeUsageRequestRow)
+      .filter((row): row is UsageRequestRow => Boolean(row));
+    return {
+      rows,
+      integrationMode: "live",
+    };
+  }
+
+  return {
+    rows: [],
     integrationMode: "fallback",
   };
 }
