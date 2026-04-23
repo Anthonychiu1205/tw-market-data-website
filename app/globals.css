@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+:root {
+  --font-sans: "Noto Sans TC", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --line: #e2e8f0;
+  --muted: #475569;
+  --accent: #0f766e;
+}
+
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+* {
+  border-color: var(--line);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: #0f172a;
+  scroll-behavior: smooth;
+}
+
+a {
+  color: inherit;
+}
+
+pre,
+code {
+  font-family: var(--font-mono);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-in {
+    animation: fadeIn 0.45s ease-out both;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
