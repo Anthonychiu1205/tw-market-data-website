@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { ApiSidePanel } from "@/src/components/docs/api-side-panel";
+import { DocsLandingContent } from "@/src/components/docs/docs-landing-content";
 import { DocsPageShell } from "@/src/components/docs/docs-page-shell";
 import { QuickStartContent } from "@/src/components/docs/quick-start-content";
 import { SectionHeading } from "@/src/components/docs/section-heading";
@@ -343,6 +344,14 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
           <QuickStartContent />
           <TwseDailyPriceLiveDemo />
         </div>
+      </DocsPageShell>
+    );
+  }
+
+  if (page.slug.join("/") === "introduction") {
+    return (
+      <DocsPageShell page={page} pageLabel="文件總覽">
+        <DocsLandingContent />
       </DocsPageShell>
     );
   }

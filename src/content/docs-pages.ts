@@ -593,8 +593,8 @@ const baseDocsPages: DocsPageEntry[] = [
     navLabel: "介紹",
     category: "overview",
     icon: "book",
-    title: "台股資料 API 文件",
-    subtitle: "台股市場的資料基礎設施，面向程式化存取與自動化系統設計。",
+    title: "台股資料平台",
+    subtitle: "本平台提供已標準化、可驗證的台股資料，適合 AI agent、量化策略與研究使用。",
     tier: "complete",
     sections: [
       {
