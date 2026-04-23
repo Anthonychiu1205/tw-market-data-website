@@ -4,6 +4,7 @@ import type {
   AccountSummary,
   ApiKeysSummary,
   BillingSummary,
+  UsageRequestsSummary,
   UsageSummary,
 } from "@/src/lib/backend-adapter";
 import { DashboardSection } from "@/src/content/dashboard";
@@ -13,6 +14,10 @@ import { buttonClass } from "@/src/components/ui/button";
 import { Card } from "@/src/components/ui/card";
 import { ApiKeysManager } from "@/src/components/dashboard/api-keys-manager";
 import { DashboardSidebar } from "@/src/components/dashboard/dashboard-sidebar";
+import { BillingLandingPage } from "@/src/components/dashboard/billing-landing-page";
+import { BillingSubscriptionsPage } from "@/src/components/dashboard/billing-subscriptions-page";
+import { BillingCreditsPage } from "@/src/components/dashboard/billing-credits-page";
+import { UsagePageShell } from "@/src/components/dashboard/usage-page-shell";
 
 type DashboardConsoleProps = {
   email: string;
@@ -22,8 +27,11 @@ type DashboardConsoleProps = {
   account: AccountSummary;
   billing: BillingSummary;
   usage: UsageSummary;
+  usageRequests: UsageRequestsSummary;
   apiKeys: ApiKeysSummary;
 };
+
+type CreditState = "normal" | "low" | "exhausted";
 
 function modeLabel(mode: "live" | "fallback") {
   return mode === "live" ? "已連接" : "簡化模式";
@@ -124,13 +132,37 @@ function UsageActivityCard({ usage }: { usage: UsageSummary }) {
   );
 }
 
-function OverviewPanel({ account, usage, apiKeys }: { account: AccountSummary; usage: UsageSummary; apiKeys: ApiKeysSummary }) {
+function OverviewPanel({
+  account,
+  usage,
+  apiKeys,
+  creditState,
+}: {
+  account: AccountSummary;
+  usage: UsageSummary;
+  apiKeys: ApiKeysSummary;
+  creditState: CreditState;
+}) {
   return (
     <div className="space-y-4">
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
         <h1 className="text-2xl font-semibold tracking-tight text-slate-900">控制台</h1>
         <p className="mt-2 text-sm text-slate-600">查看 API 金鑰、使用量與帳號摘要</p>
       </section>
+
+      {creditState === "exhausted" ? (
+        <Card className="border-amber-200 bg-amber-50">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-amber-900">您的使用額度已用完</p>
+              <p className="mt-1 text-sm text-amber-800">請升級方案或購買 credits，恢復資料查詢。</p>
+            </div>
+            <Link href="/billing/subscriptions" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
+              升級方案
+            </Link>
+          </div>
+        </Card>
+      ) : null}
 
       <Card>
         <h2 className="text-base font-semibold text-slate-900">API keys</h2>
@@ -164,53 +196,6 @@ function OverviewPanel({ account, usage, apiKeys }: { account: AccountSummary; u
   );
 }
 
-function BillingPanel({ billing }: { billing: BillingSummary }) {
-  return (
-    <div className="space-y-4">
-      <PanelTitle title="訂閱與帳單" description="管理方案、帳單入口與用量計價。" mode={billing.integrationMode} />
-
-      <section className="grid gap-4 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
-          <h2 className="text-base font-semibold text-slate-900">訂閱</h2>
-          <p className="mt-2 text-sm text-slate-600">狀態：{billing.subscriptionStatus}</p>
-          <p className="mt-1 text-sm text-slate-600">續約日：{billing.renewalDate}</p>
-          <button
-            disabled={!billing.checkoutAvailable}
-            className={buttonClass("primary", "mt-4")}
-          >
-            變更方案
-          </button>
-        </Card>
-
-        <Card>
-          <h2 className="text-base font-semibold text-slate-900">帳戶餘額</h2>
-          <p className="mt-2 text-sm text-slate-600">{billing.currentBalance}</p>
-          <button
-            disabled={!billing.portalAvailable}
-            className={buttonClass("secondary", "mt-4")}
-          >
-            開啟帳單入口
-          </button>
-        </Card>
-      </section>
-
-      <Card>
-        <h2 className="text-base font-semibold text-slate-900">發票</h2>
-        <p className="mt-2 text-sm text-slate-600">目前無可顯示項目。</p>
-      </Card>
-    </div>
-  );
-}
-
-function UsagePanel({ usage }: { usage: UsageSummary }) {
-  return (
-    <div className="space-y-4">
-      <PanelTitle title="用量" description="查看本月配額、速率限制與主要端點使用。" mode={usage.integrationMode} />
-      <UsageActivityCard usage={usage} />
-    </div>
-  );
-}
-
 function KeysPanel({ apiKeys }: { apiKeys: ApiKeysSummary }) {
   return (
     <div className="space-y-4">
@@ -235,28 +220,61 @@ function KeysPanel({ apiKeys }: { apiKeys: ApiKeysSummary }) {
 function SettingsPanel({ email, account }: { email: string; account: AccountSummary }) {
   return (
     <div className="space-y-4">
-      <PanelTitle title="設定" description="帳號資訊與基本操作。" mode={account.integrationMode} />
+      <PanelTitle title="設定" description="帳號與方案設定。" mode={account.integrationMode} />
 
-      <Card>
-        <h2 className="text-base font-semibold text-slate-900">帳號</h2>
-        <p className="mt-2 text-sm text-slate-600">Email：{email}</p>
-        <p className="mt-1 text-sm text-slate-600">方案：{account.plan}</p>
-        <p className="mt-1 text-sm text-slate-600">狀態：{account.accessStatus}</p>
-        <p className="mt-1 text-sm text-slate-600">已啟用資料主題：{account.enabledDatasets}</p>
-      </Card>
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold tracking-wide text-slate-900">Plan</h2>
+        <Card className="p-0">
+          <div className="flex items-center justify-between gap-4 px-5 py-4">
+            <div>
+              <p className="text-sm font-medium text-slate-900">Current plan: {account.plan}</p>
+              <p className="mt-1 text-xs text-slate-500">可在此管理目前方案與升級設定。</p>
+            </div>
+            <Link href="/billing/subscriptions" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
+              Manage Plan
+            </Link>
+          </div>
+        </Card>
+      </section>
 
-      <Card>
-        <h2 className="text-base font-semibold text-slate-900">操作</h2>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Link href="/pricing" className={buttonClass("secondary")}>
-            管理方案
-          </Link>
-          <form action="/api/auth/logout" method="post">
-            <button className={buttonClass("secondary")}>登出</button>
-          </form>
-          <button className={buttonClass("danger-secondary")}>刪除帳號（人工審核）</button>
-        </div>
-      </Card>
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold tracking-wide text-slate-900">Profile</h2>
+        <p className="text-sm text-slate-600">你的帳號資料目前為示意版，可於後續接入真實帳號系統。</p>
+        <Card className="p-0">
+          <div className="divide-y divide-slate-200">
+            <div className="flex items-center justify-between gap-4 px-5 py-4">
+              <p className="text-sm font-medium text-slate-900">Email</p>
+              <p className="text-sm text-slate-600">{email}</p>
+            </div>
+            <div className="flex items-center justify-between gap-4 px-5 py-4">
+              <p className="text-sm font-medium text-slate-900">First Name</p>
+              <p className="text-sm text-slate-600">Ant</p>
+            </div>
+            <div className="flex items-center justify-between gap-4 px-5 py-4">
+              <p className="text-sm font-medium text-slate-900">Last Name</p>
+              <p className="text-sm text-slate-600">User</p>
+            </div>
+          </div>
+        </Card>
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold tracking-wide text-slate-900">More</h2>
+        <Card className="p-0">
+          <div className="divide-y divide-slate-200">
+            <div className="flex items-center justify-between gap-4 px-5 py-4">
+              <p className="text-sm font-medium text-slate-900">Log Out</p>
+              <form action="/api/auth/logout" method="post">
+                <button className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>Log Out</button>
+              </form>
+            </div>
+            <div className="flex items-center justify-between gap-4 px-5 py-4">
+              <p className="text-sm font-medium text-slate-900">Delete Account</p>
+              <button className={buttonClass("danger-secondary", "h-9 rounded-lg px-4 text-xs")}>Delete</button>
+            </div>
+          </div>
+        </Card>
+      </section>
     </div>
   );
 }
@@ -314,16 +332,27 @@ function SupportPanel() {
 }
 
 function renderSection(section: DashboardSection, props: DashboardConsoleProps) {
+  const quotaRatio = props.usage.monthlyQuota > 0 ? props.usage.monthlyUsed / props.usage.monthlyQuota : 0;
+  const creditState: CreditState = props.usageRequests.insufficientCredits
+    ? "exhausted"
+    : quotaRatio >= 0.85
+      ? "low"
+      : "normal";
+
   if (section === "overview") {
-    return <OverviewPanel account={props.account} usage={props.usage} apiKeys={props.apiKeys} />;
+    return <OverviewPanel account={props.account} usage={props.usage} apiKeys={props.apiKeys} creditState={creditState} />;
   }
-  if (section === "billing") return <BillingPanel billing={props.billing} />;
-  if (section === "usage") return <UsagePanel usage={props.usage} />;
+  if (section === "billing") {
+    if (props.currentPath === "/billing/subscriptions") return <BillingSubscriptionsPage />;
+    if (props.currentPath === "/billing/credits") return <BillingCreditsPage />;
+    return <BillingLandingPage />;
+  }
+  if (section === "usage") return <UsagePageShell usageRequests={props.usageRequests} creditState={creditState} />;
   if (section === "keys") return <KeysPanel apiKeys={props.apiKeys} />;
   if (section === "settings") return <SettingsPanel email={props.email} account={props.account} />;
   if (section === "docs") return <DocsPanel />;
   if (section === "support") return <SupportPanel />;
-  return <OverviewPanel account={props.account} usage={props.usage} apiKeys={props.apiKeys} />;
+  return <OverviewPanel account={props.account} usage={props.usage} apiKeys={props.apiKeys} creditState={creditState} />;
 }
 
 export function DashboardConsole(props: DashboardConsoleProps) {

@@ -39,6 +39,7 @@ export type UsageRequestRow = {
 export type UsageRequestsSummary = {
   rows: UsageRequestRow[];
   integrationMode: IntegrationMode;
+  insufficientCredits?: boolean;
 };
 
 export type ApiKeyItem = {
@@ -378,24 +379,54 @@ function normalizeUsageRequestRow(item: unknown): UsageRequestRow | null {
 }
 
 export async function getUsageRequestRows(email: string): Promise<UsageRequestsSummary> {
-  const direct = await fetchFromCandidates<Record<string, unknown> | Array<Record<string, unknown>>>(email, [
-    "/v2/self-serve/usage-events",
-  ]);
-
-  if (direct?.data) {
-    const rows = pickArray(direct.data)
-      .map(normalizeUsageRequestRow)
-      .filter((row): row is UsageRequestRow => Boolean(row));
+  const base = getBase();
+  if (!base) {
     return {
-      rows,
-      integrationMode: "live",
+      rows: [],
+      integrationMode: "fallback",
+      insufficientCredits: false,
     };
   }
 
-  return {
-    rows: [],
-    integrationMode: "fallback",
-  };
+  try {
+    const response = await fetch(`${base}/v2/self-serve/usage-events`, {
+      cache: "no-store",
+      headers: getHeaders(email),
+    });
+    const payload = (await parseJsonSafe<Record<string, unknown>>(response)) ?? {};
+
+    if (response.status === 402 && getString(payload.detail) === "insufficient_credits") {
+      return {
+        rows: [],
+        integrationMode: "live",
+        insufficientCredits: true,
+      };
+    }
+
+    if (!response.ok) {
+      return {
+        rows: [],
+        integrationMode: "fallback",
+        insufficientCredits: false,
+      };
+    }
+
+    const rows = pickArray(payload)
+      .map(normalizeUsageRequestRow)
+      .filter((row): row is UsageRequestRow => Boolean(row));
+    const exhaustedFromRows = rows.some((row) => row.statusCode === 402);
+    return {
+      rows,
+      integrationMode: "live",
+      insufficientCredits: exhaustedFromRows,
+    };
+  } catch {
+    return {
+      rows: [],
+      integrationMode: "fallback",
+      insufficientCredits: false,
+    };
+  }
 }
 
 export async function getApiKeysSummary(email: string): Promise<ApiKeysSummary> {
