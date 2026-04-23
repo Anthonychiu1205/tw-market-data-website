@@ -8,6 +8,7 @@ import {
   getAccountSummary,
   getApiKeysSummary,
   getBillingSummary,
+  getUsageRequestRows,
   getUsageSummary,
 } from "@/src/lib/backend-adapter";
 
@@ -23,10 +24,11 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
     redirect("/login");
   }
 
-  const [account, billing, usage, apiKeys] = await Promise.all([
+  const [account, billing, usage, usageRequests, apiKeys] = await Promise.all([
     getAccountSummary(session.email),
     getBillingSummary(session.email),
     getUsageSummary(session.email),
+    getUsageRequestRows(session.email),
     getApiKeysSummary(session.email),
   ]);
 
@@ -40,9 +42,9 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
         account={account}
         billing={billing}
         usage={usage}
+        usageRequests={usageRequests}
         apiKeys={apiKeys}
       />
     </Container>
   );
 }
-

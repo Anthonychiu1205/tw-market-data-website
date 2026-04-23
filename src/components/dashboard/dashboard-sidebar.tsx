@@ -20,6 +20,13 @@ type DashboardSidebarProps = {
   currentHref: string;
 };
 
+const SIDEBAR_NAV_GROUPS: string[][] = [
+  ["overview", "billing"],
+  ["usage", "settings"],
+  ["docs", "tools"],
+  ["support", "upgrade"],
+];
+
 function DashboardIconGlyph({ icon, className }: { icon: DashboardIcon; className?: string }) {
   const common = "h-4 w-4";
 
@@ -151,95 +158,119 @@ export function DashboardSidebar({ email, section, plan, currentPath, currentHre
     });
   }
 
+  const navNodeMap = useMemo(() => {
+    const map = new Map<string, (typeof dashboardNav)[number]>();
+    for (const node of dashboardNav) {
+      map.set(node.id, node);
+    }
+    return map;
+  }, []);
+
   return (
     <aside className="rounded-2xl border border-slate-200 bg-white p-4 lg:sticky lg:top-20 lg:h-[calc(100vh-6.5rem)] lg:overflow-auto">
       <p className="text-sm font-semibold text-slate-900">控制台</p>
       <p className="mt-1 text-xs text-slate-500">{plan} · {email}</p>
 
-      <nav className="mt-5 space-y-1">
-        {dashboardNav.map((node) => {
-          if (node.type === "group") {
-            const isOpen = resolvedExpandedGroups.has(node.id);
-            const hasActiveChild = node.children.some((child) => leafIsActive(child, section, currentPath, currentHref));
+      <nav className="mt-5 space-y-0">
+        {SIDEBAR_NAV_GROUPS.map((groupIds, groupIndex) => (
+          <div
+            key={`sidebar-group-${groupIndex}`}
+            className={cn(
+              "space-y-1",
+              groupIndex > 0 && "mt-3 border-t border-slate-200 pt-3",
+            )}
+          >
+            {groupIds.map((nodeId) => {
+              const node = navNodeMap.get(nodeId);
+              if (!node) return null;
 
-            return (
-              <div key={node.id} className="space-y-1">
-                <button
-                  type="button"
-                  onClick={() => toggleGroup(node)}
+              if (node.type === "group") {
+                const isOpen = resolvedExpandedGroups.has(node.id);
+                const hasActiveChild = node.children.some((child) => leafIsActive(child, section, currentPath, currentHref));
+
+                return (
+                  <div key={node.id} className="space-y-1">
+                    <button
+                      type="button"
+                      onClick={() => toggleGroup(node)}
+                      className={cn(
+                        "group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900",
+                        hasActiveChild && "bg-slate-100 text-slate-900",
+                      )}
+                    >
+                      <span className="flex items-center gap-2.5">
+                        <DashboardIconGlyph
+                          icon={node.icon}
+                          className={cn(
+                            "transition",
+                            hasActiveChild ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700",
+                          )}
+                        />
+                        <span className="font-medium text-slate-700">{node.label}</span>
+                      </span>
+                      <ChevronIcon open={isOpen} className="text-slate-500" />
+                    </button>
+
+                    {isOpen && (
+                      <div className="ml-3 space-y-1 border-l border-slate-200 pl-2">
+                        {node.children.map((child) => {
+                          const active = leafIsActive(child, section, currentPath, currentHref);
+                          return (
+                            <Link
+                              key={child.id}
+                              href={child.href}
+                              className={cn(
+                                "group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition",
+                                active
+                                  ? "bg-slate-200 font-medium text-slate-900"
+                                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+                              )}
+                            >
+                              <DashboardIconGlyph
+                                icon={child.icon}
+                                className={cn(
+                                  "transition",
+                                  active ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700",
+                                )}
+                              />
+                              <span>{child.label}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              const active = leafIsActive(node, section, currentPath, currentHref);
+              const openInNewTab = node.id === "docs" || node.id === "tools";
+              return (
+                <Link
+                  key={node.id}
+                  href={node.href}
+                  target={openInNewTab ? "_blank" : undefined}
+                  rel={openInNewTab ? "noreferrer" : undefined}
                   className={cn(
-                    "group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900",
-                    hasActiveChild && "bg-slate-100 text-slate-900",
+                    "group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition",
+                    active
+                      ? "bg-slate-200 font-medium text-slate-900"
+                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                   )}
                 >
-                  <span className="flex items-center gap-2.5">
-                    <DashboardIconGlyph
-                      icon={node.icon}
-                      className={cn(
-                        "transition",
-                        hasActiveChild ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700",
-                      )}
-                    />
-                    <span className="font-medium text-slate-700">{node.label}</span>
-                  </span>
-                  <ChevronIcon open={isOpen} className="text-slate-500" />
-                </button>
-
-                {isOpen && (
-                  <div className="ml-3 space-y-1 border-l border-slate-200 pl-2">
-                    {node.children.map((child) => {
-                      const active = leafIsActive(child, section, currentPath, currentHref);
-                      return (
-                        <Link
-                          key={child.id}
-                          href={child.href}
-                          className={cn(
-                            "group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition",
-                            active
-                              ? "bg-slate-200 font-medium text-slate-900"
-                              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
-                          )}
-                        >
-                          <DashboardIconGlyph
-                            icon={child.icon}
-                            className={cn(
-                              "transition",
-                              active ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700",
-                            )}
-                          />
-                          <span>{child.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          }
-
-          const active = leafIsActive(node, section, currentPath, currentHref);
-          return (
-            <Link
-              key={node.id}
-              href={node.href}
-              className={cn(
-                "group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition",
-                active
-                  ? "bg-slate-200 font-medium text-slate-900"
-                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
-              )}
-            >
-              <DashboardIconGlyph
-                icon={node.icon}
-                className={cn(
-                  "transition",
-                  active ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700",
-                )}
-              />
-              <span>{node.label}</span>
-            </Link>
-          );
-        })}
+                  <DashboardIconGlyph
+                    icon={node.icon}
+                    className={cn(
+                      "transition",
+                      active ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700",
+                    )}
+                  />
+                  <span>{node.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
     </aside>
   );

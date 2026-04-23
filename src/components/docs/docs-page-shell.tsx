@@ -70,6 +70,20 @@ function toggleGroupExpanded(expanded: string[], groupHref: string): string[] {
   return [...expanded, groupHref];
 }
 
+function readExpandedGroupsFromSession(): string[] {
+  if (typeof window === "undefined") return [];
+  const raw = window.sessionStorage.getItem(SIDEBAR_EXPANDED_GROUPS_KEY);
+  if (!raw) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((value): value is string => typeof value === "string" && value.length > 0);
+  } catch {
+    return [];
+  }
+}
+
 function readSidebarScrollTopFromSession(): number {
   if (typeof window === "undefined") return 0;
   const raw = window.sessionStorage.getItem(SIDEBAR_SCROLL_TOP_KEY);
@@ -274,7 +288,9 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
     );
   }
 
-  const [userExpandedGroups, setUserExpandedGroups] = useState<string[]>(() => [...activeAncestorGroups]);
+  const [userExpandedGroups, setUserExpandedGroups] = useState<string[]>(() =>
+    mergeExpandedGroupsWithActiveAncestors(readExpandedGroupsFromSession(), activeAncestorGroups),
+  );
 
   const expandedGroups = useMemo(
     () => mergeExpandedGroupsWithActiveAncestors(userExpandedGroups, activeAncestorGroups),
@@ -302,9 +318,9 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
   function renderSidebarItems(items: DocsSidebarNavItem[], depth = 0) {
     const isNested = depth > 0;
     return (
-      <ul className={cn("space-y-0.5", isNested ? "pl-4" : "")}>
+      <ul className={cn("list-none m-0 p-0 space-y-0.5", isNested ? "pl-14" : "")}>
         {items.map((item) => (
-          <li key={item.href}>
+          <li key={item.href} className="list-none">
             {item.children?.length ? (
               <div>
                 <div className="flex items-center gap-1">
@@ -312,14 +328,15 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
                     type="button"
                     aria-label={`${item.title}${expandedGroups.includes(item.href) ? "收合" : "展開"}`}
                     onClick={() => setUserExpandedGroups((previous) => toggleGroupExpanded(previous, item.href))}
-                    className={
+                    className={cn(
                       isItemActive(item)
-                        ? "flex min-w-0 flex-1 items-center gap-2.5 rounded-md bg-slate-100 px-2 py-1.5 text-sm font-medium text-slate-800"
-                        : "flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-                    }
+                        ? "flex min-w-0 flex-1 items-center gap-2.5 rounded-md bg-slate-100 py-1.5 text-sm font-medium text-slate-800"
+                        : "flex min-w-0 flex-1 items-center gap-2.5 rounded-md py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900",
+                      isNested ? "pl-10 pr-2" : "px-2",
+                    )}
                   >
-                    {isNested ? <span className="h-1.5 w-1.5 rounded-full bg-slate-400" aria-hidden="true" /> : <SidebarIcon icon={item.icon ?? "database"} />}
-                    <span className="min-w-0 flex-1 truncate text-left">{item.title}</span>
+                    {isNested ? null : <SidebarIcon icon={item.icon ?? "database"} />}
+                    <span className={cn("min-w-0 flex-1 truncate text-left", isNested ? "pl-2" : "")}>{item.title}</span>
                   </button>
                   <button
                     type="button"
@@ -341,19 +358,27 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
                     </svg>
                   </button>
                 </div>
-                {expandedGroups.includes(item.href) ? <div className="mt-1">{renderSidebarItems(item.children, depth + 1)}</div> : null}
+                {expandedGroups.includes(item.href) ? (
+                  <div className="relative mt-1">
+                    <span className="pointer-events-none absolute bottom-0 left-6 top-0 w-px bg-slate-200" aria-hidden="true" />
+                    {renderSidebarItems(item.children, depth + 1)}
+                  </div>
+                ) : null}
               </div>
             ) : (
               <Link
                 href={item.href}
                 className={
-                  pathname === item.href
-                    ? "flex items-center gap-2.5 rounded-md bg-slate-200 px-2 py-1.5 text-sm font-semibold text-slate-950"
-                    : "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                  cn(
+                    pathname === item.href
+                      ? "flex items-center gap-2.5 rounded-md bg-slate-200 py-1.5 text-sm font-semibold text-slate-950"
+                      : "flex items-center gap-2.5 rounded-md py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900",
+                    isNested ? "pl-10 pr-2" : "px-2",
+                  )
                 }
               >
-                {isNested ? <span className="h-1.5 w-1.5 rounded-full bg-slate-400" aria-hidden="true" /> : <SidebarIcon icon={item.icon ?? "database"} />}
-                <span>{item.title}</span>
+                {isNested ? null : <SidebarIcon icon={item.icon ?? "database"} />}
+                <span className={cn(isNested ? "pl-2" : "")}>{item.title}</span>
               </Link>
             )}
           </li>
@@ -371,7 +396,7 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
         <aside className="hidden lg:block">
           <div
             ref={sidebarScrollRef}
-            className="sticky overflow-y-auto overscroll-contain pr-1"
+            className="docs-sidebar sticky overflow-y-auto overscroll-contain pr-1"
             onScroll={(event) => {
               if (typeof window === "undefined") return;
               window.sessionStorage.setItem(SIDEBAR_SCROLL_TOP_KEY, String(event.currentTarget.scrollTop));

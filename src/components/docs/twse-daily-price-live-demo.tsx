@@ -120,7 +120,17 @@ export function TwseDailyPriceLiveDemo() {
           <p className="text-sm font-medium text-amber-900">
             目前方案僅顯示前 {planLimitedMeta.rowLimit ?? 50} 筆資料
           </p>
-          <p className="mt-1 text-sm text-amber-800">升級方案即可取得完整資料</p>
+          <p className="mt-1 text-sm text-amber-800">升級後可取得最多 5000 筆資料</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="rounded-md border border-amber-200 bg-white px-3 py-2">
+              <p className="text-xs font-medium text-slate-700">Free</p>
+              <p className="mt-1 text-sm text-slate-900">50 rows</p>
+            </div>
+            <div className="rounded-md border border-slate-300 bg-white px-3 py-2">
+              <p className="text-xs font-medium text-slate-700">Developer / Pro</p>
+              <p className="mt-1 text-sm text-slate-900">5000 rows</p>
+            </div>
+          </div>
           <Link
             href="/billing/subscriptions"
             className="mt-3 inline-flex items-center justify-center rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-xs font-medium text-white transition hover:bg-slate-800"
