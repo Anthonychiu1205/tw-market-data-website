@@ -31,7 +31,7 @@ export function MarketCoverageShowcase() {
               </h2>
               <p className="mt-5 max-w-lg text-base leading-7 text-slate-600">
                 涵蓋台股市場主要資料主題，包括股價、財報、營運指標與公司事件。支援跨股票、跨時間與多資料集查詢，讓
-                agent 可在單一資料層完成分析與篩選。
+                agent 可在單一資料層完成分析與篩選，並支援完整財報分析（損益表 + 現金流量表）。
               </p>
             </div>
           </div>

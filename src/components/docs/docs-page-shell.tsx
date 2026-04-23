@@ -70,19 +70,6 @@ function toggleGroupExpanded(expanded: string[], groupHref: string): string[] {
   return [...expanded, groupHref];
 }
 
-function readExpandedGroupsFromSession(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.sessionStorage.getItem(SIDEBAR_EXPANDED_GROUPS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((value): value is string => typeof value === "string");
-  } catch {
-    return [];
-  }
-}
-
 function readSidebarScrollTopFromSession(): number {
   if (typeof window === "undefined") return 0;
   const raw = window.sessionStorage.getItem(SIDEBAR_SCROLL_TOP_KEY);
@@ -287,9 +274,7 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
     );
   }
 
-  const [userExpandedGroups, setUserExpandedGroups] = useState<string[]>(() =>
-    mergeExpandedGroupsWithActiveAncestors(readExpandedGroupsFromSession(), activeAncestorGroups),
-  );
+  const [userExpandedGroups, setUserExpandedGroups] = useState<string[]>(() => [...activeAncestorGroups]);
 
   const expandedGroups = useMemo(
     () => mergeExpandedGroupsWithActiveAncestors(userExpandedGroups, activeAncestorGroups),
@@ -312,6 +297,69 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
       return hasActiveDescendant(item);
     }
     return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  }
+
+  function renderSidebarItems(items: DocsSidebarNavItem[], depth = 0) {
+    const isNested = depth > 0;
+    return (
+      <ul className={cn("space-y-0.5", isNested ? "pl-4" : "")}>
+        {items.map((item) => (
+          <li key={item.href}>
+            {item.children?.length ? (
+              <div>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    aria-label={`${item.title}${expandedGroups.includes(item.href) ? "收合" : "展開"}`}
+                    onClick={() => setUserExpandedGroups((previous) => toggleGroupExpanded(previous, item.href))}
+                    className={
+                      isItemActive(item)
+                        ? "flex min-w-0 flex-1 items-center gap-2.5 rounded-md bg-slate-100 px-2 py-1.5 text-sm font-medium text-slate-800"
+                        : "flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                    }
+                  >
+                    {isNested ? <span className="h-1.5 w-1.5 rounded-full bg-slate-400" aria-hidden="true" /> : <SidebarIcon icon={item.icon ?? "database"} />}
+                    <span className="min-w-0 flex-1 truncate text-left">{item.title}</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`${item.title}${expandedGroups.includes(item.href) ? "收合" : "展開"}`}
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
+                    onClick={() => setUserExpandedGroups((previous) => toggleGroupExpanded(previous, item.href))}
+                  >
+                    <svg
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className={cn("h-3.5 w-3.5 transition-transform", expandedGroups.includes(item.href) ? "rotate-90" : "")}
+                      aria-hidden="true"
+                    >
+                      <path d="m7 5 6 5-6 5" />
+                    </svg>
+                  </button>
+                </div>
+                {expandedGroups.includes(item.href) ? <div className="mt-1">{renderSidebarItems(item.children, depth + 1)}</div> : null}
+              </div>
+            ) : (
+              <Link
+                href={item.href}
+                className={
+                  pathname === item.href
+                    ? "flex items-center gap-2.5 rounded-md bg-slate-200 px-2 py-1.5 text-sm font-semibold text-slate-950"
+                    : "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                }
+              >
+                {isNested ? <span className="h-1.5 w-1.5 rounded-full bg-slate-400" aria-hidden="true" /> : <SidebarIcon icon={item.icon ?? "database"} />}
+                <span>{item.title}</span>
+              </Link>
+            )}
+          </li>
+        ))}
+      </ul>
+    );
   }
 
   const sidebarTopOffset = SITE_HEADER_HEIGHT_PX + DESKTOP_SIDEBAR_TOP_GAP_PX;
@@ -338,80 +386,7 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
               {docsSidebarNav.map((group) => (
                 <div key={group.id}>
                   <p className="px-2 pb-1 text-[11px] font-semibold tracking-wide text-slate-500">{group.label}</p>
-                  <ul className="space-y-0.5">
-                    {group.items.map((item) => (
-                      <li key={item.href}>
-                        {item.children?.length ? (
-                          <div>
-                            <div className="flex items-center gap-1">
-                              <button
-                                type="button"
-                                aria-label={`${item.title}${expandedGroups.includes(item.href) ? "收合" : "展開"}`}
-                                onClick={() => setUserExpandedGroups((previous) => toggleGroupExpanded(previous, item.href))}
-                                className={
-                                  isItemActive(item)
-                                    ? "flex min-w-0 flex-1 items-center gap-2.5 rounded-md bg-slate-100 px-2 py-1.5 text-sm font-medium text-slate-800"
-                                    : "flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-                                }
-                              >
-                                <SidebarIcon icon={item.icon ?? "database"} />
-                                <span className="min-w-0 flex-1 truncate text-left">{item.title}</span>
-                              </button>
-                              <button
-                                type="button"
-                                aria-label={`${item.title}${expandedGroups.includes(item.href) ? "收合" : "展開"}`}
-                                className="inline-flex h-7 w-7 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
-                                onClick={() => setUserExpandedGroups((previous) => toggleGroupExpanded(previous, item.href))}
-                              >
-                                <svg
-                                  viewBox="0 0 20 20"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth="1.8"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className={cn("h-3.5 w-3.5 transition-transform", expandedGroups.includes(item.href) ? "rotate-90" : "")}
-                                  aria-hidden="true"
-                                >
-                                  <path d="m7 5 6 5-6 5" />
-                                </svg>
-                              </button>
-                            </div>
-                            {expandedGroups.includes(item.href) ? (
-                              <ul className="mt-1 space-y-0.5 pl-6">
-                                {item.children.map((child) => (
-                                  <li key={child.href}>
-                                    <Link
-                                      href={child.href}
-                                      className={
-                                        pathname === child.href
-                                          ? "block rounded-md bg-slate-200 px-2 py-1.5 text-sm font-semibold text-slate-950"
-                                          : "block rounded-md px-2 py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-                                      }
-                                    >
-                                      {child.title}
-                                    </Link>
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : null}
-                          </div>
-                        ) : (
-                          <Link
-                            href={item.href}
-                            className={
-                              pathname === item.href
-                                ? "flex items-center gap-2.5 rounded-md bg-slate-200 px-2 py-1.5 text-sm font-semibold text-slate-950"
-                                : "flex items-center gap-2.5 rounded-md px-2 py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
-                            }
-                          >
-                            <SidebarIcon icon={item.icon ?? "database"} />
-                            <span>{item.title}</span>
-                          </Link>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+                  {renderSidebarItems(group.items)}
                 </div>
               ))}
             </nav>

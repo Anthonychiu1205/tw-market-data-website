@@ -180,7 +180,7 @@ const apiPlaceholderCatalog: Array<{
   { sectionId: "filings", slug: "company-announcements", navLabel: "公司公告", title: "公司公告", subtitle: "提供公司公告索引與欄位，支援公告查詢與追蹤。", usage: "公告監控、事件索引建立與法說追蹤" },
   { sectionId: "filings", slug: "financial-filings", navLabel: "財報文件", title: "財報文件", subtitle: "提供財報類文件索引與 metadata，便於文件檢索。", usage: "文件下載流程、財報對照與審核留存" },
   { sectionId: "filings", slug: "material-information", navLabel: "重大訊息", title: "重大訊息", subtitle: "提供重大訊息資料，支援事件偵測與風險告警。", usage: "重大事件追蹤、公告分類與異常監控" },
-  { sectionId: "company-master", slug: "company-profile", navLabel: "公司基本資料", title: "公司基本資料", subtitle: "提供公司主檔欄位，包含識別、產業與市場分類。", usage: "主檔建立、ticker 對照與資料整合前置" },
+  { sectionId: "company-master", slug: "issuer-profile", navLabel: "公司基本資料", title: "公司基本資料", subtitle: "提供公司主檔欄位，包含識別、產業與市場分類。", usage: "主檔建立、ticker 對照與資料整合前置" },
   { sectionId: "company-master", slug: "company-classification", navLabel: "公司分類", title: "公司分類", subtitle: "提供公司分類資料，支援產業與主題分群。", usage: "分群建模、投資池管理與篩選條件設定" },
   { sectionId: "analyst-estimates", slug: "estimates", navLabel: "預估數據", title: "預估數據", subtitle: "提供市場預估欄位，支援預期與實際落差分析。", usage: "共識追蹤、預估偏差分析與事件研究" },
   { sectionId: "analyst-estimates", slug: "revision-history", navLabel: "修正歷史", title: "修正歷史", subtitle: "提供預估修正歷史，觀察市場預期變化路徑。", usage: "修正趨勢分析、風險提前偵測與策略觸發" },
@@ -218,10 +218,10 @@ const apiEndpointPathMap: Record<string, string> = {
   "operating-indicators/metrics": "/v1/operating-indicators/metrics",
   "operating-indicators/guidance": "/v1/operating-indicators/guidance",
   "operating-indicators/non-gaap-metrics": "/v1/operating-indicators/non-gaap-metrics",
-  "market-prices/historical-prices": "/v1/prices/historical",
-  "market-prices/realtime-prices": "/v1/prices/realtime",
-  "market-prices/company-overview": "/v1/prices/company-overview",
-  "market-prices/market-overview": "/v1/prices/market-overview",
+  "market-prices/historical-prices": "/v2/datasets/price-enhanced/historical",
+  "market-prices/realtime-prices": "/v2/datasets/price-enhanced/realtime",
+  "market-prices/company-overview": "/v2/datasets/price-enhanced/company-overview",
+  "market-prices/market-overview": "/v2/datasets/price-enhanced/market-overview",
   "segment-financials/segment-income-statement": "/v1/segments/income-statement",
   "segment-financials/segment-balance-sheet": "/v1/segments/balance-sheet",
   "segment-financials/segment-cash-flow": "/v1/segments/cash-flow",
@@ -231,7 +231,7 @@ const apiEndpointPathMap: Record<string, string> = {
   "filings/company-announcements": "/v1/filings/company-announcements",
   "filings/financial-filings": "/v1/filings/financial-filings",
   "filings/material-information": "/v1/filings/material-information",
-  "company-master/company-profile": "/v1/company/profile",
+  "company-master/issuer-profile": "/v2/datasets/issuer-profile",
   "company-master/company-classification": "/v1/company/classification",
   "analyst-estimates/estimates": "/v1/analyst-estimates/estimates",
   "analyst-estimates/revision-history": "/v1/analyst-estimates/revision-history",
@@ -292,7 +292,7 @@ function getApiSampleData(item: ApiPlaceholderItem) {
       return [{ ticker: "2330", filing_date: "2026-04-15", report_type: "Q1 財報", doc_id: "mops_2330_2026Q1", source_url: "https://mops.twse.com.tw" }];
     case "filings/material-information":
       return [{ ticker: "2330", event_time: "2026-04-21T08:30:00+08:00", category: "重大訊息", summary: "設備擴產進度更新" }];
-    case "company-master/company-profile":
+    case "company-master/issuer-profile":
       return { ticker: "2330", name: "台積電", short_name: "TSMC", exchange: "TWSE", listed_market: "上市" };
     case "company-master/company-classification":
       return { ticker: "2330", industry: "半導體", sector: "電子工業", sub_sector: "晶圓代工" };
@@ -1101,8 +1101,8 @@ const baseDocsPages: DocsPageEntry[] = [
     },
   },
   {
-    slug: ["api", "company-profile"],
-    href: "/docs/api/company-profile",
+    slug: ["api", "company", "issuer-profile"],
+    href: "/docs/api/company/issuer-profile",
     navLabel: "公司基本資料",
     category: "api",
     icon: "building",
@@ -1121,7 +1121,7 @@ const baseDocsPages: DocsPageEntry[] = [
     apiReference: {
       categoryLabel: "公司主檔",
       method: "GET",
-      endpoint: "/v2/datasets/company-profile",
+      endpoint: "/v2/datasets/issuer-profile",
       overview: [
         "此 endpoint 提供公司識別主檔，包含 ticker、公司名稱、上市櫃別、交易所與產業分類。",
         "資料適合作為所有查詢流程的基礎維度，先建立主檔可降低後續 join 錯誤。",
@@ -1135,7 +1135,7 @@ const baseDocsPages: DocsPageEntry[] = [
         "帶入 API key 與 ticker 後即可查詢單一公司主檔。",
         "若需要搜尋用途，可在 query 帶入公司名關鍵字。",
       ],
-      exampleRequestCurl: `curl -G "https://api.twmd.example/v2/datasets/company-profile" \\
+      exampleRequestCurl: `curl -G "https://api.twmd.example/v2/datasets/issuer-profile" \\
   -H "X-API-Key: your_api_key_here" \\
   --data-urlencode "ticker=2330"`,
       queryParameters: [
@@ -1144,24 +1144,25 @@ const baseDocsPages: DocsPageEntry[] = [
         { name: "market", type: "string", required: false, description: "市場別篩選，例如 TWSE、TPEx。" },
       ],
       responseSummary: [
-        "回應 data 可為單一物件或清單，取決於查詢條件是否為精確 ticker。",
-        "來源資訊會保留於 lineage，以供主檔同步與審計流程使用。",
+        "回應結構固定為 dataset、rows、count。",
+        "rows 依查詢條件回傳單筆或多筆公司主檔資料。",
       ],
       responseFields: [
-        { path: "dataset", type: "string", description: "固定為 company_profile。" },
-        { path: "data[].ticker", type: "string", description: "公司代號。" },
-        { path: "data[].company_name", type: "string", description: "公司名稱。" },
-        { path: "data[].exchange", type: "string", description: "交易所識別。" },
-        { path: "data[].market_type", type: "string", description: "上市櫃別或市場板塊。" },
-        { path: "data[].industry", type: "string", description: "產業分類。" },
-        { path: "data[].status", type: "string", description: "公司狀態（正常、停牌、下市等）。" },
+        { path: "dataset", type: "string", description: "固定為 issuer_profile。" },
+        { path: "rows[].symbol", type: "string", description: "公司代號（內部對應 ticker）。" },
+        { path: "rows[].company_name", type: "string", description: "公司名稱。" },
+        { path: "rows[].exchange", type: "string", description: "交易所識別。" },
+        { path: "rows[].market_type", type: "string", description: "上市櫃別或市場板塊。" },
+        { path: "rows[].industry", type: "string", description: "產業分類。" },
+        { path: "rows[].status", type: "string", description: "公司狀態（正常、停牌、下市等）。" },
+        { path: "count", type: "integer", description: "回傳資料筆數。" },
       ],
       notes: [
         "公司狀態與分類可能異動，建議定期同步主檔而非僅在初始化時查詢一次。",
         "跨來源合併時請固定使用同一識別鍵與生效日期規則。",
       ],
       sidePanel: {
-        requestExample: `curl -G "https://api.twmd.example/v2/datasets/company-profile" \\
+        requestExample: `curl -G "https://api.twmd.example/v2/datasets/issuer-profile" \\
   -H "X-API-Key: your_api_key_here" \\
   --data-urlencode "query=台積電"`,
         statusExamples: [
@@ -1169,18 +1170,18 @@ const baseDocsPages: DocsPageEntry[] = [
             status: "200",
             description: "成功回傳公司主檔",
             body: `{
-  "dataset": "company_profile",
-  "source_role": "canonical",
-  "data": [
+  "dataset": "issuer_profile",
+  "rows": [
     {
-      "ticker": "2330",
+      "symbol": "2330",
       "company_name": "台灣積體電路製造股份有限公司",
       "exchange": "TWSE",
       "market_type": "上市",
       "industry": "半導體",
       "status": "active"
     }
-  ]
+  ],
+  "count": 1
 }`,
           },
           { status: "400", description: "ticker 與 query 皆未提供", body: `{"error":{"code":"invalid_request","message":"ticker or query is required"}}` },
@@ -1255,7 +1256,7 @@ const baseDocsPages: DocsPageEntry[] = [
       notes: [
         "初步公告通常先揭露主欄位，完整欄位會在後續正式揭露補齊。",
         "若用於回測，請固定查詢時間點並保存當時回應，避免回看偏差。",
-        "建議搭配 /v1/financial-statements 與 /v1/prices 建立完整事件分析流程。",
+        "建議搭配 /v2/datasets/income-statement 與 /v2/datasets/price-enhanced 建立完整事件分析流程。",
       ],
       sidePanel: {
         requestExample: `curl -G "https://api.twmd.example/v1/earnings" \\
@@ -1640,7 +1641,7 @@ const baseDocsPages: DocsPageEntry[] = [
         "常作為前端 autocomplete 與批次查詢前的標的校正入口。",
       ],
       useCases: ["使用者輸入校正。", "建立標的清單。", "依市場別過濾查詢結果。"],
-      gettingStarted: ["帶入 API key 與 query。", "視需求加 market 與 limit。", "結果可再搭配 /v2/datasets/company-profile 做二次驗證。"],
+      gettingStarted: ["帶入 API key 與 query。", "視需求加 market 與 limit。", "結果可再搭配 /v2/datasets/issuer-profile 做二次驗證。"],
       exampleRequestCurl: `curl -G "https://api.twmd.example/v2/search" \\
   -H "X-API-Key: your_api_key_here" \\
   --data-urlencode "query=台積電"`,
@@ -1848,7 +1849,7 @@ const baseDocsPages: DocsPageEntry[] = [
     apiReference: {
       categoryLabel: "股價資料",
       method: "GET",
-      endpoint: "/v1/prices",
+      endpoint: "/v2/datasets/price-enhanced",
       overview: [
         "此 endpoint 提供日線層級的 OHLCV 與成交金額欄位，支援還原價查詢。",
         "資料適合做技術指標、報酬序列、事件窗口分析與回測前處理。",
@@ -1859,7 +1860,7 @@ const baseDocsPages: DocsPageEntry[] = [
         "用 start_date 與 end_date 控制查詢期間。",
         "根據策略口徑決定是否使用 adjusted=true。",
       ],
-      exampleRequestCurl: `curl -G "https://api.twmd.example/v1/prices" \\
+      exampleRequestCurl: `curl -G "https://api.twmd.example/v2/datasets/price-enhanced" \\
   -H "X-API-Key: your_api_key_here" \\
   --data-urlencode "ticker=2330" \\
   --data-urlencode "start_date=2026-01-01" \\
@@ -1893,7 +1894,7 @@ const baseDocsPages: DocsPageEntry[] = [
         "建議搭配 /v1/corporate-actions 一起檢查事件調整。",
       ],
       sidePanel: {
-        requestExample: `curl -G "https://api.twmd.example/v1/prices" \\
+        requestExample: `curl -G "https://api.twmd.example/v2/datasets/price-enhanced" \\
   -H "X-API-Key: your_api_key_here" \\
   --data-urlencode "ticker=2330" \\
   --data-urlencode "adjusted=true"`,
@@ -1953,8 +1954,8 @@ const baseDocsPages: DocsPageEntry[] = [
           "每次查詢都保留 dataset、source_role、lineage，便於後續比對來源。",
         ],
         bullets: [
-          "步驟 1：查 company-profile 建立主檔",
-          "步驟 2：查 revenue 與 financial-statements",
+          "步驟 1：查 issuer-profile 建立主檔",
+          "步驟 2：查 revenue 與 income-statement",
           "步驟 3：查 financial-metrics 補足估值欄位",
           "步驟 4：落地並做欄位一致性檢查",
         ],
@@ -1979,7 +1980,7 @@ const baseDocsPages: DocsPageEntry[] = [
         id: "applicable-endpoints",
         label: "適用 endpoint",
         paragraphs: [
-          "/docs/api/company-profile、/docs/api/financial-statements、/docs/api/financial-metrics、/docs/data-access。",
+          "/docs/api/company/issuer-profile、/docs/api/financial-growth/income-statement、/docs/api/financial-growth/financial-metrics、/docs/data-access。",
         ],
       },
     ],
@@ -2071,7 +2072,7 @@ const baseDocsPages: DocsPageEntry[] = [
       {
         id: "applicable-endpoints",
         label: "適用 endpoint",
-        paragraphs: ["/docs/api/prices、/docs/api/segments、/docs/source-policy。"],
+        paragraphs: ["/docs/api/market-prices/price-data、/docs/api/market-prices/twse-daily-price、/docs/source-policy。"],
       },
     ],
   },
@@ -2473,7 +2474,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     href: "/docs/api/company",
     icon: "building",
     topics: [
-      { title: "公司基本資料", href: "/docs/api/company/company-profile", topicId: "issuer_profile", tableName: "issuer_profile", endpoint: "/v2/datasets/company-profile", source: "TWSE / TPEx" },
+      { title: "公司基本資料", href: "/docs/api/company/issuer-profile", topicId: "issuer_profile", tableName: "issuer_profile", endpoint: "/v2/datasets/issuer-profile", source: "TWSE / TPEx" },
     ],
   },
   {
@@ -2498,7 +2499,11 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
       { title: "財報指標", href: "/docs/api/financial-growth/financial-metrics", topicId: "financial_metrics", tableName: "financial_metrics", endpoint: "/v2/datasets/financial-metrics", source: "MOPS / TWSE / TPEx" },
       { title: "月營收", href: "/docs/api/financial-growth/monthly-revenue", topicId: "monthly_revenue_enhanced", tableName: "monthly_revenue_enhanced", endpoint: "/v2/datasets/monthly-revenue-enhanced", source: "MOPS" },
       { title: "估值資料", href: "/docs/api/financial-growth/valuation-data", topicId: "valuation_data", tableName: "valuation_data", endpoint: "/v2/datasets/valuation-data", source: "TWSE / TPEx" },
-      { title: "財報（損益表）", href: "/docs/api/financial-growth/income-statement", topicId: "income_statement", tableName: "fundamental_income_statements", endpoint: "/v2/datasets/income-statement", source: "MOPS" },
+      { title: "財報資料", href: "/docs/api/financial-growth/financial-statements", topicId: "financial_statements_product", tableName: "fundamental_income_statements + fundamental_cash_flows", endpoint: "/v2/datasets/income-statement + /v2/datasets/cash-flow-statement", source: "MOPS" },
+      { title: "損益表", href: "/docs/api/financial-growth/income-statement", topicId: "income_statement", tableName: "fundamental_income_statements", endpoint: "/v2/datasets/income-statement", source: "MOPS" },
+      { title: "現金流量表", href: "/docs/api/financial-growth/cash-flow-statement", topicId: "cash_flow_statement", tableName: "fundamental_cash_flows", endpoint: "/v2/datasets/cash-flow-statement", source: "MOPS" },
+      { title: "財報資料（Canonical）", href: "/docs/api/financial-growth/financials-canonical", topicId: "financials_canonical", tableName: "fundamental_*", endpoint: "/v2/datasets/financials", source: "MOPS / Canonical Layer" },
+      { title: "估值資料（Canonical）", href: "/docs/api/financial-growth/valuations-canonical", topicId: "valuations_canonical", tableName: "valuation_core_daily", endpoint: "/v2/datasets/valuations", source: "MOPS / Canonical Layer" },
     ],
   },
   {
@@ -2507,11 +2512,15 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     href: "/docs/api/market-prices",
     icon: "prices",
     topics: [
+      { title: "TWSE 日線價格", href: "/docs/api/market-prices/twse-daily-price", topicId: "twse_daily_price", tableName: "normalized_twse_daily_prices", endpoint: "/v2/datasets/twse-daily-price", source: "TWSE" },
+      { title: "TPEx 日線價格", href: "/docs/api/market-prices/tpex-daily-price", topicId: "tpex_daily_price", tableName: "normalized_tpex_daily_prices", endpoint: "/v2/datasets/tpex-daily-price", source: "TPEx" },
       { title: "股價資料", href: "/docs/api/market-prices/price-data", topicId: "price_enhanced", tableName: "price_enhanced", endpoint: "/v2/datasets/price-enhanced", source: "TWSE / TPEx" },
       { title: "技術指標", href: "/docs/api/market-prices/technical-indicators", topicId: "technical_indicators", tableName: "technical_indicators", endpoint: "/v2/datasets/technical-indicators", source: "TWSE / TPEx" },
       { title: "指數資料", href: "/docs/api/market-prices/index-data", topicId: "index_data", tableName: "index_data", endpoint: "/v2/datasets/index-data", source: "TWSE / TPEx" },
       { title: "市場廣度", href: "/docs/api/market-prices/market-breadth", topicId: "market_breadth", tableName: "market_breadth", endpoint: "/v2/datasets/market-breadth", source: "TWSE / TPEx" },
       { title: "利率", href: "/docs/api/market-prices/interest-rate", topicId: "interest_rate_snapshot", tableName: "interest_rate_snapshot", endpoint: "/v2/datasets/interest-rate-snapshot", source: "中央銀行 / 公開資料平台" },
+      { title: "市場價格（Canonical）", href: "/docs/api/market-prices/market-prices-canonical", topicId: "market_prices_canonical", tableName: "normalized_twse_daily_prices + normalized_tpex_daily_prices", endpoint: "/v2/datasets/market-prices", source: "TWSE / TPEx / Canonical Layer" },
+      { title: "調整價格（Canonical）", href: "/docs/api/market-prices/adjusted-prices-canonical", topicId: "adjusted_prices_canonical", tableName: "market_prices + corporate_actions overlay", endpoint: "/v2/datasets/adjusted-prices", source: "Canonical Adjustment Layer" },
     ],
   },
   {
@@ -2520,8 +2529,9 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     href: "/docs/api/capital-flow",
     icon: "holdings",
     topics: [
+      { title: "籌碼流向", href: "/docs/api/capital-flow/chip-flows", topicId: "chip_flows", tableName: "chip_flows", endpoint: "/v2/datasets/chip-flows", source: "TWSE / TPEx" },
       { title: "法人買賣", href: "/docs/api/capital-flow/institutional-flow", topicId: "institutional_flow", tableName: "institutional_flow", endpoint: "/v2/datasets/institutional-flow", source: "TWSE / TPEx" },
-      { title: "融資融券", href: "/docs/api/capital-flow/margin-short", topicId: "margin_short", tableName: "margin_short", endpoint: "/v2/datasets/margin-short", source: "TWSE / TPEx" },
+      { title: "融資融券（Enhanced）", href: "/docs/api/capital-flow/margin-short-enhanced", topicId: "margin_short_enhanced", tableName: "margin_short", endpoint: "/v2/datasets/margin-short-enhanced", source: "TWSE / TPEx" },
     ],
   },
   {
@@ -2723,20 +2733,20 @@ function buildSchemaReadyTopicSections(topic: SchemaReadyTopic): DocsContentSect
 }
 
 function buildCompanyProfileApiReference(): ApiReferenceContent {
-  const endpoint = "/v2/datasets/company-profile";
+  const endpoint = "/v2/datasets/issuer-profile";
 
   const codeExamples: ApiCodeExamples = {
     python: `import requests
 
 headers = {"X-API-Key": "your_api_key_here"}
 response = requests.get(
-    "https://api.twmarketdata.com/v2/datasets/company-profile",
+    "https://api.twmarketdata.com/v2/datasets/issuer-profile",
     headers=headers,
     params={"ticker": "2330"},
 )
 print(response.json())`,
     javascript: `const response = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/company-profile?ticker=2330",
+  "https://api.twmarketdata.com/v2/datasets/issuer-profile?ticker=2330",
   {
     headers: {
       "X-API-Key": "your_api_key_here"
@@ -2746,24 +2756,17 @@ print(response.json())`,
 
 const data = await response.json();
 console.log(data);`,
-    curl: `curl -G "https://api.twmarketdata.com/v2/datasets/company-profile" \\
+    curl: `curl -G "https://api.twmarketdata.com/v2/datasets/issuer-profile" \\
   -H "X-API-Key: your_api_key_here" \\
   --data-urlencode "ticker=2330"`,
   };
 
   const successBody = JSON.stringify(
     {
-      dataset: "company_profile",
-      source_role: "canonical",
-      freshness: "2026-04-22T09:30:00+08:00",
-      lineage: {
-        source: "TWSE",
-        ingested_at: "2026-04-22T09:30:02+08:00",
-        trace_id: "company_profile_2330_20260422",
-      },
-      data: [
+      dataset: "issuer_profile",
+      rows: [
         {
-          ticker: "2330",
+          symbol: "2330",
           company_name: "台灣積體電路製造股份有限公司",
           short_name: "台積電",
           market: "TWSE",
@@ -2772,6 +2775,7 @@ console.log(data);`,
           listing_status: "active",
         },
       ],
+      count: 1,
     },
     null,
     2,
@@ -2798,7 +2802,7 @@ console.log(data);`,
     gettingStarted: [
       "在 header 放入 X-API-Key。",
       "先以 ticker=2330 驗證回應結構。",
-      "再依需求加入 market、limit、offset。",
+      "再依需求加入 market、limit。",
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
@@ -2807,20 +2811,16 @@ console.log(data);`,
       { name: "limit", type: "integer", required: false, description: "回傳筆數限制（若後端支持）。" },
       { name: "offset", type: "integer", required: false, description: "分頁偏移（若後端支持）。" },
     ],
-    responseSummary: [
-      "所有回應維持一致結構，包含 dataset、source_role、freshness、lineage、data。",
-    ],
+    responseSummary: ["回應結構固定為 dataset、rows、count。"],
     responseFields: [
-      { path: "data[].ticker", type: "string", description: "股票代碼。" },
-      { path: "data[].company_name", type: "string", description: "公司全名。" },
-      { path: "data[].short_name", type: "string", description: "公司簡稱。" },
-      { path: "data[].market", type: "string", description: "市場識別（例如 TWSE、TPEx）。" },
-      { path: "data[].exchange", type: "string", description: "上市櫃別。" },
-      { path: "data[].industry", type: "string", description: "主要產業分類。" },
-      { path: "data[].listing_status", type: "string", description: "掛牌狀態（例如 active）。" },
-      { path: "source_role", type: "string", description: "資料來源角色（canonical / fallback / helper）。" },
-      { path: "freshness", type: "string", description: "資料更新時間或有效時間。" },
-      { path: "lineage.trace_id", type: "string", description: "資料追蹤識別碼。" },
+      { path: "rows[].symbol", type: "string", description: "股票代碼（內部對應 ticker）。" },
+      { path: "rows[].company_name", type: "string", description: "公司全名。" },
+      { path: "rows[].short_name", type: "string", description: "公司簡稱。" },
+      { path: "rows[].market", type: "string", description: "市場識別（例如 TWSE、TPEx）。" },
+      { path: "rows[].exchange", type: "string", description: "上市櫃別。" },
+      { path: "rows[].industry", type: "string", description: "主要產業分類。" },
+      { path: "rows[].listing_status", type: "string", description: "掛牌狀態（例如 active）。" },
+      { path: "count", type: "integer", description: "回傳資料筆數。" },
     ],
     notes: [
       "建議使用 ticker 作為 join key。",
@@ -2883,7 +2883,7 @@ console.log(data);`,
             {
               error: {
                 code: "FORBIDDEN",
-                message: "目前方案未開放 company_profile，請升級方案後重試。",
+                message: "目前方案未開放 issuer-profile，請升級方案後重試。",
               },
             },
             null,
@@ -2895,9 +2895,9 @@ console.log(data);`,
           description: "查無符合條件的公司資料。",
           body: JSON.stringify(
             {
-              dataset: "company_profile",
-              source_role: "canonical",
-              data: [],
+              dataset: "issuer_profile",
+              rows: [],
+              count: 0,
               message: "查無符合條件的公司資料。",
             },
             null,
@@ -3136,12 +3136,12 @@ headers = {"X-API-Key": "your_api_key_here"}
 response = requests.get(
     "https://api.twmarketdata.com/v2/datasets/monthly-revenue",
     headers=headers,
-    params={"ticker": "2330", "limit": 24}
+    params={"symbol": "2330", "limit": 24}
 )
 
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/monthly-revenue?ticker=2330&limit=24",
+  "https://api.twmarketdata.com/v2/datasets/monthly-revenue?symbol=2330&limit=24",
   {
     headers: {
       "X-API-Key": "your_api_key_here"
@@ -3152,29 +3152,23 @@ print(response.json())`,
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/monthly-revenue?ticker=2330&limit=24" \\
+  --url "https://api.twmarketdata.com/v2/datasets/monthly-revenue?symbol=2330&limit=24" \\
   --header "X-API-Key: your_api_key_here"`,
   };
 
   const successBody = JSON.stringify(
     {
       dataset: "monthly_revenue",
-      source_role: "canonical",
-      freshness: "2026-04-22T11:45:00+08:00",
-      lineage: {
-        source: "MOPS",
-        ingested_at: "2026-04-22T11:45:05+08:00",
-        trace_id: "monthly_revenue_2330_20260422",
-      },
-      data: [
+      rows: [
         {
-          ticker: "2330",
+          symbol: "2330",
           revenue_month: "2026-03",
           revenue: 210000000000,
           revenue_yoy: 0.18,
           revenue_mom: 0.05,
         },
       ],
+      count: 1,
     },
     null,
     2,
@@ -3205,32 +3199,29 @@ console.log(data)`,
       "作為量化模型中的輸入特徵",
     ],
     gettingStarted: [
-      "優先使用 ticker 查詢單一公司。",
+      "優先使用 symbol 查詢單一公司。",
       "若需要趨勢分析，建議拉取至少 12～24 個月資料。",
       "若做回測或策略，建議資料落地後再使用。",
       "若與財報整合，應保留月份與期間欄位。",
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: true, description: "股票代碼。" },
+      { name: "symbol", type: "string", required: true, description: "股票代碼（內部對應 ticker）。" },
+      { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
       { name: "limit", type: "integer", required: false, description: "回傳筆數（建議用於控制月份數）。" },
-      { name: "offset", type: "integer", required: false, description: "分頁。" },
     ],
-    responseSummary: [
-      "所有回應遵循一致結構，包含 dataset、source_role、freshness、lineage、data。",
-    ],
+    responseSummary: ["回應結構固定為 dataset、rows、count。"],
     responseFields: [
-      { path: "data[].ticker", type: "string", description: "股票代碼。" },
-      { path: "data[].revenue_month", type: "string", description: "營收月份（例如 2026-03）。" },
-      { path: "data[].revenue", type: "number", description: "當月營收。" },
-      { path: "data[].revenue_yoy", type: "number|null", description: "年增率（若目前 schema 有）。" },
-      { path: "data[].revenue_mom", type: "number|null", description: "月增率（若目前 schema 有）。" },
-      { path: "source_role", type: "string", description: "資料來源角色。" },
-      { path: "freshness", type: "string", description: "資料更新時間。" },
-      { path: "lineage.trace_id", type: "string", description: "可追蹤資料處理鏈路。" },
+      { path: "rows[].symbol", type: "string", description: "股票代碼。" },
+      { path: "rows[].revenue_month", type: "string", description: "營收月份（例如 2026-03）。" },
+      { path: "rows[].revenue", type: "number", description: "當月營收。" },
+      { path: "rows[].revenue_yoy", type: "number|null", description: "年增率（若目前 schema 有）。" },
+      { path: "rows[].revenue_mom", type: "number|null", description: "月增率（若目前 schema 有）。" },
+      { path: "count", type: "integer", description: "回傳資料筆數。" },
     ],
     notes: [
-      "使用 ticker + revenue_month 作為識別。",
+      "使用 symbol + revenue_month 作為識別。",
       "若要分析成長，應搭配 yoy / mom。",
       "若要做策略，建議與價格資料整合。",
       "若需要完整財務結構，應搭配財報資料。",
@@ -3298,8 +3289,8 @@ console.log(data)`,
           body: JSON.stringify(
             {
               dataset: "monthly_revenue",
-              source_role: "canonical",
-              data: [],
+              rows: [],
+              count: 0,
               message: "查無符合條件的月營收資料。",
             },
             null,
@@ -3362,16 +3353,9 @@ console.log(data)`,
   const successBody = JSON.stringify(
     {
       dataset: "valuation_data",
-      source_role: "canonical",
-      freshness: "2026-04-22T12:20:00+08:00",
-      lineage: {
-        source: "TWSE/TPEx",
-        ingested_at: "2026-04-22T12:20:08+08:00",
-        trace_id: "valuation_data_2330_20260422",
-      },
-      data: [
+      rows: [
         {
-          ticker: "2330",
+          symbol: "2330",
           date: "2026-04-22",
           market_cap: 21050000000000,
           pe_ratio: 25.3,
@@ -3382,6 +3366,7 @@ console.log(data)`,
           price_to_sales: 9.4,
         },
       ],
+      count: 1,
     },
     null,
     2,
@@ -3406,7 +3391,7 @@ console.log(data)`,
     gettingStarted: [
       "優先使用 symbol 查詢單一公司。",
       "若做趨勢觀察，建議搭配 start_date / end_date。",
-      "若要控制資料量，可搭配 limit 與 offset。",
+      "若要控制資料量，可搭配 limit。",
       "若與其他資料整合，請保留 date 與 lineage 欄位。",
     ],
     exampleRequestCurl: codeExamples.curl,
@@ -3415,28 +3400,27 @@ console.log(data)`,
       { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
       { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
       { name: "limit", type: "integer", required: false, description: "回傳筆數限制。" },
-      { name: "offset", type: "integer", required: false, description: "分頁偏移。" },
     ],
-    responseSummary: ["所有回應遵循一致結構，包含 dataset、source_role、freshness、lineage、data。"],
+    responseSummary: ["回應結構固定為 dataset、rows、count。"],
     responseFields: [
-      { path: "data[].ticker", type: "string", description: "股票代碼。" },
-      { path: "data[].date", type: "string", description: "資料日期（交易日語意）。" },
-      { path: "data[].market_cap", type: "number|null", description: "市值。" },
-      { path: "data[].pe_ratio", type: "number|null", description: "本益比（PE）。" },
-      { path: "data[].pb_ratio", type: "number|null", description: "股價淨值比（PB）。" },
-      { path: "data[].dividend_yield", type: "number|null", description: "殖利率。" },
-      { path: "data[].enterprise_value", type: "number|null", description: "企業價值（EV）。" },
-      { path: "data[].ev_to_ebitda", type: "number|null", description: "EV / EBITDA。" },
-      { path: "data[].price_to_sales", type: "number|null", description: "市銷率（P/S）。" },
-      { path: "source_role", type: "string", description: "資料來源角色。" },
-      { path: "freshness", type: "string", description: "資料更新時間。" },
-      { path: "lineage.trace_id", type: "string", description: "可追蹤資料處理鏈路。" },
+      { path: "rows[].symbol", type: "string", description: "股票代碼。" },
+      { path: "rows[].date", type: "string", description: "資料日期（交易日語意）。" },
+      { path: "rows[].market_cap", type: "number|null", description: "市值。" },
+      { path: "rows[].pe_ratio", type: "number|null", description: "本益比（PE）。" },
+      { path: "rows[].pb_ratio", type: "number|null", description: "股價淨值比（PB）。" },
+      { path: "rows[].dividend_yield", type: "number|null", description: "殖利率。" },
+      { path: "rows[].enterprise_value", type: "number|null", description: "企業價值（EV）。" },
+      { path: "rows[].ev_to_ebitda", type: "number|null", description: "EV / EBITDA。" },
+      { path: "rows[].price_to_sales", type: "number|null", description: "市銷率（P/S）。" },
+      { path: "count", type: "integer", description: "回傳資料筆數。" },
     ],
     notes: [
       "估值欄位可能受價格波動與財報更新時點影響。",
       "跨標的比較前，建議固定同一日期區間。",
       "若欄位為 null，通常代表當期無法穩定計算，不建議直接補零。",
       "日期以 Asia/Taipei 交易日語意（YYYY-MM-DD）為準。",
+      "Canonical 補充：`/v2/datasets/valuations` 為較低層查詢面（ticker/date_from/date_to）。",
+      "一般產品整合建議優先使用本頁主公開 endpoint `/v2/datasets/valuation-data`。",
     ],
     planRequirement: {
       title: "Plan Requirement",
@@ -3500,8 +3484,8 @@ console.log(data)`,
           body: JSON.stringify(
             {
               dataset: "valuation_data",
-              source_role: "canonical",
-              data: [],
+              rows: [],
+              count: 0,
               message: "查無符合條件的估值資料。",
             },
             null,
@@ -3593,6 +3577,7 @@ console.log(data)`,
     endpoint,
     method: "GET",
     overview: [
+      "此資料集為「財報資料」的一部分，建議搭配現金流量表一起使用（`/docs/api/financial-growth/cash-flow-statement`）。",
       "損益表 API 提供公司期間性的營收與獲利欄位，適合用於基本面分析與研究流程。",
       "資料來自公開揭露來源，並以結構化欄位回傳。",
     ],
@@ -3633,9 +3618,12 @@ console.log(data)`,
       { path: "count", type: "integer", description: "回傳資料筆數。" },
     ],
     notes: [
+      "財報資料互補：建議搭配現金流量表 `/v2/datasets/cash-flow-statement` 一起分析公司獲利與現金品質。",
       "欄位完整度會因公司與期間不同而有差異，缺值應以 null 處理。",
       "日期欄位以 Asia/Taipei 財報語意（YYYY-MM-DD）為準。",
       "若需三大表完整欄位，請搭配財報三表相關資料主題。",
+      "Canonical 補充：`/v2/datasets/financials` 為較低層查詢面，支援 statement_type/period_type。",
+      "一般產品整合建議優先使用本頁主公開 endpoint `/v2/datasets/income-statement`。",
     ],
     planRequirement: {
       title: "Plan Requirement",
@@ -3713,6 +3701,930 @@ console.log(data)`,
 }
 
 function buildIncomeStatementApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildCashFlowStatementApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/cash-flow-statement";
+
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/cash-flow-statement",
+    headers=headers,
+    params={
+        "symbol": "2330",
+        "start_date": "2025-01-01",
+        "end_date": "2026-12-31",
+        "limit": 12
+    },
+)
+
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/cash-flow-statement?symbol=2330&start_date=2025-01-01&end_date=2026-12-31&limit=12",
+  {
+    headers: {
+      "X-API-Key": "your_api_key_here"
+    }
+  }
+)
+
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/cash-flow-statement?symbol=2330&start_date=2025-01-01&end_date=2026-12-31&limit=12" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+
+  const successBody = JSON.stringify(
+    {
+      dataset: "cash_flow_statement",
+      rows: [
+        {
+          symbol: "2330",
+          fiscal_year: 2025,
+          fiscal_quarter: 4,
+          period_type: "quarterly",
+          period_end_date: "2025-12-31",
+          report_date: "2026-03-08",
+          source: "mops_official",
+          operating_cash_flow: 1320000000000,
+          investing_cash_flow: -742000000000,
+          financing_cash_flow: -221000000000,
+          free_cash_flow: 578000000000,
+        },
+      ],
+      count: 1,
+    },
+    null,
+    2,
+  );
+
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "財務與分析",
+    endpoint,
+    method: "GET",
+    overview: [
+      "此資料集為「財報資料」的一部分，建議搭配損益表一起使用（`/docs/api/financial-growth/income-statement`）。",
+      "現金流量表 API 提供公司期間性的現金流欄位，適合用於現金品質分析與基本面研究。",
+      "資料來自公開揭露來源，並以結構化欄位回傳。",
+    ],
+    requestDescription: ["使用此 endpoint 時，建議："],
+    useCases: [
+      "檢查營運現金流與自由現金流的變化趨勢。",
+      "搭配損益表交叉驗證獲利品質與現金轉換能力。",
+      "做財務健康度與風險指標研究。",
+      "與估值資料整合做資本效率分析。",
+    ],
+    gettingStarted: [
+      "使用 symbol 指定公司代碼。",
+      "可透過 start_date / end_date 控制財報期間範圍。",
+      "若只需近期資料，可降低 limit 以縮小回應。",
+      "建議保留 period_type 與 fiscal_year 以利後續分組分析。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "symbol", type: "string", required: true, description: "股票代碼（內部對應 ticker）。" },
+      { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數限制。" },
+    ],
+    responseSummary: ["回應結構固定為 dataset、rows、count。"],
+    responseFields: [
+      { path: "rows[].symbol", type: "string", description: "股票代碼。" },
+      { path: "rows[].fiscal_year", type: "integer", description: "財政年度。" },
+      { path: "rows[].fiscal_quarter", type: "integer|null", description: "財政季度。" },
+      { path: "rows[].period_type", type: "string", description: "期間類型（quarterly/annual/ttm）。" },
+      { path: "rows[].period_end_date", type: "string", description: "財報期間結束日期。" },
+      { path: "rows[].report_date", type: "string|null", description: "公告或報告日期。" },
+      { path: "rows[].operating_cash_flow", type: "number|null", description: "營運活動現金流。" },
+      { path: "rows[].investing_cash_flow", type: "number|null", description: "投資活動現金流。" },
+      { path: "rows[].financing_cash_flow", type: "number|null", description: "籌資活動現金流。" },
+      { path: "rows[].free_cash_flow", type: "number|null", description: "自由現金流。" },
+      { path: "count", type: "integer", description: "回傳資料筆數。" },
+    ],
+    notes: [
+      "財報資料互補：建議搭配損益表 `/v2/datasets/income-statement` 一起分析獲利與現金品質。",
+      "欄位完整度會因公司與期間不同而有差異，缺值應以 null 處理。",
+      "日期欄位以 Asia/Taipei 財報語意（YYYY-MM-DD）為準。",
+      "若需三大表完整欄位，請搭配財報三表相關資料主題。",
+      "Canonical 補充：`/v2/datasets/financials` 為較低層查詢面，支援 statement_type/period_type。",
+      "一般產品整合建議優先使用本頁主公開 endpoint `/v2/datasets/cash-flow-statement`。",
+    ],
+    planRequirement: {
+      title: "Plan Requirement",
+      bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"],
+    },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        {
+          status: "200",
+          description: "成功回傳現金流量表資料",
+          body: successBody,
+        },
+        {
+          status: "400",
+          description: "查詢參數錯誤",
+          body: JSON.stringify(
+            {
+              error: {
+                code: "BAD_REQUEST",
+                message: "查詢參數錯誤。",
+              },
+            },
+            null,
+            2,
+          ),
+        },
+        {
+          status: "401",
+          description: "缺少或無效 API key",
+          body: JSON.stringify(
+            {
+              error: {
+                code: "UNAUTHORIZED",
+                message: "缺少或無效 API key。",
+              },
+            },
+            null,
+            2,
+          ),
+        },
+        {
+          status: "403",
+          description: "目前方案無法存取此資料",
+          body: JSON.stringify(
+            {
+              error: {
+                code: "FORBIDDEN",
+                message: "目前方案無法存取 cash-flow-statement。",
+              },
+            },
+            null,
+            2,
+          ),
+        },
+        {
+          status: "404",
+          description: "查無符合條件的現金流量表資料",
+          body: JSON.stringify(
+            {
+              dataset: "cash_flow_statement",
+              rows: [],
+              count: 0,
+              message: "查無符合條件的現金流量表資料。",
+            },
+            null,
+            2,
+          ),
+        },
+      ],
+    },
+  };
+}
+
+function buildCashFlowStatementApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildFinancialsCanonicalApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/financials";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/financials",
+    headers=headers,
+    params={
+        "ticker": "2330",
+        "statement_type": "income_statement",
+        "period_type": "quarterly",
+        "date_from": "2025-01-01",
+        "date_to": "2026-12-31",
+        "limit": 5
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/financials?ticker=2330&statement_type=income_statement&period_type=quarterly&date_from=2025-01-01&date_to=2026-12-31&limit=5",
+  {
+    headers: { "X-API-Key": "your_api_key_here" }
+  }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/financials?ticker=2330&statement_type=income_statement&period_type=quarterly&date_from=2025-01-01&date_to=2026-12-31&limit=5" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/datasets/financials",
+      request_id: "req_abc123def456",
+      plan_id: "free",
+      dataset: "financials",
+      query: {
+        ticker: "2330",
+        statement_type: "income_statement",
+        period_type: "quarterly",
+        date_from: "2025-01-01",
+        date_to: "2026-12-31",
+        limit: 5,
+      },
+      meta: {
+        rows_returned: 1,
+        mandatory_contract_fields_present: [
+          "api_version",
+          "dataset",
+          "dataset_version",
+          "release_date",
+          "release_version",
+          "request_context",
+          "data",
+          "quality",
+          "lineage",
+          "error",
+        ],
+      },
+      envelope: {
+        api_version: "v2",
+        dataset: "financials",
+        dataset_version: "v2.0.0-preview",
+        release_version: "v2.2026-04-23.preview",
+        release_date: "2026-04-23",
+        request_context: {
+          ticker: "2330",
+          as_of_date: "2026-12-31",
+          family: "fundamentals",
+          field_group_type: "fundamental_statement",
+          dataset_view: "fundamental_statements_v1",
+        },
+        data: [
+          {
+            ticker: "2330",
+            statement_type: "income_statement",
+            period_type: "quarterly",
+            fiscal_period_end: "2025-12-31",
+            report_date: "2026-03-08",
+            fiscal_year: 2025,
+            fiscal_quarter: 4,
+            currency: "TWD",
+            source_id: "mops_official",
+            fields: {
+              revenue: 625000000000,
+              gross_profit: 320000000000,
+              operating_income: 250000000000,
+              pretax_income: 246000000000,
+              net_income: 210000000000,
+              eps: 8.1,
+            },
+            quality_flag: "ok",
+          },
+        ],
+        quality: {
+          freshness_state: "fresh",
+          freshness_as_of: "2026-12-31",
+          completeness_ratio: 1,
+          quality_status: "ready",
+        },
+        lineage: {
+          source_role: "canonical",
+          selected_source: "mops_official",
+          fallback_chain: ["data_gov_mirror", "finmind_legacy"],
+          policy_notes: ["official/public-first canonical"],
+        },
+        error: {
+          error_code: null,
+          error_message: null,
+          dataset: "financials",
+          request_id: "read-api-abc123def456",
+          blocking_gate: null,
+        },
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "財務與成長（Canonical）",
+    endpoint,
+    method: "GET",
+    overview: [
+      "financials 是 canonical/supplemental surface，提供較低階、可組合的財報結構資料。",
+      "此 route 不是主公開產品頁；若要穩定對外整合，優先使用 `/v2/datasets/income-statement`。",
+    ],
+    requestDescription: ["使用此 endpoint 時，請注意它與 productized endpoint 契約不同。"],
+    useCases: [
+      "需要 statement_type（income/balance/cash flow）共用查詢入口時。",
+      "內部或進階流程需直接讀 canonical envelope 時。",
+      "做欄位映射或 schema 對照測試時。",
+    ],
+    gettingStarted: [
+      "先用 ticker + statement_type + period_type 收斂資料範圍。",
+      "再透過 date_from/date_to 控制期間。",
+      "若是對外產品整合，建議改用 income-statement 主公開 endpoint。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "ticker", type: "string", required: false, description: "股票代碼（canonical route 使用 ticker）。" },
+      { name: "statement_type", type: "string", required: false, description: "income_statement / balance_sheet / cash_flow。" },
+      { name: "period_type", type: "string", required: false, description: "quarterly / annual / ttm。" },
+      { name: "date_from", type: "string", required: false, description: "期間起始（YYYY-MM-DD）。" },
+      { name: "date_to", type: "string", required: false, description: "期間結束（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數（預設 100，最大 5000）。" },
+    ],
+    responseSummary: [
+      "回應為 canonical envelope payload，頂層包含 api_version/endpoint/request_id/plan_id/dataset/query/meta/envelope。",
+      "實際資料列位於 `envelope.data[]`，非 productized endpoint 的 `rows`。",
+    ],
+    responseFields: [
+      { path: "dataset", type: "string", description: "固定為 financials。" },
+      { path: "query.ticker", type: "string|null", description: "查詢 ticker。" },
+      { path: "query.statement_type", type: "string|null", description: "查詢財報類型。" },
+      { path: "meta.rows_returned", type: "integer", description: "回傳資料列數。" },
+      { path: "envelope.data[].ticker", type: "string", description: "股票代碼。" },
+      { path: "envelope.data[].statement_type", type: "string", description: "財報類型。" },
+      { path: "envelope.data[].period_type", type: "string", description: "期間類型。" },
+      { path: "envelope.data[].fields", type: "object", description: "對應 statement 的欄位集合。" },
+      { path: "envelope.quality.quality_status", type: "string", description: "資料品質狀態。" },
+      { path: "envelope.lineage.source_role", type: "string", description: "來源角色（canonical/fallback/helper/legacy）。" },
+    ],
+    notes: [
+      "此頁為 canonical/supplemental surface，非主產品 endpoint。",
+      "主公開對外建議：`/v2/datasets/income-statement`（symbol + dataset/rows/count）。",
+      "canonical endpoint 使用 `ticker` 參數，請勿視為主 endpoint 的替代叫法。",
+    ],
+    planRequirement: {
+      title: "Plan Requirement",
+      bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"],
+    },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳 canonical financials payload", body: successBody },
+        { status: "400", description: "statement_type 或 period_type 不支援", body: `{"detail":"unsupported_statement_type"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+        { status: "404", description: "查無符合條件資料", body: `{"api_version":"v2","dataset":"financials","meta":{"rows_returned":0},"envelope":{"data":[]}}` },
+      ],
+    },
+  };
+}
+
+function buildFinancialsCanonicalApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildValuationsCanonicalApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/valuations";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/valuations",
+    headers=headers,
+    params={
+        "ticker": "2330",
+        "date_from": "2026-01-01",
+        "date_to": "2026-04-30",
+        "limit": 10
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/valuations?ticker=2330&date_from=2026-01-01&date_to=2026-04-30&limit=10",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/valuations?ticker=2330&date_from=2026-01-01&date_to=2026-04-30&limit=10" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/datasets/valuations",
+      request_id: "req_def456ghi789",
+      plan_id: "free",
+      dataset: "valuations",
+      query: {
+        ticker: "2330",
+        date_from: "2026-01-01",
+        date_to: "2026-04-30",
+        limit: 10,
+      },
+      meta: { rows_returned: 1 },
+      envelope: {
+        api_version: "v2",
+        dataset: "valuations",
+        data: [
+          {
+            ticker: "2330",
+            valuation_date: "2026-04-22",
+            pe_ratio: 25.3,
+            pb_ratio: 6.7,
+            dividend_yield: 0.018,
+            market_cap: 21050000000000,
+            eps: null,
+            currency: "TWD",
+            source_id: "mops_official",
+            quality_flag: "ok",
+          },
+        ],
+        quality: {
+          freshness_state: "fresh",
+          freshness_as_of: "2026-04-30",
+          completeness_ratio: 1,
+          quality_status: "ready",
+        },
+        lineage: {
+          source_role: "canonical",
+          selected_source: "mops_official",
+          fallback_chain: ["data_gov_mirror", "finmind_legacy"],
+          policy_notes: ["official/public-first canonical"],
+        },
+        error: {
+          error_code: null,
+          error_message: null,
+          dataset: "valuations",
+          request_id: "read-api-def456ghi789",
+          blocking_gate: null,
+        },
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "財務與成長（Canonical）",
+    endpoint,
+    method: "GET",
+    overview: [
+      "valuations 是 canonical/supplemental surface，提供估值核心欄位的低階 envelope。",
+      "此 route 不是主公開產品頁；對外整合優先使用 `/v2/datasets/valuation-data`。",
+    ],
+    requestDescription: ["本 route 採 canonical 契約，參數與回應格式與主公開 endpoint 不同。"],
+    useCases: [
+      "內部資料對齊與估值核心欄位驗證。",
+      "需要直接讀取 canonical envelope 與 lineage 時。",
+      "補充 productized endpoint 之外的低階資料查詢。",
+    ],
+    gettingStarted: [
+      "使用 ticker 與日期區間控制查詢。",
+      "limit 可限制回傳筆數。",
+      "若是對外產品用途，建議改用 valuation-data 主公開 endpoint。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "ticker", type: "string", required: false, description: "股票代碼（canonical route 使用 ticker）。" },
+      { name: "date_from", type: "string", required: false, description: "起始日期（YYYY-MM-DD）。" },
+      { name: "date_to", type: "string", required: false, description: "結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數（預設 100，最大 5000）。" },
+    ],
+    responseSummary: [
+      "回應為 canonical envelope payload（api_version/endpoint/request_id/.../envelope）。",
+      "估值資料列位於 `envelope.data[]`，非 productized endpoint 的 `rows`。",
+    ],
+    responseFields: [
+      { path: "dataset", type: "string", description: "固定為 valuations。" },
+      { path: "query.ticker", type: "string|null", description: "查詢 ticker。" },
+      { path: "envelope.data[].valuation_date", type: "string", description: "估值資料日期。" },
+      { path: "envelope.data[].pe_ratio", type: "number|null", description: "本益比。" },
+      { path: "envelope.data[].pb_ratio", type: "number|null", description: "股價淨值比。" },
+      { path: "envelope.data[].dividend_yield", type: "number|null", description: "殖利率。" },
+      { path: "envelope.data[].market_cap", type: "number|null", description: "市值。" },
+      { path: "envelope.quality.quality_status", type: "string", description: "資料品質狀態。" },
+      { path: "envelope.lineage.selected_source", type: "string", description: "選用來源。" },
+    ],
+    notes: [
+      "此頁為 canonical/supplemental surface，非主產品 endpoint。",
+      "主公開對外建議：`/v2/datasets/valuation-data`（symbol + dataset/rows/count）。",
+      "canonical endpoint 使用 `ticker` 參數，請勿視為主 endpoint 的替代叫法。",
+    ],
+    planRequirement: {
+      title: "Plan Requirement",
+      bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"],
+    },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳 canonical valuations payload", body: successBody },
+        { status: "400", description: "查詢參數錯誤", body: `{"detail":"bad_request"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+        { status: "404", description: "查無符合條件資料", body: `{"api_version":"v2","dataset":"valuations","meta":{"rows_returned":0},"envelope":{"data":[]}}` },
+      ],
+    },
+  };
+}
+
+function buildValuationsCanonicalApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildMarketPricesCanonicalApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/market-prices";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/market-prices",
+    headers=headers,
+    params={
+        "ticker": "2330",
+        "market": "TWSE",
+        "date_from": "2026-01-01",
+        "date_to": "2026-04-30",
+        "limit": 10
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/market-prices?ticker=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&limit=10",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/market-prices?ticker=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&limit=10" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/datasets/market-prices",
+      request_id: "req_xyz987uvw654",
+      plan_id: "developer",
+      dataset: "market_prices",
+      query: {
+        ticker: "2330",
+        market: "TWSE",
+        date_from: "2026-01-01",
+        date_to: "2026-04-30",
+        limit: 10,
+      },
+      meta: { rows_returned: 1 },
+      envelope: {
+        api_version: "v2",
+        dataset: "market_prices",
+        request_context: {
+          ticker: "2330",
+          as_of_date: "2026-04-30",
+          family: "market_technical",
+          field_group_type: "price_series",
+        },
+        data: [
+          {
+            ticker: "2330",
+            market: "TWSE",
+            trade_date: "2026-04-22",
+            open: 812,
+            high: 818,
+            low: 808,
+            close: 815,
+            volume_shares: 18234000,
+            turnover_value: 14856300000,
+            trade_count: 37842,
+            price_change: 6,
+            price_change_sign: "+",
+            source_canonical: "twse_official",
+            source_name: "TWSE",
+          },
+        ],
+        quality: {
+          freshness_state: "fresh",
+          freshness_as_of: "2026-04-30",
+          completeness_ratio: 1,
+          quality_status: "ready",
+        },
+        lineage: {
+          source_role: "canonical",
+          selected_source: "twse_official",
+          fallback_chain: ["tpex_official", "data_gov_mirror", "yahoo_helper"],
+          policy_notes: ["official/public-first canonical"],
+        },
+        error: {
+          error_code: null,
+          error_message: null,
+          dataset: "market_prices",
+          request_id: "read-api-xyz987uvw654",
+          blocking_gate: null,
+        },
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "市場與價格（Canonical）",
+    endpoint,
+    method: "GET",
+    overview: [
+      "market-prices 是 canonical/supplemental surface，提供跨市場（TWSE/TPEx）的低階價格資料查詢。",
+      "此 route 不是主公開產品頁；對外整合優先使用 `/v2/datasets/twse-daily-price` 或 `/v2/datasets/tpex-daily-price`。",
+    ],
+    requestDescription: ["本 route 為 canonical payload，回應與主公開 endpoint 不同。"],
+    useCases: [
+      "跨市場統一查詢（market + ticker + 日期範圍）。",
+      "直接取得 canonical envelope 與來源鏈路。",
+      "進階資料映射與內部工具整合。",
+    ],
+    gettingStarted: [
+      "使用 ticker 與 market 控制查詢範圍。",
+      "可搭配 date_from/date_to 與 limit。",
+      "若是對外產品串接，優先使用 twse/tpex 日線主公開 endpoint。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "ticker", type: "string", required: false, description: "股票代碼（canonical route 使用 ticker）。" },
+      { name: "market", type: "string", required: false, description: "TWSE 或 TPEx。" },
+      { name: "date_from", type: "string", required: false, description: "起始日期（YYYY-MM-DD）。" },
+      { name: "date_to", type: "string", required: false, description: "結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數（預設 100，最大 5000）。" },
+    ],
+    responseSummary: [
+      "回應為 canonical envelope payload（api_version/endpoint/request_id/.../envelope）。",
+      "價格資料列位於 `envelope.data[]`，非 productized endpoint 的 `rows`。",
+    ],
+    responseFields: [
+      { path: "dataset", type: "string", description: "固定為 market_prices。" },
+      { path: "query.market", type: "string|null", description: "查詢市場別。" },
+      { path: "envelope.data[].ticker", type: "string", description: "股票代碼。" },
+      { path: "envelope.data[].market", type: "string", description: "市場別。" },
+      { path: "envelope.data[].trade_date", type: "string", description: "交易日期。" },
+      { path: "envelope.data[].open/high/low/close", type: "number", description: "OHLC 欄位。" },
+      { path: "envelope.data[].volume_shares", type: "number", description: "成交股數。" },
+      { path: "envelope.quality.quality_status", type: "string", description: "資料品質狀態。" },
+    ],
+    notes: [
+      "此頁為 canonical/supplemental surface，非主產品 endpoint。",
+      "主公開對外建議：`/v2/datasets/twse-daily-price`、`/v2/datasets/tpex-daily-price`（symbol + dataset/rows/count）。",
+      "canonical endpoint 使用 `ticker` 參數，與主公開 endpoint `symbol` 契約不同。",
+    ],
+    planRequirement: {
+      title: "Plan Requirement",
+      bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"],
+    },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳 canonical market-prices payload", body: successBody },
+        { status: "400", description: "查詢參數錯誤", body: `{"detail":"bad_request"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+        { status: "404", description: "查無符合條件資料", body: `{"api_version":"v2","dataset":"market_prices","meta":{"rows_returned":0},"envelope":{"data":[]}}` },
+      ],
+    },
+  };
+}
+
+function buildMarketPricesCanonicalApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildAdjustedPricesCanonicalApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/adjusted-prices";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/adjusted-prices",
+    headers=headers,
+    params={
+        "ticker": "2330",
+        "market": "TWSE",
+        "date_from": "2026-01-01",
+        "date_to": "2026-04-30",
+        "adjustment_basis": "price_only",
+        "limit": 10
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/adjusted-prices?ticker=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&adjustment_basis=price_only&limit=10",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/adjusted-prices?ticker=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&adjustment_basis=price_only&limit=10" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/datasets/adjusted-prices",
+      request_id: "req_hij321klm654",
+      plan_id: "pro",
+      dataset: "adjusted_prices",
+      query: {
+        ticker: "2330",
+        market: "TWSE",
+        date_from: "2026-01-01",
+        date_to: "2026-04-30",
+        adjustment_basis: "price_only",
+        limit: 10,
+      },
+      meta: { rows_returned: 1 },
+      envelope: {
+        api_version: "v2",
+        dataset: "adjusted_prices",
+        request_context: {
+          ticker: "2330",
+          as_of_date: "2026-04-30",
+          family: "market_technical",
+          field_group_type: "adjusted_price_series",
+          dataset_view: "adjusted_prices_v3",
+          adjustment_basis: "price_only",
+        },
+        data: [
+          {
+            ticker: "2330",
+            trade_date: "2026-04-22",
+            market: "TWSE",
+            close: 815,
+            adjusted_close: 790.5,
+            adjustment_factor: 0.97,
+            adjusted_close_total_return: null,
+            adjustment_factor_total_return: null,
+            adjustment_factor_actions_v3: 0.97,
+            dividend_component: null,
+            actions_applied: ["split"],
+            actions_excluded: [],
+            adjustment_basis: "price_only",
+            open: 812,
+            high: 818,
+            low: 808,
+            adjusted_open: 787.64,
+            adjusted_high: 793.46,
+            adjusted_low: 783.76,
+            volume_shares: 18234000,
+            adjusted_volume: 18800000,
+            source_id: "twse_official",
+            quality_flag: "ok",
+          },
+        ],
+        quality: {
+          freshness_state: "fresh",
+          freshness_as_of: "2026-04-30",
+          completeness_ratio: 1,
+          quality_status: "ready",
+        },
+        lineage: {
+          source_role: "canonical",
+          selected_source: "market_prices_plus_corporate_actions",
+          fallback_chain: ["twse_official", "tpex_official", "data_gov_mirror"],
+          policy_notes: ["official/public-first canonical"],
+        },
+        error: {
+          error_code: null,
+          error_message: null,
+          dataset: "adjusted_prices",
+          request_id: "read-api-hij321klm654",
+          blocking_gate: null,
+        },
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "市場與價格（Canonical）",
+    endpoint,
+    method: "GET",
+    overview: [
+      "adjusted-prices 是 canonical/supplemental surface，以 market-prices + corporate-actions 做 read-time 調整。",
+      "此 route 不是主公開產品頁，適合進階資料整合與調整規則驗證。",
+    ],
+    requestDescription: ["本 route 為 canonical payload，且支援 adjustment_basis。"],
+    useCases: [
+      "比較未調整價格與調整後價格。",
+      "驗證 split/dividend 等事件對價格序列影響。",
+      "在內部流程中直接消費 adjusted canonical envelope。",
+    ],
+    gettingStarted: [
+      "使用 ticker + market + 日期區間查詢。",
+      "adjustment_basis 可選 `price_only` 或 `total_return`。",
+      "若僅需主公開產品契約，建議使用 twse/tpex 日線主頁。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "ticker", type: "string", required: false, description: "股票代碼（canonical route 使用 ticker）。" },
+      { name: "market", type: "string", required: false, description: "TWSE 或 TPEx。" },
+      { name: "date_from", type: "string", required: false, description: "起始日期（YYYY-MM-DD）。" },
+      { name: "date_to", type: "string", required: false, description: "結束日期（YYYY-MM-DD）。" },
+      { name: "adjustment_basis", type: "string", required: false, description: "price_only（預設）或 total_return。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數（預設 100，最大 5000）。" },
+    ],
+    responseSummary: [
+      "回應為 canonical envelope payload（api_version/endpoint/request_id/.../envelope）。",
+      "調整後價格列位於 `envelope.data[]`，包含 adjustment_factor 與 actions_applied。",
+    ],
+    responseFields: [
+      { path: "dataset", type: "string", description: "固定為 adjusted_prices。" },
+      { path: "query.adjustment_basis", type: "string", description: "調整基準。" },
+      { path: "envelope.data[].ticker", type: "string", description: "股票代碼。" },
+      { path: "envelope.data[].trade_date", type: "string", description: "交易日期。" },
+      { path: "envelope.data[].close", type: "number", description: "原始收盤價。" },
+      { path: "envelope.data[].adjusted_close", type: "number|null", description: "調整後收盤價。" },
+      { path: "envelope.data[].adjustment_factor", type: "number", description: "調整係數。" },
+      { path: "envelope.data[].actions_applied", type: "array", description: "已套用的公司行動類型。" },
+      { path: "envelope.data[].actions_excluded", type: "array", description: "排除的行動類型與原因。" },
+      { path: "envelope.quality.quality_status", type: "string", description: "資料品質狀態。" },
+    ],
+    notes: [
+      "此頁為 canonical/supplemental surface，非主產品 endpoint。",
+      "若需主公開產品契約，優先使用 twse/tpex 日線主公開 endpoint。",
+      "canonical endpoint 使用 `ticker`，與主公開 endpoint `symbol` 命名不同。",
+    ],
+    planRequirement: {
+      title: "Plan Requirement",
+      bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"],
+    },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳 canonical adjusted-prices payload", body: successBody },
+        { status: "400", description: "adjustment_basis 不支援", body: `{"detail":"unsupported_adjustment_basis"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+        { status: "404", description: "查無符合條件資料", body: `{"api_version":"v2","dataset":"adjusted_prices","meta":{"rows_returned":0},"envelope":{"data":[]}}` },
+      ],
+    },
+  };
+}
+
+function buildAdjustedPricesCanonicalApiSections(): DocsContentSection[] {
   return [
     { id: "overview", label: "Overview", paragraphs: [] },
     { id: "request", label: "Request", paragraphs: [] },
@@ -3846,6 +4758,7 @@ console.log(data)`,
       "若要與事件資料對照，請保留日期欄位並注意交易日對齊。",
       "對長期研究建議先完整抓取並落地，不要重複高頻查詢同一段歷史區間。",
       "日期以 Asia/Taipei 交易日語意（YYYY-MM-DD）為準。",
+      "公開主路徑補充：`/v2/datasets/twse-daily-price`、`/v2/datasets/tpex-daily-price`；canonical 路徑補充：`/v2/datasets/market-prices`、`/v2/datasets/adjusted-prices`。",
     ],
     planRequirement: {
       title: "Plan Requirement",
@@ -3940,6 +4853,320 @@ function buildPriceDataApiSections(): DocsContentSection[] {
   ];
 }
 
+function buildTwseDailyPriceApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/twse-daily-price";
+
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/twse-daily-price",
+    headers=headers,
+    params={
+        "symbol": "2330",
+        "start_date": "2026-01-01",
+        "end_date": "2026-04-30",
+        "limit": 5
+    },
+)
+
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&start_date=2026-01-01&end_date=2026-04-30&limit=5",
+  {
+    headers: {
+      "X-API-Key": "your_api_key_here"
+    }
+  }
+)
+
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&start_date=2026-01-01&end_date=2026-04-30&limit=5" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+
+  const successBody = JSON.stringify(
+    {
+      dataset: "twse_daily_price",
+      rows: [
+        {
+          symbol: "2330",
+          date: "2026-04-22",
+          open: 812,
+          high: 818,
+          low: 808,
+          close: 815,
+          volume_shares: 18234000,
+          turnover_value: 14856300000,
+          trade_count: 37842,
+          price_change: 6,
+          price_change_sign: "+",
+        },
+      ],
+      count: 1,
+    },
+    null,
+    2,
+  );
+
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "市場與價格",
+    endpoint,
+    method: "GET",
+    overview: [
+      "TWSE 日線價格 API 提供上市股票的日線 OHLCV 與成交相關欄位，適合用於回測、價格研究與事件對照。",
+      "資料以未還原（unadjusted）日線為主，日期語意採 Asia/Taipei 交易日。",
+    ],
+    requestDescription: ["使用此 endpoint 時，建議："],
+    useCases: [
+      "建立上市股票的歷史價格序列。",
+      "與公告、事件、財報資料進行時間對齊分析。",
+      "作為技術指標或特徵工程的基礎輸入。",
+      "在研究流程中快速驗證單一標的近期價格行為。",
+    ],
+    gettingStarted: [
+      "使用 symbol 指定標的（例如 2330）。",
+      "可選擇 start_date / end_date 控制日期範圍。",
+      "limit 預設 100，最大 5000。",
+      "主公開 route 為本頁 endpoint；canonical 補充路徑請見 Notes。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "symbol", type: "string", required: true, description: "股票代碼（內部對應 ticker）。" },
+      { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數（預設 100，最大 5000）。" },
+    ],
+    responseSummary: ["回應結構固定為 dataset、rows、count。"],
+    responseFields: [
+      { path: "rows[].symbol", type: "string", description: "股票代碼。" },
+      { path: "rows[].date", type: "string", description: "交易日期（YYYY-MM-DD）。" },
+      { path: "rows[].open", type: "number", description: "開盤價。" },
+      { path: "rows[].high", type: "number", description: "最高價。" },
+      { path: "rows[].low", type: "number", description: "最低價。" },
+      { path: "rows[].close", type: "number", description: "收盤價。" },
+      { path: "rows[].volume_shares", type: "number", description: "成交股數。" },
+      { path: "rows[].turnover_value", type: "number|null", description: "成交金額。" },
+      { path: "rows[].trade_count", type: "number|null", description: "成交筆數。" },
+      { path: "rows[].price_change", type: "number|null", description: "漲跌價差。" },
+      { path: "rows[].price_change_sign", type: "string|null", description: "漲跌符號（+/-）。" },
+      { path: "count", type: "integer", description: "回傳資料筆數。" },
+    ],
+    notes: [
+      "此頁為主公開 endpoint 契約；不要與 legacy/canonical 回應格式混用。",
+      "canonical/supplemental surface 補充：`/v2/datasets/market-prices`。",
+      "若需要權值事件調整後序列，請改用對應 adjusted/canonical 路徑。",
+      "若需要較低層 canonical payload（含 envelope 與 lineage），請參考「市場價格（Canonical）」與「調整價格（Canonical）」。",
+    ],
+    planRequirement: {
+      title: "Plan Requirement",
+      bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"],
+    },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳 TWSE 日線資料", body: successBody },
+        {
+          status: "400",
+          description: "查詢參數錯誤",
+          body: JSON.stringify({ error: { code: "BAD_REQUEST", message: "查詢參數錯誤。" } }, null, 2),
+        },
+        {
+          status: "401",
+          description: "缺少或無效 API key",
+          body: JSON.stringify({ error: { code: "UNAUTHORIZED", message: "缺少或無效 API key。" } }, null, 2),
+        },
+        {
+          status: "403",
+          description: "目前方案無法存取此資料",
+          body: JSON.stringify({ error: { code: "FORBIDDEN", message: "目前方案無法存取 twse-daily-price。" } }, null, 2),
+        },
+        {
+          status: "404",
+          description: "查無符合條件的 TWSE 日線資料",
+          body: JSON.stringify({ dataset: "twse_daily_price", rows: [], count: 0, message: "查無符合條件的 TWSE 日線資料。" }, null, 2),
+        },
+      ],
+    },
+  };
+}
+
+function buildTwseDailyPriceApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildTpexDailyPriceApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/tpex-daily-price";
+
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/tpex-daily-price",
+    headers=headers,
+    params={
+        "symbol": "8069",
+        "start_date": "2026-01-01",
+        "end_date": "2026-04-30",
+        "limit": 5
+    },
+)
+
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/tpex-daily-price?symbol=8069&start_date=2026-01-01&end_date=2026-04-30&limit=5",
+  {
+    headers: {
+      "X-API-Key": "your_api_key_here"
+    }
+  }
+)
+
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/tpex-daily-price?symbol=8069&start_date=2026-01-01&end_date=2026-04-30&limit=5" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+
+  const successBody = JSON.stringify(
+    {
+      dataset: "tpex_daily_price",
+      rows: [
+        {
+          symbol: "8069",
+          date: "2026-04-22",
+          open: 32.1,
+          high: 32.9,
+          low: 31.8,
+          close: 32.6,
+          volume_shares: 2745000,
+          turnover_value: 89340000,
+          trade_count: 3241,
+          price_change: 0.5,
+          price_change_sign: "+",
+        },
+      ],
+      count: 1,
+    },
+    null,
+    2,
+  );
+
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "市場與價格",
+    endpoint,
+    method: "GET",
+    overview: [
+      "TPEx 日線價格 API 提供上櫃股票的日線 OHLCV 與成交相關欄位，適合用於策略回測、研究與事件對照。",
+      "資料以未還原（unadjusted）日線為主，日期語意採 Asia/Taipei 交易日。",
+    ],
+    requestDescription: ["使用此 endpoint 時，建議："],
+    useCases: [
+      "建立上櫃股票歷史價格序列。",
+      "觀察事件前後的價格與成交量變化。",
+      "作為技術指標與特徵工程上游資料來源。",
+      "與其他市場資料進行跨資料集對照分析。",
+    ],
+    gettingStarted: [
+      "使用 symbol 指定標的（例如 8069）。",
+      "可選擇 start_date / end_date 控制日期範圍。",
+      "limit 預設 100，最大 5000。",
+      "主公開 route 為本頁 endpoint；canonical 補充路徑請見 Notes。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "symbol", type: "string", required: true, description: "股票代碼（內部對應 ticker）。" },
+      { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數（預設 100，最大 5000）。" },
+    ],
+    responseSummary: ["回應結構固定為 dataset、rows、count。"],
+    responseFields: [
+      { path: "rows[].symbol", type: "string", description: "股票代碼。" },
+      { path: "rows[].date", type: "string", description: "交易日期（YYYY-MM-DD）。" },
+      { path: "rows[].open", type: "number", description: "開盤價。" },
+      { path: "rows[].high", type: "number", description: "最高價。" },
+      { path: "rows[].low", type: "number", description: "最低價。" },
+      { path: "rows[].close", type: "number", description: "收盤價。" },
+      { path: "rows[].volume_shares", type: "number", description: "成交股數。" },
+      { path: "rows[].turnover_value", type: "number|null", description: "成交金額。" },
+      { path: "rows[].trade_count", type: "number|null", description: "成交筆數。" },
+      { path: "rows[].price_change", type: "number|null", description: "漲跌價差。" },
+      { path: "rows[].price_change_sign", type: "string|null", description: "漲跌符號（+/-）。" },
+      { path: "count", type: "integer", description: "回傳資料筆數。" },
+    ],
+    notes: [
+      "此頁為主公開 endpoint 契約；不要與 legacy/canonical 回應格式混用。",
+      "canonical/supplemental surface 補充：`/v2/datasets/market-prices`。",
+      "若需要權值事件調整後序列，請改用對應 adjusted/canonical 路徑。",
+      "若需要較低層 canonical payload（含 envelope 與 lineage），請參考「市場價格（Canonical）」與「調整價格（Canonical）」。",
+    ],
+    planRequirement: {
+      title: "Plan Requirement",
+      bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"],
+    },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳 TPEx 日線資料", body: successBody },
+        {
+          status: "400",
+          description: "查詢參數錯誤",
+          body: JSON.stringify({ error: { code: "BAD_REQUEST", message: "查詢參數錯誤。" } }, null, 2),
+        },
+        {
+          status: "401",
+          description: "缺少或無效 API key",
+          body: JSON.stringify({ error: { code: "UNAUTHORIZED", message: "缺少或無效 API key。" } }, null, 2),
+        },
+        {
+          status: "403",
+          description: "目前方案無法存取此資料",
+          body: JSON.stringify({ error: { code: "FORBIDDEN", message: "目前方案無法存取 tpex-daily-price。" } }, null, 2),
+        },
+        {
+          status: "404",
+          description: "查無符合條件的 TPEx 日線資料",
+          body: JSON.stringify({ dataset: "tpex_daily_price", rows: [], count: 0, message: "查無符合條件的 TPEx 日線資料。" }, null, 2),
+        },
+      ],
+    },
+  };
+}
+
+function buildTpexDailyPriceApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
 function buildTechnicalIndicatorsApiReference(): ApiReferenceContent {
   const endpoint = "/v2/datasets/technical-indicators";
 
@@ -3979,16 +5206,9 @@ console.log(data)`,
   const successBody = JSON.stringify(
     {
       dataset: "technical_indicators",
-      source_role: "canonical",
-      freshness: "2026-04-22T12:30:00+08:00",
-      lineage: {
-        source: "TWSE/TPEx",
-        ingested_at: "2026-04-22T12:30:06+08:00",
-        trace_id: "technical_indicators_2330_20260422",
-      },
-      data: [
+      rows: [
         {
-          ticker: "2330",
+          symbol: "2330",
           date: "2026-04-22",
           close: 815,
           ma_5: 809.4,
@@ -4004,6 +5224,7 @@ console.log(data)`,
           volume: 18234000,
         },
       ],
+      count: 1,
     },
     null,
     2,
@@ -4037,27 +5258,24 @@ console.log(data)`,
       { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
       { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
       { name: "limit", type: "integer", required: false, description: "回傳筆數限制。" },
-      { name: "offset", type: "integer", required: false, description: "分頁偏移。" },
     ],
-    responseSummary: ["所有回應遵循一致結構，包含 dataset、source_role、freshness、lineage、data。"],
+    responseSummary: ["回應結構固定為 dataset、rows、count。"],
     responseFields: [
-      { path: "data[].ticker", type: "string", description: "股票代碼。" },
-      { path: "data[].date", type: "string", description: "資料日期（交易日語意）。" },
-      { path: "data[].close", type: "number", description: "收盤價。" },
-      { path: "data[].ma_5", type: "number|null", description: "5 日均線。" },
-      { path: "data[].ma_20", type: "number|null", description: "20 日均線。" },
-      { path: "data[].ma_60", type: "number|null", description: "60 日均線。" },
-      { path: "data[].rsi_14", type: "number|null", description: "14 日 RSI。" },
-      { path: "data[].macd", type: "number|null", description: "MACD 主線。" },
-      { path: "data[].macd_signal", type: "number|null", description: "MACD 訊號線。" },
-      { path: "data[].macd_hist", type: "number|null", description: "MACD 柱狀值。" },
-      { path: "data[].bollinger_upper", type: "number|null", description: "布林通道上軌。" },
-      { path: "data[].bollinger_middle", type: "number|null", description: "布林通道中軌。" },
-      { path: "data[].bollinger_lower", type: "number|null", description: "布林通道下軌。" },
-      { path: "data[].volume", type: "number|null", description: "成交量。" },
-      { path: "source_role", type: "string", description: "資料來源角色。" },
-      { path: "freshness", type: "string", description: "資料更新時間。" },
-      { path: "lineage.trace_id", type: "string", description: "可追蹤資料處理鏈路。" },
+      { path: "rows[].symbol", type: "string", description: "股票代碼。" },
+      { path: "rows[].date", type: "string", description: "資料日期（交易日語意）。" },
+      { path: "rows[].close", type: "number", description: "收盤價。" },
+      { path: "rows[].ma_5", type: "number|null", description: "5 日均線。" },
+      { path: "rows[].ma_20", type: "number|null", description: "20 日均線。" },
+      { path: "rows[].ma_60", type: "number|null", description: "60 日均線。" },
+      { path: "rows[].rsi_14", type: "number|null", description: "14 日 RSI。" },
+      { path: "rows[].macd", type: "number|null", description: "MACD 主線。" },
+      { path: "rows[].macd_signal", type: "number|null", description: "MACD 訊號線。" },
+      { path: "rows[].macd_hist", type: "number|null", description: "MACD 柱狀值。" },
+      { path: "rows[].bollinger_upper", type: "number|null", description: "布林通道上軌。" },
+      { path: "rows[].bollinger_middle", type: "number|null", description: "布林通道中軌。" },
+      { path: "rows[].bollinger_lower", type: "number|null", description: "布林通道下軌。" },
+      { path: "rows[].volume", type: "number|null", description: "成交量。" },
+      { path: "count", type: "integer", description: "回傳資料筆數。" },
     ],
     notes: [
       "技術指標會受 lookback 視窗影響，序列前段可能出現 null。",
@@ -4127,8 +5345,8 @@ console.log(data)`,
           body: JSON.stringify(
             {
               dataset: "technical_indicators",
-              source_role: "canonical",
-              data: [],
+              rows: [],
+              count: 0,
               message: "查無符合條件的技術指標資料。",
             },
             null,
@@ -4188,23 +5406,59 @@ console.log(data)`,
 
   const successBody = JSON.stringify(
     {
-      dataset: "events",
-      source_role: "canonical",
-      freshness: "2026-04-22T10:15:00+08:00",
-      lineage: {
-        source: "TWSE",
-        ingested_at: "2026-04-22T10:15:04+08:00",
-        trace_id: "issuer_announcements_2330_20260422",
+      api_version: "v2",
+      endpoint: "/v2/datasets/issuer-announcements",
+      request_id: "req_9af2d5b1c321",
+      plan_id: "pro",
+      dataset: "issuer_announcements",
+      query: {
+        ticker: "2330",
+        date_from: "2026-04-01",
+        date_to: "2026-04-22",
+        category: "financial",
+        limit: 20,
+        offset: 0,
+        sort_by: "announcement_date",
+        sort_order: "desc",
       },
-      data: [
-        {
+      meta: {
+        rows_returned: 1,
+      },
+      envelope: {
+        api_version: "v2",
+        dataset: "issuer_announcements",
+        release_date: "2026-04-22",
+        request_context: {
           ticker: "2330",
-          event_date: "2026-04-22",
-          title: "公告本公司董事會通過第一季財務報告",
-          event_type: "financial_report",
-          summary: "董事會決議通過 2026 年第一季財務報告。",
+          as_of_date: "2026-04-22",
+          family: "issuer_official_news",
+          dataset_view: "issuer_announcements_v1",
         },
-      ],
+        data: [
+          {
+            ticker: "2330",
+            announcement_date: "2026-04-22",
+            category: "financial",
+            title: "公告本公司董事會通過第一季財務報告",
+            source_url: "https://mops.twse.com.tw/...",
+          },
+        ],
+        quality: {
+          freshness_state: "fresh",
+          freshness_as_of: "2026-04-22",
+          completeness_ratio: 1,
+          quality_status: "ready",
+        },
+        lineage: {
+          source_role: "canonical",
+          selected_source: "mops_official",
+        },
+        error: {
+          error_code: null,
+          error_message: null,
+          blocking_gate: null,
+        },
+      },
     },
     null,
     2,
@@ -4216,69 +5470,59 @@ console.log(data)`,
     endpoint,
     method: "GET",
     overview: [
-      "公告資訊 API 提供公司對外揭露的事件型資料，可用於追蹤個股異動、建立事件時間線，或與價格、財報、月營收等資料整合分析。",
-      "這類資料的特性包括：",
+      "公告資訊 API 提供公司對外揭露公告資料，適合用於事件追蹤、披露監控與研究流程。",
+      "此 endpoint 為 productized public route，查詢參數與回應契約以 backend runtime 為準。",
     ],
     requestDescription: [
       "使用此 endpoint 時，建議：",
     ],
     useCases: [
-      "更新節奏不固定，但具高度事件價值",
-      "適合用於事件驅動研究與監控流程",
-      "通常需要與 ticker、日期與其他資料集一起使用",
       "追蹤單一公司的公告歷史",
-      "建立重大事件時間線",
-      "將公告事件與價格反應進行對照",
-      "作為研究流程中的事件標記層",
-      "將公告資料接入 agent workflow 作為文本型 context 入口",
-      "公告資訊不應被視為單純的新聞摘要，而是正式揭露資料的一部分。若要在研究或正式流程中使用，建議保留事件時間、ticker 與來源資訊。",
+      "建立重大揭露事件時間線",
+      "搭配價格與財務資料做事件對照分析",
+      "作為監控與研究流程的官方披露來源",
     ],
     gettingStarted: [
-      "優先使用 ticker 查詢單一公司",
-      "以日期範圍或 limit 控制查詢量",
-      "對長期間資料做分批抓取，而不是一次請求過大範圍",
-      "若後續要與價格或財報資料整合，應保留 ticker 與 event_date",
+      "使用 ticker 查詢單一公司，並以 date_from/date_to 控制區間。",
+      "sort_by 目前只支援 announcement_date。",
+      "sort_order 僅支援 asc 或 desc。",
+      "category 可用於過濾公告類型（若來源有提供）。",
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
       { name: "ticker", type: "string", required: true, description: "股票代碼，用於查詢單一公司公告資料。" },
-      { name: "start_date", type: "string", required: false, description: "查詢起始日期。" },
-      { name: "end_date", type: "string", required: false, description: "查詢結束日期。" },
+      { name: "date_from", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "date_to", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "category", type: "string", required: false, description: "公告分類過濾。" },
       { name: "limit", type: "integer", required: false, description: "回傳筆數限制。" },
       { name: "offset", type: "integer", required: false, description: "分頁偏移。" },
+      { name: "sort_by", type: "string", required: false, description: "排序欄位，固定為 announcement_date。" },
+      { name: "sort_order", type: "string", required: false, description: "排序方向：asc 或 desc。" },
     ],
     responseSummary: [
-      "所有回應遵循一致結構，包含 dataset、source_role、freshness、lineage、data。",
+      "回應為 canonical envelope 格式，頂層包含 api_version、endpoint、dataset、query、meta、envelope。",
     ],
     responseFields: [
-      { path: "data[].ticker", type: "string", description: "股票代碼。" },
-      { path: "data[].event_date", type: "string", description: "事件日期或公告發布日期。" },
-      { path: "data[].title", type: "string", description: "公告標題。" },
-      { path: "data[].event_type", type: "string", description: "公告或事件類型。" },
-      { path: "data[].summary", type: "string|null", description: "摘要內容（若 schema 提供）。" },
-      { path: "data[].source_url", type: "string|null", description: "原始來源連結（若 schema 提供）。" },
-      { path: "source_role", type: "string", description: "資料來源角色。" },
-      { path: "freshness", type: "string", description: "資料更新時間。" },
-      { path: "lineage.trace_id", type: "string", description: "可追蹤資料處理鏈路。" },
+      { path: "dataset", type: "string", description: "資料集識別，固定為 issuer_announcements。" },
+      { path: "query.ticker", type: "string", description: "本次查詢使用的股票代碼。" },
+      { path: "meta.rows_returned", type: "integer", description: "回傳資料筆數。" },
+      { path: "envelope.data[].ticker", type: "string", description: "股票代碼。" },
+      { path: "envelope.data[].announcement_date", type: "string", description: "公告日期。" },
+      { path: "envelope.data[].category", type: "string|null", description: "公告分類。" },
+      { path: "envelope.data[].title", type: "string|null", description: "公告標題。" },
+      { path: "envelope.data[].source_url", type: "string|null", description: "來源連結。" },
+      { path: "envelope.lineage.source_role", type: "string", description: "來源角色（canonical）。" },
     ],
     notes: [
-      "使用 ticker + event_date 作為主要識別組合。",
-      "若要與價格資料整合，應保留事件發生時間。",
-      "對長期研究建議落地存放，不要重複高頻請求同一批事件。",
-      "若要接入 agent 或分析流程，建議將公告資料視為事件層，而不是靜態 company metadata。",
-      "若同時需要正式揭露與高階分析，應搭配 company-profile、financial-statements 或 monthly-revenue 一起使用。",
+      "此頁為 productized endpoint，請勿與 legacy 回應格式混用。",
+      "若要做事件整合分析，可搭配 `/v2/datasets/events` 與 `/v2/datasets/structured-events`。",
+      "若需要較高頻價格對照，建議搭配 TWSE/TPEx 日線價格 endpoint。",
     ],
     planRequirement: {
       title: "Plan Requirement",
       bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"],
     },
-    errorCases: [
-      "200：成功回傳公告資料",
-      "400：查詢參數錯誤",
-      "401：缺少或無效 API key",
-      "403：目前方案無法存取此資料",
-      "404：查無符合條件的公告資料",
-    ],
+    errorCases: ["200", "400", "401", "403", "404"],
     sidePanel: {
       requestExample: codeExamples.curl,
       codeExamples,
@@ -4293,10 +5537,7 @@ console.log(data)`,
           description: "查詢參數錯誤",
           body: JSON.stringify(
             {
-              error: {
-                code: "BAD_REQUEST",
-                message: "查詢參數錯誤。",
-              },
+              detail: "unsupported_sort_by",
             },
             null,
             2,
@@ -4307,10 +5548,7 @@ console.log(data)`,
           description: "缺少或無效 API key",
           body: JSON.stringify(
             {
-              error: {
-                code: "UNAUTHORIZED",
-                message: "缺少或無效 API key。",
-              },
+              detail: "missing_api_key",
             },
             null,
             2,
@@ -4321,10 +5559,7 @@ console.log(data)`,
           description: "目前方案無法存取此資料",
           body: JSON.stringify(
             {
-              error: {
-                code: "FORBIDDEN",
-                message: "目前方案無法存取 issuer_announcements。",
-              },
+              error: "dataset_not_entitled",
             },
             null,
             2,
@@ -4335,10 +5570,10 @@ console.log(data)`,
           description: "查無符合條件的公告資料",
           body: JSON.stringify(
             {
-              dataset: "events",
-              source_role: "canonical",
-              data: [],
-              message: "查無符合條件的公告資料。",
+              api_version: "v2",
+              dataset: "issuer_announcements",
+              meta: { rows_returned: 0 },
+              envelope: { data: [] },
             },
             null,
             2,
@@ -4350,6 +5585,574 @@ console.log(data)`,
 }
 
 function buildIssuerAnnouncementsApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildIndexDataApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/index-data";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/index-data",
+    headers=headers,
+    params={
+        "index_code": "TAIEX",
+        "date_from": "2026-04-01",
+        "date_to": "2026-04-22",
+        "limit": 30
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/index-data?index_code=TAIEX&date_from=2026-04-01&date_to=2026-04-22&limit=30",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/index-data?index_code=TAIEX&date_from=2026-04-01&date_to=2026-04-22&limit=30" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/datasets/index-data",
+      request_id: "req_idx_1234abcd",
+      plan_id: "pro",
+      dataset: "index_data",
+      query: {
+        index_code: "TAIEX",
+        market: null,
+        as_of_date: null,
+        date_from: "2026-04-01",
+        date_to: "2026-04-22",
+        limit: 30,
+        offset: 0,
+        sort_by: "as_of_date",
+        sort_order: "desc",
+      },
+      meta: { rows_returned: 1 },
+      envelope: {
+        api_version: "v2",
+        dataset: "index_data",
+        request_context: {
+          ticker: "TAIEX",
+          as_of_date: "2026-04-22",
+          family: "taiwan_macro",
+          dataset_view: "index_data_v1",
+        },
+        data: [
+          {
+            index_code: "TAIEX",
+            as_of_date: "2026-04-22",
+            index_level: 20235.1,
+            index_change: 132.4,
+            index_return_pct: 0.66,
+            turnover_value: 345600000000,
+            volume_shares: 4123000000,
+          },
+        ],
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "市場與價格",
+    endpoint,
+    method: "GET",
+    overview: [
+      "指數資料 API 提供指數層級的日度市場資料，適合做市場狀態追蹤與指數研究。",
+      "此頁為 productized endpoint，採 canonical envelope 回應。",
+    ],
+    requestDescription: ["使用此 endpoint 時，至少需提供 index_code 或 market 其一。"],
+    useCases: [
+      "追蹤特定指數日度變化與成交狀態。",
+      "建立指數時間序列分析流程。",
+      "作為市場層級策略或風險監控輸入。",
+    ],
+    gettingStarted: [
+      "以 index_code 或 market 做過濾。",
+      "可用 as_of_date 指定單日，或 date_from/date_to 查區間。",
+      "sort_by 固定為 as_of_date。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "index_code", type: "string", required: false, description: "指數代碼（index_code 或 market 至少其一）。" },
+      { name: "market", type: "string", required: false, description: "市場代碼（index_code 或 market 至少其一）。" },
+      { name: "as_of_date", type: "string", required: false, description: "指定單一資料日期（YYYY-MM-DD）。" },
+      { name: "date_from", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "date_to", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數限制。" },
+      { name: "offset", type: "integer", required: false, description: "分頁偏移。" },
+      { name: "sort_by", type: "string", required: false, description: "排序欄位，固定為 as_of_date。" },
+      { name: "sort_order", type: "string", required: false, description: "排序方向：asc 或 desc。" },
+    ],
+    responseSummary: ["回應為 canonical envelope 格式，頂層包含 query/meta 與 envelope.data。"],
+    responseFields: [
+      { path: "dataset", type: "string", description: "資料集識別，固定為 index_data。" },
+      { path: "meta.rows_returned", type: "integer", description: "回傳資料筆數。" },
+      { path: "envelope.data[].index_code", type: "string", description: "指數代碼。" },
+      { path: "envelope.data[].as_of_date", type: "string", description: "資料日期。" },
+      { path: "envelope.data[].index_level", type: "number|null", description: "指數點位。" },
+      { path: "envelope.data[].index_change", type: "number|null", description: "點數變化。" },
+      { path: "envelope.data[].index_return_pct", type: "number|null", description: "漲跌幅。" },
+      { path: "envelope.data[].turnover_value", type: "number|null", description: "成交金額。" },
+      { path: "envelope.data[].volume_shares", type: "number|null", description: "成交量。" },
+    ],
+    notes: [
+      "此頁為 productized endpoint。",
+      "若需更市場橫截面的漲跌家數資訊，請參考 `/v2/datasets/market-breadth`。",
+      "若需較底層 canonical 價格面，請參考「市場價格（Canonical）」。",
+    ],
+    planRequirement: { title: "Plan Requirement", bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"] },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳指數資料", body: successBody },
+        { status: "400", description: "參數錯誤或缺少必要 filter", body: `{"detail":"missing_required_filter"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+        { status: "404", description: "查無符合條件資料", body: `{"api_version":"v2","dataset":"index_data","meta":{"rows_returned":0},"envelope":{"data":[]}}` },
+      ],
+    },
+  };
+}
+
+function buildIndexDataApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildMarketBreadthApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/market-breadth";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/market-breadth",
+    headers=headers,
+    params={
+        "market": "TWSE",
+        "date_from": "2026-04-01",
+        "date_to": "2026-04-22",
+        "limit": 30
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/market-breadth?market=TWSE&date_from=2026-04-01&date_to=2026-04-22&limit=30",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/market-breadth?market=TWSE&date_from=2026-04-01&date_to=2026-04-22&limit=30" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/datasets/market-breadth",
+      request_id: "req_breadth_7788",
+      plan_id: "pro",
+      dataset: "market_breadth",
+      query: {
+        market: "TWSE",
+        as_of_date: null,
+        date_from: "2026-04-01",
+        date_to: "2026-04-22",
+        limit: 30,
+        offset: 0,
+        sort_by: "as_of_date",
+        sort_order: "desc",
+      },
+      meta: { rows_returned: 1 },
+      envelope: {
+        api_version: "v2",
+        dataset: "market_breadth",
+        request_context: {
+          ticker: "TWSE",
+          as_of_date: "2026-04-22",
+          family: "taiwan_macro",
+          dataset_view: "market_breadth_v1",
+        },
+        data: [
+          {
+            market: "TWSE",
+            as_of_date: "2026-04-22",
+            advancers: 512,
+            decliners: 321,
+            unchanged: 47,
+            advance_decline_ratio: 1.59,
+            breadth_ratio: 0.61,
+          },
+        ],
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "市場與價格",
+    endpoint,
+    method: "GET",
+    overview: [
+      "市場廣度 API 提供漲跌家數與廣度比例等市場層級資料，適合用於盤勢監控與策略濾網。",
+      "此頁為 productized endpoint，採 canonical envelope 回應。",
+    ],
+    requestDescription: ["至少需提供 market、as_of_date 或 date_from/date_to 其中一組條件。"],
+    useCases: ["觀察市場整體強弱與漲跌結構。", "搭配指數點位進行多維度盤勢分析。", "作為策略前置風險濾網。"],
+    gettingStarted: [
+      "可用 market + 日期區間查詢一段時間的廣度資料。",
+      "也可用 as_of_date 直接抓單日快照。",
+      "sort_by 固定為 as_of_date。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "market", type: "string", required: false, description: "市場代碼（TWSE/TPEx 等）。" },
+      { name: "as_of_date", type: "string", required: false, description: "指定單一資料日期（YYYY-MM-DD）。" },
+      { name: "date_from", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "date_to", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數限制。" },
+      { name: "offset", type: "integer", required: false, description: "分頁偏移。" },
+      { name: "sort_by", type: "string", required: false, description: "排序欄位，固定為 as_of_date。" },
+      { name: "sort_order", type: "string", required: false, description: "排序方向：asc 或 desc。" },
+    ],
+    responseSummary: ["回應為 canonical envelope 格式，頂層包含 query/meta 與 envelope.data。"],
+    responseFields: [
+      { path: "dataset", type: "string", description: "資料集識別，固定為 market_breadth。" },
+      { path: "meta.rows_returned", type: "integer", description: "回傳資料筆數。" },
+      { path: "envelope.data[].market", type: "string", description: "市場代碼。" },
+      { path: "envelope.data[].as_of_date", type: "string", description: "資料日期。" },
+      { path: "envelope.data[].advancers", type: "integer|null", description: "上漲家數。" },
+      { path: "envelope.data[].decliners", type: "integer|null", description: "下跌家數。" },
+      { path: "envelope.data[].unchanged", type: "integer|null", description: "平盤家數。" },
+      { path: "envelope.data[].advance_decline_ratio", type: "number|null", description: "漲跌家數比。" },
+      { path: "envelope.data[].breadth_ratio", type: "number|null", description: "市場廣度比例。" },
+    ],
+    notes: [
+      "此頁為 productized endpoint。",
+      "若需指數層級點位與成交資料，請參考 `/v2/datasets/index-data`。",
+      "若需底層價格序列，請參考 `TWSE/TPEx 日線價格` 或 `市場價格（Canonical）`。",
+    ],
+    planRequirement: { title: "Plan Requirement", bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"] },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳市場廣度資料", body: successBody },
+        { status: "400", description: "參數錯誤或缺少必要 filter", body: `{"detail":"missing_required_filter"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+        { status: "404", description: "查無符合條件資料", body: `{"api_version":"v2","dataset":"market_breadth","meta":{"rows_returned":0},"envelope":{"data":[]}}` },
+      ],
+    },
+  };
+}
+
+function buildMarketBreadthApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildChipFlowsApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/chip-flows";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/chip-flows",
+    headers=headers,
+    params={
+        "ticker": "2330",
+        "market": "tw",
+        "participant_type": "foreign",
+        "date_from": "2026-04-01",
+        "date_to": "2026-04-22",
+        "limit": 50
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/chip-flows?ticker=2330&market=tw&participant_type=foreign&date_from=2026-04-01&date_to=2026-04-22&limit=50",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/chip-flows?ticker=2330&market=tw&participant_type=foreign&date_from=2026-04-01&date_to=2026-04-22&limit=50" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/datasets/chip-flows",
+      request_id: "req_chip_4422",
+      plan_id: "pro",
+      dataset: "chip_flows",
+      query: {
+        ticker: "2330",
+        market: "tw",
+        flow_type: null,
+        participant_type: "foreign",
+        date_from: "2026-04-01",
+        date_to: "2026-04-22",
+        limit: 50,
+      },
+      meta: { rows_returned: 1 },
+      envelope: {
+        api_version: "v2",
+        dataset: "chip_flows",
+        request_context: {
+          ticker: "2330",
+          as_of_date: "2026-04-22",
+          family: "chip_deep",
+          dataset_view: "broker_trading_daily_agg_v2",
+        },
+        data: [
+          {
+            ticker: "2330",
+            trade_date: "2026-04-22",
+            participant_type: "foreign",
+            net_volume: 1250000,
+            net_value: 1024000000,
+            source_dataset: "broker_trading_daily",
+          },
+        ],
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "籌碼與資金",
+    endpoint,
+    method: "GET",
+    overview: [
+      "籌碼流向 API 提供法人與參與者拆分的買賣超流向資料，適合做籌碼面研究與策略訊號。",
+      "此頁為 productized endpoint，採 canonical envelope 回應。",
+    ],
+    requestDescription: ["可使用 ticker、participant_type、flow_type 與日期區間做條件查詢。"],
+    useCases: ["追蹤外資/投信/自營商資金流向。", "建立籌碼動能訊號。", "與價格資料做事件對照。"],
+    gettingStarted: [
+      "以 ticker 指定標的，並用 date_from/date_to 控制區間。",
+      "market 預設為 tw。",
+      "participant_type 可篩選 foreign/investment_trust/dealer/institutional_total。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "ticker", type: "string", required: false, description: "股票代碼。" },
+      { name: "market", type: "string", required: false, description: "市場代碼，預設 tw。" },
+      { name: "flow_type", type: "string", required: false, description: "流向類型過濾。" },
+      { name: "participant_type", type: "string", required: false, description: "參與者類型過濾。" },
+      { name: "date_from", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "date_to", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數限制。" },
+    ],
+    responseSummary: ["回應為 canonical envelope 格式，頂層包含 query/meta 與 envelope.data。"],
+    responseFields: [
+      { path: "dataset", type: "string", description: "資料集識別，固定為 chip_flows。" },
+      { path: "meta.rows_returned", type: "integer", description: "回傳資料筆數。" },
+      { path: "envelope.data[].ticker", type: "string", description: "股票代碼。" },
+      { path: "envelope.data[].trade_date", type: "string", description: "交易日期。" },
+      { path: "envelope.data[].participant_type", type: "string|null", description: "參與者類型。" },
+      { path: "envelope.data[].net_volume", type: "number|null", description: "買賣超張數。" },
+      { path: "envelope.data[].net_value", type: "number|null", description: "買賣超金額。" },
+      { path: "envelope.data[].source_dataset", type: "string|null", description: "來源資料集標記。" },
+    ],
+    notes: [
+      "此頁為 productized endpoint。",
+      "若需要融資融券補充面，請參考 `/v2/datasets/margin-short-enhanced`。",
+      "若需要法人淨買超寬表，請參考 `/v2/datasets/institutional-flow`。",
+    ],
+    planRequirement: { title: "Plan Requirement", bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"] },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳籌碼流向資料", body: successBody },
+        { status: "400", description: "查詢參數錯誤", body: `{"detail":"bad_request"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+        { status: "404", description: "查無符合條件資料", body: `{"api_version":"v2","dataset":"chip_flows","meta":{"rows_returned":0},"envelope":{"data":[]}}` },
+      ],
+    },
+  };
+}
+
+function buildChipFlowsApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildMarginShortEnhancedApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/margin-short-enhanced";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/margin-short-enhanced",
+    headers=headers,
+    params={
+        "ticker": "2330",
+        "date_from": "2026-04-01",
+        "date_to": "2026-04-22",
+        "limit": 50
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/margin-short-enhanced?ticker=2330&date_from=2026-04-01&date_to=2026-04-22&limit=50",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/margin-short-enhanced?ticker=2330&date_from=2026-04-01&date_to=2026-04-22&limit=50" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/datasets/margin-short-enhanced",
+      request_id: "req_margin_6655",
+      plan_id: "pro",
+      dataset: "margin_short",
+      query: {
+        ticker: "2330",
+        date_from: "2026-04-01",
+        date_to: "2026-04-22",
+        limit: 50,
+        offset: 0,
+        sort_by: "trade_date",
+        sort_order: "desc",
+      },
+      meta: { rows_returned: 1 },
+      envelope: {
+        api_version: "v2",
+        dataset: "margin_short",
+        request_context: {
+          ticker: "2330",
+          as_of_date: "2026-04-22",
+          family: "chip_deep",
+          dataset_view: "margin_short_enhanced_v1",
+        },
+        data: [
+          {
+            ticker: "2330",
+            trade_date: "2026-04-22",
+            margin_balance: 124500,
+            short_balance: 18200,
+            margin_usage_ratio: 0.24,
+            short_usage_ratio: 0.03,
+          },
+        ],
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "籌碼與資金",
+    endpoint,
+    method: "GET",
+    overview: [
+      "融資融券（Enhanced）API 提供融資、融券與比率欄位，適合做籌碼風險與交易擁擠度分析。",
+      "此頁為 productized endpoint，採 canonical envelope 回應。",
+    ],
+    requestDescription: ["ticker 為必要參數，並可搭配日期區間查詢。"],
+    useCases: ["監控融資融券變化。", "建立過熱/過冷風險條件。", "與法人流向、價格資料做交叉分析。"],
+    gettingStarted: [
+      "使用 ticker 指定標的。",
+      "sort_by 固定 trade_date；sort_order 只支援 asc/desc。",
+      "建議搭配 date_from/date_to 取固定觀察區間。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "ticker", type: "string", required: true, description: "股票代碼。" },
+      { name: "date_from", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "date_to", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數限制。" },
+      { name: "offset", type: "integer", required: false, description: "分頁偏移。" },
+      { name: "sort_by", type: "string", required: false, description: "排序欄位，固定為 trade_date。" },
+      { name: "sort_order", type: "string", required: false, description: "排序方向：asc 或 desc。" },
+    ],
+    responseSummary: ["回應為 canonical envelope 格式，頂層包含 query/meta 與 envelope.data。"],
+    responseFields: [
+      { path: "dataset", type: "string", description: "資料集識別（目前為 margin_short）。" },
+      { path: "meta.rows_returned", type: "integer", description: "回傳資料筆數。" },
+      { path: "envelope.data[].ticker", type: "string", description: "股票代碼。" },
+      { path: "envelope.data[].trade_date", type: "string", description: "交易日期。" },
+      { path: "envelope.data[].margin_balance", type: "number|null", description: "融資餘額。" },
+      { path: "envelope.data[].short_balance", type: "number|null", description: "融券餘額。" },
+      { path: "envelope.data[].margin_usage_ratio", type: "number|null", description: "融資使用率。" },
+      { path: "envelope.data[].short_usage_ratio", type: "number|null", description: "融券使用率。" },
+    ],
+    notes: [
+      "此頁為 productized endpoint；path 為 margin-short-enhanced。",
+      "回應內 dataset 目前為 margin_short，屬 backend 契約既有行為。",
+      "若要補充法人買賣資料，可搭配 `/v2/datasets/institutional-flow`。",
+    ],
+    planRequirement: { title: "Plan Requirement", bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"] },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳融資融券資料", body: successBody },
+        { status: "400", description: "查詢參數錯誤", body: `{"detail":"unsupported_sort_by"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+        { status: "404", description: "查無符合條件資料", body: `{"api_version":"v2","dataset":"margin_short","meta":{"rows_returned":0},"envelope":{"data":[]}}` },
+      ],
+    },
+  };
+}
+
+function buildMarginShortEnhancedApiSections(): DocsContentSection[] {
   return [
     { id: "overview", label: "Overview", paragraphs: [] },
     { id: "request", label: "Request", paragraphs: [] },
@@ -5233,7 +7036,7 @@ const workflowPageCatalog: Array<{
         ],
       },
       {
-        id: "step-1-company-profile",
+        id: "step-1-issuer-profile",
         label: "Step 1：先查公司基本資料",
         paragraphs: [
           "第一步先確認公司主體資訊。這可以幫你確認 ticker 是否正確，並建立後續 join 與資料整理的基礎。",
@@ -5248,7 +7051,7 @@ const workflowPageCatalog: Array<{
 headers = {"X-API-Key": "your_api_key_here"}
 
 response = requests.get(
-    "https://api.twmarketdata.com/v2/datasets/company-profile",
+    "https://api.twmarketdata.com/v2/datasets/issuer-profile",
     headers=headers,
     params={"ticker": "2330"},
 )
@@ -5272,9 +7075,9 @@ print(response.json())`,
 headers = {"X-API-Key": "your_api_key_here"}
 
 response = requests.get(
-    "https://api.twmarketdata.com/v2/datasets/financial-statements",
+    "https://api.twmarketdata.com/v2/datasets/income-statement",
     headers=headers,
-    params={"ticker": "2330", "period": "quarterly", "limit": 8},
+    params={"symbol": "2330", "limit": 8},
 )
 
 print(response.json())`,
@@ -5322,7 +7125,7 @@ headers = {"X-API-Key": "your_api_key_here"}
 response = requests.get(
     "https://api.twmarketdata.com/v2/datasets/monthly-revenue",
     headers=headers,
-    params={"ticker": "2330", "limit": 24},
+    params={"symbol": "2330", "limit": 24},
 )
 
 print(response.json())`,
@@ -5336,8 +7139,8 @@ print(response.json())`,
           "把前面四步整合後，你可以建立一個固定的基本面檢查順序：",
         ],
         bullets: [
-          "先查 company-profile，確認公司識別",
-          "再查 financial-statements，取得原始財報數據",
+          "先查 issuer-profile，確認公司識別",
+          "再查 income-statement，取得原始財報數據",
           "再查 financial-metrics，快速做分析判讀",
           "最後補 monthly-revenue，觀察近期營運趨勢",
           "若要進一步策略化，建議把這套流程落地成可重複執行的 pipeline。",
@@ -5826,6 +7629,95 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
       };
     }
 
+    if (topic.topicId === "financial_statements_product") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "財報資料",
+        subtitle: "將損益表與現金流量表作為同一組產品能力，適合完整財報分析與整合流程。",
+        tier: "complete",
+        sections: [
+          {
+            id: "overview",
+            label: "Overview",
+            paragraphs: [
+              "財報資料目前由兩個 productized endpoint 組成：損益表與現金流量表。",
+              "一般整合建議先以本頁為入口，再依分析目的分別串接兩張表。",
+            ],
+          },
+          {
+            id: "endpoints",
+            label: "Endpoints",
+            paragraphs: [],
+            bullets: [
+              "損益表：/v2/datasets/income-statement",
+              "現金流量表：/v2/datasets/cash-flow-statement",
+            ],
+          },
+          {
+            id: "integration",
+            label: "整合建議",
+            paragraphs: [
+              "若要評估獲利品質，建議同時使用淨利（損益表）與營運現金流（現金流量表）。",
+              "若需要 lower-level 查詢面，可再補充使用 canonical `/v2/datasets/financials`。",
+            ],
+          },
+        ],
+      };
+    }
+
+    if (topic.topicId === "cash_flow_statement") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "財報（現金流量表）",
+        subtitle: "提供公司現金流量表關鍵欄位，適合用於現金品質分析與基本面研究。",
+        tier: "complete",
+        sections: buildCashFlowStatementApiSections(),
+        apiReference: buildCashFlowStatementApiReference(),
+      };
+    }
+
+    if (topic.topicId === "financials_canonical") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "財報資料（Canonical）",
+        subtitle: "canonical/supplemental 財報查詢面，適用於低階契約與資料對齊流程。",
+        tier: "complete",
+        sections: buildFinancialsCanonicalApiSections(),
+        apiReference: buildFinancialsCanonicalApiReference(),
+      };
+    }
+
+    if (topic.topicId === "valuations_canonical") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "估值資料（Canonical）",
+        subtitle: "canonical/supplemental 估值查詢面，適用於低階契約與資料對齊流程。",
+        tier: "complete",
+        sections: buildValuationsCanonicalApiSections(),
+        apiReference: buildValuationsCanonicalApiReference(),
+      };
+    }
+
     if (topic.topicId === "technical_indicators") {
       return {
         slug: hrefToSlug(topic.href),
@@ -5842,6 +7734,38 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
       };
     }
 
+    if (topic.topicId === "index_data") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "指數資料",
+        subtitle: "提供指數層級日度資料，適合市場狀態追蹤與指數研究。",
+        tier: "complete",
+        sections: buildIndexDataApiSections(),
+        apiReference: buildIndexDataApiReference(),
+      };
+    }
+
+    if (topic.topicId === "market_breadth") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "市場廣度",
+        subtitle: "提供漲跌家數與市場廣度比例，適合盤勢監控與策略濾網。",
+        tier: "complete",
+        sections: buildMarketBreadthApiSections(),
+        apiReference: buildMarketBreadthApiReference(),
+      };
+    }
+
     if (topic.topicId === "price_enhanced") {
       return {
         slug: hrefToSlug(topic.href),
@@ -5855,6 +7779,102 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         tier: "complete",
         sections: buildPriceDataApiSections(),
         apiReference: buildPriceDataApiReference(),
+      };
+    }
+
+    if (topic.topicId === "market_prices_canonical") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "市場價格（Canonical）",
+        subtitle: "canonical/supplemental 價格查詢面，提供跨市場的低階 envelope 契約。",
+        tier: "complete",
+        sections: buildMarketPricesCanonicalApiSections(),
+        apiReference: buildMarketPricesCanonicalApiReference(),
+      };
+    }
+
+    if (topic.topicId === "adjusted_prices_canonical") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "調整價格（Canonical）",
+        subtitle: "canonical/supplemental 調整價格查詢面，提供 read-time 調整後序列。",
+        tier: "complete",
+        sections: buildAdjustedPricesCanonicalApiSections(),
+        apiReference: buildAdjustedPricesCanonicalApiReference(),
+      };
+    }
+
+    if (topic.topicId === "chip_flows") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "籌碼流向",
+        subtitle: "提供法人與參與者拆分的籌碼流向資料，適合籌碼面分析與策略研究。",
+        tier: "complete",
+        sections: buildChipFlowsApiSections(),
+        apiReference: buildChipFlowsApiReference(),
+      };
+    }
+
+    if (topic.topicId === "margin_short_enhanced") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "融資融券（Enhanced）",
+        subtitle: "提供融資融券與比率欄位，適合做籌碼風險監控與擁擠度觀察。",
+        tier: "complete",
+        sections: buildMarginShortEnhancedApiSections(),
+        apiReference: buildMarginShortEnhancedApiReference(),
+      };
+    }
+
+    if (topic.topicId === "twse_daily_price") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "TWSE 日線價格",
+        subtitle: "提供上市股票日線價格資料，適合用於回測、研究與事件對照流程。",
+        tier: "complete",
+        sections: buildTwseDailyPriceApiSections(),
+        apiReference: buildTwseDailyPriceApiReference(),
+      };
+    }
+
+    if (topic.topicId === "tpex_daily_price") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "TPEx 日線價格",
+        subtitle: "提供上櫃股票日線價格資料，適合用於回測、研究與事件對照流程。",
+        tier: "complete",
+        sections: buildTpexDailyPriceApiSections(),
+        apiReference: buildTpexDailyPriceApiReference(),
       };
     }
 
@@ -6017,6 +8037,42 @@ export const docsPages: DocsPageEntry[] = [
   ...comingSoonDocsPages,
 ].filter((page) => !deprecatedDocsPrefixes.has(page.slug[0]));
 
+function buildSchemaReadySidebarItems(group: SchemaReadyGroup): DocsSidebarNavItem[] {
+  const baseItems = group.topics.map((topic) => ({ title: topic.title, href: topic.href }));
+
+  if (group.id !== "financial-growth") {
+    return baseItems;
+  }
+
+  const parent = group.topics.find((topic) => topic.topicId === "financial_statements_product");
+  const income = group.topics.find((topic) => topic.topicId === "income_statement");
+  const cashFlow = group.topics.find((topic) => topic.topicId === "cash_flow_statement");
+  if (!parent || !income || !cashFlow) {
+    return baseItems;
+  }
+
+  const result: DocsSidebarNavItem[] = [];
+  for (const topic of group.topics) {
+    if (topic.topicId === "income_statement" || topic.topicId === "cash_flow_statement") {
+      continue;
+    }
+    if (topic.topicId === "financial_statements_product") {
+      result.push({
+        title: topic.title,
+        href: topic.href,
+        children: [
+          { title: income.title, href: income.href },
+          { title: cashFlow.title, href: cashFlow.href },
+        ],
+      });
+      continue;
+    }
+    result.push({ title: topic.title, href: topic.href });
+  }
+
+  return result;
+}
+
 export const docsSidebarNav: DocsSidebarNavGroup[] = [
   {
     id: "getting-started",
@@ -6039,7 +8095,7 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
       title: group.label,
       href: group.href,
       icon: group.icon,
-      children: group.topics.map((topic) => ({ title: topic.title, href: topic.href })),
+      children: buildSchemaReadySidebarItems(group),
     })),
   },
   {
