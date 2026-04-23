@@ -69,6 +69,23 @@ export function DocsLandingContent() {
           ))}
         </div>
       </section>
+
+      <section className="space-y-3 border-t border-slate-200 pt-8">
+        <SectionHeading id="upgrade-value">為什麼需要升級</SectionHeading>
+        <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
+          <li>免費方案：每次請求最多 50 筆資料</li>
+          <li>升級後：每次請求最多 5000 筆資料</li>
+        </ul>
+        <p className="text-sm leading-7 text-slate-600">當資料被限制時，升級即可取得完整分析能力</p>
+        <div>
+          <Link
+            href="/billing/subscriptions"
+            className="inline-flex items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
+          >
+            查看方案
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
