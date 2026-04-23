@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { SectionHeading } from "@/src/components/docs/section-heading";
@@ -16,6 +17,10 @@ export function TwseDailyPriceLiveDemo() {
   const [error, setError] = useState("");
   const [rows, setRows] = useState<DemoRow[]>([]);
   const [raw, setRaw] = useState<unknown>(null);
+  const [planLimitedMeta, setPlanLimitedMeta] = useState<{ isLimited: boolean; rowLimit: number | null }>({
+    isLimited: false,
+    rowLimit: null,
+  });
 
   const handleFetch = async () => {
     const value = symbol.trim();
@@ -23,6 +28,7 @@ export function TwseDailyPriceLiveDemo() {
       setError("請先輸入 symbol。");
       setRows([]);
       setRaw(null);
+      setPlanLimitedMeta({ isLimited: false, rowLimit: null });
       return;
     }
 
@@ -40,6 +46,19 @@ export function TwseDailyPriceLiveDemo() {
 
       const payload = await response.json();
       setRaw(payload);
+
+      const meta = (payload?.meta ?? {}) as Record<string, unknown>;
+      const rowLimitRaw = meta.row_limit;
+      const parsedRowLimit =
+        typeof rowLimitRaw === "number"
+          ? rowLimitRaw
+          : typeof rowLimitRaw === "string"
+            ? Number(rowLimitRaw)
+            : Number.NaN;
+      setPlanLimitedMeta({
+        isLimited: meta.is_limited === true,
+        rowLimit: Number.isFinite(parsedRowLimit) ? parsedRowLimit : null,
+      });
 
       if (!response.ok) {
         setRows([]);
@@ -61,6 +80,7 @@ export function TwseDailyPriceLiveDemo() {
     } catch {
       setRows([]);
       setRaw(null);
+      setPlanLimitedMeta({ isLimited: false, rowLimit: null });
       setError("無法連線到本機 API（http://127.0.0.1:8011）。");
     } finally {
       setLoading(false);
@@ -94,6 +114,21 @@ export function TwseDailyPriceLiveDemo() {
       </div>
 
       {error ? <p className="text-sm text-rose-600">{error}</p> : null}
+
+      {planLimitedMeta.isLimited ? (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3">
+          <p className="text-sm font-medium text-amber-900">
+            目前方案僅顯示前 {planLimitedMeta.rowLimit ?? 50} 筆資料
+          </p>
+          <p className="mt-1 text-sm text-amber-800">升級方案即可取得完整資料</p>
+          <Link
+            href="/billing/subscriptions"
+            className="mt-3 inline-flex items-center justify-center rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-xs font-medium text-white transition hover:bg-slate-800"
+          >
+            升級方案
+          </Link>
+        </div>
+      ) : null}
 
       {rows.length > 0 ? (
         <div className="overflow-x-auto rounded-lg border border-slate-200">
