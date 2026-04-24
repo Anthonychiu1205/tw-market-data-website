@@ -2250,6 +2250,7 @@ const baseDocsPages: DocsPageEntry[] = [
         paragraphs: [
           "Q：欄位解析異常時該先看什麼？",
           "A：先確認 dataset 與 data 型態，再檢查 period/date、欄位型別與來源 metadata。",
+          "如需人工協助，請來信 avenra.platform@gmail.com。",
         ],
       },
     ],
@@ -2278,6 +2279,7 @@ const baseDocsPages: DocsPageEntry[] = [
         paragraphs: [
           "建議透過聯絡頁提交問題，並在標題中標註環境（dev/staging/prod）與受影響資料集。",
           "若為緊急故障，請同步提供影響範圍與預期回覆時限。",
+          "聯絡信箱：avenra.platform@gmail.com",
         ],
       },
       {
@@ -5800,6 +5802,865 @@ function buildMarketBreadthApiSections(): DocsContentSection[] {
   ];
 }
 
+function buildInterestRateApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/interest-rate-snapshot";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/interest-rate-snapshot",
+    headers=headers,
+    params={
+        "date_from": "2026-01-01",
+        "date_to": "2026-04-30",
+        "limit": 30
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/interest-rate-snapshot?date_from=2026-01-01&date_to=2026-04-30&limit=30",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/interest-rate-snapshot?date_from=2026-01-01&date_to=2026-04-30&limit=30" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/datasets/interest-rate-snapshot",
+      request_id: "req_rates_1a2b3c4d",
+      plan_id: "developer",
+      dataset: "interest_rate_snapshot",
+      query: {
+        as_of_date: null,
+        date_from: "2026-01-01",
+        date_to: "2026-04-30",
+        limit: 30,
+        offset: 0,
+        sort_by: "as_of_date",
+        sort_order: "desc",
+      },
+      meta: { rows_returned: 1 },
+      envelope: {
+        api_version: "v2",
+        dataset: "interest_rate_snapshot",
+        request_context: {
+          ticker: "TWD_POLICY_RATE",
+          as_of_date: "2026-04-22",
+          family: "taiwan_macro",
+          dataset_view: "interest_rate_snapshot_v1",
+        },
+        data: [
+          {
+            as_of_date: "2026-04-22",
+            policy_rate_pct: 1.875,
+            overnight_rate_pct: 1.61,
+            source_name: "cbc_official",
+          },
+        ],
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "市場與價格",
+    endpoint,
+    method: "GET",
+    overview: [
+      "利率 API 提供台灣市場利率快照資料，可作為估值折現、風險參數與宏觀條件分析的基礎輸入。",
+      "資料對應 canonical topic `interest_rate_snapshot`，對外路徑採 `/v2/datasets/interest-rate-snapshot`。",
+    ],
+    requestDescription: [
+      "使用此 endpoint 時，建議以 as_of_date 查單日快照，或以 date_from/date_to 查歷史區間。若流程需要長期序列，建議先批次落地再下游使用。",
+    ],
+    useCases: [
+      "設定折現率或資金成本參數。",
+      "作為宏觀條件過濾器，搭配價格與財務資料做策略檢查。",
+      "建立利率變動時間序列並觀察市場反應。",
+    ],
+    gettingStarted: [
+      "在 header 帶入 X-API-Key。",
+      "先用 as_of_date 查單日，再擴展到 date_from/date_to 區間。",
+      "對長期流程建議搭配 limit/offset 做分批抓取。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "as_of_date", type: "string", required: false, description: "指定單一資料日期（YYYY-MM-DD）。" },
+      { name: "date_from", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "date_to", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數限制。" },
+      { name: "offset", type: "integer", required: false, description: "分頁偏移。" },
+    ],
+    responseSummary: ["回應採 canonical envelope，頂層包含 query/meta，實際資料位於 envelope.data。"],
+    responseFields: [
+      { path: "dataset", type: "string", description: "資料集識別，固定為 interest_rate_snapshot。" },
+      { path: "meta.rows_returned", type: "integer", description: "回傳資料筆數。" },
+      { path: "envelope.data[].as_of_date", type: "string", description: "資料日期。" },
+      { path: "envelope.data[].policy_rate_pct", type: "number|null", description: "政策利率（百分比）。" },
+      { path: "envelope.data[].overnight_rate_pct", type: "number|null", description: "隔夜利率（百分比）。" },
+      { path: "envelope.data[].source_name", type: "string|null", description: "來源識別（例如 cbc_official）。" },
+    ],
+    notes: [
+      "此頁使用 data-api-standard 版型，與技術指標、估值資料、TWSE/TPEx 日線價格頁一致。",
+      "若要做跨資料集分析，建議保留 as_of_date 以便和 index-data、market-breadth 對齊。",
+      "是否可完整讀取仍受 entitlement 控制，實際以控制台方案為準。",
+    ],
+    planRequirement: {
+      title: "Plan Requirement",
+      bullets: ["Readiness：live external route（canonical topic）", "適用方案：Free（限制） / Developer / Pro / Enterprise（實際 entitlement 以控制台為準）"],
+    },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳利率快照資料", body: successBody },
+        { status: "400", description: "查詢參數錯誤", body: `{"detail":"invalid_query_params"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+        { status: "404", description: "查無符合條件的利率資料", body: `{"api_version":"v2","dataset":"interest_rate_snapshot","meta":{"rows_returned":0},"envelope":{"data":[]}}` },
+      ],
+    },
+  };
+}
+
+function buildInterestRateApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildThemeTaxonomyApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/theme-taxonomy";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/theme-taxonomy",
+    headers=headers,
+    params={
+        "ticker": "2330",
+        "limit": 20
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/theme-taxonomy?ticker=2330&limit=20",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/theme-taxonomy?ticker=2330&limit=20" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/datasets/theme-taxonomy",
+      request_id: "req_theme_1a2b3c4d",
+      plan_id: "developer",
+      dataset: "theme_taxonomy",
+      query: {
+        ticker: "2330",
+        market: null,
+        sector: null,
+        industry: null,
+        theme_primary: null,
+        limit: 20,
+        offset: 0,
+        sort_by: "as_of_date",
+        sort_order: "desc",
+      },
+      meta: { rows_returned: 1 },
+      envelope: {
+        dataset: "theme_taxonomy",
+        ticker: "2330",
+        as_of_date: "2026-04-22",
+        release_date: "2026-04-22",
+        data: [
+          {
+            ticker: "2330",
+            market: "TWSE",
+            as_of_date: "2026-04-22",
+            sector: "半導體業",
+            industry: "晶圓代工",
+            subindustry: null,
+            theme_primary: "AI基礎設施",
+            theme_secondary: "高效能運算",
+            classification_source: "issuer_classification_map+issuer_classification_taxonomy",
+            provider: "twse_official",
+            source_role: "canonical",
+          },
+        ],
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "分類與結構",
+    endpoint,
+    method: "GET",
+    overview: [
+      "公司分類 API 提供 deterministic 的公司分類與題材映射資料，來源為 `issuer_classification_map` 與 `issuer_classification_taxonomy`。",
+      "這個 endpoint 屬於已對外開放的 live route，可用於產業分群、主題篩選與跨資料集分類對齊。",
+    ],
+    requestDescription: [
+      "至少需要提供一個 filter（ticker、market、sector、industry、theme_primary 任一），未提供時會回傳 `missing_required_filter`。",
+    ],
+    useCases: [
+      "依 ticker 取得公司當期 sector/industry/theme 分類。",
+      "建立題材分群清單，作為篩選與監控條件。",
+      "與價格或財務資料串接，建立分類維度的橫截面分析。",
+    ],
+    gettingStarted: [
+      "先用 ticker 驗證單一公司分類資料。",
+      "需要分群時可改用 sector/industry/theme_primary 作為 filter。",
+      "排序僅支援 sort_by=as_of_date|ticker，sort_order=asc|desc。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "ticker", type: "string", required: false, description: "股票代碼。" },
+      { name: "market", type: "string", required: false, description: "市場代碼（例如 TWSE、TPEx）。" },
+      { name: "sector", type: "string", required: false, description: "產業大類篩選。" },
+      { name: "industry", type: "string", required: false, description: "產業細分類篩選。" },
+      { name: "theme_primary", type: "string", required: false, description: "主題分類篩選。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數限制（1..1000）。" },
+      { name: "offset", type: "integer", required: false, description: "分頁偏移。" },
+      { name: "sort_by", type: "string", required: false, description: "排序欄位：as_of_date 或 ticker。" },
+      { name: "sort_order", type: "string", required: false, description: "排序方向：asc 或 desc。" },
+    ],
+    responseSummary: [
+      "回應採 canonical envelope，頂層包含 query/meta，分類資料位於 envelope.data。",
+      "資料為 deterministic 映射結果，不包含 AI 推論分數或主觀標註欄位。",
+    ],
+    responseFields: [
+      { path: "dataset", type: "string", description: "固定為 theme_taxonomy。" },
+      { path: "query", type: "object", description: "本次查詢條件。" },
+      { path: "meta.rows_returned", type: "integer", description: "回傳資料筆數。" },
+      { path: "envelope.data[].ticker", type: "string", description: "股票代碼。" },
+      { path: "envelope.data[].market", type: "string", description: "市場代碼。" },
+      { path: "envelope.data[].as_of_date", type: "string", description: "分類資料日期。" },
+      { path: "envelope.data[].sector", type: "string|null", description: "產業大類。" },
+      { path: "envelope.data[].industry", type: "string|null", description: "產業細類。" },
+      { path: "envelope.data[].theme_primary", type: "string|null", description: "主題主分類。" },
+      { path: "envelope.data[].theme_secondary", type: "string|null", description: "主題次分類。" },
+      { path: "envelope.data[].classification_source", type: "string|null", description: "分類映射來源識別。" },
+      { path: "envelope.data[].source_role", type: "string|null", description: "來源角色。" },
+    ],
+    notes: [
+      "backend source-of-truth：`data_topic_registry.theme_taxonomy` 為 LIVE_API，外部路由 `/v2/datasets/theme-taxonomy`。",
+      "若只查主題關鍵字入口，建議搭配 `/v2/search?type=theme`。",
+      "若條件查不到資料，通常回傳 200 + 空資料集合，不代表 endpoint 不可用。",
+    ],
+    planRequirement: {
+      title: "Plan / Readiness",
+      bullets: ["Status：productized（LIVE_API）", "Route：/v2/datasets/theme-taxonomy", "實際 entitlement 仍以 API key 方案為準"],
+    },
+    errorCases: ["200", "400", "401", "403"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳公司分類資料", body: successBody },
+        { status: "400", description: "缺少必要 filter 或排序參數錯誤", body: `{"detail":"missing_required_filter"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+      ],
+    },
+  };
+}
+
+function buildThemeTaxonomyApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildIndexClassificationApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/index-classification";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/index-classification",
+    headers=headers,
+    params={
+        "index_code": "TWSE_TAIEX",
+        "limit": 20
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/index-classification?index_code=TWSE_TAIEX&limit=20",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/index-classification?index_code=TWSE_TAIEX&limit=20" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/datasets/index-classification",
+      request_id: "req_idxcls_9f8e7d6c",
+      plan_id: "developer",
+      dataset: "index_classification",
+      query: {
+        index_code: "TWSE_TAIEX",
+        market: null,
+        index_type: null,
+        sector: null,
+        industry: null,
+        limit: 20,
+        offset: 0,
+        sort_by: "as_of_date",
+        sort_order: "desc",
+      },
+      meta: { rows_returned: 1 },
+      envelope: {
+        dataset: "index_classification",
+        ticker: "TWSE_TAIEX",
+        as_of_date: "2026-04-22",
+        data: [
+          {
+            index_code: "TWSE_TAIEX",
+            market: "TWSE",
+            as_of_date: "2026-04-22",
+            classification_version: "v1",
+            index_name: "發行量加權股價指數",
+            index_type: "broad_market",
+            sector: null,
+            industry: null,
+            parent_index_code: null,
+            is_sector_index: false,
+            is_broad_market_index: true,
+            theme_primary: null,
+            theme_secondary: null,
+            classification_source: "index_code_mapping_v1",
+            provider: "twse_official",
+            source_role: "canonical",
+          },
+        ],
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "分類與結構",
+    endpoint,
+    method: "GET",
+    overview: [
+      "指數分類 API 提供指數層級的分類事實欄位（type/sector/industry/theme flags），適合做市場分類視角分析與索引維度整理。",
+      "此 endpoint 對應 `index_classification` live route，不是 AI 分群或動態評分模型。",
+    ],
+    requestDescription: [
+      "至少需要提供一個 filter（index_code、market、index_type、sector、industry 任一），未提供時會回傳 `missing_required_filter`。",
+    ],
+    useCases: [
+      "查單一指數（index_code）分類屬性與旗標欄位。",
+      "建立市場分類清單，作為 dashboard 或研究分群維度。",
+      "搭配 index-data / market-breadth 進行市場結構與盤勢分析。",
+    ],
+    gettingStarted: [
+      "先用 index_code 取得單一指數欄位結構。",
+      "批量檢索時可改用 market 或 index_type 作篩選。",
+      "排序僅支援 sort_by=as_of_date|index_code，sort_order=asc|desc。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "index_code", type: "string", required: false, description: "指數代碼。" },
+      { name: "market", type: "string", required: false, description: "市場代碼。" },
+      { name: "index_type", type: "string", required: false, description: "指數類型（如 broad_market / sector）。" },
+      { name: "sector", type: "string", required: false, description: "產業分類條件。" },
+      { name: "industry", type: "string", required: false, description: "產業細分類條件。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數限制（1..1000）。" },
+      { name: "offset", type: "integer", required: false, description: "分頁偏移。" },
+      { name: "sort_by", type: "string", required: false, description: "排序欄位：as_of_date 或 index_code。" },
+      { name: "sort_order", type: "string", required: false, description: "排序方向：asc 或 desc。" },
+    ],
+    responseSummary: [
+      "回應採 canonical envelope，頂層包含 query/meta，實際分類資料位於 envelope.data。",
+      "contract 僅包含 deterministic 分類欄位，不包含信心分數與動態 ranking。",
+    ],
+    responseFields: [
+      { path: "dataset", type: "string", description: "固定為 index_classification。" },
+      { path: "meta.rows_returned", type: "integer", description: "回傳筆數。" },
+      { path: "envelope.data[].index_code", type: "string", description: "指數代碼。" },
+      { path: "envelope.data[].market", type: "string", description: "市場代碼。" },
+      { path: "envelope.data[].as_of_date", type: "string", description: "資料日期。" },
+      { path: "envelope.data[].index_name", type: "string|null", description: "指數名稱。" },
+      { path: "envelope.data[].index_type", type: "string|null", description: "指數類型。" },
+      { path: "envelope.data[].is_broad_market_index", type: "boolean|null", description: "是否為大盤型指數。" },
+      { path: "envelope.data[].is_sector_index", type: "boolean|null", description: "是否為產業型指數。" },
+      { path: "envelope.data[].theme_primary", type: "string|null", description: "主題主分類。" },
+      { path: "envelope.data[].classification_source", type: "string|null", description: "分類映射來源。" },
+      { path: "envelope.data[].source_role", type: "string|null", description: "來源角色。" },
+    ],
+    notes: [
+      "backend source-of-truth：`data_topic_registry.index_classification` 為 LIVE_API，外部路由 `/v2/datasets/index-classification`。",
+      "若需要指數點位與漲跌等行情欄位，請搭配 `/v2/datasets/index-data`。",
+      "查無資料通常回 200 空集合，建議依 `meta.rows_returned` 判斷結果。",
+    ],
+    planRequirement: {
+      title: "Plan / Readiness",
+      bullets: ["Status：productized（LIVE_API）", "Route：/v2/datasets/index-classification", "實際 entitlement 仍以 API key 方案為準"],
+    },
+    errorCases: ["200", "400", "401", "403"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳指數分類資料", body: successBody },
+        { status: "400", description: "缺少必要 filter 或排序參數錯誤", body: `{"detail":"missing_required_filter"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+      ],
+    },
+  };
+}
+
+function buildIndexClassificationApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildSearchApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/search";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/search",
+    headers=headers,
+    params={"q": "台積電", "type": "issuer", "limit": 20},
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/search?q=%E5%8F%B0%E7%A9%8D%E9%9B%BB&type=issuer&limit=20",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/search?q=%E5%8F%B0%E7%A9%8D%E9%9B%BB&type=issuer&limit=20" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/search",
+      request_id: "req_search_5b7d9f1a",
+      plan_id: "developer",
+      dataset: "universal_search",
+      query: { q: "台積電", type: "issuer", limit: 20, offset: 0 },
+      meta: { rows_returned: 1, supported_types: ["all", "index", "issuer", "theme"] },
+      results: [
+        {
+          entity_type: "issuer",
+          ticker: "2330",
+          market: "TWSE",
+          company_name: "台灣積體電路製造股份有限公司",
+          english_name: "Taiwan Semiconductor Manufacturing Co., Ltd.",
+          matched_on: "company_name_contains",
+          provider: "twse_official",
+          source_role: "canonical",
+        },
+      ],
+      errors: [],
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "查詢與工具",
+    endpoint,
+    method: "GET",
+    overview: [
+      "搜尋 API 提供 deterministic 的實體搜尋能力，可在 issuer/index/theme 三種實體之間統一查找。",
+      "這是對外公開能力，路徑為 `/v2/search`，不使用向量檢索或 LLM 排名。",
+    ],
+    requestDescription: [
+      "必填參數為 `q`；`type` 可選 `issuer | index | theme | all`。若 type 不支援，會回傳 `unsupported_search_type`。",
+    ],
+    useCases: [
+      "輸入公司名稱或代碼，快速定位 ticker。",
+      "在 index/theme 維度快速找可用實體。",
+      "作為 query 前置步驟，先定位 entity 再提取欄位。",
+    ],
+    gettingStarted: [
+      "先以 q + type=issuer 測試公司搜尋。",
+      "需要跨實體搜尋時改為 type=all。",
+      "大批量場景請以 limit/offset 分頁避免單次過大。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "q", type: "string", required: true, description: "搜尋字串。" },
+      { name: "type", type: "string", required: false, description: "issuer | index | theme | all（預設 all）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數限制（1..100）。" },
+      { name: "offset", type: "integer", required: false, description: "分頁偏移（>=0）。" },
+    ],
+    responseSummary: [
+      "回應固定包含 `dataset=universal_search`、`query`、`meta`、`results`、`errors`。",
+      "空結果以 200 + results=[] 回傳，不以 404 表示。",
+    ],
+    responseFields: [
+      { path: "dataset", type: "string", description: "固定為 universal_search。" },
+      { path: "query", type: "object", description: "本次查詢參數回填。" },
+      { path: "meta.rows_returned", type: "integer", description: "回傳筆數。" },
+      { path: "results[].entity_type", type: "string", description: "實體類型（issuer/index/theme）。" },
+      { path: "results[].ticker", type: "string|null", description: "股票代碼（issuer 時常見）。" },
+      { path: "results[].index_code", type: "string|null", description: "指數代碼（index 時常見）。" },
+      { path: "results[].theme_primary", type: "string|null", description: "主題欄位（theme 時常見）。" },
+      { path: "results[].matched_on", type: "string", description: "命中欄位/規則。" },
+      { path: "results[].source_role", type: "string|null", description: "來源角色。" },
+      { path: "results[].lineage", type: "object|string|null", description: "來源追溯資訊。" },
+      { path: "errors[]", type: "array", description: "錯誤欄位（分支失敗或參數問題）。" },
+    ],
+    notes: [
+      "排序策略是 deterministic 規則，不包含語意向量或模型 rerank。",
+      "如果某個分支來源表為空，系統會回 200 空結果而不是 500。",
+      "推薦流程：先 `/v2/search` 定位，再使用 `/v2/query` 擷取欄位。",
+    ],
+    planRequirement: {
+      title: "Plan / Readiness",
+      bullets: ["Status：productized capability（registry: universal_search）", "Route：/v2/search", "實際 entitlement 以 API key 方案與 rate/quota 設定為準"],
+    },
+    errorCases: ["200", "400", "401", "403"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳搜尋結果", body: successBody },
+        { status: "400", description: "type 不支援或參數非法（含部分驗證錯誤）", body: `{"detail":"unsupported_search_type"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取搜尋能力", body: `{"error":"dataset_not_entitled"}` },
+      ],
+    },
+  };
+}
+
+function buildSearchApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildQueryApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/query";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/query",
+    headers=headers,
+    params={
+        "entity_id": "2330",
+        "entity_type": "issuer",
+        "fields": "company_name,pe_ratio,revenue_yoy_pct",
+        "as_of_date": "2026-04-22"
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/query?entity_id=2330&entity_type=issuer&fields=company_name,pe_ratio,revenue_yoy_pct&as_of_date=2026-04-22",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/query?entity_id=2330&entity_type=issuer&fields=company_name,pe_ratio,revenue_yoy_pct&as_of_date=2026-04-22" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/query",
+      request_id: "req_query_4e6a8c0d",
+      plan_id: "developer",
+      dataset: "field_query",
+      entity_id: "2330",
+      entity_type: "issuer",
+      as_of_date: "2026-04-22",
+      fields: ["company_name", "pe_ratio", "revenue_yoy_pct"],
+      data: {
+        company_name: "台灣積體電路製造股份有限公司",
+        pe_ratio: 26.8,
+        revenue_yoy_pct: 0.18,
+      },
+      explainability: {
+        company_name: {
+          source_topic: "issuer_profile",
+          source_table_or_contract: "issuer_profiles",
+          source_field: "company_name",
+          attach_rule: "exact_entity_attach",
+          formula: null,
+          nullability_rule: "nullable_if_source_missing",
+          freshness_basis: "latest_on_or_before(as_of_date)",
+        },
+      },
+      errors: [],
+      meta: { batch_mode: false, supported_entity_types: ["index", "issuer"] },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "查詢與工具",
+    endpoint,
+    method: "GET",
+    overview: [
+      "查詢 API 提供嚴格 allowlist 的欄位查詢能力，適合在固定契約下擷取跨資料主題欄位。",
+      "回應預設附帶 explainability metadata，可直接用於來源驗證與欄位審計。",
+    ],
+    requestDescription: [
+      "必填條件為 `entity_type`、`fields`，且必須提供 `entity_id` 或 `entity_ids[]` 其中之一。單次最多 10 個 entity。",
+    ],
+    useCases: [
+      "以單一 issuer/index 抽取固定欄位，供策略與面板使用。",
+      "批次查詢多標的並取得共享 explainability metadata。",
+      "搭配 `/v2/query/fields` 先查 allowlist，再動態組裝查詢。",
+    ],
+    gettingStarted: [
+      "先用單一 entity_id 驗證欄位與 explainability。",
+      "確定欄位後再使用 entity_ids[] 進入 batch 模式。",
+      "若只需要值可加 `minimal_fields=true` 減少 payload。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "entity_id", type: "string", required: false, description: "單一實體識別（ticker 或 index code）。" },
+      { name: "entity_ids", type: "string", required: false, description: "逗號分隔的批次實體識別。" },
+      { name: "entity_ids[]", type: "string[]", required: false, description: "重複 query 參數的批次實體識別。" },
+      { name: "entity_type", type: "string", required: true, description: "issuer 或 index。" },
+      { name: "fields", type: "string", required: true, description: "逗號分隔欄位清單。" },
+      { name: "fields[]", type: "string[]", required: false, description: "重複 query 參數欄位清單。" },
+      { name: "as_of_date", type: "string", required: false, description: "查詢基準日（YYYY-MM-DD）。" },
+      { name: "minimal_fields", type: "boolean", required: false, description: "true 時省略 explainability payload。" },
+    ],
+    responseSummary: [
+      "單筆模式回傳 `data + explainability`；批次模式回傳 `results + explainability_shared`。",
+      "dataset 固定為 `field_query`，不支援任意 SQL passthrough。",
+    ],
+    responseFields: [
+      { path: "dataset", type: "string", description: "固定為 field_query。" },
+      { path: "entity_type", type: "string", description: "issuer 或 index。" },
+      { path: "fields[]", type: "string[]", description: "實際解析後欄位清單。" },
+      { path: "data", type: "object", description: "單筆模式欄位值映射。" },
+      { path: "results[]", type: "array", description: "批次模式結果列。" },
+      { path: "explainability", type: "object", description: "單筆模式欄位級解釋資訊。" },
+      { path: "explainability_shared", type: "object", description: "批次模式共享 explainability 區塊。" },
+      { path: "errors[]", type: "array", description: "欄位或請求錯誤資訊。" },
+      { path: "meta.allowlist", type: "array", description: "目前 entity_type 可用欄位列表。" },
+    ],
+    notes: [
+      "Companion endpoints：`/v2/query/fields`（欄位契約）與 `/v2/query/examples`（請求範例）。",
+      "unsupported_field 會明確出現在 errors，不會默默忽略。",
+      "Explainability 為 deterministic 映射，不包含 LLM 生成敘述。",
+    ],
+    planRequirement: {
+      title: "Plan / Readiness",
+      bullets: ["Status：productized capability（registry: field_query）", "Routes：/v2/query、/v2/query/fields、/v2/query/examples", "實際 entitlement 以 API key 方案為準"],
+    },
+    errorCases: ["200", "400", "401", "403"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳欄位查詢結果", body: successBody },
+        { status: "400", description: "缺少 entity/fields、entity_type 不支援，或超過 batch 限制", body: `{"detail":{"code":"missing_fields","message":"Provide fields or fields[]"}}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此能力", body: `{"error":"dataset_not_entitled"}` },
+      ],
+    },
+  };
+}
+
+function buildQueryApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildExplainabilityApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/query/fields";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/query/fields",
+    headers=headers,
+    params={"entity_type": "issuer"},
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/query/fields?entity_type=issuer",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/query/fields?entity_type=issuer" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/query/fields",
+      request_id: "req_explain_2c4e6a8b",
+      plan_id: "developer",
+      entity_type: "issuer",
+      fields: [
+        {
+          entity_type: "issuer",
+          field_name: "company_name",
+          description: "Deterministic query field `company_name` for `issuer` entity_type.",
+          source_topic: "issuer_profile",
+          source_table_or_contract: "issuer_profiles",
+          source_field: "company_name",
+          attach_rule: "exact_entity_attach",
+          formula: null,
+          nullability_rule: "nullable_if_source_missing",
+          freshness_basis: "latest_on_or_before(as_of_date)",
+          status: "active",
+          exclusion_reason: null,
+        },
+      ],
+      meta: {
+        supported_entity_types: ["index", "issuer"],
+        active_field_count: 1,
+        excluded_field_count: 0,
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "查詢與工具",
+    endpoint,
+    method: "GET",
+    overview: [
+      "Explainability 在 backend 中不是獨立 `/v2/query/explain` endpoint，而是由 `/v2/query` 內嵌欄位解釋資訊，並由 `/v2/query/fields` 提供 machine-readable 欄位契約。",
+      "此頁聚焦 explainability 層的可用介面與資料結構，對齊 `search_query_explainability.py` 的 deterministic 規則。",
+    ],
+    requestDescription: [
+      "`/v2/query/fields` 可用 `entity_type` 篩選欄位；`/v2/query` 預設回傳 explainability（除非 `minimal_fields=true`）。",
+    ],
+    useCases: [
+      "在程式端先拉欄位契約，再組裝 query 請求。",
+      "把欄位來源、公式、attach rule 寫入審計與研究報表。",
+      "在 batch 模式重用 `explainability_shared` 降低重複 payload。",
+    ],
+    gettingStarted: [
+      "先查 `/v2/query/fields?entity_type=issuer` 取得可用欄位與 explainability metadata。",
+      "再呼叫 `/v2/query` 取得資料值與 explainability。",
+      "只需要值時可加 `minimal_fields=true`。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "entity_type", type: "string", required: false, description: "issuer 或 index；不帶則回傳全部。" },
+    ],
+    responseSummary: [
+      "`/v2/query/fields` 回傳欄位定義與 explainability metadata；`/v2/query` 回傳資料值時可附 explainability / explainability_shared。",
+      "Explainability payload key 固定為 source_topic、source_table_or_contract、source_field、attach_rule、formula、nullability_rule、freshness_basis。",
+    ],
+    responseFields: [
+      { path: "fields[].entity_type", type: "string", description: "欄位所屬實體類型。" },
+      { path: "fields[].field_name", type: "string", description: "可查詢欄位名稱。" },
+      { path: "fields[].source_topic", type: "string|null", description: "來源 topic 識別。" },
+      { path: "fields[].source_table_or_contract", type: "string|null", description: "來源 table/contract。" },
+      { path: "fields[].attach_rule", type: "string|null", description: "欄位掛接規則。" },
+      { path: "fields[].formula", type: "string|null", description: "公式描述（若有）。" },
+      { path: "fields[].status", type: "string", description: "active 或 excluded。" },
+      { path: "fields[].exclusion_reason", type: "string|null", description: "排除原因。" },
+      { path: "meta.active_field_count", type: "integer", description: "可用欄位數量。" },
+      { path: "meta.excluded_field_count", type: "integer", description: "排除欄位數量。" },
+    ],
+    notes: [
+      "Explainability 層為 productized capability，但屬於 `/v2/query` 生態的一部分，不是獨立 dataset route。",
+      "不提供模型生成敘述；所有欄位說明均來自 deterministic registry。",
+      "可搭配 `/v2/query/examples` 作為客戶端快速接線樣板。",
+    ],
+    planRequirement: {
+      title: "Plan / Readiness",
+      bullets: ["Status：productized capability（embedded in field_query）", "Routes：/v2/query、/v2/query/fields、/v2/query/examples", "不提供獨立 `/v2/query/explain` endpoint"],
+    },
+    errorCases: ["200", "400", "401", "403"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳欄位 explainability 契約", body: successBody },
+        { status: "400", description: "entity_type 不支援（含部分驗證錯誤）", body: `{"detail":"unsupported_entity_type"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此能力", body: `{"error":"dataset_not_entitled"}` },
+      ],
+    },
+  };
+}
+
+function buildExplainabilityApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
 function buildChipFlowsApiReference(): ApiReferenceContent {
   const endpoint = "/v2/datasets/chip-flows";
   const codeExamples: ApiCodeExamples = {
@@ -7842,6 +8703,102 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         tier: "complete",
         sections: buildMarketBreadthApiSections(),
         apiReference: buildMarketBreadthApiReference(),
+      };
+    }
+
+    if (topic.topicId === "interest_rate_snapshot") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "利率",
+        subtitle: "提供台灣市場利率快照資料，適合用於折現參數設定、宏觀條件對照與研究流程。",
+        tier: "complete",
+        sections: buildInterestRateApiSections(),
+        apiReference: buildInterestRateApiReference(),
+      };
+    }
+
+    if (topic.topicId === "theme_taxonomy") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "公司分類",
+        subtitle: "提供 deterministic 公司分類與題材映射資料，適合分群分析與跨資料集分類對齊。",
+        tier: "complete",
+        sections: buildThemeTaxonomyApiSections(),
+        apiReference: buildThemeTaxonomyApiReference(),
+      };
+    }
+
+    if (topic.topicId === "index_classification") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "指數分類",
+        subtitle: "提供 deterministic 指數分類欄位，適合市場結構分析與指數維度整理。",
+        tier: "complete",
+        sections: buildIndexClassificationApiSections(),
+        apiReference: buildIndexClassificationApiReference(),
+      };
+    }
+
+    if (topic.topicId === "search_api") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "搜尋 API",
+        subtitle: "提供 deterministic 實體搜尋能力，支援 issuer、index、theme 三類查找。",
+        tier: "complete",
+        sections: buildSearchApiSections(),
+        apiReference: buildSearchApiReference(),
+      };
+    }
+
+    if (topic.topicId === "query_api") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "查詢 API",
+        subtitle: "提供 allowlist 欄位查詢能力，適合固定契約資料提取與 explainability 驗證。",
+        tier: "complete",
+        sections: buildQueryApiSections(),
+        apiReference: buildQueryApiReference(),
+      };
+    }
+
+    if (topic.topicId === "explainability_layer") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "Explainability",
+        subtitle: "說明欄位來源與掛接規則，供 query 流程做可追溯與契約驗證。",
+        tier: "complete",
+        sections: buildExplainabilityApiSections(),
+        apiReference: buildExplainabilityApiReference(),
       };
     }
 
