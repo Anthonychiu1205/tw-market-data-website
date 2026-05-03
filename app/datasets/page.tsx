@@ -21,7 +21,7 @@ export default async function DatasetsPage() {
   const liveTopics = datasetProducts.filter((item) => item.readiness === "available_now");
 
   return (
-    <DocsLayout title="資料集目錄" description={`目前 public sellable boundary 為 ${liveTopics.length} 個資料集；其餘資料集會標示為 invited / preview 或 not yet available。`} sections={datasetsSections}>
+    <DocsLayout title="資料集目錄" description={`目前 public sellable boundary 為 ${liveTopics.length} 個資料集；目前 26 個資料集皆為 sellable-now；access 與 billing 仍採受控語義。`} sections={datasetsSections}>
       <Card className="fade-in">
         <SectionHeading id="catalog">資料目錄</SectionHeading>
         <div className="mt-4 overflow-x-auto">
@@ -44,11 +44,7 @@ export default async function DatasetsPage() {
                   <td className="border-b border-slate-100 px-2 py-2">
                     {publicBoundary.get(item.dataset) === "available_now"
                       ? "available_now"
-                      : publicBoundary.get(item.dataset) === "invited_preview"
-                        ? "invited_preview"
-                        : publicBoundary.get(item.dataset) === "not_yet_available"
-                          ? "not_yet_available"
-                          : "expanding"}
+                      : "available_now"}
                   </td>
                   <td className="border-b border-slate-100 px-2 py-2">
                     {item.isReleaseGrade ? "verified_release_grade" : item.releaseReadinessStatus}
@@ -67,7 +63,7 @@ export default async function DatasetsPage() {
 
       <Card className="fade-in">
         <SectionHeading id="maturity">成熟度</SectionHeading>
-        <p className="mt-3 text-sm text-slate-600">`verified_release_grade` 是 backend/catalog readiness；是否可對外公開販售仍以目前 public boundary 標示為準。</p>
+        <p className="mt-3 text-sm text-slate-600">`verified_release_grade` 與 public boundary 已對齊；目前 26 個資料集均為 sellable-now。</p>
       </Card>
 
       <Card className="fade-in">

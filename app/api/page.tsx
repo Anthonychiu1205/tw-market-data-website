@@ -27,8 +27,8 @@ export default function ApiPage() {
 
       <Card className="fade-in">
         <SectionHeading id="datasets">資料集</SectionHeading>
-        <p className="mt-3 text-sm text-slate-600">目前 available now：`/v2/datasets/twse-daily-price`、`/v2/datasets/tpex-daily-price`、`/v2/datasets/monthly-revenue`、`/v2/datasets/valuation-data`、`/v2/datasets/adjusted-prices`、`/v2/datasets/issuer-announcements`、`/v2/datasets/issuer-profile`、`/v2/datasets/interest-rate-snapshot`。</p>
-        <p className="mt-2 text-sm text-slate-600">`technical-indicators`、`institutional-flow`、`company-news`、`market-news` 仍屬 invited / preview；其餘資料集仍在擴充，不應視為已全面可用。</p>
+        <p className="mt-3 text-sm text-slate-600">目前 available now：26 個 sellable-now datasets（含財報三表、技術指標、法人流、融資融券、指數成分、ETF flow、衍生性商品、可轉債、結構化事件、公司/市場新聞與主題 taxonomy）。</p>
+        <p className="mt-2 text-sm text-slate-600">對外語義維持 controlled rollout；billing 仍為 preview semantics，避免誤判為 full public GA。</p>
       </Card>
 
       <Card className="fade-in">

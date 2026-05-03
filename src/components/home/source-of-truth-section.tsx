@@ -7,11 +7,7 @@ import { HOME_SOURCE_OF_TRUTH_ITEMS } from "@/src/content/home-source-of-truth";
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 
 const DEFAULT_ACTIVE_ID = "monthly_revenue";
-const PUBLIC_SELLABLE_IDS = new Set([
-  "monthly_revenue",
-  "daily_price",
-  "valuation_metrics",
-]);
+const PUBLIC_SELLABLE_IDS = new Set(HOME_SOURCE_OF_TRUTH_ITEMS.map((item) => item.id));
 
 type TokenType = "key" | "string" | "number" | "boolean" | "null" | "punctuation" | "text";
 
@@ -155,7 +151,7 @@ export function SourceOfTruthSection() {
         <div>
           <h2 className="text-3xl font-semibold tracking-tight text-slate-900">單一可信資料來源</h2>
           <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-            以下只展示目前已納入 public sellable boundary 的資料主題範例。其餘資料能力仍可能處於 invited / preview 或後續 graduation 階段，不應視為已全面可買。
+            以下展示目前 public sellable boundary 的資料主題範例。現況已完成 26 個 sellable-now datasets 對齊；access 採 controlled rollout，billing 維持 preview semantics。
           </p>
         </div>
 
