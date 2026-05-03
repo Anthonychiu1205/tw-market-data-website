@@ -17,12 +17,12 @@ export default function HomePage() {
           <div className="fade-in">
             <Tag>台股資料平台</Tag>
             <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">台股資料 API，為系統與量化流程而設計</h1>
-            <p className="mt-4 max-w-xl text-base leading-7 text-slate-600">
+            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
               專為 agent 與自動化系統打造，
               <br />
-              低延遲存取、結構一致、來源可審計，
+              低延遲存取、結構一致、來源可審計。
               <br />
-              支援策略開發與決策流程。
+              目前已可公開販售 8 個 dataset，其餘能力仍維持 invited / limited rollout 擴充中。
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/login" className={buttonClass("secondary")}>
@@ -47,10 +47,10 @@ export default function HomePage() {
 
           <div className="grid gap-0 border-y border-slate-200 md:grid-cols-2 xl:grid-cols-4">
             {[
-              ["3", "個已上線資料集", "TWSE daily price、TPEx daily price、monthly revenue"],
+              ["8", "個可公開販售資料集", "TWSE、TPEx、monthly revenue、valuation、adjusted prices、issuer announcements、issuer profile、interest rate snapshot"],
               ["3", "個官方來源", "TWSE、TPEx、MOPS"],
-              ["3", "API endpoints", "twse-daily-price、tpex-daily-price、monthly-revenue"],
-              ["1", "canonical schema", "統一 schema 與欄位設計"],
+              ["8", "條 available-now dataset routes", "對應 8 個可公開販售資料集的正式 API contract"],
+              ["1", "個可信產品邊界", "available now / invited-preview / not-yet-available 明確分級"],
             ].map(([value, label, description], index) => (
               <div
                 key={`${value}-${label}`}
@@ -75,7 +75,7 @@ export default function HomePage() {
         <MarketingContainer className="space-y-8">
           <div className="border-b border-slate-200 pb-6">
             <h2 className="text-lg font-semibold text-slate-900">為開發者、量化研究與資料產品團隊打造</h2>
-            <p className="mt-2 text-sm text-slate-600">聚焦可程式化接入與穩定交付，支援研究到上線流程。</p>
+            <p className="mt-2 text-sm text-slate-600">聚焦可程式化接入與穩定交付，支援研究到上線流程；目前商售邊界為 8 個 dataset，非 full GA 全量資料供應。</p>
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-700">
               {["量化研究", "策略開發", "自動化系統", "Agent workflow", "資料產品團隊"].map((item) => (
                 <span key={item} className="inline-flex items-center">
@@ -87,9 +87,9 @@ export default function HomePage() {
 
           <div className="grid gap-0 border-y border-slate-200 md:grid-cols-3">
             {[
-              ["資料集目錄", "查看目前可用資料與覆蓋範圍。", "/datasets", "查看資料集"],
-              ["API 參考", "直接查看端點、參數與回應格式。", "/api", "查看 API"],
-              ["方案與控制台", "管理方案、用量與 API 金鑰。", "/dashboard", "前往控制台"],
+              ["資料集目錄", "查看目前 8 個可公開販售資料集與其餘 invited / preview 範圍。", "/datasets", "查看資料集"],
+              ["API 參考", "直接查看 available-now endpoint、參數與回應格式。", "/api", "查看 API"],
+              ["方案與控制台", "管理方案、用量與 API 金鑰；billing 仍維持 preview semantics。", "/dashboard", "前往控制台"],
             ].map(([title, description, href, action], index) => (
               <div key={title} className={`py-5 ${index > 0 ? "md:border-l md:border-slate-200 md:pl-6" : "md:pr-6"}`}>
                 <p className="text-base font-semibold text-slate-900">{title}</p>
@@ -104,9 +104,9 @@ export default function HomePage() {
           <div className="border-t border-slate-200 pt-8">
             <h3 className="text-3xl font-semibold tracking-tight text-slate-900">立即開始使用</h3>
             <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
-              立即開始使用台股資料 API。
+              從 8 個 available-now dataset 開始接入台股資料 API。
               <br />
-              支援股價、財報與公司事件，快速建立你的分析與交易流程。
+              其餘資料能力仍在 invited / preview 或後續 graduation 批次中。
             </p>
             <div className="mt-6 flex flex-wrap gap-4">
               <Link href="/login" className={buttonClass("secondary")}>
