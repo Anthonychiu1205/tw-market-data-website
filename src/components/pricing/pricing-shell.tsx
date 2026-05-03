@@ -46,7 +46,7 @@ const plans: PlanItem[] = [
     yearly: "免費",
     monthlyHint: "試用方案",
     yearlyHint: "試用方案",
-    highlights: ["基本資料集（部分）", "API 存取（低速）", "開發測試用", "不適用生產系統"],
+    highlights: ["26 個 sellable-now 資料集（受控 access）", "API 存取（低速）", "開發測試用", "不適用生產系統"],
     cta: "開始使用",
     href: "/dashboard",
   },
@@ -58,7 +58,7 @@ const plans: PlanItem[] = [
     yearly: "NT$16,500",
     monthlyHint: "月付方案",
     yearlyHint: "年付方案（平均約 NT$1,375 / 月）",
-    highlights: ["8 個資料集（完整）", "標準 API 存取", "中等速率限制", "API 金鑰管理", "基本用量統計"],
+    highlights: ["26 個 sellable-now 資料集（完整）", "標準 API 存取", "中等速率限制", "API 金鑰管理", "基本用量統計"],
     persona: "適用：開發、測試、研究",
     cta: "選擇開發者方案",
     href: "/dashboard",
@@ -71,7 +71,7 @@ const plans: PlanItem[] = [
     yearly: "NT$66,000",
     monthlyHint: "月付方案",
     yearlyHint: "年付方案（平均約 NT$5,500 / 月）",
-    highlights: ["高速 API 存取（高頻）", "完整歷史資料（backfill）", "資料一致性保證（跨 dataset 對齊）", "優先更新（低延遲）", "高併發請求支援", "進階用量與監控"],
+    highlights: ["26 個 sellable-now 資料集完整存取", "高速 API 存取（高頻）", "資料一致性保證（跨 dataset 對齊）", "優先更新（低延遲）", "高併發請求支援", "進階用量與監控"],
     persona: "適用：正式交易系統 / production 環境",
     cta: "選擇專業方案",
     href: "/dashboard",
@@ -85,7 +85,7 @@ const plans: PlanItem[] = [
     yearly: "聯繫我們",
     monthlyHint: "",
     yearlyHint: "",
-    highlights: ["無限制 API", "SLA 保證", "專用基礎設施", "自訂資料供應", "專屬支援與顧問"],
+    highlights: ["26 個 sellable-now 資料集 + 客製擴充", "SLA 保證", "專用基礎設施", "自訂資料供應", "專屬支援與顧問"],
     cta: "聯繫我們",
     href: "/contact",
   },
@@ -114,14 +114,11 @@ const comparisonSections: ComparisonSection[] = [
   {
     title: "DATA",
     rows: [
-      { feature: "行情資料", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
-      { feature: "還原價格", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
-      { feature: "月營收", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
-      { feature: "財報資料", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
-      { feature: "估值資料", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
-      { feature: "公司事件", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
-      { feature: "籌碼流向", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
-      { feature: "融資融券", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
+      { feature: "sellable-now dataset 數量", free: "26（受控）", developer: "26", pro: "26", enterprise: "26 + 客製擴充" },
+      { feature: "行情 / 基本面 / 財報", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
+      { feature: "籌碼 / 持股 / 指數", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
+      { feature: "衍生性商品 / 可轉債", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
+      { feature: "公司新聞 / 市場新聞 / 主題分類", free: "✔（限制）", developer: "✔", pro: "✔", enterprise: "✔" },
     ],
   },
   {
@@ -149,14 +146,13 @@ const comparisonSections: ComparisonSection[] = [
 ];
 
 const creditsRows = [
-  { dataset: "行情資料", endpoint: "/v2/datasets/market-prices", cost: "1 credit / request" },
-  { dataset: "月營收", endpoint: "/v2/datasets/monthly-revenue", cost: "1 credit / request" },
-  { dataset: "財報資料", endpoint: "/v2/datasets/financials", cost: "2 credits / request" },
-  { dataset: "估值資料", endpoint: "/v2/datasets/valuations", cost: "1 credit / request" },
-  { dataset: "公司事件", endpoint: "/v2/datasets/corporate-actions", cost: "1 credit / request" },
-  { dataset: "籌碼流向", endpoint: "/v2/datasets/chip-flows", cost: "2 credits / request" },
-  { dataset: "還原價格", endpoint: "/v2/datasets/adjusted-prices", cost: "2 credits / request" },
-  { dataset: "融資融券", endpoint: "/v2/datasets/margin-short", cost: "2 credits / request" },
+  { dataset: "TWSE 日線價格", endpoint: "/v2/datasets/twse-daily-price", cost: "1 credit / request" },
+  { dataset: "財報三表（範例：損益表）", endpoint: "/v2/datasets/income-statement", cost: "2 credits / request" },
+  { dataset: "技術指標", endpoint: "/v2/datasets/technical-indicators", cost: "2 credits / request" },
+  { dataset: "法人買賣", endpoint: "/v2/datasets/institutional-flow", cost: "2 credits / request" },
+  { dataset: "衍生性商品", endpoint: "/v2/datasets/derivatives-market", cost: "3 credits / request" },
+  { dataset: "公司新聞", endpoint: "/v2/datasets/company-news", cost: "2 credits / request" },
+  { dataset: "主題分類", endpoint: "/v2/datasets/theme-taxonomy", cost: "1 credit / request" },
 ];
 
 function getDisplayPrice(plan: PlanItem, mode: BillingMode) {

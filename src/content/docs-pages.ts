@@ -237,8 +237,8 @@ const apiEndpointPathMap: Record<string, string> = {
   "analyst-estimates/revision-history": "/v1/analyst-estimates/revision-history",
   "institutional-holdings/investor-holdings": "/v1/institutional-holdings/investor-holdings",
   "institutional-holdings/single-stock-holdings": "/v1/institutional-holdings/single-stock-holdings",
-  "news/company-news": "/v1/news/company-news",
-  "news/market-news": "/v1/news/market-news",
+  "news/company-news": "/v2/datasets/company-news",
+  "news/market-news": "/v2/datasets/market-news",
   "interest-rates/rate-snapshot": "/v1/interest-rates/snapshot",
   "interest-rates/rate-history": "/v1/interest-rates/history",
   "search/stock-search": "/v2/search/stocks",
@@ -2334,19 +2334,19 @@ const topicPlanVisibility: Partial<Record<string, { bullets: string[] }>> = {
   },
   institutional_flow: {
     bullets: [
-      "Free：可用（限制）",
+      "Invited / Preview：可用（受控驗證）",
       "Developer：可用（限制，僅限開發與測試）",
-      "Pro / Enterprise：完整可用（含商業使用）",
+      "Pro / Enterprise：尚未納入 available-now 商售邊界",
     ],
   },
   technical_indicators: {
     bullets: [
-      "Free：可用（限制）",
+      "Invited / Preview：可用（受控驗證）",
       "Developer：可用（限制，僅限開發與測試）",
-      "Pro / Enterprise：完整可用（含商業使用）",
+      "Pro / Enterprise：尚未納入 available-now 商售邊界",
     ],
   },
-  monthly_revenue_enhanced: {
+  monthly_revenue: {
     bullets: [
       "Free：可用（限制）",
       "Developer：可用（限制，僅限開發與測試）",
@@ -2399,7 +2399,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     icon: "metrics",
     topics: [
       { title: "財報指標", href: "/docs/api/financial-growth/financial-metrics", topicId: "financial_metrics", tableName: "financial_metrics", endpoint: "/v2/datasets/financial-metrics", source: "MOPS / TWSE / TPEx" },
-      { title: "月營收", href: "/docs/api/financial-growth/monthly-revenue", topicId: "monthly_revenue_enhanced", tableName: "monthly_revenue_enhanced", endpoint: "/v2/datasets/monthly-revenue-enhanced", source: "MOPS" },
+      { title: "月營收", href: "/docs/api/financial-growth/monthly-revenue", topicId: "monthly_revenue", tableName: "monthly_revenue", endpoint: "/v2/datasets/monthly-revenue", source: "MOPS" },
       { title: "估值資料", href: "/docs/api/financial-growth/valuation-data", topicId: "valuation_data", tableName: "valuation_data", endpoint: "/v2/datasets/valuation-data", source: "TWSE / TPEx" },
       { title: "財報資料", href: "/docs/api/financial-growth/financial-statements", topicId: "financial_statements_product", tableName: "fundamental_income_statements + fundamental_cash_flows + fundamental_balance_sheets", endpoint: "/v2/datasets/income-statement + /v2/datasets/cash-flow-statement + /v2/datasets/balance-sheet", source: "MOPS" },
       { title: "損益表", href: "/docs/api/financial-growth/income-statement", topicId: "income_statement", tableName: "fundamental_income_statements", endpoint: "/v2/datasets/income-statement", source: "MOPS" },
@@ -2488,7 +2488,7 @@ const usageFocusedTopicIds = new Set([
   "factor_data",
   "time_alignment",
   "financial_metrics",
-  "monthly_revenue_enhanced",
+  "monthly_revenue",
   "valuation_data",
   "institutional_flow",
   "margin_short",
@@ -2510,7 +2510,7 @@ const topicWorkflowLinks: Record<string, Array<{ title: string; href: string }>>
   financial_metrics: [
     { title: "查公司基本面", href: "/docs/workflows/company-fundamentals" },
   ],
-  monthly_revenue_enhanced: [
+  monthly_revenue: [
     { title: "查公司基本面", href: "/docs/workflows/company-fundamentals" },
   ],
   valuation_data: [
@@ -8503,7 +8503,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
       };
     }
 
-    if (topic.topicId === "monthly_revenue_enhanced") {
+    if (topic.topicId === "monthly_revenue") {
       return {
         slug: hrefToSlug(topic.href),
         href: topic.href,

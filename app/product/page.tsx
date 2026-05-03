@@ -13,7 +13,6 @@ export const metadata: Metadata = {
 
 export default function ProductPage() {
   const liveTopics = datasetProducts.filter((item) => item.readiness === "available_now");
-  const upcomingTopics = datasetProducts.filter((item) => item.readiness !== "available_now");
 
   return (
     <Container className="space-y-8 py-12">
@@ -21,42 +20,25 @@ export default function ProductPage() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">產品</p>
           <h1 className="mt-2 text-4xl font-semibold tracking-tight text-slate-900">官方資料 API 產品（第 1 版）</h1>
-          <p className="mt-3 text-base text-slate-600">目前對外正式可用主題為 issuer-profile 與 issuer-announcements。</p>
+          <p className="mt-3 text-base text-slate-600">目前對外可公開販售 26 個 dataset；access 採 controlled rollout，並不等同 full public GA。</p>
         </div>
         <CodeWindow
           title="產品面向"
           code={`{
-  "available_now": ["issuer-profile", "issuer-announcements"],
-  "coming_soon": ["interest-rate-snapshot"],
-  "beta": ["company-news", "market-news"]
+  "available_now_count": 26,
+  "access_semantics": "controlled_rollout",
+  "billing_semantics": "preview"
 }`}
         />
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
+      <section className="grid gap-4 md:grid-cols-1">
         <Card>
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Available now / 已可用</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Available now / 已可公開販售</h2>
           <div className="mt-4 space-y-3">
             {liveTopics.map((topic) => (
               <div key={topic.id} className="rounded-md border border-emerald-200 bg-emerald-50/30 px-3 py-2">
                 <p className="text-sm font-semibold text-slate-900">{topic.name}</p>
-                <p className="mt-1 text-xs text-slate-600">{topic.shortUseCase}</p>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card>
-          <h2 className="text-xl font-semibold tracking-tight text-slate-900">Coming soon / Beta</h2>
-          <div className="mt-4 space-y-3">
-            {upcomingTopics.map((topic) => (
-              <div key={topic.id} className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-slate-900">{topic.name}</p>
-                  <span className="rounded-full border border-slate-200 px-2 py-0.5 text-[11px] font-medium uppercase tracking-wide text-slate-600">
-                    {topic.readiness === "beta" ? "beta" : "coming soon"}
-                  </span>
-                </div>
                 <p className="mt-1 text-xs text-slate-600">{topic.shortUseCase}</p>
               </div>
             ))}
@@ -79,7 +61,7 @@ export default function ProductPage() {
 
       <Card>
         <h2 className="text-xl font-semibold tracking-tight text-slate-900">開始使用</h2>
-        <p className="mt-2 text-sm text-slate-600">建議先閱讀 Quickstart 與文件，再接入兩個已上線主題。</p>
+        <p className="mt-2 text-sm text-slate-600">建議先閱讀 Quickstart 與文件，再從 26 個 available-now dataset 中選擇最貼近流程的主題開始整合。</p>
         <div className="mt-4 flex flex-wrap gap-4 text-sm">
           <Link href="/docs/quick-start" className="font-medium text-slate-900 underline-offset-4 hover:underline">
             前往 Quickstart

@@ -21,13 +21,14 @@ export default function ApiPage() {
 
       <Card className="fade-in">
         <SectionHeading id="auth">驗證</SectionHeading>
-        <CodeWindow title="Header" code={`Authorization: Bearer <API_KEY>`} />
+        <CodeWindow title="Header" code={`X-API-Key: <API_KEY>`} />
+        <p className="mt-3 text-sm text-slate-600">帳號與授權狀態可由 `/v2/account/entitlements` 檢視。</p>
       </Card>
 
       <Card className="fade-in">
         <SectionHeading id="datasets">資料集</SectionHeading>
-        <p className="mt-3 text-sm text-slate-600">目前正式可用：`/v2/datasets/issuer-profile`、`/v2/datasets/issuer-announcements`。</p>
-        <p className="mt-2 text-sm text-slate-600">`company-news`、`market-news` 為 beta；`interest-rate-snapshot` 為 coming soon。</p>
+        <p className="mt-3 text-sm text-slate-600">目前 available now：26 個 sellable-now datasets（含財報三表、技術指標、法人流、融資融券、指數成分、ETF flow、衍生性商品、可轉債、結構化事件、公司/市場新聞與主題 taxonomy）。</p>
+        <p className="mt-2 text-sm text-slate-600">對外語義維持 controlled rollout；billing 仍為 preview semantics，避免誤判為 full public GA。</p>
       </Card>
 
       <Card className="fade-in">
@@ -43,6 +44,15 @@ export default function ApiPage() {
   "data": [{ "ticker": "2330", "issuer_name": "台積電" }]
 }`}
           />
+        </div>
+        <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+          <p className="font-medium text-slate-900">Account surfaces</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5">
+            <li>`GET /v2/product/catalog`</li>
+            <li>`GET /v2/account/entitlements`</li>
+            <li>`GET /v2/account/usage-summary?window=month`</li>
+            <li>`GET /v2/account/billing-preview?window=month`（preview only）</li>
+          </ul>
         </div>
       </Card>
     </DocsLayout>

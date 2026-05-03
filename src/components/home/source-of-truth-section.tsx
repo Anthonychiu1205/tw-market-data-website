@@ -7,6 +7,7 @@ import { HOME_SOURCE_OF_TRUTH_ITEMS } from "@/src/content/home-source-of-truth";
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 
 const DEFAULT_ACTIVE_ID = "monthly_revenue";
+const PUBLIC_SELLABLE_IDS = new Set(HOME_SOURCE_OF_TRUTH_ITEMS.map((item) => item.id));
 
 type TokenType = "key" | "string" | "number" | "boolean" | "null" | "punctuation" | "text";
 
@@ -94,9 +95,14 @@ export function SourceOfTruthSection() {
   const [isAtTop, setIsAtTop] = useState(true);
   const [isAtBottom, setIsAtBottom] = useState(false);
 
+  const publicItems = useMemo(
+    () => HOME_SOURCE_OF_TRUTH_ITEMS.filter((item) => PUBLIC_SELLABLE_IDS.has(item.id)),
+    [],
+  );
+
   const activeItem = useMemo(
-    () => HOME_SOURCE_OF_TRUTH_ITEMS.find((item) => item.id === activeId) ?? HOME_SOURCE_OF_TRUTH_ITEMS[0],
-    [activeId],
+    () => publicItems.find((item) => item.id === activeId) ?? publicItems[0],
+    [activeId, publicItems],
   );
 
   const updateScrollState = useCallback(() => {
@@ -145,7 +151,7 @@ export function SourceOfTruthSection() {
         <div>
           <h2 className="text-3xl font-semibold tracking-tight text-slate-900">單一可信資料來源</h2>
           <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-            以下展示目前已上線的台股資料能力，涵蓋營運、財報、估值、價格、技術指標與籌碼分析，資料經標準化處理後可直接透過 API 使用。
+            以下展示目前 public sellable boundary 的資料主題範例。現況已完成 26 個 sellable-now datasets 對齊；access 採 controlled rollout，billing 維持 preview semantics。
           </p>
         </div>
 
@@ -153,7 +159,7 @@ export function SourceOfTruthSection() {
           <div className="relative lg:border-r lg:border-slate-200">
             <div ref={scrollContainerRef} className="h-[320px] overflow-y-auto lg:h-[520px]">
               <div className="divide-y divide-slate-200">
-                {HOME_SOURCE_OF_TRUTH_ITEMS.map((item) => (
+                {publicItems.map((item) => (
                   <button
                     key={item.id}
                     type="button"

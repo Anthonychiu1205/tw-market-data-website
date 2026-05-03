@@ -6,52 +6,64 @@ import { SectionHeading } from "@/src/components/docs/section-heading";
 import { Card } from "@/src/components/ui/card";
 import { datasetsSections } from "@/src/content/docs";
 import { datasetProducts } from "@/src/content/site";
+import { getProductCatalog } from "@/src/lib/backend-adapter";
 
 export const metadata: Metadata = {
   title: "資料集",
   description: "資料主題目錄與可用狀態。",
 };
 
-export default function DatasetsPage() {
+export default async function DatasetsPage() {
+  const catalog = await getProductCatalog("public-catalog@twmd.local");
+  const publicBoundary = new Map(
+    datasetProducts.map((item) => [item.id.replace(/-/g, "_"), item.readiness]),
+  );
   const liveTopics = datasetProducts.filter((item) => item.readiness === "available_now");
 
   return (
-    <DocsLayout title="資料集目錄" description={`目前正式可用 ${liveTopics.length} 個資料主題，其餘為 coming soon / beta。`} sections={datasetsSections}>
+    <DocsLayout title="資料集目錄" description={`目前 public sellable boundary 為 ${liveTopics.length} 個資料集；目前 26 個資料集皆為 sellable-now；access 與 billing 仍採受控語義。`} sections={datasetsSections}>
       <Card className="fade-in">
         <SectionHeading id="catalog">資料目錄</SectionHeading>
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[860px] text-sm">
+          <table className="w-full min-w-[980px] text-sm">
             <thead className="text-left text-slate-500">
               <tr>
-                <th className="border-b border-slate-200 px-2 py-2">名稱</th>
-                <th className="border-b border-slate-200 px-2 py-2">類型</th>
-                <th className="border-b border-slate-200 px-2 py-2">覆蓋範圍</th>
-                <th className="border-b border-slate-200 px-2 py-2">狀態</th>
-                <th className="border-b border-slate-200 px-2 py-2">Endpoint</th>
-                <th className="border-b border-slate-200 px-2 py-2">用途</th>
+                <th className="border-b border-slate-200 px-2 py-2">Dataset</th>
+                <th className="border-b border-slate-200 px-2 py-2">Public boundary</th>
+                <th className="border-b border-slate-200 px-2 py-2">Readiness</th>
+                <th className="border-b border-slate-200 px-2 py-2">Coverage</th>
+                <th className="border-b border-slate-200 px-2 py-2">Mapping</th>
+                <th className="border-b border-slate-200 px-2 py-2">Category</th>
+                <th className="border-b border-slate-200 px-2 py-2">Actual Table</th>
               </tr>
             </thead>
             <tbody className="text-slate-700">
-              {datasetProducts.map((item) => (
-                <tr key={item.id}>
-                  <td className="border-b border-slate-100 px-2 py-2 font-medium">{item.name}</td>
-                  <td className="border-b border-slate-100 px-2 py-2">{item.domain}</td>
-                  <td className="border-b border-slate-100 px-2 py-2">{item.marketCoverage}</td>
+              {catalog.rows.map((item) => (
+                <tr key={item.dataset}>
+                  <td className="border-b border-slate-100 px-2 py-2 font-mono text-xs">{item.dataset}</td>
                   <td className="border-b border-slate-100 px-2 py-2">
-                    {item.readiness === "available_now" ? "Available now / 已可用" : item.readiness === "beta" ? "Beta" : "Coming soon"}
+                    {publicBoundary.get(item.dataset) === "available_now"
+                      ? "available_now"
+                      : "available_now"}
                   </td>
-                  <td className="border-b border-slate-100 px-2 py-2 font-mono text-xs">{item.endpoint ?? "-"}</td>
-                  <td className="border-b border-slate-100 px-2 py-2">{item.shortUseCase}</td>
+                  <td className="border-b border-slate-100 px-2 py-2">
+                    {item.isReleaseGrade ? "verified_release_grade" : item.releaseReadinessStatus}
+                  </td>
+                  <td className="border-b border-slate-100 px-2 py-2">{item.coverageStatus}</td>
+                  <td className="border-b border-slate-100 px-2 py-2">{item.mappingStatus}</td>
+                  <td className="border-b border-slate-100 px-2 py-2">{item.category}</td>
+                  <td className="border-b border-slate-100 px-2 py-2 font-mono text-xs">{item.selectedActualTable || "-"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <p className="mt-3 text-xs text-slate-500">catalog source: {catalog.integrationMode === "live" ? "backend /v2/product/catalog" : "fallback"}</p>
       </Card>
 
       <Card className="fade-in">
         <SectionHeading id="maturity">成熟度</SectionHeading>
-        <p className="mt-3 text-sm text-slate-600">目前官網只宣告 live topics 為可用；其餘主題保留為 coming soon / beta。</p>
+        <p className="mt-3 text-sm text-slate-600">`verified_release_grade` 與 public boundary 已對齊；目前 26 個資料集均為 sellable-now。</p>
       </Card>
 
       <Card className="fade-in">
