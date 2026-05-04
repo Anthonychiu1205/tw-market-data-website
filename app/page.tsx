@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { AgentDocumentsShowcase } from "@/src/components/home/agent-documents-showcase";
 import { AgentWorkflowShowcase } from "@/src/components/home/agent-workflow-showcase";
+import { MarketMarquee } from "@/src/components/home/market-marquee";
 import { MarketCoverageShowcase } from "@/src/components/home/market-coverage-showcase";
 import { AiAgentWorkflowSection } from "@/src/components/home/ai-agent-workflow-section";
 import { buttonClass } from "@/src/components/ui/button";
@@ -35,6 +36,8 @@ export default function HomePage() {
           </div>
         </MarketingContainer>
       </section>
+
+      <MarketMarquee />
 
       <section className="border-b border-slate-200 bg-white py-14">
         <MarketingContainer className="space-y-8">

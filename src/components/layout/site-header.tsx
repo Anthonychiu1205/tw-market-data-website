@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 import { productMegaMenuColumns } from "../../content/mega-menu-links";
 import { MarketingContainer } from "../ui/marketing-container";
@@ -49,7 +50,14 @@ export function SiteHeader() {
       <MarketingContainer className="grid grid-cols-[auto_1fr_auto] items-center gap-5 py-3">
         <div className="justify-self-start">
           <Link href="/" className="inline-flex items-center gap-2.5 text-base font-semibold tracking-tight text-slate-900">
-            <span className="inline-block h-3 w-3 rounded-[3px] border-2 border-slate-900" aria-hidden />
+            <Image
+              src="/brand/logo-mark.png"
+              alt="TW Market Data Logo"
+              width={22}
+              height={22}
+              className="h-[22px] w-[22px] object-contain"
+              priority
+            />
             <span>TW Market Data</span>
           </Link>
         </div>
