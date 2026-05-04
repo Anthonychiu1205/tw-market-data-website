@@ -57,6 +57,21 @@ export type ApiKeysSummary = {
   integrationMode: IntegrationMode;
 };
 
+export type ProductCatalogRow = {
+  dataset: string;
+  category: string;
+  releaseReadinessStatus: string;
+  coverageStatus: string;
+  mappingStatus: string;
+  selectedActualTable: string;
+  isReleaseGrade: boolean;
+};
+
+export type ProductCatalogSummary = {
+  rows: ProductCatalogRow[];
+  integrationMode: IntegrationMode;
+};
+
 type FetchResult<T> = {
   data: T;
   status: number;
@@ -196,6 +211,21 @@ function normalizeApiKeyItem(item: unknown, index: number): ApiKeyItem {
     maskedKey: getString(row.maskedKey || row.masked_key, fallbackMasked),
     lastUsed: getString(row.lastUsed || row.last_used || row.lastUsedAt || row.last_used_at, "-"),
     keyValue: rawValue || undefined,
+  };
+}
+
+function normalizeCatalogRow(item: unknown): ProductCatalogRow | null {
+  const row = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
+  const dataset = getString(row.dataset || row.dataset_id || row.id);
+  if (!dataset) return null;
+  return {
+    dataset,
+    category: getString(row.category, "unknown"),
+    releaseReadinessStatus: getString(row.release_readiness_status || row.releaseReadinessStatus, "unknown"),
+    coverageStatus: getString(row.coverage_status || row.coverageStatus, "unknown"),
+    mappingStatus: getString(row.mapping_status || row.mappingStatus, "unknown"),
+    selectedActualTable: getString(row.selected_actual_table || row.selectedActualTable, ""),
+    isReleaseGrade: getBoolean(row.is_release_grade ?? row.isReleaseGrade, false),
   };
 }
 
@@ -500,4 +530,35 @@ export async function revokeApiKey(email: string, keyId: string): Promise<boolea
   });
 
   return Boolean(live?.status && live.status >= 200 && live.status < 300);
+}
+
+export async function getProductCatalog(email: string): Promise<ProductCatalogSummary> {
+  const live = await fetchFromCandidates<Record<string, unknown> | Array<Record<string, unknown>>>(email, [
+    "/v2/product/catalog",
+  ]);
+
+  if (live?.data) {
+    const rows = pickArray(live.data)
+      .map(normalizeCatalogRow)
+      .filter((row): row is ProductCatalogRow => Boolean(row));
+    if (rows.length > 0) {
+      return {
+        rows,
+        integrationMode: "live",
+      };
+    }
+  }
+
+  return {
+    rows: datasetProducts.map((item) => ({
+      dataset: item.id.replace(/-/g, "_"),
+      category: "market_data",
+      releaseReadinessStatus: item.readiness === "available_now" ? "verified_release_grade" : "not_ready",
+      coverageStatus: "unknown",
+      mappingStatus: "unknown",
+      selectedActualTable: "",
+      isReleaseGrade: item.readiness === "available_now",
+    })),
+    integrationMode: "fallback",
+  };
 }
