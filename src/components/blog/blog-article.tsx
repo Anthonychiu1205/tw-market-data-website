@@ -2,10 +2,10 @@ import Link from "next/link";
 
 import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
-import type { BlogDetailPost } from "@/src/lib/blog-detail-adapter";
+import type { BlogPost } from "@/src/content/blog-posts";
 
 type BlogArticleProps = {
-  post: BlogDetailPost;
+  post: BlogPost;
 };
 
 export function BlogArticle({ post }: BlogArticleProps) {
@@ -19,38 +19,9 @@ export function BlogArticle({ post }: BlogArticleProps) {
         </Link>
 
         <header className="space-y-4 border-b border-slate-200 pb-8">
-          <p className="text-sm text-slate-500">
-            {post.category} · {post.publishedAt} · {post.readingTime}
-          </p>
           <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">{post.title}</h1>
           <p className="max-w-4xl text-lg leading-9 text-slate-700">{post.lead}</p>
         </header>
-
-        {post.tldr.length > 0 ? (
-          <section className="space-y-3 border-b border-slate-200 pb-8">
-            <h2 className="text-xl font-semibold tracking-tight text-slate-900">TL;DR</h2>
-            {post.tldr.map((paragraph) => (
-              <p key={paragraph} className="text-base leading-8 text-slate-700">
-                {paragraph}
-              </p>
-            ))}
-          </section>
-        ) : null}
-
-        {post.tableOfContents.length > 0 ? (
-          <nav aria-label="Table of contents" className="space-y-3 border-b border-slate-200 pb-8">
-            <h2 className="text-xl font-semibold tracking-tight text-slate-900">Table of contents</h2>
-            <ol className="list-decimal space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
-              {post.tableOfContents.map((item) => (
-                <li key={item.id}>
-                  <a href={`#${item.id}`} className="hover:text-slate-900">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </nav>
-        ) : null}
 
         <div className="space-y-11">
           <ArticleContent />
