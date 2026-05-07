@@ -53,13 +53,13 @@ export const dashboardNav: DashboardNavItem[] = [
   {
     type: "group",
     id: "billing",
-    label: "Billing",
+    label: "帳務",
     icon: "billing",
     children: [
       {
         type: "item",
         id: "billing-subscriptions",
-        label: "Subscriptions",
+        label: "訂閱方案",
         icon: "subscriptions",
         href: "/billing/subscriptions",
         activeMode: "path",
@@ -67,7 +67,7 @@ export const dashboardNav: DashboardNavItem[] = [
       {
         type: "item",
         id: "billing-credits",
-        label: "Credits",
+        label: "Credits 點數",
         icon: "credits",
         href: "/billing/credits",
         activeMode: "path",
@@ -120,7 +120,7 @@ export const dashboardNav: DashboardNavItem[] = [
   {
     type: "item",
     id: "upgrade",
-    label: "Upgrade plan",
+    label: "升級方案",
     icon: "upgrade",
     href: "/billing/subscriptions",
     activeMode: "none",

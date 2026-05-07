@@ -24,55 +24,39 @@ export function TocNav({
   const [active, setActive] = useState(sections[0]?.id ?? "");
 
   useEffect(() => {
-    const headingElements = sections
-      .map((section) => document.getElementById(section.id))
-      .filter((element): element is HTMLElement => Boolean(element));
+    const sectionIds = sections.map((section) => section.id);
+    if (!sectionIds.length) return;
 
-    if (!headingElements.length) return;
+    const updateActiveSection = () => {
+      const offset = 140;
+      let current = sectionIds[0];
 
-    const lastSectionId = headingElements[headingElements.length - 1].id;
-    const topScanLine = 160;
-
-    const calculateActiveSection = () => {
-      const doc = document.documentElement;
-      const remaining = doc.scrollHeight - (window.scrollY + window.innerHeight);
-
-      // Lock to last section at page bottom to avoid short-last-section misses.
-      if (remaining <= 24) {
-        setActive(lastSectionId);
-        return;
-      }
-
-      let candidateId = headingElements[0].id;
-
-      for (const heading of headingElements) {
-        if (heading.getBoundingClientRect().top <= topScanLine) {
-          candidateId = heading.id;
+      for (const id of sectionIds) {
+        const element = document.getElementById(id);
+        if (!element) continue;
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= offset) {
+          current = id;
         } else {
           break;
         }
       }
 
-      setActive(candidateId);
+      const nearBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 8;
+      if (nearBottom) {
+        current = sectionIds[sectionIds.length - 1];
+      }
+
+      setActive(current);
     };
 
-    let frame = 0;
-    const onScrollOrResize = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        calculateActiveSection();
-      });
-    };
-
-    calculateActiveSection();
-    window.addEventListener("scroll", onScrollOrResize, { passive: true });
-    window.addEventListener("resize", onScrollOrResize);
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
 
     return () => {
-      if (frame) window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScrollOrResize);
-      window.removeEventListener("resize", onScrollOrResize);
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
     };
   }, [sections]);
 
@@ -82,6 +66,14 @@ export function TocNav({
         <li key={section.id}>
           <a
             href={`#${section.id}`}
+            onClick={(event) => {
+              event.preventDefault();
+              const target = document.getElementById(section.id);
+              if (!target) return;
+              target.scrollIntoView({ behavior: "smooth", block: "start" });
+              window.history.replaceState(null, "", `#${section.id}`);
+              setActive(section.id);
+            }}
             className={cn(
               itemClassName,
               active === section.id ? activeClassName : inactiveClassName,

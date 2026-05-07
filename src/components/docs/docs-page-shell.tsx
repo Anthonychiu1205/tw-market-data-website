@@ -2,12 +2,38 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  Activity,
+  Bot,
+  Braces,
+  Building2,
+  ChevronDown,
+  Eye,
+  FileCheck,
+  FileSpreadsheet,
+  GitBranch,
+  Home,
+  LifeBuoy,
+  Landmark,
+  LineChart,
+  Network,
+  Rocket,
+  Search,
+  SearchCode,
+  ShieldCheck,
+  Wrench,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import type { DocsSection } from "@/src/content/docs";
-import type { DocsPageEntry, DocsSidebarIcon, DocsSidebarNavItem } from "@/src/content/docs-pages";
-import { docsSidebarNav } from "@/src/content/docs-pages";
+import { normalizeDocsSections } from "@/src/content/docs-sections";
+import {
+  docsSidebarApiGroups,
+  docsSidebarGuideItems,
+  docsSidebarOverviewItems,
+} from "@/src/content/docs-sidebar";
+import type { DocsSidebarNavGroup, DocsSidebarNavItem } from "@/src/content/docs-sidebar";
 import { cn } from "@/src/lib/cn";
 
 import { TocNav } from "./toc-nav";
@@ -19,7 +45,11 @@ const SIDEBAR_EXPANDED_GROUPS_KEY = "docs-sidebar-expanded-groups";
 const SIDEBAR_SCROLL_TOP_KEY = "docs-sidebar-scroll-top";
 
 type DocsPageShellProps = {
-  page: DocsPageEntry;
+  page: {
+    title: string;
+    subtitle: string;
+    sections: DocsSection[];
+  };
   children: React.ReactNode;
   tocSections?: DocsSection[];
   rightPanelTitle?: string;
@@ -27,47 +57,22 @@ type DocsPageShellProps = {
   pageLabel?: string;
 };
 
-function getAncestorGroupHrefs(pathname: string): string[] {
-  function walk(items: DocsSidebarNavItem[], ancestors: string[]): string[] {
-    for (const item of items) {
-      const nextAncestors = item.children?.length ? [...ancestors, item.href] : ancestors;
-
-      if (!item.children?.length) {
-        if (pathname === item.href || pathname.startsWith(`${item.href}/`)) {
-          return ancestors;
-        }
-        continue;
-      }
-
-      if (pathname === item.href || pathname.startsWith(`${item.href}/`)) {
-        const deepMatch = walk(item.children, nextAncestors);
-        if (deepMatch.length) return deepMatch;
-        return nextAncestors;
-      }
-
-      const deepMatch = walk(item.children, nextAncestors);
-      if (deepMatch.length) return deepMatch;
-    }
-    return [];
+function itemHasActivePath(item: DocsSidebarNavItem, pathname: string): boolean {
+  if (pathname === item.href || pathname.startsWith(`${item.href}/`)) {
+    return true;
   }
-
-  for (const group of docsSidebarNav) {
-    const match = walk(group.items, []);
-    if (match.length) return match;
-  }
-
-  return [];
+  return item.children?.some((child) => itemHasActivePath(child, pathname)) ?? false;
 }
 
-function mergeExpandedGroupsWithActiveAncestors(expanded: string[], ancestors: string[]): string[] {
-  return Array.from(new Set([...expanded, ...ancestors]));
+function groupHasActivePath(group: DocsSidebarNavGroup, pathname: string): boolean {
+  return group.items.some((item) => itemHasActivePath(item, pathname));
 }
 
-function toggleGroupExpanded(expanded: string[], groupHref: string): string[] {
-  if (expanded.includes(groupHref)) {
-    return expanded.filter((href) => href !== groupHref);
+function toggleGroupExpanded(expanded: string[], groupId: string): string[] {
+  if (expanded.includes(groupId)) {
+    return expanded.filter((id) => id !== groupId);
   }
-  return [...expanded, groupHref];
+  return [...expanded, groupId];
 }
 
 function readExpandedGroupsFromSession(): string[] {
@@ -91,216 +96,104 @@ function readSidebarScrollTopFromSession(): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
-function SidebarIcon({ icon }: { icon: DocsSidebarIcon }) {
-  const commonProps = {
-    className: "h-4 w-4 shrink-0",
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.8,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-    "aria-hidden": true,
-  };
-
-  switch (icon) {
-    case "book":
-      return (
-        <svg {...commonProps}>
-          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-          <path d="M6.5 17A2.5 2.5 0 0 0 4 19.5V5a2 2 0 0 1 2-2h14v14" />
-        </svg>
-      );
+function GroupIcon({ groupIcon, className }: { groupIcon: DocsSidebarNavGroup["groupIcon"]; className?: string }) {
+  switch (groupIcon) {
     case "rocket":
-      return (
-        <svg {...commonProps}>
-          <path d="M5 19c2-.5 4-1.5 5.5-3L14 12.5c1.5-1.5 2.5-3.5 3-5.5-2 .5-4 1.5-5.5 3L8 13.5C6.5 15 5.5 17 5 19Z" />
-          <path d="M14 7h3" />
-          <path d="M7 17v3" />
-        </svg>
-      );
-    case "database":
-      return (
-        <svg {...commonProps}>
-          <ellipse cx="12" cy="5" rx="7" ry="3" />
-          <path d="M5 5v7c0 1.7 3.1 3 7 3s7-1.3 7-3V5" />
-          <path d="M5 12v7c0 1.7 3.1 3 7 3s7-1.3 7-3v-7" />
-        </svg>
-      );
-    case "shield":
-      return (
-        <svg {...commonProps}>
-          <path d="M12 3l7 3v5c0 4.4-3 8.1-7 9-4-1-7-4.6-7-9V6l7-3Z" />
-          <path d="m9.5 12 1.8 1.8L14.8 10" />
-        </svg>
-      );
-    case "braces":
-      return (
-        <svg {...commonProps}>
-          <path d="M9 4H7a2 2 0 0 0-2 2v2c0 1.1-.9 2-2 2 1.1 0 2 .9 2 2v2a2 2 0 0 0 2 2h2" />
-          <path d="M15 4h2a2 2 0 0 1 2 2v2c0 1.1.9 2 2 2-1.1 0-2 .9-2 2v2a2 2 0 0 1-2 2h-2" />
-        </svg>
-      );
-    case "chart":
-      return (
-        <svg {...commonProps}>
-          <path d="M3 20h18" />
-          <path d="M6 15l4-4 3 2 5-6" />
-        </svg>
-      );
-    case "building":
-      return (
-        <svg {...commonProps}>
-          <path d="M4 21h16" />
-          <path d="M6 21V5h12v16" />
-          <path d="M9 9h2M13 9h2M9 13h2M13 13h2" />
-        </svg>
-      );
-    case "earnings":
-      return (
-        <svg {...commonProps}>
-          <path d="M4 20h16" />
-          <path d="M7 16V8" />
-          <path d="M12 16V5" />
-          <path d="M17 16v-6" />
-        </svg>
-      );
-    case "kpi":
-      return (
-        <svg {...commonProps}>
-          <circle cx="12" cy="12" r="8" />
-          <path d="M12 12 16 9" />
-          <path d="M12 12V7" />
-        </svg>
-      );
-    case "metrics":
-      return (
-        <svg {...commonProps}>
-          <path d="M4 19h16" />
-          <path d="M6 15h3M11 11h3M16 7h2" />
-        </svg>
-      );
-    case "statements":
-      return (
-        <svg {...commonProps}>
-          <rect x="5" y="4" width="14" height="16" rx="2" />
-          <path d="M8 9h8M8 13h8M8 17h5" />
-        </svg>
-      );
-    case "insider":
-      return (
-        <svg {...commonProps}>
-          <circle cx="12" cy="8" r="3" />
-          <path d="M6 20a6 6 0 0 1 12 0" />
-        </svg>
-      );
-    case "news":
-      return (
-        <svg {...commonProps}>
-          <rect x="4" y="5" width="16" height="14" rx="2" />
-          <path d="M8 9h8M8 13h8M8 17h5" />
-        </svg>
-      );
-    case "holdings":
-      return (
-        <svg {...commonProps}>
-          <path d="M4 19h16" />
-          <path d="M5 11h4v8H5zM10 7h4v12h-4zM15 13h4v6h-4z" />
-        </svg>
-      );
-    case "rates":
-      return (
-        <svg {...commonProps}>
-          <path d="M5 16h14" />
-          <path d="m8 19 4-14 4 14" />
-        </svg>
-      );
-    case "search":
-      return (
-        <svg {...commonProps}>
-          <circle cx="11" cy="11" r="6" />
-          <path d="m20 20-4.5-4.5" />
-        </svg>
-      );
-    case "filings":
-      return (
-        <svg {...commonProps}>
-          <path d="M7 3h8l4 4v14H7z" />
-          <path d="M15 3v4h4" />
-          <path d="M10 12h6M10 16h6" />
-        </svg>
-      );
-    case "segments":
-      return (
-        <svg {...commonProps}>
-          <rect x="4" y="5" width="16" height="14" rx="2" />
-          <path d="M12 5v14M4 12h16" />
-        </svg>
-      );
-    case "prices":
-      return (
-        <svg {...commonProps}>
-          <path d="M4 20h16" />
-          <path d="M8 15v-6M12 18V7M16 14v-4" />
-        </svg>
-      );
-    case "guide":
-      return (
-        <svg {...commonProps}>
-          <path d="M4 6h16" />
-          <path d="M4 12h10" />
-          <path d="M4 18h8" />
-        </svg>
-      );
-    case "advanced":
-      return (
-        <svg {...commonProps}>
-          <path d="M12 3v4M12 17v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M3 12h4M17 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8" />
-          <circle cx="12" cy="12" r="3" />
-        </svg>
-      );
-    case "support":
-      return (
-        <svg {...commonProps}>
-          <circle cx="12" cy="12" r="8" />
-          <path d="M9.5 9.5a2.5 2.5 0 1 1 4.3 1.8c-.7.7-1.3 1.1-1.3 2" />
-          <circle cx="12" cy="17" r="0.5" />
-        </svg>
-      );
+      return <Rocket className={className} aria-hidden="true" />;
+    case "line-chart":
+      return <LineChart className={className} aria-hidden="true" />;
+    case "file-spreadsheet":
+      return <FileSpreadsheet className={className} aria-hidden="true" />;
+    case "landmark":
+      return <Landmark className={className} aria-hidden="true" />;
+    case "building-2":
+      return <Building2 className={className} aria-hidden="true" />;
+    case "network":
+      return <Network className={className} aria-hidden="true" />;
+    case "activity":
+      return <Activity className={className} aria-hidden="true" />;
+    case "search-code":
+      return <SearchCode className={className} aria-hidden="true" />;
+    case "eye":
+      return <Eye className={className} aria-hidden="true" />;
+  }
+}
+
+function getOverviewItemIcon(href: string) {
+  switch (href) {
+    case "/docs/introduction":
+      return Home;
+    case "/docs/quick-start":
+      return Rocket;
+    case "/docs/authentication":
+      return ShieldCheck;
+    case "/docs/source-policy":
+      return FileCheck;
+    case "/docs/data-freshness-lineage":
+      return GitBranch;
+    case "/docs/api-model":
+      return Braces;
+    case "/docs/tools-and-mcp":
+      return Wrench;
+    case "/docs/support":
+      return LifeBuoy;
+    default:
+      return Home;
+  }
+}
+
+function getGuideItemIcon(href: string) {
+  switch (href) {
+    case "/docs/workflows/company-fundamentals":
+      return Building2;
+    case "/docs/workflows/capital-flow":
+      return Landmark;
+    case "/docs/workflows/market-status":
+      return Activity;
+    case "/docs/workflows/fast-data-access":
+      return Search;
+    case "/docs/workflows/strategy-ai":
+      return Bot;
+    default:
+      return Building2;
   }
 }
 
 export function DocsPageShell({ page, children, tocSections, rightPanelTitle, rightPanelContent, pageLabel = "文件" }: DocsPageShellProps) {
   const pathname = usePathname();
-  const sections: DocsSection[] = (tocSections ?? page.sections).map((section) => ({ id: section.id, label: section.label }));
+  const sections: DocsSection[] = useMemo(
+    () => normalizeDocsSections(tocSections ?? page.sections).map((section) => ({ id: section.id, label: section.label })),
+    [tocSections, page.sections],
+  );
   const sidebarScrollRef = useRef<HTMLDivElement | null>(null);
 
-  const activeAncestorGroups = useMemo(() => getAncestorGroupHrefs(pathname), [pathname]);
-
-  function hasActiveDescendant(item: DocsSidebarNavItem): boolean {
-    return (
-      item.children?.some(
-        (child) =>
-          pathname === child.href ||
-          pathname.startsWith(`${child.href}/`) ||
-          hasActiveDescendant(child),
-      ) ?? false
-    );
-  }
-
-  const [userExpandedGroups, setUserExpandedGroups] = useState<string[]>(() =>
-    mergeExpandedGroupsWithActiveAncestors(readExpandedGroupsFromSession(), activeAncestorGroups),
+  const activeGroupIds = useMemo(
+    () => docsSidebarApiGroups.filter((group) => groupHasActivePath(group, pathname)).map((group) => group.id),
+    [pathname],
   );
 
-  const expandedGroups = useMemo(
-    () => mergeExpandedGroupsWithActiveAncestors(userExpandedGroups, activeAncestorGroups),
-    [userExpandedGroups, activeAncestorGroups],
-  );
+  const userToggledGroupsRef = useRef<Set<string>>(new Set());
+  const [openGroupIds, setOpenGroupIds] = useState<string[]>(() => {
+    const restored = readExpandedGroupsFromSession();
+    return Array.from(new Set([...(restored.length ? restored : ["quick-start"]), ...activeGroupIds]));
+  });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    window.sessionStorage.setItem(SIDEBAR_EXPANDED_GROUPS_KEY, JSON.stringify(userExpandedGroups));
-  }, [userExpandedGroups]);
+    window.sessionStorage.setItem(SIDEBAR_EXPANDED_GROUPS_KEY, JSON.stringify(openGroupIds));
+  }, [openGroupIds]);
+
+  useEffect(() => {
+    setOpenGroupIds((current) => {
+      const next = new Set(current);
+      for (const groupId of activeGroupIds) {
+        if (!userToggledGroupsRef.current.has(groupId)) {
+          next.add(groupId);
+        }
+      }
+      return Array.from(next);
+    });
+  }, [activeGroupIds]);
 
   useEffect(() => {
     const container = sidebarScrollRef.current;
@@ -308,82 +201,62 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
     container.scrollTop = readSidebarScrollTopFromSession();
   }, [pathname]);
 
-  function isItemActive(item: DocsSidebarNavItem) {
-    if (item.children?.length) {
-      return hasActiveDescendant(item);
-    }
-    return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  function isItemActive(item: DocsSidebarNavItem): boolean {
+    return itemHasActivePath(item, pathname);
   }
 
   function renderSidebarItems(items: DocsSidebarNavItem[], depth = 0) {
-    const isNested = depth > 0;
     return (
-      <ul className={cn("list-none m-0 p-0 space-y-0.5", isNested ? "pl-14" : "")}>
-        {items.map((item) => (
-          <li key={item.href} className="list-none">
-            {item.children?.length ? (
-              <div>
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    aria-label={`${item.title}${expandedGroups.includes(item.href) ? "收合" : "展開"}`}
-                    onClick={() => setUserExpandedGroups((previous) => toggleGroupExpanded(previous, item.href))}
-                    className={cn(
-                      isItemActive(item)
-                        ? "flex min-w-0 flex-1 items-center gap-2.5 rounded-md bg-slate-100 py-1.5 text-sm font-medium text-slate-800"
-                        : "flex min-w-0 flex-1 items-center gap-2.5 rounded-md py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900",
-                      isNested ? "pl-10 pr-2" : "px-2",
-                    )}
-                  >
-                    {isNested ? null : <SidebarIcon icon={item.icon ?? "database"} />}
-                    <span className={cn("min-w-0 flex-1 truncate text-left", isNested ? "pl-2" : "")}>{item.title}</span>
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={`${item.title}${expandedGroups.includes(item.href) ? "收合" : "展開"}`}
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
-                    onClick={() => setUserExpandedGroups((previous) => toggleGroupExpanded(previous, item.href))}
-                  >
-                    <svg
-                      viewBox="0 0 20 20"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className={cn("h-3.5 w-3.5 transition-transform", expandedGroups.includes(item.href) ? "rotate-90" : "")}
-                      aria-hidden="true"
-                    >
-                      <path d="m7 5 6 5-6 5" />
-                    </svg>
-                  </button>
-                </div>
-                {expandedGroups.includes(item.href) ? (
-                  <div className="relative mt-1">
-                    <span className="pointer-events-none absolute bottom-0 left-6 top-0 w-px bg-slate-200" aria-hidden="true" />
-                    {renderSidebarItems(item.children, depth + 1)}
-                  </div>
-                ) : null}
+      <div className={cn("space-y-1", depth > 0 && "pl-4")}>
+        {items.map((item) => {
+          if (item.children?.length) {
+            return (
+              <div key={item.href}>
+                <p className="px-3 py-2 text-sm font-medium text-slate-500">{item.title}</p>
+                {renderSidebarItems(item.children, depth + 1)}
               </div>
-            ) : (
-              <Link
-                href={item.href}
-                className={
-                  cn(
-                    pathname === item.href
-                      ? "flex items-center gap-2.5 rounded-md bg-slate-200 py-1.5 text-sm font-semibold text-slate-950"
-                      : "flex items-center gap-2.5 rounded-md py-1.5 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900",
-                    isNested ? "pl-10 pr-2" : "px-2",
-                  )
-                }
-              >
-                {isNested ? null : <SidebarIcon icon={item.icon ?? "database"} />}
-                <span className={cn(isNested ? "pl-2" : "")}>{item.title}</span>
-              </Link>
-            )}
-          </li>
-        ))}
-      </ul>
+            );
+          }
+
+          const isActive = isItemActive(item);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "block rounded-xl px-3 py-2 text-sm transition",
+                isActive ? "bg-slate-100 font-medium text-slate-950" : "text-slate-600 hover:bg-slate-50 hover:text-slate-950",
+              )}
+            >
+              <span className="block truncate">{item.title}</span>
+            </Link>
+          );
+        })}
+      </div>
+    );
+  }
+
+  function renderFlatSidebarItems(items: DocsSidebarNavItem[], section: "overview" | "guides") {
+    return (
+      <div className="space-y-1">
+        {items.map((item) => {
+          const isActive = isItemActive(item);
+          const Icon = section === "overview" ? getOverviewItemIcon(item.href) : getGuideItemIcon(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition",
+                isActive ? "bg-slate-100 font-medium text-slate-950" : "text-slate-600 hover:bg-slate-50 hover:text-slate-950",
+              )}
+            >
+              <Icon className="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+              <span className="truncate">{item.title}</span>
+            </Link>
+          );
+        })}
+      </div>
     );
   }
 
@@ -396,7 +269,7 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
         <aside className="hidden lg:block">
           <div
             ref={sidebarScrollRef}
-            className="docs-sidebar sticky overflow-y-auto overscroll-contain pr-1"
+            className="docs-sidebar sticky overflow-y-auto overscroll-contain pr-1 pb-28"
             onScroll={(event) => {
               if (typeof window === "undefined") return;
               window.sessionStorage.setItem(SIDEBAR_SCROLL_TOP_KEY, String(event.currentTarget.scrollTop));
@@ -407,14 +280,46 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
             }}
           >
             <p className="text-xs font-semibold tracking-wide text-slate-500">文件總覽</p>
-            <nav className="mt-3 space-y-4">
-              {docsSidebarNav.map((group) => (
-                <div key={group.id}>
-                  <p className="px-2 pb-1 text-[11px] font-semibold tracking-wide text-slate-500">{group.label}</p>
-                  {renderSidebarItems(group.items)}
-                </div>
-              ))}
+            <nav className="mt-3">
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">Overview</p>
+              {renderFlatSidebarItems(docsSidebarOverviewItems, "overview")}
+
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">APIs</p>
+              <div className="space-y-4">
+                {docsSidebarApiGroups.map((group) => (
+                  <div key={group.id}>
+                    <button
+                      type="button"
+                      aria-label={`${group.label}${openGroupIds.includes(group.id) ? "收合" : "展開"}`}
+                      className={cn(
+                        "flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-950",
+                        activeGroupIds.includes(group.id) && "text-slate-950",
+                      )}
+                      onClick={() => {
+                        userToggledGroupsRef.current.add(group.id);
+                        setOpenGroupIds((previous) => toggleGroupExpanded(previous, group.id));
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <GroupIcon groupIcon={group.groupIcon} className="h-4 w-4 text-slate-500" />
+                        <span>{group.label}</span>
+                      </div>
+                      <ChevronDown
+                        className={cn("h-4 w-4 text-slate-400 transition-transform", openGroupIds.includes(group.id) && "rotate-180")}
+                        aria-hidden="true"
+                      />
+                    </button>
+                    {openGroupIds.includes(group.id) ? (
+                      <div className="mt-1 space-y-1 pl-7">{renderSidebarItems(group.items)}</div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">Guides</p>
+              {renderFlatSidebarItems(docsSidebarGuideItems, "guides")}
             </nav>
+            <div className="h-28 shrink-0" aria-hidden="true" />
           </div>
         </aside>
 
@@ -433,15 +338,21 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
             {rightPanelContent ? (
               <div className="mt-3">{rightPanelContent}</div>
             ) : (
-              <nav className="mt-3">
-                <TocNav
-                  sections={sections}
-                  className="space-y-0.5"
-                  itemClassName="block border-l-2 border-transparent py-1.5 pl-2 text-sm transition"
-                  activeClassName="border-slate-400 font-medium text-slate-900"
-                  inactiveClassName="text-slate-500 hover:text-slate-900"
-                />
-              </nav>
+              <>
+                {sections.length > 0 ? (
+                  <nav className="mt-3">
+                    <TocNav
+                      sections={sections}
+                      className="space-y-0.5"
+                      itemClassName="block border-l px-3 py-2 text-sm transition"
+                      activeClassName="border-slate-900 font-medium text-slate-950"
+                      inactiveClassName="border-slate-200 text-slate-500 hover:border-slate-400 hover:text-slate-900"
+                    />
+                  </nav>
+                ) : (
+                  <p className="mt-3 text-sm text-slate-500">本頁目前沒有章節目錄。</p>
+                )}
+              </>
             )}
           </div>
         </aside>

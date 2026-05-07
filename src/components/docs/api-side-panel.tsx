@@ -14,6 +14,7 @@ type ApiSidePanelProps = {
 type ScrollableCodeBlockProps = {
   copyValue: string;
   contentKey: string;
+  headerLabel?: string;
   header?: ReactNode;
   children: ReactNode;
 };
@@ -80,7 +81,7 @@ function CopyButton({ value, className }: { value: string; className?: string })
         }
       }}
       className={cn(
-        "rounded-md border border-slate-200 bg-white px-2 py-1 text-[11px] font-medium text-slate-600 transition-opacity duration-200 hover:text-slate-900",
+        "inline-flex h-7 items-center rounded-md border border-slate-200 bg-white px-2.5 text-[11px] font-medium leading-none text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-800",
         className,
       )}
       aria-label="複製"
@@ -90,7 +91,7 @@ function CopyButton({ value, className }: { value: string; className?: string })
   );
 }
 
-function ScrollableCodeBlock({ copyValue, contentKey, header, children }: ScrollableCodeBlockProps) {
+function ScrollableCodeBlock({ copyValue, contentKey, header, headerLabel, children }: ScrollableCodeBlockProps) {
   const scrollRef = useRef<HTMLElement | null>(null);
   const [showFade, setShowFade] = useState(false);
 
@@ -129,14 +130,22 @@ function ScrollableCodeBlock({ copyValue, contentKey, header, children }: Scroll
 
   return (
     <div className="group relative overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-      <CopyButton
-        value={copyValue}
-        className="absolute right-2 top-2 z-10 opacity-30 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100"
-      />
-      {header ? <div className="border-b border-slate-200 px-2 py-1 pr-14">{header}</div> : null}
+      {header || headerLabel ? (
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-3 py-2">
+          <div className="min-w-0">
+            {header ? header : <span className="text-[11px] font-medium text-slate-500">{headerLabel}</span>}
+          </div>
+          <CopyButton value={copyValue} className="shrink-0 opacity-70 group-hover:opacity-100 group-focus-within:opacity-100" />
+        </div>
+      ) : (
+        <CopyButton
+          value={copyValue}
+          className="absolute right-3 top-3 z-10 opacity-35 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100"
+        />
+      )}
       <pre
         ref={scrollRef as React.RefObject<HTMLPreElement>}
-        className="max-h-[320px] overflow-auto p-3 pr-2 text-[11.5px] leading-[1.5] text-slate-700 lg:max-h-[420px]"
+        className="max-h-[320px] overflow-auto px-3 pb-3 pt-2.5 pr-2 text-[11.5px] leading-[1.5] text-slate-700 lg:max-h-[420px]"
       >
         <code>{children}</code>
       </pre>
@@ -182,7 +191,7 @@ export function ApiSidePanel({ requestExample, codeExamples, statusExamples }: A
                     type="button"
                     onClick={() => setActiveCodeTab(tab)}
                     className={cn(
-                      "rounded-md px-2.5 py-1 text-[11px] font-medium transition",
+                      "inline-flex h-7 items-center rounded-md px-2.5 text-[11px] font-medium leading-none transition",
                       isActive ? "bg-slate-200 text-slate-900" : "text-slate-500 hover:text-slate-800",
                     )}
                   >
@@ -219,7 +228,7 @@ export function ApiSidePanel({ requestExample, codeExamples, statusExamples }: A
       {activeExample ? (
         <section className="space-y-2">
           <p className="text-xs text-slate-600">{activeExample.description}</p>
-          <ScrollableCodeBlock copyValue={activeExample.body} contentKey={`${activeStatus}-${activeExample.body}`}>
+          <ScrollableCodeBlock copyValue={activeExample.body} contentKey={`${activeStatus}-${activeExample.body}`} headerLabel="JSON">
             {highlightJson(activeExample.body)}
           </ScrollableCodeBlock>
         </section>

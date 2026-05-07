@@ -133,7 +133,7 @@ function TaiwanStockApiCompleteGuideContent() {
           <div>
             <h3 className="text-xl font-semibold tracking-tight text-slate-900">4. 事件層：補上價格波動脈絡</h3>
             <p>
-              公告、結構化事件、公司行動、可轉債、公司新聞與市場新聞，都屬於這一層。它的價值在於解釋「為什麼動」，而不是替代價格與基本面。
+              公告、結構化事件、公司行動、股利、公司新聞與市場新聞，都屬於這一層。它的價值在於解釋「為什麼動」，而不是替代價格與基本面。
             </p>
           </div>
         </div>

@@ -9,7 +9,7 @@ type Props = {
 };
 
 function trendClass(trend: MarketMarqueeViewItem["trend"]) {
-  if (trend === "up") return "text-rose-600";
+  if (trend === "up") return "text-rose-500";
   if (trend === "down") return "text-emerald-600";
   return "text-slate-500";
 }
@@ -24,8 +24,7 @@ export function MarketMarqueeTrack({ items }: Props) {
           <div key={`${item.id}-${index}`} className="market-marquee__item">
             <span className="text-sm font-medium text-slate-700">{item.name}</span>
             <span className="text-sm font-semibold text-slate-900">{item.value}</span>
-            <span className={`text-sm font-semibold ${trendClass(item.trend)}`}>{item.change}</span>
-            <span className={`text-xs font-semibold ${trendClass(item.trend)}`}>{item.percent}</span>
+            <span className={`text-sm font-medium ${trendClass(item.trend)}`}>{item.percent || item.change}</span>
           </div>
         ))}
       </div>
@@ -38,7 +37,7 @@ export function MarketMarqueeTrack({ items }: Props) {
         .market-marquee__track {
           display: flex;
           width: max-content;
-          animation: market-marquee-scroll 36s linear infinite;
+          animation: market-marquee-scroll 40s linear infinite;
           will-change: transform;
         }
 
@@ -46,19 +45,31 @@ export function MarketMarqueeTrack({ items }: Props) {
           display: inline-flex;
           align-items: center;
           gap: 0.6rem;
-          border-right: 1px solid rgb(226 232 240);
-          padding: 0.85rem 1.1rem;
+          padding: 0.2rem 1rem;
           white-space: nowrap;
+          position: relative;
+        }
+
+        .market-marquee__item::after {
+          content: "";
+          width: 1px;
+          height: 0.9rem;
+          background: rgb(226 232 240 / 0.4);
+          margin-left: 1rem;
         }
 
         @media (max-width: 768px) {
           .market-marquee__track {
-            animation-duration: 30s;
+            animation-duration: 34s;
           }
 
           .market-marquee__item {
             gap: 0.5rem;
-            padding: 0.75rem 0.9rem;
+            padding: 0.15rem 0.8rem;
+          }
+
+          .market-marquee__item::after {
+            margin-left: 0.8rem;
           }
         }
 

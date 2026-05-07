@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+import { ContactModal } from "@/src/components/layout/contact-modal";
 import { cn } from "@/src/lib/cn";
 import {
   dashboardNav,
@@ -75,8 +76,14 @@ function DashboardIconGlyph({ icon, className }: { icon: DashboardIcon; classNam
     case "settings":
       return (
         <svg viewBox="0 0 24 24" fill="none" className={cn(common, className)}>
-          <path d="M12 8.5A3.5 3.5 0 1 1 8.5 12A3.5 3.5 0 0 1 12 8.5Z" stroke="currentColor" strokeWidth="1.8" />
-          <path d="M12 3V5M12 19V21M21 12H19M5 12H3M18.36 5.64L16.95 7.05M7.05 16.95L5.64 18.36M18.36 18.36L16.95 16.95M7.05 7.05L5.64 5.64" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path
+            d="M19.4 15A1.7 1.7 0 0 0 19.74 16.88L19.8 16.94A2.06 2.06 0 1 1 16.89 19.85L16.83 19.79A1.7 1.7 0 0 0 14.95 19.45A1.7 1.7 0 0 0 14 21V21.2A2.06 2.06 0 1 1 9.88 21.2V21.1A1.7 1.7 0 0 0 8.83 19.55A1.7 1.7 0 0 0 6.95 19.89L6.89 19.95A2.06 2.06 0 1 1 3.98 17.04L4.04 16.98A1.7 1.7 0 0 0 4.38 15.1A1.7 1.7 0 0 0 2.83 14H2.63A2.06 2.06 0 1 1 2.63 9.88H2.73A1.7 1.7 0 0 0 4.33 8.83A1.7 1.7 0 0 0 3.99 6.95L3.93 6.89A2.06 2.06 0 1 1 6.84 3.98L6.9 4.04A1.7 1.7 0 0 0 8.78 4.38H8.88A1.7 1.7 0 0 0 9.98 2.83V2.63A2.06 2.06 0 1 1 14.1 2.63V2.73A1.7 1.7 0 0 0 15.2 4.28A1.7 1.7 0 0 0 17.08 3.94L17.14 3.88A2.06 2.06 0 1 1 20.05 6.79L19.99 6.85A1.7 1.7 0 0 0 19.65 8.73V8.83A1.7 1.7 0 0 0 21.2 9.93H21.4A2.06 2.06 0 1 1 21.4 14.05H21.3A1.7 1.7 0 0 0 19.75 15.15Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="12.015" cy="12.015" r="3.2" stroke="currentColor" strokeWidth="1.6" />
         </svg>
       );
     case "docs":
@@ -126,6 +133,7 @@ function leafIsActive(item: DashboardLeafNavItem, section: DashboardSection, cur
 }
 
 export function DashboardSidebar({ email, section, plan, currentPath, currentHref }: DashboardSidebarProps) {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const activeGroupIds = useMemo(() => {
     const ids = new Set<string>();
     for (const node of dashboardNav) {
@@ -167,7 +175,7 @@ export function DashboardSidebar({ email, section, plan, currentPath, currentHre
   }, []);
 
   return (
-    <aside className="rounded-2xl border border-slate-200 bg-white p-4 lg:sticky lg:top-20 lg:h-[calc(100vh-6.5rem)] lg:overflow-auto">
+    <aside className="h-full overflow-y-auto px-2 py-1">
       <p className="text-sm font-semibold text-slate-900">控制台</p>
       <p className="mt-1 text-xs text-slate-500">{plan} · {email}</p>
 
@@ -222,7 +230,7 @@ export function DashboardSidebar({ email, section, plan, currentPath, currentHre
                               className={cn(
                                 "group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition",
                                 active
-                                  ? "bg-slate-200 font-medium text-slate-900"
+                                  ? "bg-slate-200/70 font-medium text-slate-900"
                                   : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                               )}
                             >
@@ -245,6 +253,32 @@ export function DashboardSidebar({ email, section, plan, currentPath, currentHre
 
               const active = leafIsActive(node, section, currentPath, currentHref);
               const openInNewTab = node.id === "docs" || node.id === "tools";
+
+              if (node.id === "support") {
+                return (
+                  <button
+                    key={node.id}
+                    type="button"
+                    onClick={() => setIsContactModalOpen(true)}
+                    className={cn(
+                      "group flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition",
+                      active
+                        ? "bg-slate-200/70 font-medium text-slate-900"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+                    )}
+                  >
+                    <DashboardIconGlyph
+                      icon={node.icon}
+                      className={cn(
+                        "transition",
+                        active ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700",
+                      )}
+                    />
+                    <span>{node.label}</span>
+                  </button>
+                );
+              }
+
               return (
                 <Link
                   key={node.id}
@@ -254,7 +288,7 @@ export function DashboardSidebar({ email, section, plan, currentPath, currentHre
                   className={cn(
                     "group flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition",
                     active
-                      ? "bg-slate-200 font-medium text-slate-900"
+                      ? "bg-slate-200/70 font-medium text-slate-900"
                       : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
                   )}
                 >
@@ -272,6 +306,7 @@ export function DashboardSidebar({ email, section, plan, currentPath, currentHre
           </div>
         ))}
       </nav>
+      <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
     </aside>
   );
 }

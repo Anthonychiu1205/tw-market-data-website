@@ -16,12 +16,18 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
   const [keys, setKeys] = useState(initialKeys);
   const [newKeyName, setNewKeyName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [createdPlainKey, setCreatedPlainKey] = useState<string | null>(null);
 
   const canSubmit = canCreate && !isSubmitting;
   const hasKeys = keys.length > 0;
+
+  function publishKeysUpdate(nextKeys: ApiKeyItem[]) {
+    if (typeof window === "undefined") return;
+    window.dispatchEvent(new CustomEvent("dashboard-api-keys-updated", { detail: nextKeys }));
+  }
 
   async function handleCreateKey(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -51,9 +57,14 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
         plainTextKey?: string;
       };
 
-      setKeys((prev) => [payload.key, ...prev]);
+      setKeys((prev) => {
+        const next = [payload.key, ...prev];
+        publishKeysUpdate(next);
+        return next;
+      });
       setNewKeyName("");
       setCreatedPlainKey(payload.plainTextKey ?? null);
+      setIsModalOpen(false);
     } catch {
       setErrorMessage("目前無法建立金鑰，請稍後再試。");
     } finally {
@@ -76,7 +87,11 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
         throw new Error("delete_failed");
       }
 
-      setKeys((prev) => prev.filter((item) => item.id !== keyId));
+      setKeys((prev) => {
+        const next = prev.filter((item) => item.id !== keyId);
+        publishKeysUpdate(next);
+        return next;
+      });
       if (copiedKeyId === keyId) {
         setCopiedKeyId(null);
       }
@@ -152,7 +167,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
             ) : (
               <tr>
                 <td className="px-2 py-4 text-sm text-slate-500" colSpan={4}>
-                  尚無金鑰資料。
+                  尚無 API key。
                 </td>
               </tr>
             )}
@@ -160,25 +175,61 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
         </table>
       </div>
 
-      <form className="flex flex-wrap items-center gap-2" onSubmit={handleCreateKey}>
-        <input
-          value={newKeyName}
-          onChange={(event) => setNewKeyName(event.target.value)}
-          placeholder="金鑰名稱（可選）"
-          className="h-11 min-w-[220px] flex-1 rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
-          disabled={!canCreate || isSubmitting}
-        />
-        <button type="submit" disabled={!canSubmit} className={buttonClass("primary")}>
-          {isSubmitting ? "處理中..." : "建立 API 金鑰"}
+      <div className="flex items-center justify-end">
+        <button
+          type="button"
+          disabled={!canCreate}
+          onClick={() => {
+            setErrorMessage(null);
+            setCreatedPlainKey(null);
+            setIsModalOpen(true);
+          }}
+          className={buttonClass("primary", "h-10 rounded-lg px-4 text-sm")}
+        >
+          建立 API 金鑰
         </button>
-      </form>
+      </div>
 
       {disabledHint ? <p className="text-xs text-slate-500">{disabledHint}</p> : null}
       {errorMessage ? <p className="text-xs text-red-600">{errorMessage}</p> : null}
       {createdPlainKey ? (
         <p className="text-xs text-slate-700">
-          已建立新金鑰：<span className="font-mono">{createdPlainKey}</span>（請立即保存）
+          新金鑰：<span className="font-mono">{createdPlainKey}</span>
         </p>
+      ) : null}
+
+      {isModalOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 px-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5">
+            <h3 className="text-base font-semibold text-slate-900">建立新的 API 金鑰</h3>
+            <form className="mt-4 space-y-4" onSubmit={handleCreateKey}>
+              <label className="block space-y-1 text-sm text-slate-600">
+                <span>金鑰名稱</span>
+                <input
+                  value={newKeyName}
+                  onChange={(event) => setNewKeyName(event.target.value)}
+                  placeholder="例如 research-bot"
+                  className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
+                  disabled={!canCreate || isSubmitting}
+                />
+              </label>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className={buttonClass("secondary", "h-10 rounded-lg px-4 text-sm")}
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+                <button type="submit" disabled={!canSubmit} className={buttonClass("primary", "h-10 rounded-lg px-4 text-sm")}>
+                  {isSubmitting ? "建立中..." : "建立"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       ) : null}
     </div>
   );

@@ -4,7 +4,7 @@ import { AgentDocumentsDemo } from "./agent-documents-demo";
 
 export function AgentDocumentsShowcase() {
   return (
-    <section className="border-b border-slate-200 bg-white py-20 lg:py-24">
+    <section className="bg-white py-20 lg:py-24">
       <MarketingContainer>
         <div className="grid items-start gap-7 lg:grid-cols-[34%_66%] lg:gap-5">
           <div className="order-1 lg:order-1 lg:border-r lg:border-slate-200 lg:pr-4">
@@ -26,4 +26,3 @@ export function AgentDocumentsShowcase() {
     </section>
   );
 }
-

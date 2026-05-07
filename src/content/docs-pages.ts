@@ -25,7 +25,7 @@ export type DocsSidebarIcon =
 export type DocsContentSection = {
   id: string;
   label: string;
-  paragraphs: string[];
+  paragraphs?: string[];
   bullets?: string[];
   codeBlocks?: Array<{
     language?: "python" | "javascript" | "curl" | "text";
@@ -95,6 +95,7 @@ export type DocsPageEntry = {
   subtitle: string;
   sections: DocsContentSection[];
   apiReference?: ApiReferenceContent;
+  apiReferenceFactory?: () => ApiReferenceContent;
   tier: "complete" | "placeholder";
 };
 
@@ -102,13 +103,29 @@ export type DocsSidebarNavItem = {
   title: string;
   href: string;
   icon?: DocsSidebarIcon;
+  status?: "production" | "normalized" | "preview";
   children?: DocsSidebarNavItem[];
 };
 
 export type DocsSidebarNavGroup = {
   id: string;
   label: string;
+  groupIcon:
+    | "rocket"
+    | "line-chart"
+    | "file-spreadsheet"
+    | "landmark"
+    | "building-2"
+    | "network"
+    | "activity"
+    | "search-code"
+    | "eye";
   items: DocsSidebarNavItem[];
+};
+
+type DocSectionLike = {
+  id?: string | null;
+  label: string;
 };
 
 const apiSidebarSections: Array<{
@@ -135,8 +152,8 @@ const apiSidebarSections: Array<{
   { id: "financial-metrics", label: "財務指標", icon: "metrics" },
   { id: "filings", label: "公告文件", icon: "filings" },
   { id: "company-master", label: "公司基本資料", icon: "building" },
-  { id: "analyst-estimates", label: "分析師預估", icon: "chart" },
-  { id: "institutional-holdings", label: "法人持股", icon: "holdings" },
+  { id: "analyst-estimates", label: "進階估計資料（規劃中）", icon: "chart" },
+  { id: "institutional-holdings", label: "進階持有結構（規劃中）", icon: "holdings" },
   { id: "news", label: "新聞", icon: "news" },
   { id: "interest-rates", label: "利率", icon: "rates" },
   { id: "search", label: "搜尋", icon: "search" },
@@ -182,10 +199,10 @@ const apiPlaceholderCatalog: Array<{
   { sectionId: "filings", slug: "material-information", navLabel: "重大訊息", title: "重大訊息", subtitle: "提供重大訊息資料，支援事件偵測與風險告警。", usage: "重大事件追蹤、公告分類與異常監控" },
   { sectionId: "company-master", slug: "issuer-profile", navLabel: "公司基本資料", title: "公司基本資料", subtitle: "提供公司主檔欄位，包含識別、產業與市場分類。", usage: "主檔建立、ticker 對照與資料整合前置" },
   { sectionId: "company-master", slug: "company-classification", navLabel: "公司分類", title: "公司分類", subtitle: "提供公司分類資料，支援產業與主題分群。", usage: "分群建模、投資池管理與篩選條件設定" },
-  { sectionId: "analyst-estimates", slug: "estimates", navLabel: "預估數據", title: "預估數據", subtitle: "提供市場預估欄位，支援預期與實際落差分析。", usage: "共識追蹤、預估偏差分析與事件研究" },
-  { sectionId: "analyst-estimates", slug: "revision-history", navLabel: "修正歷史", title: "修正歷史", subtitle: "提供預估修正歷史，觀察市場預期變化路徑。", usage: "修正趨勢分析、風險提前偵測與策略觸發" },
-  { sectionId: "institutional-holdings", slug: "investor-holdings", navLabel: "投資者持股", title: "投資者持股", subtitle: "提供投資者層級持股資料，支援持股結構分析。", usage: "資金流向觀察、持股集中度分析與風格研究" },
-  { sectionId: "institutional-holdings", slug: "single-stock-holdings", navLabel: "個股持股", title: "個股持股", subtitle: "提供個股持股資訊，用於標的層級結構檢視。", usage: "個股法人動態追蹤與持股變化檢測" },
+  { sectionId: "analyst-estimates", slug: "estimates", navLabel: "預估數據（規劃中）", title: "預估數據（規劃中）", subtitle: "此資料主題尚未納入 available-now 能力。", usage: "目前不提供公開查詢，僅保留規劃說明。" },
+  { sectionId: "analyst-estimates", slug: "revision-history", navLabel: "修正歷史（規劃中）", title: "修正歷史（規劃中）", subtitle: "此資料主題尚未納入 available-now 能力。", usage: "目前不提供公開查詢，僅保留規劃說明。" },
+  { sectionId: "institutional-holdings", slug: "investor-holdings", navLabel: "投資者持股（規劃中）", title: "投資者持股（規劃中）", subtitle: "此資料主題尚未納入 available-now 能力。", usage: "目前不提供公開查詢，僅保留規劃說明。" },
+  { sectionId: "institutional-holdings", slug: "single-stock-holdings", navLabel: "個股持股（規劃中）", title: "個股持股（規劃中）", subtitle: "此資料主題尚未納入 available-now 能力。", usage: "目前不提供公開查詢，僅保留規劃說明。" },
   { sectionId: "news", slug: "company-news", navLabel: "公司新聞", title: "公司新聞", subtitle: "提供公司層級新聞資料，用於事件與情緒分析。", usage: "公司事件追蹤、輿情監控與風險評估" },
   { sectionId: "news", slug: "market-news", navLabel: "市場新聞", title: "市場新聞", subtitle: "提供市場層級新聞資料，輔助總體脈絡判讀。", usage: "市場主題追蹤、訊息分類與宏觀觀察" },
   { sectionId: "interest-rates", slug: "rate-snapshot", navLabel: "利率快照", title: "利率快照", subtitle: "提供當期利率快照，支援估值與風險參數設定。", usage: "折現率設定、當期風險因子補充與報表輸入" },
@@ -546,7 +563,7 @@ const apiDocsPages: DocsPageEntry[] = apiPlaceholderCatalog.map((item) => {
       { id: "best-practices", label: "Best Practices", paragraphs: [] },
       { id: "error-boundaries", label: "Errors", paragraphs: [] },
     ],
-    apiReference: buildApiReference(item),
+    apiReferenceFactory: () => buildApiReference(item),
   };
 });
 
@@ -593,89 +610,29 @@ const baseDocsPages: DocsPageEntry[] = [
     navLabel: "介紹",
     category: "overview",
     icon: "book",
-    title: "台股資料平台",
-    subtitle: "本平台提供已標準化、可驗證的台股資料，適合 AI agent、量化策略與研究使用。",
+    title: "台股資料 API 基礎設施",
+    subtitle: "為 AI agent、量化研究與自動化系統提供可驗證、結構一致、來源可追溯的台股資料。",
     tier: "complete",
     sections: [
       {
-        id: "platform-overview",
-        label: "平台說明",
-        paragraphs: [
-          "這是一個台股決策資料平台文件入口，面向研究、量化與自動化系統。",
-          "平台採官方來源優先（TWSE / TPEx / MOPS），資料經結構化處理後透過 API 對外提供。",
-          "每筆回應保留 source_role 與 lineage，支援可追溯驗證與治理流程。",
-        ],
-      },
-      {
         id: "docs-portals",
         label: "文件入口",
-        paragraphs: ["文件導覽分為四個主要入口："],
-        bullets: [
-          "Getting Started：平台介紹、快速開始、認證方式、API 模型、來源政策、資料更新與 lineage",
-          "Data APIs：依資料主題分類的正式 API 文件（公司、財務、市場、籌碼、量化、分類、查詢工具）",
-          "Workflows / Use Cases：任務導向流程，聚焦 5 個核心情境，避免零碎教學頁干擾",
-          "Coming Soon：規劃中主題清單，明確區分尚未開放能力",
-        ],
-      },
-      {
-        id: "workflow-highlights",
-        label: "Workflows / Use Cases（5 個核心情境）",
-        paragraphs: ["文件站目前保留以下 5 個任務導向工作流入口："],
-        bullets: [
-          "查公司基本面（issuer_profile + financial_metrics + valuation_data）",
-          "看籌碼（institutional_flow + margin_short）",
-          "看市場狀態（index_data + market_breadth）",
-          "快速查資料（search + query + explainability）",
-          "做策略 / AI（features + factor_data + time_alignment）",
-        ],
-      },
-      {
-        id: "core-differentiators",
-        label: "核心差異化能力",
-        paragraphs: ["平台差異化能力集中在查詢層與可解釋性："],
-        bullets: [
-          "Search API：快速定位股票與資料主題，降低查詢前置成本",
-          "Query API：欄位與條件式查詢入口，支援批次與流程化查詢",
-          "Explainability：提供來源與公式解釋，便於驗證、審計與策略回顧",
-          "official-first + source_role + lineage：確保資料來源透明與治理一致性",
-        ],
-      },
-      {
-        id: "data-coverage",
-        label: "可取得資料摘要",
-        paragraphs: ["目前可用能力依下列主題分組："],
-        bullets: [
-          "公司與事件：公司主檔、公告、事件、公司行動、股利",
-          "財務與成長：財報指標、月營收、估值",
-          "市場與價格：股價、技術指標、指數、市場廣度、利率",
-          "籌碼與資金：法人買賣、融資融券",
-          "策略與量化：features、factor_data、time_alignment、screener",
-          "分類與結構：公司分類、指數分類",
-          "查詢與工具：/v2/search、/v2/query、explainability layer",
-        ],
-      },
-      {
-        id: "target-users",
-        label: "適用對象",
         paragraphs: [],
-        bullets: [
-          "研究者與資料分析團隊",
-          "量化開發者與策略研究流程",
-          "SaaS / workflow builders",
-          "AI agent 與 automation use cases",
-        ],
+      },
+      {
+        id: "what-you-can-access",
+        label: "目前可存取的資料",
+        paragraphs: [],
+      },
+      {
+        id: "built-for",
+        label: "適合使用者",
+        paragraphs: [],
       },
       {
         id: "design-principles",
         label: "設計原則",
         paragraphs: [],
-        bullets: [
-          "官方來源優先：以交易所與官方揭露資料為核心來源",
-          "一致的資料結構：所有 API 採統一 schema 設計",
-          "可追溯性（lineage）：每筆資料保留來源與處理流程",
-          "資料角色分層：明確區分 canonical / fallback / helper",
-          "面向機器設計：優先支援程式化存取與自動化流程",
-        ],
       },
     ],
   },
@@ -686,134 +643,103 @@ const baseDocsPages: DocsPageEntry[] = [
     category: "overview",
     icon: "rocket",
     title: "Quick Start",
-    subtitle: "在 2 分鐘內完成第一個台股資料 API 呼叫。建立帳號、取得 API key，並驗證第一筆回應。",
+    subtitle: "用 2 分鐘建立第一個 TW Market Data API request，完成認證、查詢台股資料，並理解 response 結構。",
     tier: "complete",
     sections: [
       {
         id: "create-account",
-        label: "1. 建立帳號",
-        paragraphs: ["註冊帳號後，在 dashboard 取得 API key。"],
+        label: "建立帳號",
+        paragraphs: [],
       },
       {
         id: "first-request",
-        label: "2. 發送第一個請求",
-        paragraphs: ["每個 API request 需要："],
-        bullets: [
-          "API key（放在 X-API-Key header）",
-          "ticker（股票代碼，例如 2330）",
-        ],
+        label: "發送第一個請求",
+        paragraphs: [],
       },
       {
         id: "explore-more",
-        label: "3. Explore More",
-        paragraphs: ["延伸查詢常用資料主題，確認欄位與更新節奏。"],
+        label: "探索更多 endpoint",
+        paragraphs: [],
       },
       {
         id: "whats-next",
-        label: "4. What's Next",
-        paragraphs: ["從常用文件入口繼續完成整合流程。"],
+        label: "下一步",
+        paragraphs: [],
       },
     ],
   },
   {
     slug: ["data-access"],
     href: "/docs/data-access",
-    navLabel: "資料存取",
+    navLabel: "市場覆蓋範圍",
     category: "overview",
     icon: "database",
-    title: "資料存取",
-    subtitle:
-      "所有資料透過一致的 REST API 提供，設計重點在於穩定性、可預測性與可組合性。每一個 endpoint 都遵循相同的回應結構與欄位命名規則，讓資料可以直接接入研究流程、策略系統與自動化 agent。",
+    title: "市場覆蓋範圍",
+    subtitle: "涵蓋台灣上市、上櫃市場的核心行情、財務、籌碼、事件與分類資料。",
     tier: "complete",
     sections: [
       {
-        id: "dataset-categories",
-        label: "資料主題分類",
+        id: "docs-portals",
+        label: "文件入口",
         paragraphs: [
-          "平台的目標不是提供一次性的資料查詢，而是建立一個可以長期維運的資料層。當你的系統需要跨資料主題整合、回測、或進入 production 環境時，資料存取方式必須保持一致且可追溯。",
-          "資料依照主題（dataset）進行組織，每個主題對應一組 API endpoints。不同主題之間共用相同的 request / response 結構，避免在整合時需要針對每個資料來源做客製解析。",
-          "目前主要資料主題包括：",
-        ],
-        bullets: [
-          "行情資料：即時與歷史價格、成交資訊與市場指標",
-          "財報資料：損益表、資產負債表與現金流量表",
-          "營運資料：月營收與公司揭露的營運數據",
-          "公司基本資料：公司資訊、產業分類與基礎識別資料",
-          "公司事件：公告、重大訊息與事件型資料",
-          "籌碼與資金流向：法人資金流與市場資金動向",
-          "利率與總體資料：利率快照與部分總體指標",
+          "你可以從左側導覽查看所有資料集文件，也可以先從 Quick Start 建立第一個 request。",
+          "若要讓 agent 或內部工具讀取文件，後續可透過 OpenAPI spec、llms.txt 或 MCP tools 作為入口。",
         ],
       },
       {
-        id: "endpoint-pattern",
-        label: "endpoint 使用模式",
-        paragraphs: [
-          "每個 dataset 都可以獨立查詢，也可以在同一個流程中組合使用。這樣的設計可以降低跨資料整合的成本，並避免資料結構不一致帶來的風險。",
-          "API 設計偏向可組合，而不是高度封裝的單一功能接口。建議的使用方式如下：",
-        ],
+        id: "coverage-overview",
+        label: "覆蓋範圍總覽",
+        paragraphs: [],
         bullets: [
-          "先以單一 ticker 與短時間範圍進行驗證，確認欄位與回應結構符合預期後，再擴大查詢範圍",
-          "將不同 dataset 的查詢拆成多個 request，在應用層做整合，而不是依賴單一複雜 endpoint",
-          "對於大規模資料需求，使用分批查詢（batch）與適當的速率控制，避免觸發限制",
-          "避免把 API 當作資料庫查詢語言；API 的設計是資料傳輸層，而不是即時分析引擎",
+          "TWSE listed equities：上市股票日線價格與市場資料。",
+          "TPEx listed equities：上櫃股票日線價格與市場資料。",
+          "MOPS fundamentals：月營收與財報三表。",
+          "Valuation / technical / factor layer：估值、技術指標、因子與策略查詢層。",
+          "Company & events：公司基本資料、公告、事件、公司行動、股利。",
+          "目前 public sellable boundary 以 26 個 available-now dataset 為核心。",
+          "實際可用範圍依帳號方案與 API key 權限決定。",
         ],
       },
       {
-        id: "response-structure",
-        label: "一致的回應結構",
+        id: "core-strength",
+        label: "核心優勢",
         paragraphs: [
-          "所有 API 回應都遵循同一個結構，讓資料可以被統一處理：",
-          "這個設計讓你可以在 parser 或資料處理層先統一處理 metadata（dataset、freshness、lineage），再針對 data 欄位做具體解析。當系統規模擴大時，這種分層會大幅降低維護成本。",
-        ],
-        bullets: [
-          "dataset：資料集識別名稱",
-          "source_role：資料來源角色（canonical / fallback / helper）",
-          "freshness：資料更新時間或有效時間",
-          "lineage：資料來源與處理流程資訊（可用於追溯）",
-          "data：實際資料內容",
+          "TW Market Data 的重點不是提供所有市場所有資料，而是把台股常用研究資料整理成穩定、可查詢、可追溯的 API。",
+          "主要優先順序是 official/public-first、schema consistency、agent-ready response。",
         ],
       },
       {
-        id: "query-expansion-strategy",
-        label: "查詢與擴展策略",
+        id: "discover-coverage",
+        label: "如何發現可用股票與資料集",
         paragraphs: [
-          "當資料需求從單一查詢成長為系統級使用時，建議採用以下策略：",
-          "這些策略能讓 API 從「查資料工具」升級為「資料基礎設施」。",
+          "你可以先用公司基本資料建立標的清單，再用分類與欄位清單縮小查詢範圍。",
+          "若要讓 agent 自動探索可用能力，後續可結合 OpenAPI spec 與 MCP tools。",
+          "常用入口：",
         ],
         bullets: [
-          "建立中間層（data access layer），將 API 呼叫集中管理，而不是散落在不同服務中",
-          "統一 ticker 與時間格式，避免不同資料源使用不同 key 導致錯誤匹配",
-          "對常用查詢做快取（cache），降低重複請求與速率壓力",
-          "將長期資料（如歷史價格、財報）落地；API 適合做資料同步，不適合每次即時查詢",
-          "對重要流程加入資料版本與時間標記，確保回測與實際交易使用相同資料狀態",
+          "GET /v2/datasets/issuer-profile",
+          "GET /v2/datasets/theme-taxonomy",
+          "GET /v2/datasets/index-classification",
+          "GET /v2/query/fields",
         ],
       },
       {
-        id: "error-handling-limits",
-        label: "錯誤處理與限制",
-        paragraphs: [
-          "在實務使用中，最常見的問題來自於速率限制與資料邊界。",
-          "建議在系統中對不同錯誤類型做分類處理，對 rate limit 加入 retry 或 backoff 機制，並對關鍵流程加上監控與警示。",
-        ],
+        id: "limitations",
+        label: "目前限制",
+        paragraphs: [],
         bullets: [
-          "請求過於頻繁：會觸發 rate limit，需要調整節奏或分批處理",
-          "查詢範圍過大：可能導致回應時間增加或資料不完整",
-          "使用未授權的 dataset：不同方案可用資料範圍不同",
-          "資料尚未更新：freshness 欄位應作為判斷依據，而不是假設資料即時",
+          "不是 full public GA；採 controlled rollout。",
+          "部分資料集為 preview 或 not-yet-available。",
+          "部分延伸資料主題尚未納入公開主功能，後續會依 controlled rollout 另行公告。",
+          "若官方來源延遲或暫停，平台會保留最後 snapshot 或標記資料新鮮度。",
+          "配額、rate limit 與 dataset access 依方案不同。",
         ],
       },
       {
-        id: "practical-guidance",
-        label: "實務建議",
+        id: "feedback",
+        label: "Feedback",
         paragraphs: [
-          "在開發初期，可以直接從 API 讀取資料進行實驗。但當進入穩定運行階段，建議將資料存取納入整體系統設計。",
-          "當資料存取被正確設計後，後續的策略開發、分析與產品化會變得更穩定。",
-        ],
-        bullets: [
-          "將 API 當作資料來源，而不是最終資料存放位置",
-          "為不同用途建立明確的資料流（research / backtest / production）",
-          "保留 lineage 與 freshness，用於驗證與排錯",
-          "避免在 production 流程中依賴不可預測的即時查詢",
+          "若需要特定產業、資料集或企業級導入，請聯繫我們。",
         ],
       },
     ],
@@ -896,7 +822,7 @@ const baseDocsPages: DocsPageEntry[] = [
       {
         id: "holdings-source",
         label: "法人與持股資料",
-        paragraphs: ["法人持股與相關統計資料來自交易所與公開揭露系統。"],
+        paragraphs: ["法人買賣與融資融券資料以交易所公開揭露系統為優先來源。"],
         bullets: [
           "來源：TWSE",
           "來源：TPEx",
@@ -951,55 +877,65 @@ const baseDocsPages: DocsPageEntry[] = [
   {
     slug: ["api-model"],
     href: "/docs/api-model",
-    navLabel: "API 模型",
+    navLabel: "OpenAPI Spec",
     category: "overview",
     icon: "braces",
-    title: "API 模型",
-    subtitle: "維持一致 schema 與可預測欄位，降低整合成本。",
+    title: "OpenAPI Spec",
+    subtitle: "提供機器可讀的 API 規格，方便 client generation、API testing 與 agent endpoint discovery。",
     tier: "complete",
     sections: [
       {
-        id: "resource-design",
-        label: "resource-oriented 設計",
+        id: "docs-portals",
+        label: "文件入口",
         paragraphs: [
-          "API 以資源為中心命名與分組，讓端點目的清楚、行為可預測。",
-          "不同資料主題的差異主要位於 data 內容，而非回應外層框架。",
+          "你可以從左側導覽查看所有資料集文件，也可以先從 Quick Start 建立第一個 request。",
+          "若要讓 agent 或內部工具讀取文件，後續可透過 OpenAPI spec、llms.txt 或 MCP tools 作為入口。",
         ],
       },
       {
-        id: "top-level-fields",
-        label: "常見頂層欄位",
-        paragraphs: ["多數回應會包含 dataset、source_role、freshness、lineage、data。"],
+        id: "openapi-json",
+        label: "openapi.json",
+        paragraphs: [
+          "TW Market Data 會以 OpenAPI 3.x 格式描述可公開使用的 API contract。",
+          "若 production 環境尚未公開固定 URL，請使用儀表板或部署環境提供的 OpenAPI endpoint。",
+          "部署後可由站台提供 /openapi.json。",
+        ],
+      },
+      {
+        id: "whats-included",
+        label: "What’s included",
+        paragraphs: [],
         bullets: [
-          "dataset：資料主題識別",
-          "source_role：來源角色",
-          "freshness：時效資訊",
-          "lineage：來源追蹤資訊",
-          "data：實際資料內容",
+          "endpoint path",
+          "request parameters",
+          "response schema",
+          "authentication header",
+          "error status",
+          "dataset availability status",
+          "examples for query / screener",
         ],
       },
       {
-        id: "data-shapes",
-        label: "data 欄位型態",
-        paragraphs: [
-          "data 可能是陣列或單一物件，取決於資源與查詢條件。",
-          "建議 parser 先判斷型態，再進入欄位映射，避免固定假設造成解析錯誤。",
+        id: "use-cases",
+        label: "使用情境",
+        paragraphs: [],
+        bullets: [
+          "產生 TypeScript / Python client",
+          "匯入 Postman / Insomnia / Bruno",
+          "讓 agent 或 MCP tool 探索可用 endpoint",
+          "validate request / response schema",
+          "將 docs 與 backend contract 對齊",
         ],
       },
       {
-        id: "metadata-traceability",
-        label: "metadata 與 traceability",
-        paragraphs: [
-          "metadata 提供審計與治理所需上下文，應與 data 一起保存。",
-          "對於需要重現結果的流程，trace_id、ingested_at 與來源文件識別是關鍵欄位。",
-        ],
-      },
-      {
-        id: "error-response",
-        label: "錯誤回應格式",
-        paragraphs: [
-          "錯誤回應維持固定模型，包含錯誤代碼、訊息與可判斷的處理方向。",
-          "建議對 4xx、5xx 分別設計重試與告警策略，不要用同一條重試邏輯。",
+        id: "notes",
+        label: "注意事項",
+        paragraphs: [],
+        bullets: [
+          "spec 只描述 available-now / preview API，不保證 skeleton / placeholder。",
+          "controlled rollout 下，不同 API key 可能有不同 access。",
+          "以 backend read API contract 為準。",
+          "若 docs 與 spec 不一致，應回報並以 spec / backend contract 校正。",
         ],
       },
     ],
@@ -1009,12 +945,12 @@ const baseDocsPages: DocsPageEntry[] = [
   {
     slug: ["api", "analyst-estimates"],
     href: "/docs/api/analyst-estimates",
-    navLabel: "分析師預估",
+    navLabel: "分析師預估（規劃中）",
     category: "api",
     icon: "chart",
-    title: "分析師預估",
-    subtitle: "提供市場對營收、獲利與關鍵指標的預估資料。",
-    tier: "complete",
+    title: "分析師預估（規劃中）",
+    subtitle: "此主題目前未納入 available-now 或 preview 對外能力。",
+    tier: "placeholder",
     sections: [
       { id: "overview", label: "Overview", paragraphs: [] },
       { id: "use-cases", label: "適用情境", paragraphs: [] },
@@ -1025,22 +961,22 @@ const baseDocsPages: DocsPageEntry[] = [
       { id: "notes", label: "Notes", paragraphs: [] },
     ],
     apiReference: {
-      categoryLabel: "分析師預估",
+      categoryLabel: "規劃中資料主題",
       method: "GET",
       endpoint: "/v1/analyst-estimates",
       overview: [
-        "此 endpoint 回傳特定公司在指定期間的預估值與共識統計，常見指標包含 EPS、營收與毛利率。",
-        "回應會保留預估更新時間與來源追蹤欄位，便於建立 revision 與 surprise 分析流程。",
+        "此主題目前未納入 public sellable boundary。",
+        "請改用 available-now 的財務與成長資料集（例如月營收、財報三表、估值資料）。",
       ],
       useCases: [
-        "比較公司實際財報與市場共識差異。",
-        "追蹤預估修正方向，建立事件前後預期變動序列。",
-        "搭配價格與財報資料建立預估偏差因子。",
+        "用作未來規劃範圍參考。",
+        "與現行可用資料集做能力邊界區分。",
+        "避免將此主題誤判為可立即串接的正式功能。",
       ],
       gettingStarted: [
-        "在 request header 帶入 X-API-Key: your_api_key_here。",
-        "至少提供 ticker；若要控制資料範圍可加 period 或 latest。",
-        "先以單一公司驗證欄位，再擴展批次查詢。",
+        "若有此主題導入需求，請先聯繫團隊評估。",
+        "正式可用範圍以帳號方案與權限開通狀態為準。",
+        "目前建議先使用已上線 endpoint 建立流程。",
       ],
       exampleRequestCurl: `curl -G "https://api.twmd.example/v1/analyst-estimates" \\
   -H "X-API-Key: your_api_key_here" \\
@@ -1052,8 +988,8 @@ const baseDocsPages: DocsPageEntry[] = [
         { name: "latest", type: "boolean", required: false, description: "true 時僅回傳最新可用預估。預設 false。" },
       ],
       responseSummary: [
-        "回應 data 為預估紀錄陣列，單筆通常對應某一期間、某一指標的共識與分布資訊。",
-        "若部分欄位尚未揭露，可能回傳 null，建議在下游模型中顯式處理。",
+        "此頁僅作規劃說明，不代表目前可公開查詢。",
+        "若 endpoint 未開通，應視為 not available。",
       ],
       responseFields: [
         { path: "dataset", type: "string", description: "固定為 analyst_estimates。" },
@@ -1065,8 +1001,8 @@ const baseDocsPages: DocsPageEntry[] = [
         { path: "data[].consensus_mean", type: "number", description: "共識平均值。" },
       ],
       notes: [
-        "預估值會隨時間修正，回測時請固定查詢時間點，避免回看偏差。",
-        "不同來源對指標口徑可能不同，建議建立 metric mapping 後再比較。",
+        "本頁不代表正式上線能力。",
+        "請以 available-now / preview 文件與 API contract 為準。",
       ],
       sidePanel: {
         requestExample: `curl -G "https://api.twmd.example/v1/analyst-estimates" \\
@@ -1095,7 +1031,7 @@ const baseDocsPages: DocsPageEntry[] = [
           },
           { status: "400", description: "缺少必要參數 ticker", body: `{"error":{"code":"invalid_request","message":"ticker is required"}}` },
           { status: "401", description: "API key 無效或缺失", body: `{"error":{"code":"unauthorized","message":"invalid api key"}}` },
-          { status: "404", description: "查無對應資料", body: `{"error":{"code":"not_found","message":"no analyst estimates found"}}` },
+          { status: "404", description: "此主題尚未開通", body: `{"error":{"code":"not_found","message":"dataset not available in current rollout"}}` },
         ],
       },
     },
@@ -1468,40 +1404,40 @@ const baseDocsPages: DocsPageEntry[] = [
     subtitle: "提供公司損益表關鍵欄位，適合用於基本面分析、估值研究與策略建模。",
     tier: "complete",
     sections: buildIncomeStatementApiSections(),
-    apiReference: buildIncomeStatementApiReference(),
+    apiReferenceFactory: () => buildIncomeStatementApiReference(),
   },
   {
     slug: ["api", "insider-trades"],
     href: "/docs/api/insider-trades",
-    navLabel: "內線交易",
+    navLabel: "內線交易（規劃中）",
     category: "api",
     icon: "insider",
-    title: "內線交易",
-    subtitle: "提供董事、經理人等申報交易紀錄。",
+    title: "內線交易（規劃中）",
+    subtitle: "此主題目前未納入 available-now 或 preview 對外能力。",
     tier: "placeholder",
     sections: [
       {
         id: "dataset-overview",
         label: "資料定義",
         paragraphs: [
-          "此資料集收錄公司內部人員申報的買賣交易紀錄，包含申報人身分、交易型態與數量。",
-          "資料常用於觀察管理階層行為與市場情緒輔助判讀。",
+          "此主題目前為規劃中，尚未提供正式可查詢 endpoint。",
+          "如需公司事件相關研究，請先使用公司公告、事件日曆與結構化事件資料。",
         ],
       },
       {
         id: "usage-scenarios",
         label: "使用情境",
         paragraphs: [
-          "可用於建立內部人交易事件清單、統計特定期間淨買賣方向。",
-          "建議搭配公告文件與價格資料交叉分析，不宜單一使用。",
+          "本頁僅作規劃範圍說明，不構成可用能力承諾。",
+          "正式開放時程與配額範圍依 controlled rollout 決定。",
         ],
       },
       {
         id: "field-and-source-notes",
         label: "欄位與來源注意事項",
         paragraphs: [
-          "申報時間與實際交易時間可能不同，事件研究需選定一致的時間準則。",
-          "回應保留來源資訊，便於核對原始申報依據。",
+          "目前無公開 contract，請勿將此頁資訊用於正式串接。",
+          "對外功能以 available-now / preview 文件頁為準。",
         ],
       },
     ],
@@ -1545,35 +1481,35 @@ const baseDocsPages: DocsPageEntry[] = [
   {
     slug: ["api", "institutional-holdings"],
     href: "/docs/api/institutional-holdings",
-    navLabel: "法人持股",
+    navLabel: "進階持有結構（規劃中）",
     category: "api",
     icon: "holdings",
-    title: "法人持股",
-    subtitle: "提供法人與機構持股相關資料。",
+    title: "進階持有結構（規劃中）",
+    subtitle: "此主題目前未納入 available-now 或 preview 對外能力。",
     tier: "placeholder",
     sections: [
       {
         id: "dataset-overview",
         label: "資料定義",
         paragraphs: [
-          "此資料集聚焦法人持股比例與持股變動，適合觀察資金流向與市場結構。",
-          "常見欄位包含法人類別、持股比率、變動數量與統計區間。",
+          "此主題仍屬規劃中，尚未納入目前公開可販售能力。",
+          "現行可用的資金面資料請改用法人買賣（institutional-flow）與融資融券（margin-short）。",
         ],
       },
       {
         id: "usage-scenarios",
         label: "使用情境",
         paragraphs: [
-          "可用於建立法人偏好因子、觀察持股集中度變化。",
-          "建議配合股價與成交量資料，避免只看單一維度。",
+          "若有此主題需求，建議先以法人買賣、融資融券與事件資料建立替代流程。",
+          "實際開放時程與權限範圍以 controlled rollout 為準。",
         ],
       },
       {
         id: "field-and-source-notes",
         label: "欄位與來源注意事項",
         paragraphs: [
-          "不同法人類別資料更新節奏可能不同，查詢時請帶入日期條件。",
-          "若跨來源合併，請先確認分類口徑一致。",
+          "本頁僅保留規劃說明，不代表當前可查詢 contract。",
+          "請優先使用已上線 docs 章節中的 available-now dataset。",
         ],
       },
     ],
@@ -2401,7 +2337,6 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
       { title: "財報指標", href: "/docs/api/financial-growth/financial-metrics", topicId: "financial_metrics", tableName: "financial_metrics", endpoint: "/v2/datasets/financial-metrics", source: "MOPS / TWSE / TPEx" },
       { title: "月營收", href: "/docs/api/financial-growth/monthly-revenue", topicId: "monthly_revenue", tableName: "monthly_revenue", endpoint: "/v2/datasets/monthly-revenue", source: "MOPS" },
       { title: "估值資料", href: "/docs/api/financial-growth/valuation-data", topicId: "valuation_data", tableName: "valuation_data", endpoint: "/v2/datasets/valuation-data", source: "TWSE / TPEx" },
-      { title: "財報資料", href: "/docs/api/financial-growth/financial-statements", topicId: "financial_statements_product", tableName: "fundamental_income_statements + fundamental_cash_flows + fundamental_balance_sheets", endpoint: "/v2/datasets/income-statement + /v2/datasets/cash-flow-statement + /v2/datasets/balance-sheet", source: "MOPS" },
       { title: "損益表", href: "/docs/api/financial-growth/income-statement", topicId: "income_statement", tableName: "fundamental_income_statements", endpoint: "/v2/datasets/income-statement", source: "MOPS" },
       { title: "現金流量表", href: "/docs/api/financial-growth/cash-flow-statement", topicId: "cash_flow_statement", tableName: "fundamental_cash_flows", endpoint: "/v2/datasets/cash-flow-statement", source: "MOPS" },
       { title: "資產負債表", href: "/docs/api/financial-growth/balance-sheet", topicId: "balance_sheet", tableName: "fundamental_balance_sheets", endpoint: "/v2/datasets/balance-sheet", source: "MOPS" },
@@ -2417,6 +2352,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     topics: [
       { title: "TWSE 日線價格", href: "/docs/api/market-prices/twse-daily-price", topicId: "twse_daily_price", tableName: "normalized_twse_daily_prices", endpoint: "/v2/datasets/twse-daily-price", source: "TWSE" },
       { title: "TPEx 日線價格", href: "/docs/api/market-prices/tpex-daily-price", topicId: "tpex_daily_price", tableName: "normalized_tpex_daily_prices", endpoint: "/v2/datasets/tpex-daily-price", source: "TPEx" },
+      { title: "還原股價", href: "/docs/api/market-prices/adjusted-prices", topicId: "adjusted_prices", tableName: "adjusted_prices", endpoint: "/v2/datasets/adjusted-prices", source: "TWSE / TPEx" },
       { title: "技術指標", href: "/docs/api/market-prices/technical-indicators", topicId: "technical_indicators", tableName: "technical_indicators", endpoint: "/v2/datasets/technical-indicators", source: "TWSE / TPEx" },
       { title: "指數資料", href: "/docs/api/market-prices/index-data", topicId: "index_data", tableName: "index_data", endpoint: "/v2/datasets/index-data", source: "TWSE / TPEx" },
       { title: "市場廣度", href: "/docs/api/market-prices/market-breadth", topicId: "market_breadth", tableName: "market_breadth", endpoint: "/v2/datasets/market-breadth", source: "TWSE / TPEx" },
@@ -2429,8 +2365,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     href: "/docs/api/capital-flow",
     icon: "holdings",
     topics: [
-      { title: "籌碼流向", href: "/docs/api/capital-flow/chip-flows", topicId: "chip_flows", tableName: "chip_flows", endpoint: "/v2/datasets/chip-flows", source: "TWSE / TPEx" },
-      { title: "法人買賣", href: "/docs/api/capital-flow/institutional-flow", topicId: "institutional_flow", tableName: "institutional_flow", endpoint: "/v2/datasets/institutional-flow", source: "TWSE / TPEx" },
+      { title: "三大法人", href: "/docs/api/capital-flow/institutional-flow", topicId: "institutional_flow", tableName: "institutional_flow", endpoint: "/v2/datasets/institutional-flow", source: "TWSE / TPEx" },
       { title: "融資融券", href: "/docs/api/capital-flow/margin-short", topicId: "margin_short", tableName: "margin_short", endpoint: "/v2/datasets/margin-short", source: "TWSE / TPEx" },
     ],
   },
@@ -2442,8 +2377,8 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     topics: [
       { title: "特徵資料", href: "/docs/api/strategy-quant/features", topicId: "features", tableName: "features", endpoint: "/v2/datasets/features", source: "平台派生資料" },
       { title: "因子資料", href: "/docs/api/strategy-quant/factor-data", topicId: "factor_data", tableName: "factor_data", endpoint: "/v2/datasets/factor-data", source: "平台派生資料" },
-      { title: "時間對齊資料", href: "/docs/api/strategy-quant/time-alignment", topicId: "time_alignment", tableName: "time_alignment", endpoint: "/v2/datasets/time-alignment", source: "平台對齊層" },
-      { title: "選股器", href: "/docs/api/strategy-quant/screener", topicId: "screener", tableName: "screener", endpoint: "/v2/datasets/screener", source: "平台查詢層" },
+      { title: "時間對齊", href: "/docs/api/strategy-quant/time-alignment", topicId: "time_alignment", tableName: "time_alignment", endpoint: "/v2/datasets/time-alignment", source: "平台對齊層" },
+      { title: "條件篩選", href: "/docs/api/strategy-quant/screener", topicId: "screener", tableName: "screener", endpoint: "/v2/datasets/screener", source: "平台查詢層" },
     ],
   },
   {
@@ -2464,19 +2399,30 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     topics: [
       { title: "搜尋 API", href: "/docs/api/query-tools/search-api", topicId: "search_api", tableName: "search_index", endpoint: "/v2/search", source: "平台索引層", icon: "search" },
       { title: "查詢 API", href: "/docs/api/query-tools/query-api", topicId: "query_api", tableName: "query_engine", endpoint: "/v2/query", source: "平台查詢引擎", icon: "braces" },
-      { title: "Explainability", href: "/docs/api/query-tools/explainability", topicId: "explainability_layer", tableName: "explainability_layer", endpoint: "/v2/query", source: "平台解釋層", icon: "guide" },
+      { title: "查詢欄位", href: "/docs/api/query-tools/query-fields", topicId: "query_fields", tableName: "query_field_allowlist", endpoint: "/v2/query/fields", source: "平台查詢引擎", icon: "braces" },
+      { title: "查詢範例", href: "/docs/api/query-tools/query-examples", topicId: "query_examples", tableName: "query_examples_registry", endpoint: "/v2/query/examples", source: "平台查詢引擎", icon: "braces" },
+    ],
+  },
+  {
+    id: "preview",
+    label: "預覽",
+    href: "/docs/api/preview",
+    icon: "news",
+    topics: [
+      { title: "公司新聞", href: "/docs/api/preview/company-news", topicId: "company_news", tableName: "company_news_items", endpoint: "/v2/datasets/company-news", source: "TWSE / TPEx / MOPS" },
+      { title: "市場新聞", href: "/docs/api/preview/market-news", topicId: "market_news", tableName: "market_news_items", endpoint: "/v2/datasets/market-news", source: "TWSE / TPEx / MOPS" },
     ],
   },
 ];
 
 const comingSoonTopics: Array<{ title: string; href: string; topicId: string }> = [
-  { title: "持股分布", href: "/docs/coming-soon/ownership-distribution", topicId: "ownership_distribution" },
-  { title: "ETF Flow", href: "/docs/coming-soon/etf-flow", topicId: "etf_flow" },
-  { title: "指數成分", href: "/docs/coming-soon/index-constituents", topicId: "index_constituents" },
-  { title: "法人持股", href: "/docs/coming-soon/institutional-ownership", topicId: "institutional_ownership" },
-  { title: "可轉債", href: "/docs/coming-soon/convertible-bonds", topicId: "convertible_bonds" },
-  { title: "衍生品", href: "/docs/coming-soon/derivatives-market", topicId: "derivatives_market" },
-  { title: "供應鏈資料", href: "/docs/coming-soon/supply-chain", topicId: "supply_chain" },
+  { title: "持有結構", href: "/docs/coming-soon/ownership-distribution", topicId: "ownership_distribution" },
+  { title: "主題資產流向", href: "/docs/coming-soon/etf-flow", topicId: "etf_flow" },
+  { title: "分類擴充", href: "/docs/coming-soon/index-constituents", topicId: "index_constituents" },
+  { title: "資金持有結構", href: "/docs/coming-soon/institutional-ownership", topicId: "institutional_ownership" },
+  { title: "固定收益擴充", href: "/docs/coming-soon/convertible-bonds", topicId: "convertible_bonds" },
+  { title: "進階市場資料", href: "/docs/coming-soon/derivatives-market", topicId: "derivatives_market" },
+  { title: "產業關聯資料", href: "/docs/coming-soon/supply-chain", topicId: "supply_chain" },
 ];
 
 function hrefToSlug(href: string) {
@@ -2494,7 +2440,8 @@ const usageFocusedTopicIds = new Set([
   "margin_short",
   "search_api",
   "query_api",
-  "explainability_layer",
+  "query_fields",
+  "query_examples",
 ]);
 
 const topicWorkflowLinks: Record<string, Array<{ title: string; href: string }>> = {
@@ -2527,22 +2474,21 @@ const topicWorkflowLinks: Record<string, Array<{ title: string; href: string }>>
   query_api: [
     { title: "快速查資料", href: "/docs/workflows/fast-data-access" },
   ],
-  explainability_layer: [{ title: "快速查資料", href: "/docs/workflows/fast-data-access" }],
+  query_fields: [{ title: "快速查資料", href: "/docs/workflows/fast-data-access" }],
+  query_examples: [{ title: "快速查資料", href: "/docs/workflows/fast-data-access" }],
 };
 
 function buildSchemaReadyTopicSections(topic: SchemaReadyTopic): DocsContentSection[] {
   const planRequirement = topicPlanVisibility[topic.topicId];
   const mappingSection: DocsContentSection = {
     id: "topic-mapping",
-    label: "Topic 對照",
+    label: "資料對照",
     paragraphs: [],
     bullets: [
-      `topic：${topic.topicId}`,
-      `table：${topic.tableName}`,
-      `docs route：${topic.href}`,
-      `endpoint：${topic.endpoint}`,
-      `source：${topic.source}`,
-      "readiness：schema_ready",
+      `資料表：${topic.tableName}`,
+      `文件路由：${topic.href}`,
+      `API 路由：${topic.endpoint}`,
+      `資料來源：${topic.source}`,
     ],
   };
 
@@ -2552,17 +2498,17 @@ function buildSchemaReadyTopicSections(topic: SchemaReadyTopic): DocsContentSect
         id: "topic-summary",
         label: "主題說明",
         paragraphs: [
-          `${topic.title}為台股決策資料平台的正式主題之一，對應 topic id：${topic.topicId}。`,
+          `${topic.title}為台股決策資料平台的正式主題之一。`,
           "此頁用於產品化接線，確認主題在文件與路由中的識別方式。",
         ],
       },
       mappingSection,
       {
-        id: "readiness",
-        label: "Readiness",
+        id: "availability",
+        label: "Availability",
         paragraphs: [
-          "目前狀態：schema_ready。",
-          "此標示代表主題契約已可被系統辨識；若尚未開放完整 public API，會另行於產品與文件標示。",
+          "本主題已納入文件與 API 導覽結構。",
+          "實際可用範圍請以目前公開 API 路由與帳號可用權限為準。",
         ],
       },
     ];
@@ -2582,8 +2528,8 @@ function buildSchemaReadyTopicSections(topic: SchemaReadyTopic): DocsContentSect
       id: "what-is-this",
       label: "這個主題是什麼",
       paragraphs: [
-        `${topic.title}對應 topic「${topic.topicId}」，用於台股決策流程中的核心資料查詢。`,
-        "此主題已完成 schema_ready 接線，可作為系統辨識與資料治理的正式節點。",
+        `${topic.title}用於台股決策流程中的核心資料查詢。`,
+        "此主題已納入正式資料目錄，可作為系統辨識與資料治理節點。",
       ],
     },
     {
@@ -2612,8 +2558,8 @@ function buildSchemaReadyTopicSections(topic: SchemaReadyTopic): DocsContentSect
       ],
     },
     {
-      id: "next-workflow",
-      label: "下一步（Workflow）",
+      id: "workflow-links",
+      label: "延伸流程",
       paragraphs: ["可直接延伸到以下任務導向文件："],
       bullets: (topicWorkflowLinks[topic.topicId] ?? [{ title: "快速查資料", href: "/docs/workflows/fast-data-access" }]).map(
         (item) => `${item.title}（${item.href}）`,
@@ -5909,11 +5855,11 @@ console.log(data)`,
     notes: [
       "此頁使用 data-api-standard 版型，與技術指標、估值資料、TWSE/TPEx 日線價格頁一致。",
       "若要做跨資料集分析，建議保留 as_of_date 以便和 index-data、market-breadth 對齊。",
-      "是否可完整讀取仍受 entitlement 控制，實際以控制台方案為準。",
+      "資料可用範圍會依帳號方案與 API key 權限而定，實際以控制台顯示為準。",
     ],
     planRequirement: {
       title: "Plan Requirement",
-      bullets: ["Readiness：live external route（canonical topic）", "適用方案：Free（限制） / Developer / Pro / Enterprise（實際 entitlement 以控制台為準）"],
+      bullets: ["Route：/v2/datasets/interest-rate-snapshot", "適用方案：實際可用範圍與配額以控制台方案顯示為準"],
     },
     errorCases: ["200", "400", "401", "403", "404"],
     sidePanel: {
@@ -6064,13 +6010,13 @@ console.log(data)`,
       { path: "envelope.data[].source_role", type: "string|null", description: "來源角色。" },
     ],
     notes: [
-      "backend source-of-truth：`data_topic_registry.theme_taxonomy` 為 LIVE_API，外部路由 `/v2/datasets/theme-taxonomy`。",
+      "此主題對外路由為 `/v2/datasets/theme-taxonomy`。",
       "若只查主題關鍵字入口，建議搭配 `/v2/search?type=theme`。",
       "若條件查不到資料，通常回傳 200 + 空資料集合，不代表 endpoint 不可用。",
     ],
     planRequirement: {
-      title: "Plan / Readiness",
-      bullets: ["Status：productized（LIVE_API）", "Route：/v2/datasets/theme-taxonomy", "實際 entitlement 仍以 API key 方案為準"],
+      title: "Plan Requirement",
+      bullets: ["Route：/v2/datasets/theme-taxonomy", "實際可用範圍與配額以控制台方案顯示為準"],
     },
     errorCases: ["200", "400", "401", "403"],
     sidePanel: {
@@ -6224,13 +6170,13 @@ console.log(data)`,
       { path: "envelope.data[].source_role", type: "string|null", description: "來源角色。" },
     ],
     notes: [
-      "backend source-of-truth：`data_topic_registry.index_classification` 為 LIVE_API，外部路由 `/v2/datasets/index-classification`。",
+      "此主題對外路由為 `/v2/datasets/index-classification`。",
       "若需要指數點位與漲跌等行情欄位，請搭配 `/v2/datasets/index-data`。",
       "查無資料通常回 200 空集合，建議依 `meta.rows_returned` 判斷結果。",
     ],
     planRequirement: {
-      title: "Plan / Readiness",
-      bullets: ["Status：productized（LIVE_API）", "Route：/v2/datasets/index-classification", "實際 entitlement 仍以 API key 方案為準"],
+      title: "Plan Requirement",
+      bullets: ["Route：/v2/datasets/index-classification", "實際可用範圍與配額以控制台方案顯示為準"],
     },
     errorCases: ["200", "400", "401", "403"],
     sidePanel: {
@@ -6358,8 +6304,8 @@ console.log(data)`,
       "推薦流程：先 `/v2/search` 定位，再使用 `/v2/query` 擷取欄位。",
     ],
     planRequirement: {
-      title: "Plan / Readiness",
-      bullets: ["Status：productized capability（registry: universal_search）", "Route：/v2/search", "實際 entitlement 以 API key 方案與 rate/quota 設定為準"],
+      title: "Plan Requirement",
+      bullets: ["Route：/v2/search", "實際可用範圍與配額以控制台方案顯示為準"],
     },
     errorCases: ["200", "400", "401", "403"],
     sidePanel: {
@@ -6501,8 +6447,8 @@ console.log(data)`,
       "Explainability 為 deterministic 映射，不包含 LLM 生成敘述。",
     ],
     planRequirement: {
-      title: "Plan / Readiness",
-      bullets: ["Status：productized capability（registry: field_query）", "Routes：/v2/query、/v2/query/fields、/v2/query/examples", "實際 entitlement 以 API key 方案為準"],
+      title: "Plan Requirement",
+      bullets: ["Routes：/v2/query、/v2/query/fields、/v2/query/examples", "實際可用範圍與配額以控制台方案顯示為準"],
     },
     errorCases: ["200", "400", "401", "403"],
     sidePanel: {
@@ -6632,8 +6578,8 @@ console.log(data)`,
       "可搭配 `/v2/query/examples` 作為客戶端快速接線樣板。",
     ],
     planRequirement: {
-      title: "Plan / Readiness",
-      bullets: ["Status：productized capability（embedded in field_query）", "Routes：/v2/query、/v2/query/fields、/v2/query/examples", "不提供獨立 `/v2/query/explain` endpoint"],
+      title: "Plan Requirement",
+      bullets: ["Routes：/v2/query、/v2/query/fields、/v2/query/examples", "不提供獨立 `/v2/query/explain` endpoint"],
     },
     errorCases: ["200", "400", "401", "403"],
     sidePanel: {
@@ -6650,6 +6596,335 @@ console.log(data)`,
 }
 
 function buildExplainabilityApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildQueryFieldsApiReference(): ApiReferenceContent {
+  return buildExplainabilityApiReference();
+}
+
+function buildQueryFieldsApiSections(): DocsContentSection[] {
+  return buildExplainabilityApiSections();
+}
+
+function buildQueryExamplesApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/query/examples";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/query/examples",
+    headers=headers,
+    params={"entity_type": "issuer", "limit": 5},
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/query/examples?entity_type=issuer&limit=5",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/query/examples?entity_type=issuer&limit=5" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+
+  const successBody = JSON.stringify(
+    {
+      api_version: "v2",
+      endpoint: "/v2/query/examples",
+      request_id: "req_qex_91a2b3c4",
+      plan_id: "developer",
+      entity_type: "issuer",
+      examples: [
+        {
+          id: "issuer_profile_basic",
+          title: "Issuer 基本資料",
+          description: "查詢公司名稱、交易所與產業欄位。",
+          query_template: {
+            entity_type: "issuer",
+            entity_id: "2330",
+            fields: ["company_name", "exchange", "industry"],
+          },
+        },
+      ],
+      meta: {
+        rows_returned: 1,
+      },
+    },
+    null,
+    2,
+  );
+
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "查詢與工具",
+    endpoint,
+    method: "GET",
+    overview: [
+      "Query Examples API 提供可重用的查詢範例模板，幫助快速組裝 `/v2/query` 請求。",
+      "範例資料用於開發接線，不代表即時行情或投資建議。",
+    ],
+    requestDescription: [
+      "可用 `entity_type` 先篩選 issuer/index 範例，再依 `id` 套用到查詢流程。",
+    ],
+    useCases: [
+      "快速建立 query 請求 payload。",
+      "作為團隊內欄位契約範本。",
+      "搭配 `/v2/query/fields` 驗證欄位可用性。",
+    ],
+    gettingStarted: [
+      "先呼叫 `/v2/query/examples` 取得可用範例。",
+      "挑選模板後替換 entity_id 與日期條件。",
+      "最後送到 `/v2/query` 執行正式查詢。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "entity_type", type: "string", required: false, description: "issuer 或 index。" },
+      { name: "limit", type: "integer", required: false, description: "回傳範例筆數上限。" },
+    ],
+    responseSummary: [
+      "回應含 examples 陣列，每個項目帶有 query_template，可直接套用到 `/v2/query`。",
+    ],
+    responseFields: [
+      { path: "examples[].id", type: "string", description: "範例識別碼。" },
+      { path: "examples[].title", type: "string", description: "範例標題。" },
+      { path: "examples[].description", type: "string", description: "範例說明。" },
+      { path: "examples[].query_template", type: "object", description: "可直接轉為 query 參數的模板。" },
+      { path: "meta.rows_returned", type: "integer", description: "回傳範例筆數。" },
+    ],
+    notes: [
+      "此 endpoint 僅回傳範例模板，不回傳實際資料列。",
+      "搭配 `/v2/query` 與 `/v2/query/fields` 使用可降低整合成本。",
+    ],
+    planRequirement: {
+      title: "Plan Requirement",
+      bullets: ["Routes：/v2/query、/v2/query/fields、/v2/query/examples", "實際可用範圍與配額以控制台方案顯示為準"],
+    },
+    errorCases: ["200", "400", "401", "403"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳查詢範例模板", body: successBody },
+        { status: "400", description: "查詢參數錯誤", body: `{"detail":"bad_request"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此能力", body: `{"error":"dataset_not_entitled"}` },
+      ],
+    },
+  };
+}
+
+function buildQueryExamplesApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildCompanyNewsPreviewApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/company-news";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/company-news",
+    headers=headers,
+    params={"symbol": "2330", "limit": 10},
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/company-news?symbol=2330&limit=10",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/company-news?symbol=2330&limit=10" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      dataset: "company_news",
+      rows: [
+        {
+          symbol: "2330",
+          published_at: "2026-05-06T08:30:00+08:00",
+          title: "公開資訊觀測站月營收資料更新摘要",
+          source_name: "MOPS",
+          news_type: "月營收",
+        },
+      ],
+      count: 1,
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "Preview",
+    endpoint,
+    method: "GET",
+    overview: [
+      "公司新聞目前為 Preview 能力，提供可公開展示的摘要欄位。",
+      "內容用於研究流程與資訊索引，不宣稱即時新聞。",
+    ],
+    requestDescription: ["可用 symbol 與日期範圍過濾。"],
+    useCases: ["公司事件背景補充", "研究流程的文字摘要索引", "搭配公告與事件資料交叉檢視"],
+    gettingStarted: ["先用 symbol 小範圍測試欄位，再擴大日期範圍查詢。"],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "symbol", type: "string", required: false, description: "股票代碼。" },
+      { name: "start_date", type: "string", required: false, description: "起始日期。" },
+      { name: "end_date", type: "string", required: false, description: "結束日期。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數上限。" },
+    ],
+    responseSummary: ["回應僅包含 summary 欄位，用於前端展示與流程整合。"],
+    responseFields: [
+      { path: "rows[].symbol", type: "string", description: "股票代碼。" },
+      { path: "rows[].published_at", type: "string", description: "發布時間。" },
+      { path: "rows[].title", type: "string", description: "新聞標題摘要。" },
+      { path: "rows[].source_name", type: "string", description: "來源標記。" },
+      { path: "rows[].news_type", type: "string|null", description: "分類標記。" },
+    ],
+    notes: [
+      "Preview 階段可能調整欄位與配額。",
+      "若資料來源不可用，系統可能回傳空集合。",
+    ],
+    planRequirement: {
+      title: "Plan Requirement",
+      bullets: ["Preview 能力（受控開放）", "實際可用範圍以控制台方案顯示為準"],
+    },
+    errorCases: ["200", "400", "401", "403"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳公司新聞摘要", body: successBody },
+        { status: "400", description: "查詢參數錯誤", body: `{"detail":"bad_request"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此能力", body: `{"error":"dataset_not_entitled"}` },
+      ],
+    },
+  };
+}
+
+function buildCompanyNewsPreviewApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildMarketNewsPreviewApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/market-news";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/market-news",
+    headers=headers,
+    params={"limit": 10},
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/market-news?limit=10",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/market-news?limit=10" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      dataset: "market_news",
+      rows: [
+        {
+          published_at: "2026-05-06T09:00:00+08:00",
+          title: "市場指數與類股資料以快照方式整理",
+          source_name: "TWSE",
+          news_type: "市場概況",
+          market: "TW",
+        },
+      ],
+      count: 1,
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "Preview",
+    endpoint,
+    method: "GET",
+    overview: [
+      "市場新聞目前為 Preview 能力，提供市場層級摘要欄位。",
+      "內容採 snapshot 摘要語氣，不宣稱即時新聞。",
+    ],
+    requestDescription: ["可依日期區間與市場別過濾。"],
+    useCases: ["市場背景補充", "研究筆記與事件索引", "與市場指標資料交叉對照"],
+    gettingStarted: ["先小範圍查詢確認欄位，再依需求擴展。"],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "start_date", type: "string", required: false, description: "起始日期。" },
+      { name: "end_date", type: "string", required: false, description: "結束日期。" },
+      { name: "market", type: "string", required: false, description: "市場代碼。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數上限。" },
+    ],
+    responseSummary: ["回應僅包含摘要欄位，不回傳 raw payload。"],
+    responseFields: [
+      { path: "rows[].published_at", type: "string", description: "發布時間。" },
+      { path: "rows[].title", type: "string", description: "新聞標題摘要。" },
+      { path: "rows[].source_name", type: "string", description: "來源標記。" },
+      { path: "rows[].news_type", type: "string|null", description: "分類標記。" },
+      { path: "rows[].market", type: "string|null", description: "市場代碼。" },
+    ],
+    notes: [
+      "Preview 階段可能調整欄位與配額。",
+      "資料來源不可用時，系統可能回傳空集合。",
+    ],
+    planRequirement: {
+      title: "Plan Requirement",
+      bullets: ["Preview 能力（受控開放）", "實際可用範圍以控制台方案顯示為準"],
+    },
+    errorCases: ["200", "400", "401", "403"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳市場新聞摘要", body: successBody },
+        { status: "400", description: "查詢參數錯誤", body: `{"detail":"bad_request"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此能力", body: `{"error":"dataset_not_entitled"}` },
+      ],
+    },
+  };
+}
+
+function buildMarketNewsPreviewApiSections(): DocsContentSection[] {
   return [
     { id: "overview", label: "Overview", paragraphs: [] },
     { id: "request", label: "Request", paragraphs: [] },
@@ -7929,154 +8204,255 @@ const workflowPageCatalog: Array<{
     slug: "company-fundamentals",
     navLabel: "查看公司基本面",
     title: "查看公司基本面",
-    subtitle: "學會如何用台股資料 API 快速查看一家公司的基本面，包含公司資料、財報、財報指標與月營收趨勢。",
+    subtitle: "使用 Python 查詢台股月營收、財報三表、估值資料與公司基本資料。",
     sections: [
-      {
-        id: "overview",
-        label: "Overview",
-        paragraphs: [
-          "查看公司基本面通常不只是一個 API request，而是一個由多個資料主題組成的流程。",
-          "在實務上，常見的基本面檢查會包含：",
-        ],
-        bullets: [
-          "公司基本資料：確認 ticker、公司名稱、市場別與產業分類",
-          "財報資料：查看營收、獲利、資產負債與現金流",
-          "財報指標：快速判斷毛利率、營業利益率、ROE 等分析欄位",
-          "月營收：補充較高頻的營運變化訊號",
-          "這一頁會帶你用一套固定流程，從單一 ticker 出發，逐步把一家公司的核心基本面資料串起來。",
-        ],
-      },
       {
         id: "prerequisites",
         label: "Prerequisites",
-        paragraphs: ["開始前，請先確認："],
+        paragraphs: ["開始前請先準備："],
         bullets: [
-          "你已取得 API key",
-          "你知道要查詢的股票代碼，例如 2330",
-          "你可以使用 Python、JavaScript 或 cURL 發送 request",
-          "你了解不同資料主題的更新頻率不同：財報較低頻，月營收較高頻",
+          "Python 3.9+",
+          "requests",
+          "X-API-Key",
+          "symbol（例如 2330）",
         ],
       },
       {
-        id: "step-1-issuer-profile",
-        label: "Step 1：先查公司基本資料",
+        id: "authentication",
+        label: "Authentication",
         paragraphs: [
-          "第一步先確認公司主體資訊。這可以幫你確認 ticker 是否正確，並建立後續 join 與資料整理的基礎。",
-          "建議先查：",
-        ],
-        bullets: ["公司名稱", "市場別", "產業分類", "上市狀態"],
-        codeBlocks: [
-          {
-            language: "python",
-            code: `import requests
-
-headers = {"X-API-Key": "your_api_key_here"}
-
-response = requests.get(
-    "https://api.twmarketdata.com/v2/datasets/issuer-profile",
-    headers=headers,
-    params={"ticker": "2330"},
-)
-
-print(response.json())`,
-          },
-        ],
-      },
-      {
-        id: "step-2-financial-statements",
-        label: "Step 2：取得財報資料",
-        paragraphs: [
-          "第二步用財報資料取得原始數據。這一層適合查看營收、淨利、資產負債與現金流結構。",
-          "建議先查近 4～8 季，確認季節性與趨勢，再決定是否擴展到年度資料。",
+          "所有 request 都要帶 X-API-Key。下面示例會用同一個 helper 函式讀取不同 dataset。",
         ],
         codeBlocks: [
           {
             language: "python",
             code: `import requests
 
-headers = {"X-API-Key": "your_api_key_here"}
+BASE_URL = "https://api.twmarketdata.com"
+HEADERS = {
+    "X-API-Key": "your_api_key_here",
+}
 
-response = requests.get(
-    "https://api.twmarketdata.com/v2/datasets/income-statement",
-    headers=headers,
-    params={"symbol": "2330", "limit": 8},
-)
-
-print(response.json())`,
+def get_dataset(path, params):
+    response = requests.get(
+        f"{BASE_URL}{path}",
+        headers=HEADERS,
+        params=params,
+    )
+    response.raise_for_status()
+    return response.json()`,
           },
         ],
       },
       {
-        id: "step-3-financial-metrics",
-        label: "Step 3：取得財報指標",
-        paragraphs: [
-          "第三步改用財報指標層。這一層是已計算好的分析欄位，適合快速比較與篩選。",
-          "你可以優先關注毛利率、營業利益率、ROE 等欄位，快速判讀公司基本面品質。",
-        ],
+        id: "issuer-profile",
+        label: "查詢公司基本資料",
         codeBlocks: [
           {
             language: "python",
             code: `import requests
 
-headers = {"X-API-Key": "your_api_key_here"}
+BASE_URL = "https://api.twmarketdata.com"
+HEADERS = {"X-API-Key": "your_api_key_here"}
 
-response = requests.get(
-    "https://api.twmarketdata.com/v2/datasets/financial-metrics",
-    headers=headers,
-    params={"ticker": "2330", "period": "quarterly", "limit": 8},
+def get_dataset(path, params):
+    response = requests.get(
+        f"{BASE_URL}{path}",
+        headers=HEADERS,
+        params=params,
+    )
+    response.raise_for_status()
+    return response.json()
+
+profile = get_dataset(
+    "/v2/datasets/issuer-profile",
+    {"symbol": "2330"},
 )
 
-print(response.json())`,
+print(profile)`,
           },
         ],
       },
       {
-        id: "step-4-monthly-revenue",
-        label: "Step 4：補充月營收趨勢",
-        paragraphs: [
-          "第四步補上月營收，用較高頻的資料觀察近期營運變化。",
-          "如果財報顯示長期結構，而月營收可以補足短期變化，兩者一起看通常更完整。",
-        ],
+        id: "monthly-revenue",
+        label: "查詢月營收",
         codeBlocks: [
           {
             language: "python",
             code: `import requests
 
-headers = {"X-API-Key": "your_api_key_here"}
+BASE_URL = "https://api.twmarketdata.com"
+HEADERS = {"X-API-Key": "your_api_key_here"}
 
-response = requests.get(
-    "https://api.twmarketdata.com/v2/datasets/monthly-revenue",
-    headers=headers,
-    params={"symbol": "2330", "limit": 24},
+def get_dataset(path, params):
+    response = requests.get(
+        f"{BASE_URL}{path}",
+        headers=HEADERS,
+        params=params,
+    )
+    response.raise_for_status()
+    return response.json()
+
+monthly_revenue = get_dataset(
+    "/v2/datasets/monthly-revenue",
+    {
+        "symbol": "2330",
+        "limit": 12,
+    },
 )
 
-print(response.json())`,
+print(monthly_revenue)`,
           },
         ],
       },
       {
-        id: "step-5-integration-flow",
-        label: "Step 5：整合成基本面檢查流程",
-        paragraphs: [
-          "把前面四步整合後，你可以建立一個固定的基本面檢查順序：",
+        id: "income-statement",
+        label: "查詢損益表",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `import requests
+
+BASE_URL = "https://api.twmarketdata.com"
+HEADERS = {"X-API-Key": "your_api_key_here"}
+
+def get_dataset(path, params):
+    response = requests.get(
+        f"{BASE_URL}{path}",
+        headers=HEADERS,
+        params=params,
+    )
+    response.raise_for_status()
+    return response.json()
+
+income_statement = get_dataset(
+    "/v2/datasets/income-statement",
+    {"symbol": "2330", "limit": 4},
+)
+
+print(income_statement)`,
+          },
         ],
-        bullets: [
-          "先查 issuer-profile，確認公司識別",
-          "再查 income-statement，取得原始財報數據",
-          "再查 financial-metrics，快速做分析判讀",
-          "最後補 monthly-revenue，觀察近期營運趨勢",
-          "若要進一步策略化，建議把這套流程落地成可重複執行的 pipeline。",
+      },
+      {
+        id: "balance-sheet",
+        label: "查詢資產負債表",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `import requests
+
+BASE_URL = "https://api.twmarketdata.com"
+HEADERS = {"X-API-Key": "your_api_key_here"}
+
+def get_dataset(path, params):
+    response = requests.get(
+        f"{BASE_URL}{path}",
+        headers=HEADERS,
+        params=params,
+    )
+    response.raise_for_status()
+    return response.json()
+
+balance_sheet = get_dataset(
+    "/v2/datasets/balance-sheet",
+    {"symbol": "2330", "limit": 4},
+)
+
+print(balance_sheet)`,
+          },
+        ],
+      },
+      {
+        id: "cash-flow-statement",
+        label: "查詢現金流量表",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `import requests
+
+BASE_URL = "https://api.twmarketdata.com"
+HEADERS = {"X-API-Key": "your_api_key_here"}
+
+def get_dataset(path, params):
+    response = requests.get(
+        f"{BASE_URL}{path}",
+        headers=HEADERS,
+        params=params,
+    )
+    response.raise_for_status()
+    return response.json()
+
+cash_flow = get_dataset(
+    "/v2/datasets/cash-flow-statement",
+    {"symbol": "2330", "limit": 4},
+)
+
+print(cash_flow)`,
+          },
+        ],
+      },
+      {
+        id: "valuation-data",
+        label: "查詢估值資料",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `import requests
+
+BASE_URL = "https://api.twmarketdata.com"
+HEADERS = {"X-API-Key": "your_api_key_here"}
+
+def get_dataset(path, params):
+    response = requests.get(
+        f"{BASE_URL}{path}",
+        headers=HEADERS,
+        params=params,
+    )
+    response.raise_for_status()
+    return response.json()
+
+valuation_data = get_dataset(
+    "/v2/datasets/valuation-data",
+    {"symbol": "2330", "limit": 4},
+)
+
+print(valuation_data)`,
+          },
+        ],
+      },
+      {
+        id: "fundamentals-summary",
+        label: "組合成基本面摘要",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `company_name = (profile.get("rows") or [{}])[0].get("company_name")
+latest_revenue_yoy = (monthly_revenue.get("rows") or [{}])[0].get("yoy_growth_pct")
+latest_eps = (income_statement.get("rows") or [{}])[0].get("eps")
+latest_per = (valuation_data.get("rows") or [{}])[0].get("per")
+latest_pbr = (valuation_data.get("rows") or [{}])[0].get("pbr")
+
+summary = {
+    "company_name": company_name,
+    "latest_revenue_yoy": latest_revenue_yoy,
+    "latest_eps": latest_eps,
+    "latest_per": latest_per,
+    "latest_pbr": latest_pbr,
+}
+
+print(summary)`,
+          },
         ],
       },
       {
         id: "next-steps",
         label: "Next Steps",
-        paragraphs: ["完成基本面流程後，可繼續："],
+        paragraphs: ["完成基本面摘要後，可延伸到："],
         bullets: [
-          "搭配股價資料做事件前後對照：/docs/api/market-prices/twse-daily-price（或 TPEx 日線價格）",
-          "搭配查詢工具做批量拉取：/docs/api/query-tools/query-api",
-          "搭配 Explainability 驗證欄位與來源：/docs/api/query-tools/explainability",
-          "延伸到策略場景：/docs/workflows/strategy-ai",
+          "/docs/api/market-prices/twse-daily-price",
+          "/docs/api/query-tools/query-api",
+          "/docs/workflows/market-status",
         ],
       },
     ],
@@ -8085,36 +8461,273 @@ print(response.json())`,
     slug: "capital-flow",
     navLabel: "看籌碼",
     title: "看籌碼",
-    subtitle: "結合法人買賣與融資融券，觀察資金方向與風險偏好。",
+    subtitle: "使用 Python 查詢三大法人、融資融券與公司事件，建立台股籌碼觀察流程。",
     sections: [
-      { id: "problem", label: "這個 workflow 解決什麼問題", paragraphs: ["用一致口徑追蹤市場資金流向，降低單一指標誤判。"] },
-      { id: "datasets", label: "用到哪些 API / dataset", paragraphs: [], bullets: ["institutional_flow", "margin_short"] },
+      { id: "prerequisites", label: "Prerequisites", paragraphs: ["Python 3.9+、requests、X-API-Key、symbol（例如 2330）。"] },
       {
-        id: "minimal-flow",
-        label: "最小使用流程",
-        paragraphs: [],
-        bullets: ["先看 institutional_flow 判斷法人方向", "再看 margin_short 觀察槓桿變化", "比對兩者是否同向，建立風險訊號"],
+        id: "authentication",
+        label: "Authentication",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `import requests
+
+BASE_URL = "https://api.twmarketdata.com"
+HEADERS = {
+    "X-API-Key": "your_api_key_here",
+}
+
+def get_dataset(path, params):
+    response = requests.get(
+        f"{BASE_URL}{path}",
+        headers=HEADERS,
+        params=params,
+    )
+    response.raise_for_status()
+    return response.json()`,
+          },
+        ],
       },
-      { id: "order", label: "建議先後順序", paragraphs: ["先資金方向、再槓桿結構；必要時再搭配股價做驗證。"] },
-      { id: "next", label: "可延伸搭配頁面", paragraphs: ["/docs/api/market-prices/twse-daily-price、/docs/api/market-prices/tpex-daily-price、/docs/workflows/market-status"] },
+      {
+        id: "institutional-flow",
+        label: "查詢三大法人買賣",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `flow = get_dataset(
+    "/v2/datasets/institutional-flow",
+    {
+        "symbol": "2330",
+        "limit": 10,
+    },
+)`,
+          },
+        ],
+      },
+      {
+        id: "margin-short",
+        label: "查詢融資融券",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `margin = get_dataset(
+    "/v2/datasets/margin-short",
+    {
+        "symbol": "2330",
+        "limit": 10,
+    },
+)`,
+          },
+        ],
+      },
+      {
+        id: "issuer-announcements",
+        label: "查詢公司公告",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `announcements = get_dataset(
+    "/v2/datasets/issuer-announcements",
+    {
+        "symbol": "2330",
+        "limit": 5,
+    },
+)`,
+          },
+        ],
+      },
+      {
+        id: "events",
+        label: "查詢事件日曆",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `events = get_dataset(
+    "/v2/datasets/events",
+    {
+        "symbol": "2330",
+        "limit": 5,
+    },
+)
+
+structured_events = get_dataset(
+    "/v2/datasets/structured-events",
+    {
+        "symbol": "2330",
+        "limit": 5,
+    },
+)`,
+          },
+        ],
+      },
+      {
+        id: "merge-flow-events",
+        label: "合併籌碼與事件",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `result = {
+    "institutional_flow": flow.get("rows", []),
+    "margin_short": margin.get("rows", []),
+    "announcements": announcements.get("rows", []),
+    "events": events.get("rows", []),
+    "structured_events": structured_events.get("rows", []),
+}
+
+print(result)`,
+          },
+        ],
+      },
+      {
+        id: "next-steps",
+        label: "Next Steps",
+        paragraphs: ["完成籌碼與事件整合後，可延伸到："],
+        bullets: [
+          "/docs/api/market-prices/twse-daily-price",
+          "/docs/api/market-prices/technical-indicators",
+          "/docs/workflows/market-status",
+        ],
+      },
     ],
   },
   {
     slug: "market-status",
     navLabel: "看市場狀態",
-    title: "看市場狀態",
-    subtitle: "透過指數與市場廣度辨識整體盤勢與結構變化。",
+    title: "取得台股價格與市場狀態",
+    subtitle: "使用 Python 查詢 TWSE / TPEx 日線價格、市場指數、技術指標與市場廣度。",
     sections: [
-      { id: "problem", label: "這個 workflow 解決什麼問題", paragraphs: ["快速判斷市場是普漲普跌、區間震盪，或由少數權值股帶動。"] },
-      { id: "datasets", label: "用到哪些 API / dataset", paragraphs: [], bullets: ["index_data", "market_breadth"] },
+      { id: "prerequisites", label: "Prerequisites", paragraphs: ["Python 3.9+、requests、X-API-Key、symbol（例如 2330）。"] },
       {
-        id: "minimal-flow",
-        label: "最小使用流程",
-        paragraphs: [],
-        bullets: ["先看 index_data 判斷大盤方向", "再看 market_breadth 觀察上漲/下跌家數與結構", "搭配利率快照補充宏觀環境"],
+        id: "authentication",
+        label: "Authentication",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `import requests
+
+BASE_URL = "https://api.twmarketdata.com"
+HEADERS = {
+    "X-API-Key": "your_api_key_here",
+}
+
+def get_dataset(path, params):
+    response = requests.get(
+        f"{BASE_URL}{path}",
+        headers=HEADERS,
+        params=params,
+    )
+    response.raise_for_status()
+    return response.json()`,
+          },
+        ],
       },
-      { id: "order", label: "建議先後順序", paragraphs: ["先方向、再廣度、最後補宏觀；可降低短線噪音干擾。"] },
-      { id: "next", label: "可延伸搭配頁面", paragraphs: ["/docs/api/market-prices/interest-rate、/docs/api/market-prices/technical-indicators"] },
+      {
+        id: "twse-daily-price",
+        label: "查詢 TWSE 日線價格",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `prices = get_dataset(
+    "/v2/datasets/twse-daily-price",
+    {
+        "symbol": "2330",
+        "limit": 20,
+    },
+)`,
+          },
+        ],
+      },
+      {
+        id: "tpex-daily-price",
+        label: "查詢 TPEx 日線價格",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `tpex_prices = get_dataset(
+    "/v2/datasets/tpex-daily-price",
+    {
+        "symbol": "5483",
+        "limit": 20,
+    },
+)`,
+          },
+        ],
+      },
+      {
+        id: "index-data",
+        label: "查詢市場指數",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `indices = get_dataset(
+    "/v2/datasets/index-data",
+    {
+        "limit": 10,
+    },
+)`,
+          },
+        ],
+      },
+      {
+        id: "technical-indicators",
+        label: "查詢技術指標",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `indicators = get_dataset(
+    "/v2/datasets/technical-indicators",
+    {
+        "symbol": "2330",
+        "limit": 20,
+    },
+)`,
+          },
+        ],
+      },
+      {
+        id: "market-breadth",
+        label: "查詢市場廣度",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `breadth = get_dataset(
+    "/v2/datasets/market-breadth",
+    {
+        "limit": 10,
+    },
+)`,
+          },
+        ],
+      },
+      {
+        id: "market-summary",
+        label: "組合成市場狀態摘要",
+        paragraphs: ["市場狀態資料依 snapshot / ingestion cadence 更新，建議與交易日資料一起判讀。"],
+        codeBlocks: [
+          {
+            language: "python",
+            code: `summary = {
+    "twse_prices": prices.get("rows", []),
+    "tpex_prices": tpex_prices.get("rows", []),
+    "indices": indices.get("rows", []),
+    "technical_indicators": indicators.get("rows", []),
+    "market_breadth": breadth.get("rows", []),
+}
+
+print(summary)`,
+          },
+        ],
+      },
+      {
+        id: "next-steps",
+        label: "Next Steps",
+        paragraphs: ["完成市場狀態摘要後，可延伸到："],
+        bullets: [
+          "/docs/api/market-prices/interest-rate",
+          "/docs/api/financial-growth/monthly-revenue",
+          "/docs/workflows/capital-flow",
+        ],
+      },
     ],
   },
   {
@@ -8248,96 +8861,70 @@ const gettingStartedExtraPages: DocsPageEntry[] = [
   {
     slug: ["data-freshness-lineage"],
     href: "/docs/data-freshness-lineage",
-    navLabel: "資料更新與 lineage",
+    navLabel: "資料血緣",
     category: "overview",
     icon: "chart",
-    title: "資料更新與 lineage",
-    subtitle:
-      "平台不只提供資料存取，也提供資料的更新機制與來源追蹤能力。每一筆資料都包含明確的更新時間與來源資訊，讓你可以判斷資料是否可用，並在需要時回溯資料來源。這對於研究、回測與 production 系統非常重要。當結果需要被驗證或重現時，你必須知道資料來自哪裡、何時更新、是否經過轉換，以及是否與當時決策使用的資料一致。",
+    title: "資料血緣",
+    subtitle: "以官方公開來源為優先，讓每筆台股資料都能回溯到來源、處理流程與對外 API 回應。",
     tier: "complete",
     sections: [
       {
-        id: "update-mechanism",
-        label: "資料更新機制",
+        id: "docs-portals",
+        label: "文件入口",
         paragraphs: [
-          "不同資料主題具有不同的更新頻率與特性。平台會依據資料來源與資料類型，設計對應的 ingestion 與更新流程。",
-          "常見更新模式包括：",
-          "在設計系統時，不應假設所有資料都是即時的。應依據資料類型與更新頻率，決定是否可以直接用於策略或需要做額外處理。",
-        ],
-        bullets: [
-          "即時或近即時更新：用於行情資料與部分市場指標，資料在發布後短時間內即可取得",
-          "定期更新：用於月營收、財報等資料，依據官方發布週期更新",
-          "事件驅動更新：用於公告與公司事件，資料在事件發布後即被擷取與處理",
+          "你可以從左側導覽查看所有資料集，也可以先從 Quick Start 建立第一個 request。若要讓 agent 或內部工具讀取文件，後續可透過 OpenAPI spec、llms.txt 或 MCP tools 作為入口。",
         ],
       },
       {
-        id: "freshness",
-        label: "freshness（資料時效）",
-        paragraphs: [
-          "每個 API 回應都包含 freshness 欄位，用於描述資料的時間狀態。",
-          "這個欄位可以用來：",
-          "實務上，應將 freshness 納入流程，而不是在應用邏輯中忽略。尤其在事件驅動或自動交易系統中，資料延遲可能直接影響結果。",
-        ],
+        id: "why-provenance-matters",
+        label: "為什麼資料血緣重要",
         bullets: [
-          "判斷資料是否已更新",
-          "避免使用過期資料進行決策",
-          "在 pipeline 中設計條件（例如：資料未更新則暫停流程）",
+          "台股研究、回測與 agent workflow 需要可驗證的資料來源。",
+          "若資料來源不透明，模型輸出、策略訊號與財報分析很難除錯。",
+          "TW Market Data 採 official/public-first 原則，以 TWSE、TPEx、MOPS 與官方公開資料作為 canonical source。",
+          "第三方公開網站可作為研究比對材料，但不視為 production canonical source。",
         ],
       },
       {
-        id: "lineage",
-        label: "lineage（來源追蹤）",
+        id: "data-sources",
+        label: "資料來源",
         paragraphs: [
-          "lineage 描述資料從來源到 API 回應的完整路徑。每筆資料都會附帶 lineage 資訊，讓你可以追蹤：",
-          "這些資訊讓資料具備可審計性（auditability）。當你需要驗證某個結果時，可以回到原始來源，而不是依賴不可追蹤的中間資料。",
-        ],
-        bullets: [
-          "資料來自哪個來源（例如 TWSE、TPEx、MOPS）",
-          "何時被擷取（ingested_at）",
-          "經過哪些處理流程",
-          "對應的 trace identifier（trace_id）",
+          "市場價格：TWSE 日線價格與 TPEx 日線價格分別對應 TWSE / TPEx 官方來源；還原價格、技術指標、市場指數、市場廣度以官方價格與市場資料標準化或派生，交易日期以 Asia/Taipei 為準。",
+          "財務與成長：月營收、損益表、資產負債表、現金流量表主要來自 MOPS / 公開資訊觀測站；估值與財務指標則結合價格、股本、市值與財報資料派生。",
+          "籌碼與資金：三大法人、融資融券以 TWSE / TPEx 官方公開資料為優先來源。",
+          "公司與事件：公司基本資料、公司公告、事件日曆、結構化事件、公司行動、股利來自 TWSE / TPEx / MOPS 官方公開資訊與平台標準化流程。",
+          "分類與策略層：主題分類、指數分類、features、factor-data、time-alignment、screener 為平台根據官方資料整理、映射或派生的資料層。",
         ],
       },
       {
-        id: "source-role",
-        label: "source_role（來源角色）",
-        paragraphs: [
-          "平台會對資料來源進行分層標記：",
-          "這樣的設計可以避免不同來源混用造成的不一致問題。在實務上，你可以根據 source_role 決定資料是否適合用於關鍵決策。",
-        ],
+        id: "processing-flow",
+        label: "資料處理流程",
         bullets: [
-          "canonical：官方來源或最具權威性的資料",
-          "fallback：當 canonical 資料缺失時使用的替代來源",
-          "helper：用於補充或輔助計算的資料",
+          "source fetch",
+          "raw capture / normalized table",
+          "validation / schema check",
+          "external read API",
+          "response shaping",
+          "lineage / source_role 標記",
         ],
       },
       {
-        id: "why-it-matters",
-        label: "為什麼這很重要",
-        paragraphs: [
-          "在簡單的應用中，資料來源與更新時間可能不是主要問題。但在研究、策略開發與 production 系統中，這些資訊是必要條件。",
-          "幾個典型場景：",
-          "如果資料不可追溯，就無法驗證結果。這會讓系統在規模擴大時產生風險。",
-        ],
+        id: "provenance-guarantees",
+        label: "資料血緣保證",
         bullets: [
-          "回測結果與實際交易不一致：需要確認當時使用的資料版本與來源",
-          "模型輸出異常：需要追蹤資料是否延遲或來自 fallback",
-          "多資料來源整合：需要確保欄位一致與時間對齊",
-          "團隊協作：需要明確資料責任與來源",
+          "官方來源優先。",
+          "canonical / helper / fallback 角色區分。",
+          "response 不回傳 raw payload。",
+          "schema 與欄位穩定性優先。",
+          "available-now / preview / not-yet-available 分級。",
+          "controlled rollout，避免過度承諾。",
         ],
       },
       {
-        id: "practical-guidance",
-        label: "實務建議",
+        id: "questions",
+        label: "Questions",
         paragraphs: [
-          "在實際系統中，建議把資料更新與 lineage 當成設計的一部分，而不是附加資訊。",
-          "對於長期運行的系統，這些資訊會成為排錯與驗證的基礎。",
-        ],
-        bullets: [
-          "在資料處理流程中保留 freshness 與 lineage",
-          "不要在轉換或存儲時丟棄來源資訊",
-          "在回測與 production 流程中使用相同資料條件",
-          "對關鍵資料建立監控（例如更新延遲）",
+          "若需要資料來源、方法論或企業導入確認，請聯繫 TW Market Data 團隊或從儀表板提交需求。",
         ],
       },
     ],
@@ -8345,58 +8932,158 @@ const gettingStartedExtraPages: DocsPageEntry[] = [
   {
     slug: ["tools-and-mcp"],
     href: "/docs/tools-and-mcp",
-    navLabel: "Tools & MCP",
+    navLabel: "Tools / MCP",
     category: "overview",
     icon: "braces",
-    title: "Tools & MCP",
-    subtitle: "以 docs 內建流程說明工具層能力如何與 API 協作，支援 agent 與自動化任務。",
+    title: "Tools / MCP",
+    subtitle: "讓 AI agent 與內部工具以結構化方式查詢台股資料。",
     tier: "complete",
     sections: [
       {
-        id: "tools-mcp-overview",
-        label: "Tools & MCP",
+        id: "docs-portals",
+        label: "文件入口",
         paragraphs: [
-          "Tools & MCP 提供 API 之外的工具呼叫介面，讓 agent 或自動化流程能用穩定的參數與輸出格式存取資料能力。",
-          "它不是獨立內容系統，而是同一套 docs 架構中的能力說明頁，便於與 API 文件一起維護。",
+          "你可以從左側導覽查看所有 API 文件，也可以從 Quick Start 建立第一個 request。",
+          "後續若要讓 agent 或內部工具讀取文件，可透過 OpenAPI spec、llms.txt 或 MCP tools 作為入口。",
+          "目前 Tools / MCP 採 preview / controlled rollout 語義，正式可用範圍會依帳號方案與 API key 權限決定。",
         ],
       },
       {
-        id: "mcp-use-cases",
-        label: "適用情境",
-        paragraphs: ["以下情境適合優先使用 Tools & MCP："],
-        bullets: [
-          "AI agent 需要把查詢步驟拆成可重放、可追蹤的流程",
-          "自動化任務需要固定輸入/輸出契約，避免整合歧義",
-          "研究流程需要在多次執行中保持一致的資料呼叫方式",
-        ],
-      },
-      {
-        id: "typical-workflow",
-        label: "典型工作流程",
-        paragraphs: ["常見流程可分成四步："],
-        bullets: [
-          "先定位資料主題與可用欄位",
-          "再發送查詢並回收結構化結果",
-          "檢查來源、lineage 與時間資訊",
-          "將結果回填到策略或分析流程",
-        ],
-      },
-      {
-        id: "tool-capabilities",
-        label: "可呼叫的工具型能力",
-        paragraphs: ["目前以 deterministic 能力為主："],
-        bullets: [
-          "搜尋類工具：快速定位標的、主題與 endpoint",
-          "查詢類工具：依 allowlist 取回欄位資料",
-          "解釋類工具：回傳欄位來源、規則與 freshness 基礎",
-        ],
-      },
-      {
-        id: "difference-from-api-access",
-        label: "與一般 API 存取的差異",
+        id: "overview",
+        label: "Overview",
         paragraphs: [
-          "一般 API 著重 request/response 契約；Tools & MCP 著重工作流程可組合、可追溯與 agent 友善整合。",
-          "兩者互補使用：API 提供底層資料能力，Tools & MCP 提供流程化呼叫層。",
+          "TW Market Data 的 Tools / MCP 目標，是讓 AI agent、研究流程與內部資料產品可以透過穩定工具介面查詢台股資料。",
+          "這些工具會包裝底層 dataset API，例如行情、月營收、財報、估值、技術指標、籌碼與公司事件。",
+          "前端文件可以先展示工具設計與預期用法；正式 MCP server endpoint 仍以 controlled rollout 與帳號權限為準。",
+        ],
+      },
+      {
+        id: "authentication",
+        label: "Authentication",
+        paragraphs: [
+          "Tools / MCP 建議同時理解 API key 與互動式 connector 兩種接入方向。",
+          "API Key：用於 programmatic access。正式 request 使用 X-API-Key header。",
+          "OAuth / hosted connector：可作為未來 interactive client 的接入方向，例如 Cursor、Claude、內部 agent console；目前以 rollout 狀態為準。",
+          "若還沒有帳號，先前往儀表板建立 API key。API key 權限會限制可查詢 dataset、rate limit 與 monthly usage。",
+        ],
+      },
+      {
+        id: "getting-started",
+        label: "Getting Started",
+        paragraphs: [
+          "以下示例用於展示 Tools / MCP 的預期接入方式；是否可直接連線，需依目前帳號權限與 rollout 狀態判斷。",
+          "Internal agent workflow 建議採以下步驟：agent 先選工具、工具轉成 dataset query、回傳 normalized JSON，最後由 agent 進行摘要、篩選或比對。流程中不應直接讀 raw payload 或私有 token。",
+        ],
+        bullets: [
+          "Cursor / IDE agent",
+          "Python client",
+          "Internal agent workflow",
+        ],
+        codeBlocks: [
+          {
+            language: "text",
+            code: `# Cursor / IDE agent (sample config)
+{
+  "mcpServers": {
+    "tw-market-data": {
+      "url": "https://mcp.twmarketdata.com/"
+    }
+  }
+}
+
+Note:
+- URL 為未來正式 MCP endpoint 範例，實際部署位址以帳號後台或內部部署設定為準。
+- 若尚未開放 MCP server，可先用 REST API 或 OpenAPI spec。`,
+          },
+          {
+            language: "python",
+            code: `import asyncio
+from mcp import ClientSession
+from mcp.client.streamable_http import streamablehttp_client
+
+API_KEY = "your_api_key_here"
+SERVER_URL = "https://mcp.twmarketdata.com/api"
+
+async def main():
+    async with streamablehttp_client(
+        SERVER_URL,
+        headers={"X-API-Key": API_KEY},
+    ) as streams:
+        read_stream, write_stream, _ = streams
+        async with ClientSession(read_stream, write_stream) as session:
+            await session.initialize()
+            result = await session.call_tool(
+                "get_twse_daily_price",
+                {"symbol": "2330", "limit": 5},
+            )
+            print(result.content)
+
+asyncio.run(main())`,
+          },
+        ],
+      },
+      {
+        id: "mcp-tools",
+        label: "MCP Tools",
+        paragraphs: ["下列工具清單以目前台股資料能力為基礎，並區分正式能力與 preview。"],
+        bullets: [
+          "Market Prices：get_twse_daily_price、get_tpex_daily_price、get_adjusted_prices、get_market_indices、get_market_breadth",
+          "Financials：get_monthly_revenue、get_income_statement、get_balance_sheet、get_cash_flow_statement、get_valuation_data",
+          "Capital Flow：get_institutional_flow、get_margin_short",
+          "Company & Events：get_issuer_profile、get_issuer_announcements、get_events、get_structured_events、get_dividends、get_corporate_actions",
+          "Classification & Strategy：get_theme_taxonomy、get_index_classification、get_factor_data、screen_taiwan_stocks、list_screener_fields",
+          "Preview：get_company_news、get_market_news",
+        ],
+      },
+      {
+        id: "example-usage",
+        label: "Example Usage",
+        paragraphs: ["以下是 agent 可直接提出的查詢需求範例："],
+        bullets: [
+          "查 2330 最近 20 個交易日的日線價格。",
+          "比較 2330 與 2317 最近 12 個月營收 YoY。",
+          "找出月營收 YoY 大於 20% 且 PER 低於 25 的股票。",
+          "查 2454 最近一季損益表與 EPS。",
+          "整理台積電最近公告與事件。",
+          "列出台灣市場主要指數與類股表現。",
+          "查三大法人最近一週買超最多的股票。",
+          "用技術指標篩選 RSI 低於 30 的股票。",
+          "Quick Start：/docs/quick-start",
+          "OpenAPI / API Model：/docs/api-model",
+          "Screener：/docs/api/strategy-quant/screener",
+        ],
+      },
+    ],
+  },
+  {
+    slug: ["support"],
+    href: "/docs/support",
+    navLabel: "Support",
+    category: "overview",
+    icon: "support",
+    title: "Support",
+    subtitle: "需要 API、資料覆蓋、方案或導入協助時，可以聯繫 TW Market Data 團隊。",
+    tier: "complete",
+    sections: [
+      {
+        id: "contact",
+        label: "聯繫方式",
+        paragraphs: [
+          "若你在使用資料、串接 API、建立 agent workflow 或評估企業導入時遇到問題，請來信至：",
+          "avenra.platform@gmail.com",
+          "我們會依方案與導入狀態提供支援。",
+        ],
+      },
+      {
+        id: "report-details",
+        label: "回報時建議附上",
+        paragraphs: ["你也可以在來信中附上："],
+        bullets: [
+          "帳號 email",
+          "使用的 endpoint",
+          "request id 或錯誤訊息",
+          "想查詢的 ticker / dataset",
+          "預期使用情境，例如量化研究、內部資料平台或 AI agent workflow",
         ],
       },
     ],
@@ -8416,6 +9103,7 @@ const workflowPages: DocsPageEntry[] = workflowPageCatalog.map((workflow) => ({
 }));
 
 const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group) => {
+  const isStrategyQuantGroup = group.id === "strategy-quant";
   const groupPage: DocsPageEntry = {
     slug: hrefToSlug(group.href),
     href: group.href,
@@ -8424,15 +9112,45 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
     apiSection: group.id,
     icon: group.icon,
     title: group.label,
-    subtitle: "本分類收錄台股決策資料平台已具備 schema_ready 的正式主題，可直接作為 Data APIs 導覽入口。",
+    subtitle: "本分類收錄台股決策資料平台的正式資料主題，可直接作為 Data APIs 導覽入口。",
     tier: "complete",
-    sections: [
+    sections: isStrategyQuantGroup
+      ? [
+          {
+            id: "group-overview",
+            label: "主題導覽",
+            paragraphs: [
+              `${group.label}頁是主題導覽入口，不是單一 endpoint 文件頁。`,
+              "請由左側子項進入各資料主題頁查看 request / response / code example。",
+            ],
+          },
+          {
+            id: "topic-structure",
+            label: "主題結構",
+            paragraphs: ["本分類目前包含以下主題："],
+            bullets: [
+              "特徵資料（/v2/datasets/features）",
+              "因子資料（/v2/datasets/factor-data）",
+              "時間對齊資料（/v2/datasets/time-alignment）",
+              "選股器（/v2/datasets/screener）",
+            ],
+          },
+          {
+            id: "integration",
+            label: "使用方式",
+            paragraphs: [
+              "建議先從單一主題頁完成欄位與參數驗證，再串接跨主題策略流程。",
+              "若需要整體流程示例，可搭配 Workflows / Use Cases 區塊。",
+            ],
+          },
+        ]
+      : [
       {
         id: "group-overview",
         label: "分類概覽",
         paragraphs: [
           `${group.label}為 Data APIs 主分類之一，對應可辨識的資料主題與文件路由。`,
-          "本分類僅收錄目前已具備 schema_ready 的主題，不將規劃中項目標示為可用能力。",
+          "本分類僅收錄目前已公開文件化的主題，不將規劃中項目標示為可用能力。",
         ],
       },
       {
@@ -8447,8 +9165,8 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         id: "status",
         label: "狀態標示",
         paragraphs: [
-          "本分類內主題皆標示為 schema_ready。",
-          "schema_ready 表示契約與文件可辨識，不等同於所有公開 API 都已全面開放。",
+          "本分類內主題皆有明確 route、欄位與回應契約說明。",
+          "實際可用範圍與配額以控制台方案與目前公開 API 行為為準。",
         ],
       },
     ],
@@ -8467,7 +9185,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供台股發行人的基礎識別資料，適合用於 ticker 對照、公司資訊顯示與跨資料集整合。",
         tier: "complete",
         sections: buildCompanyProfileApiSections(),
-        apiReference: buildCompanyProfileApiReference(),
+        apiReferenceFactory: () => buildCompanyProfileApiReference(),
       };
     }
 
@@ -8483,7 +9201,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供台股公司的公告與揭露事件資料，適合用於事件追蹤、研究流程與訊號整合。",
         tier: "complete",
         sections: buildIssuerAnnouncementsApiSections(),
-        apiReference: buildIssuerAnnouncementsApiReference(),
+        apiReferenceFactory: () => buildIssuerAnnouncementsApiReference(),
       };
     }
 
@@ -8499,7 +9217,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供已計算完成的財務指標資料，適合用於研究、篩選與策略分析。",
         tier: "complete",
         sections: buildFinancialMetricsApiSections(),
-        apiReference: buildFinancialMetricsApiReference(),
+        apiReferenceFactory: () => buildFinancialMetricsApiReference(),
       };
     }
 
@@ -8515,7 +9233,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供台股公司每月營收資料，適合用於營運趨勢追蹤與高頻基本面分析。",
         tier: "complete",
         sections: buildMonthlyRevenueApiSections(),
-        apiReference: buildMonthlyRevenueApiReference(),
+        apiReferenceFactory: () => buildMonthlyRevenueApiReference(),
       };
     }
 
@@ -8531,7 +9249,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供台股公司估值相關指標，適合用於估值篩選、相對比較與研究流程。",
         tier: "complete",
         sections: buildValuationDataApiSections(),
-        apiReference: buildValuationDataApiReference(),
+        apiReferenceFactory: () => buildValuationDataApiReference(),
       };
     }
 
@@ -8547,7 +9265,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供公司損益表關鍵欄位，適合用於基本面分析、估值研究與策略建模。",
         tier: "complete",
         sections: buildIncomeStatementApiSections(),
-        apiReference: buildIncomeStatementApiReference(),
+        apiReferenceFactory: () => buildIncomeStatementApiReference(),
       };
     }
 
@@ -8606,7 +9324,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供公司現金流量表關鍵欄位，適合用於現金品質分析與基本面研究。",
         tier: "complete",
         sections: buildCashFlowStatementApiSections(),
-        apiReference: buildCashFlowStatementApiReference(),
+        apiReferenceFactory: () => buildCashFlowStatementApiReference(),
       };
     }
 
@@ -8622,7 +9340,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供公司資產負債表關鍵欄位，適合用於資本結構、償債能力與財務穩健度分析。",
         tier: "complete",
         sections: buildBalanceSheetApiSections(),
-        apiReference: buildBalanceSheetApiReference(),
+        apiReferenceFactory: () => buildBalanceSheetApiReference(),
       };
     }
 
@@ -8638,7 +9356,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "canonical/supplemental 財報查詢面，適用於低階契約與資料對齊流程。",
         tier: "complete",
         sections: buildFinancialsCanonicalApiSections(),
-        apiReference: buildFinancialsCanonicalApiReference(),
+        apiReferenceFactory: () => buildFinancialsCanonicalApiReference(),
       };
     }
 
@@ -8654,7 +9372,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "canonical/supplemental 估值查詢面，適用於低階契約與資料對齊流程。",
         tier: "complete",
         sections: buildValuationsCanonicalApiSections(),
-        apiReference: buildValuationsCanonicalApiReference(),
+        apiReferenceFactory: () => buildValuationsCanonicalApiReference(),
       };
     }
 
@@ -8670,7 +9388,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供台股常用技術指標資料，適合用於趨勢追蹤、訊號判讀與量化策略研究。",
         tier: "complete",
         sections: buildTechnicalIndicatorsApiSections(),
-        apiReference: buildTechnicalIndicatorsApiReference(),
+        apiReferenceFactory: () => buildTechnicalIndicatorsApiReference(),
       };
     }
 
@@ -8686,7 +9404,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供指數層級日度資料，適合市場狀態追蹤與指數研究。",
         tier: "complete",
         sections: buildIndexDataApiSections(),
-        apiReference: buildIndexDataApiReference(),
+        apiReferenceFactory: () => buildIndexDataApiReference(),
       };
     }
 
@@ -8702,7 +9420,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供漲跌家數與市場廣度比例，適合盤勢監控與策略濾網。",
         tier: "complete",
         sections: buildMarketBreadthApiSections(),
-        apiReference: buildMarketBreadthApiReference(),
+        apiReferenceFactory: () => buildMarketBreadthApiReference(),
       };
     }
 
@@ -8718,7 +9436,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供台灣市場利率快照資料，適合用於折現參數設定、宏觀條件對照與研究流程。",
         tier: "complete",
         sections: buildInterestRateApiSections(),
-        apiReference: buildInterestRateApiReference(),
+        apiReferenceFactory: () => buildInterestRateApiReference(),
       };
     }
 
@@ -8734,7 +9452,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供 deterministic 公司分類與題材映射資料，適合分群分析與跨資料集分類對齊。",
         tier: "complete",
         sections: buildThemeTaxonomyApiSections(),
-        apiReference: buildThemeTaxonomyApiReference(),
+        apiReferenceFactory: () => buildThemeTaxonomyApiReference(),
       };
     }
 
@@ -8750,7 +9468,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供 deterministic 指數分類欄位，適合市場結構分析與指數維度整理。",
         tier: "complete",
         sections: buildIndexClassificationApiSections(),
-        apiReference: buildIndexClassificationApiReference(),
+        apiReferenceFactory: () => buildIndexClassificationApiReference(),
       };
     }
 
@@ -8766,7 +9484,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供 deterministic 實體搜尋能力，支援 issuer、index、theme 三類查找。",
         tier: "complete",
         sections: buildSearchApiSections(),
-        apiReference: buildSearchApiReference(),
+        apiReferenceFactory: () => buildSearchApiReference(),
       };
     }
 
@@ -8782,11 +9500,11 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供 allowlist 欄位查詢能力，適合固定契約資料提取與 explainability 驗證。",
         tier: "complete",
         sections: buildQueryApiSections(),
-        apiReference: buildQueryApiReference(),
+        apiReferenceFactory: () => buildQueryApiReference(),
       };
     }
 
-    if (topic.topicId === "explainability_layer") {
+    if (topic.topicId === "query_fields") {
       return {
         slug: hrefToSlug(topic.href),
         href: topic.href,
@@ -8794,11 +9512,27 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         category: "api",
         apiSection: group.id,
         icon: topic.icon ?? group.icon,
-        title: "Explainability",
-        subtitle: "說明欄位來源與掛接規則，供 query 流程做可追溯與契約驗證。",
+        title: "Query Fields",
+        subtitle: "提供可查詢欄位清單，協助建立穩定的 allowlist 查詢流程。",
         tier: "complete",
-        sections: buildExplainabilityApiSections(),
-        apiReference: buildExplainabilityApiReference(),
+        sections: buildQueryFieldsApiSections(),
+        apiReferenceFactory: () => buildQueryFieldsApiReference(),
+      };
+    }
+
+    if (topic.topicId === "query_examples") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "Query Examples",
+        subtitle: "提供 query 範例模板，幫助快速建立常見查詢模式。",
+        tier: "complete",
+        sections: buildQueryExamplesApiSections(),
+        apiReferenceFactory: () => buildQueryExamplesApiReference(),
       };
     }
 
@@ -8814,11 +9548,11 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "canonical/supplemental 價格查詢面，提供跨市場的低階 envelope 契約。",
         tier: "complete",
         sections: buildMarketPricesCanonicalApiSections(),
-        apiReference: buildMarketPricesCanonicalApiReference(),
+        apiReferenceFactory: () => buildMarketPricesCanonicalApiReference(),
       };
     }
 
-    if (topic.topicId === "adjusted_prices_canonical") {
+    if (topic.topicId === "adjusted_prices_canonical" || topic.topicId === "adjusted_prices") {
       return {
         slug: hrefToSlug(topic.href),
         href: topic.href,
@@ -8826,11 +9560,11 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         category: "api",
         apiSection: group.id,
         icon: topic.icon ?? group.icon,
-        title: "調整價格（Canonical）",
-        subtitle: "canonical/supplemental 調整價格查詢面，提供 read-time 調整後序列。",
+        title: "還原股價",
+        subtitle: "提供 read-time 調整後序列，適合歷史比較與總報酬分析。",
         tier: "complete",
         sections: buildAdjustedPricesCanonicalApiSections(),
-        apiReference: buildAdjustedPricesCanonicalApiReference(),
+        apiReferenceFactory: () => buildAdjustedPricesCanonicalApiReference(),
       };
     }
 
@@ -8846,7 +9580,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供法人與參與者拆分的籌碼流向資料，適合籌碼面分析與策略研究。",
         tier: "complete",
         sections: buildChipFlowsApiSections(),
-        apiReference: buildChipFlowsApiReference(),
+        apiReferenceFactory: () => buildChipFlowsApiReference(),
       };
     }
 
@@ -8862,7 +9596,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供三大法人的買賣超資料，適合用於資金動能分析與籌碼監控。",
         tier: "complete",
         sections: buildInstitutionalFlowApiSections(),
-        apiReference: buildInstitutionalFlowApiReference(),
+        apiReferenceFactory: () => buildInstitutionalFlowApiReference(),
       };
     }
 
@@ -8878,7 +9612,39 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供融資融券資料，適合用於籌碼風險監控與市場擁擠度觀察。",
         tier: "complete",
         sections: buildMarginShortApiSections(),
-        apiReference: buildMarginShortApiReference(),
+        apiReferenceFactory: () => buildMarginShortApiReference(),
+      };
+    }
+
+    if (topic.topicId === "company_news") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "公司新聞",
+        subtitle: "提供公司新聞摘要資料（Preview），用於事件研究與訊息監控流程。",
+        tier: "complete",
+        sections: buildCompanyNewsPreviewApiSections(),
+        apiReferenceFactory: () => buildCompanyNewsPreviewApiReference(),
+      };
+    }
+
+    if (topic.topicId === "market_news") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "市場新聞",
+        subtitle: "提供市場新聞摘要資料（Preview），用於市場狀態追蹤與研究背景補充。",
+        tier: "complete",
+        sections: buildMarketNewsPreviewApiSections(),
+        apiReferenceFactory: () => buildMarketNewsPreviewApiReference(),
       };
     }
 
@@ -8894,7 +9660,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供上市股票日線價格資料，適合用於回測、研究與事件對照流程。",
         tier: "complete",
         sections: buildTwseDailyPriceApiSections(),
-        apiReference: buildTwseDailyPriceApiReference(),
+        apiReferenceFactory: () => buildTwseDailyPriceApiReference(),
       };
     }
 
@@ -8910,7 +9676,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供上櫃股票日線價格資料，適合用於回測、研究與事件對照流程。",
         tier: "complete",
         sections: buildTpexDailyPriceApiSections(),
-        apiReference: buildTpexDailyPriceApiReference(),
+        apiReferenceFactory: () => buildTpexDailyPriceApiReference(),
       };
     }
 
@@ -8926,7 +9692,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供台股公司的事件型資料，適合用於建立事件時間線、事件追蹤與跨資料集分析。",
         tier: "complete",
         sections: buildEventsCalendarApiSections(),
-        apiReference: buildEventsCalendarApiReference(),
+        apiReferenceFactory: () => buildEventsCalendarApiReference(),
       };
     }
 
@@ -8942,7 +9708,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供經過整理與標準化的公司事件資料，適合用於事件驅動研究、篩選條件建構與自動化流程。",
         tier: "complete",
         sections: buildStructuredEventsApiSections(),
-        apiReference: buildStructuredEventsApiReference(),
+        apiReferenceFactory: () => buildStructuredEventsApiReference(),
       };
     }
 
@@ -8958,7 +9724,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供會影響持有人權益與價格序列的公司行動資料，適合用於還原價格、報酬計算與事件調整流程。",
         tier: "complete",
         sections: buildCorporateActionsApiSections(),
-        apiReference: buildCorporateActionsApiReference(),
+        apiReferenceFactory: () => buildCorporateActionsApiReference(),
       };
     }
 
@@ -8974,7 +9740,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         subtitle: "提供台股公司的股利分配資料，適合用於殖利率分析、總報酬計算與股利策略研究。",
         tier: "complete",
         sections: buildDividendsApiSections(),
-        apiReference: buildDividendsApiReference(),
+        apiReferenceFactory: () => buildDividendsApiReference(),
       };
     }
 
@@ -8986,7 +9752,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
       apiSection: group.id,
       icon: topic.icon ?? group.icon,
       title: topic.title,
-      subtitle: "schema_ready 主題頁，提供 topic、資料表、文件與 route 的對照資訊。",
+      subtitle: "主題頁提供 topic、資料表、文件與 route 的對照資訊。",
       tier: "complete",
       sections: buildSchemaReadyTopicSections(topic),
     };
@@ -9048,7 +9814,7 @@ const comingSoonDocsPages: DocsPageEntry[] = [
         label: "可用性說明",
         paragraphs: [
           "尚未開放正式 public API。",
-          "待 ingestion 與來源條件完成後，才會升級為 schema_ready 或 live 狀態。",
+          "待資料來源與路由準備完成後，將移入正式資料主題文件。",
         ],
       },
       {
@@ -9073,88 +9839,149 @@ export const docsPages: DocsPageEntry[] = [
   ...comingSoonDocsPages,
 ].filter((page) => !deprecatedDocsPrefixes.has(page.slug[0]));
 
-function buildSchemaReadySidebarItems(group: SchemaReadyGroup): DocsSidebarNavItem[] {
-  const baseItems = group.topics.map((topic) => ({ title: topic.title, href: topic.href }));
-
-  if (group.id !== "financial-growth") {
-    return baseItems;
-  }
-
-  const parent = group.topics.find((topic) => topic.topicId === "financial_statements_product");
-  const income = group.topics.find((topic) => topic.topicId === "income_statement");
-  const cashFlow = group.topics.find((topic) => topic.topicId === "cash_flow_statement");
-  const balanceSheet = group.topics.find((topic) => topic.topicId === "balance_sheet");
-  if (!parent || !income || !cashFlow || !balanceSheet) {
-    return baseItems;
-  }
-
-  const result: DocsSidebarNavItem[] = [];
-  for (const topic of group.topics) {
-    if (topic.topicId === "income_statement" || topic.topicId === "cash_flow_statement" || topic.topicId === "balance_sheet") {
-      continue;
-    }
-    if (topic.topicId === "financial_statements_product") {
-      result.push({
-        title: topic.title,
-        href: topic.href,
-        children: [
-          { title: income.title, href: income.href },
-          { title: cashFlow.title, href: cashFlow.href },
-          { title: balanceSheet.title, href: balanceSheet.href },
-        ],
-      });
-      continue;
-    }
-    result.push({ title: topic.title, href: topic.href });
-  }
-
-  return result;
-}
-
 export const docsSidebarNav: DocsSidebarNavGroup[] = [
   {
-    id: "getting-started",
-    label: "Getting Started",
+    id: "market-prices",
+    label: "市場與價格",
+    groupIcon: "line-chart",
     items: [
-      { title: "介紹", href: "/docs/introduction", icon: "book" },
-      { title: "快速開始", href: "/docs/quick-start", icon: "rocket" },
-      { title: "認證方式", href: "/docs/authentication", icon: "shield" },
-      { title: "資料存取", href: "/docs/data-access", icon: "database" },
-      { title: "API 模型", href: "/docs/api-model", icon: "braces" },
-      { title: "來源政策", href: "/docs/source-policy", icon: "shield" },
-      { title: "資料更新與 lineage", href: "/docs/data-freshness-lineage", icon: "chart" },
-      { title: "Tools & MCP", href: "/docs/tools-and-mcp", icon: "braces" },
+      { title: "TWSE 日線價格", href: "/docs/api/market-prices/twse-daily-price", icon: "prices", status: "production" },
+      { title: "TPEx 日線價格", href: "/docs/api/market-prices/tpex-daily-price", icon: "prices", status: "production" },
+      { title: "還原股價", href: "/docs/api/market-prices/adjusted-prices", icon: "prices", status: "normalized" },
+      { title: "技術指標", href: "/docs/api/market-prices/technical-indicators", icon: "prices", status: "normalized" },
+      { title: "市場指數", href: "/docs/api/market-prices/index-data", icon: "prices", status: "normalized" },
+      { title: "市場廣度", href: "/docs/api/market-prices/market-breadth", icon: "prices", status: "normalized" },
+      { title: "利率快照", href: "/docs/api/market-prices/interest-rate", icon: "rates", status: "normalized" },
     ],
   },
   {
-    id: "api",
-    label: "Data APIs",
-    items: schemaReadyGroups.map((group) => ({
-      title: group.label,
-      href: group.href,
-      icon: group.icon,
-      children: buildSchemaReadySidebarItems(group),
-    })),
+    id: "financial-growth",
+    label: "財務與成長",
+    groupIcon: "file-spreadsheet",
+    items: [
+      { title: "月營收", href: "/docs/api/financial-growth/monthly-revenue", icon: "metrics", status: "normalized" },
+      { title: "損益表", href: "/docs/api/financial-growth/income-statement", icon: "statements", status: "normalized" },
+      { title: "資產負債表", href: "/docs/api/financial-growth/balance-sheet", icon: "statements", status: "normalized" },
+      { title: "現金流量表", href: "/docs/api/financial-growth/cash-flow-statement", icon: "statements", status: "normalized" },
+      { title: "財務指標", href: "/docs/api/financial-growth/financial-metrics", icon: "metrics", status: "normalized" },
+      { title: "估值資料", href: "/docs/api/financial-growth/valuation-data", icon: "metrics", status: "normalized" },
+    ],
   },
   {
-    id: "workflows",
-    label: "Workflows / Use Cases",
-    items: workflowPages.map((page) => ({
-      title: page.navLabel,
-      href: page.href,
-      icon: "guide",
-    })),
+    id: "capital-flow",
+    label: "籌碼與資金",
+    groupIcon: "landmark",
+    items: [
+      { title: "三大法人", href: "/docs/api/capital-flow/institutional-flow", icon: "holdings", status: "normalized" },
+      { title: "融資融券", href: "/docs/api/capital-flow/margin-short", icon: "holdings", status: "normalized" },
+    ],
   },
   {
-    id: "coming-soon",
-    label: "Coming Soon",
-    items: comingSoonTopics.map((topic) => ({
-      title: topic.title,
-      href: topic.href,
-      icon: "advanced",
-    })),
+    id: "company-events",
+    label: "公司與事件",
+    groupIcon: "building-2",
+    items: [
+      { title: "公司基本資料", href: "/docs/api/company/issuer-profile", icon: "building", status: "normalized" },
+      { title: "公司公告", href: "/docs/api/company-events/issuer-announcements", icon: "filings", status: "normalized" },
+      { title: "事件日曆", href: "/docs/api/company-events/events-calendar", icon: "guide", status: "normalized" },
+      { title: "結構化事件", href: "/docs/api/company-events/structured-events", icon: "guide", status: "normalized" },
+      { title: "公司行動", href: "/docs/api/company-events/corporate-actions", icon: "guide", status: "normalized" },
+      { title: "股利", href: "/docs/api/company-events/dividends", icon: "guide", status: "normalized" },
+    ],
+  },
+  {
+    id: "taxonomy",
+    label: "分類與結構",
+    groupIcon: "network",
+    items: [
+      { title: "主題分類", href: "/docs/api/taxonomy/theme-taxonomy", icon: "segments", status: "normalized" },
+      { title: "指數分類", href: "/docs/api/taxonomy/index-classification", icon: "segments", status: "normalized" },
+    ],
+  },
+  {
+    id: "strategy-quant",
+    label: "策略與量化",
+    groupIcon: "activity",
+    items: [
+      { title: "特徵資料", href: "/docs/api/strategy-quant/features", icon: "chart", status: "normalized" },
+      { title: "因子資料", href: "/docs/api/strategy-quant/factor-data", icon: "chart", status: "normalized" },
+      { title: "時間對齊", href: "/docs/api/strategy-quant/time-alignment", icon: "chart", status: "normalized" },
+      { title: "條件篩選", href: "/docs/api/strategy-quant/screener", icon: "chart", status: "normalized" },
+    ],
+  },
+  {
+    id: "query-tools",
+    label: "查詢與工具",
+    groupIcon: "search-code",
+    items: [
+      { title: "搜尋 API", href: "/docs/api/query-tools/search-api", icon: "search", status: "normalized" },
+      { title: "查詢 API", href: "/docs/api/query-tools/query-api", icon: "braces", status: "normalized" },
+      { title: "查詢欄位", href: "/docs/api/query-tools/query-fields", icon: "braces", status: "normalized" },
+      { title: "查詢範例", href: "/docs/api/query-tools/query-examples", icon: "braces", status: "normalized" },
+    ],
+  },
+  {
+    id: "preview",
+    label: "預覽",
+    groupIcon: "eye",
+    items: [
+      { title: "公司新聞", href: "/docs/api/preview/company-news", icon: "news", status: "preview" },
+      { title: "市場新聞", href: "/docs/api/preview/market-news", icon: "news", status: "preview" },
+    ],
   },
 ];
+
+export const docsSidebarOverviewItems: DocsSidebarNavItem[] = [
+  { title: "總覽", href: "/docs/introduction", icon: "book", status: "production" },
+  { title: "快速開始", href: "/docs/quick-start", icon: "rocket", status: "production" },
+  { title: "認證", href: "/docs/authentication", icon: "shield", status: "production" },
+  { title: "來源政策", href: "/docs/source-policy", icon: "shield", status: "production" },
+  { title: "資料血緣", href: "/docs/data-freshness-lineage", icon: "chart", status: "production" },
+  { title: "API 模型", href: "/docs/api-model", icon: "braces", status: "production" },
+  { title: "Tools / MCP", href: "/docs/tools-and-mcp", icon: "braces", status: "production" },
+  { title: "Support", href: "/docs/support", icon: "support", status: "production" },
+];
+
+export const docsSidebarGuideItems: DocsSidebarNavItem[] = [
+  { title: "查看公司基本面", href: "/docs/workflows/company-fundamentals", icon: "guide", status: "production" },
+  { title: "看籌碼", href: "/docs/workflows/capital-flow", icon: "guide", status: "production" },
+  { title: "看市場狀態", href: "/docs/workflows/market-status", icon: "guide", status: "production" },
+  { title: "快速查資料", href: "/docs/workflows/fast-data-access", icon: "guide", status: "production" },
+  { title: "做策略 / AI", href: "/docs/workflows/strategy-ai", icon: "guide", status: "production" },
+];
+
+export const docsSidebarApiGroups: DocsSidebarNavGroup[] = docsSidebarNav;
+
+export function cleanTocTitle(title: string) {
+  return title.replace(/^\s*\d+[\.\、\)]\s*/, "").trim();
+}
+
+function slugifySectionTitle(title: string) {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\p{L}\p{N}-]/gu, "");
+}
+
+export function normalizeDocsSections<T extends DocSectionLike>(sections: T[]): Array<{ id: string; label: string; raw: T }> {
+  const usedIds = new Map<string, number>();
+
+  return sections.map((section) => {
+    const cleanedLabel = cleanTocTitle(section.label);
+    const preferredId = (section.id ?? "").trim();
+    const baseId = preferredId || slugifySectionTitle(cleanedLabel) || "section";
+    const duplicateIndex = usedIds.get(baseId) ?? 0;
+    usedIds.set(baseId, duplicateIndex + 1);
+    const resolvedId = duplicateIndex === 0 ? baseId : `${baseId}-${duplicateIndex + 1}`;
+
+    return {
+      id: resolvedId,
+      label: cleanedLabel || section.label,
+      raw: section,
+    };
+  });
+}
 
 function getFirstLeafHref(item: DocsSidebarNavItem): string | null {
   if (!item.children?.length) {
@@ -9196,5 +10023,25 @@ export function resolveDocsGroupTargetHref(href: string): string | null {
 }
 
 export function getDocsPageBySlug(slug: string[]) {
-  return docsPages.find((page) => page.slug.join("/") === slug.join("/"));
+  const slugKey = slug.join("/");
+  const page = docsPages.find((entry) => entry.slug.join("/") === slugKey);
+  if (!page) return undefined;
+
+  if (page.apiReference || !page.apiReferenceFactory) {
+    return page;
+  }
+
+  const cached = resolvedDocsPageCache.get(slugKey);
+  if (cached) {
+    return cached;
+  }
+
+  const resolvedPage: DocsPageEntry = {
+    ...page,
+    apiReference: page.apiReferenceFactory(),
+  };
+  resolvedDocsPageCache.set(slugKey, resolvedPage);
+  return resolvedPage;
 }
+
+const resolvedDocsPageCache = new Map<string, DocsPageEntry>();

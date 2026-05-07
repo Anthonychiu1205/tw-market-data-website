@@ -1,0 +1,26 @@
+# TW Market Data
+
+> 台股資料 API，為系統、量化研究與 AI agent workflow 而設計。
+
+## Documentation
+- Quick Start: /docs/quick-start
+- API Model: /docs/openapi-spec
+- Data Provenance: /docs/data-provenance
+- Market Coverage: /docs/market-coverage
+- Tools / MCP: /docs/tools-mcp
+- OpenAPI Spec: /docs/openapi-spec
+
+## Core API Groups
+- Market Prices
+- Financials and Growth
+- Capital Flow
+- Company and Events
+- Classification
+- Strategy and Quant
+- Query Tools
+
+## Available-now boundary
+TW Market Data uses controlled rollout. Available public datasets focus on TWSE / TPEx daily prices, MOPS fundamentals, valuation, technical indicators, institutional flow, margin/short data, company events, classification, screener, search, and query APIs.
+
+## Contact
+avenra.platform@gmail.com

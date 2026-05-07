@@ -1,18 +1,23 @@
 import { NextResponse } from "next/server";
 
-import { createSession, getDemoCredentials } from "@/src/auth/session";
+import { checkAuthRuntimeEnv } from "@/src/auth/env";
 
 export async function POST(request: Request) {
-  const formData = await request.formData();
-  const email = String(formData.get("email") ?? "").trim();
-  const password = String(formData.get("password") ?? "");
-  const demo = getDemoCredentials();
-
-  if (email !== demo.email || password !== demo.password) {
-    return NextResponse.redirect(new URL("/login?error=credentials", request.url));
+  const check = checkAuthRuntimeEnv();
+  if (!check.ok) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "auth_runtime_env_missing",
+        message: check.message,
+        missing: check.missing,
+      },
+      { status: check.status },
+    );
   }
 
-  await createSession(email);
-
-  return NextResponse.redirect(new URL("/dashboard", request.url));
+  const callbackUrl = new URL("/dashboard", request.url).toString();
+  const signInUrl = new URL("/api/auth/signin/google", request.url);
+  signInUrl.searchParams.set("callbackUrl", callbackUrl);
+  return NextResponse.redirect(signInUrl);
 }

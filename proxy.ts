@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
-import { SESSION_COOKIE_NAME } from "./src/auth/constants";
-import { verifySessionToken } from "./src/auth/token";
+import { auth } from "./src/auth";
 
-export async function proxy(request: NextRequest) {
+export const proxy = auth((request) => {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = token ? await verifySessionToken(token) : null;
+  const session = request.auth;
+  const isProtectedPath =
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/billing") ||
+    pathname.startsWith("/usage") ||
+    pathname.startsWith("/settings") ||
+    pathname.startsWith("/account");
 
-  if (pathname.startsWith("/dashboard") && !session) {
+  if (isProtectedPath && !session) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", pathname);
+    loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -20,8 +23,15 @@ export async function proxy(request: NextRequest) {
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: [
+    "/dashboard/:path*",
+    "/billing/:path*",
+    "/usage/:path*",
+    "/settings/:path*",
+    "/account/:path*",
+    "/login",
+  ],
 };

@@ -2,97 +2,73 @@ import Link from "next/link";
 
 import { SectionHeading } from "@/src/components/docs/section-heading";
 
-type CapabilityGroup = {
-  title: string;
-  items: Array<{ label: string; href: string }>;
-};
-
-const capabilityGroups: CapabilityGroup[] = [
-  {
-    title: "Available now（26 datasets）",
-    items: [
-      { label: "TWSE 日線價格", href: "/docs/api/market-prices/twse-daily-price" },
-      { label: "TPEx 日線價格", href: "/docs/api/market-prices/tpex-daily-price" },
-      { label: "月營收", href: "/docs/api/financial-growth/monthly-revenue" },
-      { label: "估值資料", href: "/docs/api/financial-growth/valuation-data" },
-    ],
-  },
-  {
-    title: "Available now（core）",
-    items: [
-      { label: "調整價格", href: "/docs/api/market-prices/adjusted-prices" },
-      { label: "公告資訊", href: "/docs/api/company-events/issuer-announcements" },
-      { label: "公司基本資料", href: "/docs/api/company/issuer-profile" },
-      { label: "利率", href: "/docs/api/market-prices/interest-rate" },
-    ],
-  },
-  {
-    title: "Available now（extended）",
-    items: [
-      { label: "損益表", href: "/docs/api/financial-growth/income-statement" },
-      { label: "現金流量表", href: "/docs/api/financial-growth/cash-flow-statement" },
-      { label: "資產負債表", href: "/docs/api/financial-growth/balance-sheet" },
-      { label: "融資融券", href: "/docs/api/capital-flow/margin-short" },
-    ],
-  },
-];
-
 export function DocsLandingContent() {
   return (
     <div className="space-y-8 py-8">
       <section className="space-y-3 border-b border-slate-200 pb-8">
-        <SectionHeading id="platform-overview">台股資料平台</SectionHeading>
         <p className="text-sm leading-7 text-slate-600">
-          本平台目前提供 26 個可公開使用的資料集。實際可用範圍與配額會依帳號方案與 API 存取權限而定。
+          TW Market Data 提供標準化的台股資料 API，將 TWSE、TPEx 與 MOPS 等官方來源整理成一致、可查詢、可串接的資料格式。
+        </p>
+        <p className="text-sm leading-7 text-slate-600">
+          平台目前以 public sellable boundary 內的 26 個 dataset 為核心，涵蓋行情、財報、營收、估值、技術指標、籌碼資金、公司事件與分類資料。實際可用範圍與配額會依帳號方案與 API key 權限決定。
         </p>
       </section>
 
-      <section className="space-y-4">
-        <SectionHeading id="capability-groups">能力分類</SectionHeading>
-        <div className="grid gap-4 md:grid-cols-2">
-          {capabilityGroups.map((group) => (
-            <article key={group.title} className="rounded-lg border border-slate-200 bg-white p-4">
-              <h3 className="text-sm font-semibold text-slate-900">{group.title}</h3>
-              <ul className="mt-3 space-y-2">
-                {group.items.map((item) => (
-                  <li key={item.href}>
-                    <Link href={item.href} className="text-sm text-slate-600 transition hover:text-slate-900 hover:underline">
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
+      <section className="space-y-3 border-b border-slate-200 pb-8">
+        <SectionHeading id="docs-portals">文件入口</SectionHeading>
+        <p className="text-sm leading-7 text-slate-600">你可以從左側導覽進入資料集文件，也可以先從 Quick Start 建立第一個 request。</p>
+        <p className="text-sm leading-7 text-slate-600">
+          若要讓 agent 或工具讀取文件，後續可提供 llms.txt、OpenAPI spec 與 MCP tools 作為入口。
+        </p>
+        <p className="text-sm leading-7 text-slate-600">目前文件優先描述 available-now 與 normalized dataset；preview 資料會獨立標示。</p>
       </section>
 
-      <section className="space-y-3 border-t border-slate-200 pt-8">
-        <SectionHeading id="upgrade-value">為什麼需要升級</SectionHeading>
+      <section className="space-y-3 border-b border-slate-200 pb-8">
+        <SectionHeading id="what-you-can-access">目前可存取的資料</SectionHeading>
         <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
-          <li>目前 public sellable boundary：26 個資料集</li>
-          <li>不同方案在可用資料範圍、配額與速率限制上有所差異</li>
-          <li>實際帳務與計費顯示以控制台與當前服務條款為準</li>
+          <li>市場價格：TWSE / TPEx 日線價格、還原股價、市場指數、市場廣度與利率快照。</li>
+          <li>財務與成長：月營收、損益表、資產負債表、現金流量表、財務指標與估值資料。</li>
+          <li>籌碼與資金：三大法人買賣、融資融券與資金面資料。</li>
+          <li>公司與事件：公司基本資料、公司公告、事件日曆、結構化事件、公司行動與股利。</li>
+          <li>分類與結構：主題分類、指數分類與跨資料集對齊用的分類 mapping。</li>
+          <li>策略與查詢：features、factor data、time alignment、screener、search API 與 query API。</li>
         </ul>
-        <p className="text-sm leading-7 text-slate-600">升級影響的是配額、速率與支援層級；目前可販售邊界已完成 26 dataset 對齊。</p>
-        <div>
+      </section>
+
+      <section className="space-y-3 border-b border-slate-200 pb-8">
+        <SectionHeading id="built-for">適合使用者</SectionHeading>
+        <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
+          <li>AI agent 與 LLM workflow</li>
+          <li>台股量化研究與回測流程</li>
+          <li>自動化投資研究系統</li>
+          <li>內部資料平台與 API 產品</li>
+          <li>需要 official/public-first lineage 的金融資料應用</li>
+        </ul>
+      </section>
+
+      <section className="space-y-3">
+        <SectionHeading id="design-principles">設計原則</SectionHeading>
+        <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
+          <li>官方來源優先：以 TWSE、TPEx、MOPS 與其他官方公開資料作為 canonical source。</li>
+          <li>結構化回應：不同資料集使用一致的 JSON response pattern 與穩定欄位命名。</li>
+          <li>可追溯資料：保留 source role、lineage 與資料處理語義，降低研究流程黑盒化。</li>
+          <li>系統優先：文件、API 與 schema 以 agent、程式與資料產品串接為主要使用情境。</li>
+          <li>受控推出：available-now、preview 與 not-yet-available 資料明確分級，避免過度承諾。</li>
+        </ul>
+        <p className="text-sm leading-7 text-slate-600">
+          準備開始時，請前往{" "}
+          <Link href="/docs/quick-start" className="font-medium text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-slate-900">
+            Quick Start
+          </Link>{" "}
+          建立第一個 request，或直接查看{" "}
           <Link
-            href="/billing/subscriptions"
-            className="inline-flex items-center justify-center rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-slate-900"
+            href="/docs/api/market-prices/twse-daily-price"
+            className="font-medium text-slate-700 underline decoration-slate-300 underline-offset-2 hover:text-slate-900"
           >
-            查看方案
+            市場與價格資料集
           </Link>
-        </div>
-      </section>
-
-      <section className="space-y-3 border-t border-slate-200 pt-8">
-        <SectionHeading id="auth-entitlement-usage-billing">Auth / Entitlement / Usage / Billing</SectionHeading>
-        <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
-          <li>API key model：`X-API-Key` header。</li>
-          <li>Dataset access：依帳號方案與 API key 權限套用可用資料範圍。</li>
-          <li>Usage summary：可透過 account 相關 API 查看當前使用概況。</li>
-          <li>Billing information：以控制台顯示與官方通知為準。</li>
-        </ul>
+          。
+        </p>
       </section>
     </div>
   );

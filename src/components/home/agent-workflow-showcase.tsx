@@ -4,7 +4,7 @@ import { AgentWorkflowDemo } from "./agent-workflow-demo";
 
 export function AgentWorkflowShowcase() {
   return (
-    <section className="border-b border-slate-200 bg-white py-20 lg:py-24">
+    <section className="bg-white py-20 lg:py-24">
       <MarketingContainer>
         <div className="grid items-start gap-7 lg:grid-cols-[66%_34%] lg:gap-5">
           <div className="order-2 w-full min-w-0 max-w-none lg:order-1">

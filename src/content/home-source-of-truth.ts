@@ -2,34 +2,50 @@ export const HOME_SOURCE_OF_TRUTH_ITEMS = [
   {
     id: "monthly_revenue",
     title: "月營收",
-    description: "來自 MOPS 的月營收資料，適合營收趨勢與成長分析",
+    description: "MOPS 月營收、YoY / MoM 成長追蹤",
     responseLabel: "monthly_revenue",
     status: "200 OK",
     responseTitle: "2330",
     code: `{
   "dataset": "monthly_revenue",
   "source_role": "canonical",
-  "freshness": "T+0",
   "lineage": {
     "provider": "MOPS",
-    "ingested_at": "2026-04-18T09:02:11+08:00"
+    "ingested_at": "2026-05-06T18:05:00+08:00"
   },
-  "data": [
+  "rows": [
     {
-      "ticker": "2330",
+      "symbol": "2330",
       "period": "2026-03",
       "revenue": 195234000000,
-      "currency": "TWD",
       "yoy_growth_pct": 34.7,
       "mom_growth_pct": 11.2
-    },
+    }
+  ]
+}`,
+  },
+  {
+    id: "twse_daily_price",
+    title: "股價日線",
+    description: "TWSE / TPEx 日線價格、成交量與交易日資料",
+    responseLabel: "twse_daily_price",
+    status: "200 OK",
+    responseTitle: "2330",
+    code: `{
+  "dataset": "twse_daily_price",
+  "source_role": "canonical",
+  "lineage": {
+    "provider": "TWSE"
+  },
+  "rows": [
     {
-      "ticker": "2330",
-      "period": "2026-02",
-      "revenue": 175912000000,
-      "currency": "TWD",
-      "yoy_growth_pct": 21.5,
-      "mom_growth_pct": null
+      "symbol": "2330",
+      "date": "2026-05-06",
+      "open": 884,
+      "high": 895,
+      "low": 878,
+      "close": 892,
+      "volume": 42168000
     }
   ]
 }`,
@@ -37,293 +53,164 @@ export const HOME_SOURCE_OF_TRUTH_ITEMS = [
   {
     id: "financial_statements",
     title: "財報三表",
-    description: "損益表、資產負債表、現金流量表，支援完整財報分析",
-    responseLabel: "financial_statements",
+    description: "損益表、資產負債表、現金流量表",
+    responseLabel: "income_statement",
     status: "200 OK",
     responseTitle: "2330",
     code: `{
-  "dataset": "financial_statements",
+  "dataset": "income_statement",
   "source_role": "canonical",
   "lineage": {
     "provider": "MOPS"
   },
-  "fiscal_period": "2025-Q4",
-  "data": {
-    "ticker": "2330",
-    "currency": "TWD",
-    "income_statement": {
+  "rows": [
+    {
+      "symbol": "2330",
+      "fiscal_period": "2025-Q4",
       "revenue": 868461000000,
-      "gross_profit": 466512000000,
       "operating_income": 382146000000,
       "net_income": 346783000000,
       "eps": 13.38
-    },
-    "balance_sheet": {
-      "total_assets": 6321458000000,
-      "total_liabilities": 2418321000000,
-      "shareholders_equity": 3903137000000,
-      "cash_and_equivalents": 1682400000000
-    },
-    "cash_flow_statement": {
-      "operating_cash_flow": 512384000000,
-      "investing_cash_flow": -218450000000,
-      "financing_cash_flow": -102381000000,
-      "free_cash_flow": 307912000000
-    },
-    "restated": false,
-    "segments": [
-      {
-        "name": "晶圓代工",
-        "revenue": 791203000000
-      },
-      {
-        "name": "其他",
-        "revenue": 77258000000
-      }
-    ]
-  },
-  "warnings": [
-    {
-      "code": "ROUNDING_NOTICE",
-      "message": "部分欄位為四捨五入數值"
     }
-  ]
-}`,
-  },
-  {
-    id: "daily_price",
-    title: "股價日線",
-    description: "開高低收、成交量、還原處理與交易日對齊",
-    responseLabel: "price_daily",
-    status: "200 OK",
-    responseTitle: "2330",
-    code: `{
-  "dataset": "price_daily",
-  "source_role": "canonical",
-  "lineage": {
-    "provider": "TWSE"
-  },
-  "data": [
-    {
-      "ticker": "2330",
-      "market": "TWSE",
-      "board_lot": 1000,
-      "is_adjusted": true,
-      "records": [
-        {
-          "date": "2026-04-18",
-          "open": 842,
-          "high": 850,
-          "low": 838,
-          "close": 847,
-          "volume": 24518321,
-          "turnover": 20781456327,
-          "adjusted_close": 847
-        },
-        {
-          "date": "2026-04-17",
-          "open": 835,
-          "high": 844,
-          "low": 832,
-          "close": 840,
-          "volume": 23145008,
-          "turnover": 19409325111,
-          "adjusted_close": 840
-        }
-      ]
-    }
+  ],
+  "related_datasets": [
+    "balance_sheet",
+    "cash_flow_statement"
   ]
 }`,
   },
   {
     id: "technical_indicators",
     title: "技術指標",
-    description: "MA、RSI、MACD 等常用技術指標，適合策略研究",
+    description: "MA、RSI、MACD 等常用技術指標",
     responseLabel: "technical_indicators",
     status: "200 OK",
     responseTitle: "2330",
     code: `{
   "dataset": "technical_indicators",
   "source_role": "canonical",
-  "freshness": "T+0",
   "lineage": {
-    "provider": "TWSE",
-    "as_of_date": "2026-04-18"
+    "provider": "TWSE"
   },
-  "data": [
+  "rows": [
     {
-      "ticker": "2330",
-      "date": "2026-04-18",
-      "ma_5": 842.4,
-      "ma_20": 819.2,
-      "ma_60": 788.3,
-      "rsi_14": 61.8,
-      "macd": 12.7,
-      "macd_signal": 10.9,
-      "macd_hist": 1.8
+      "symbol": "2330",
+      "date": "2026-05-06",
+      "ma_5": 887.4,
+      "ma_20": 861.8,
+      "rsi_14": 61.3,
+      "macd": 12.2
     }
   ]
 }`,
   },
   {
-    id: "valuation_metrics",
-    title: "PER / PBR / 殖利率",
-    description: "估值相關指標，適合篩選與估值流程",
-    responseLabel: "valuation_metrics",
+    id: "valuation_data",
+    title: "估值資料",
+    description: "PER、PBR、殖利率與市值相關指標",
+    responseLabel: "valuation_data",
     status: "200 OK",
     responseTitle: "2330",
     code: `{
-  "dataset": "valuation_metrics",
+  "dataset": "valuation_data",
   "source_role": "canonical",
   "lineage": {
     "provider": "TWSE"
   },
-  "as_of": "2026-04-18",
-  "data": {
-    "ticker": "2330",
-    "per": 28.4,
-    "forward_per": 24.7,
-    "pbr": 6.1,
-    "dividend_yield_pct": 1.82,
-    "market_cap": 21965000000000,
-    "valuation_band": {
-      "per_5y_median": 22.1,
-      "per_percentile": 0.78
-    },
-    "is_high_valuation": true,
-    "note": null
-  }
+  "rows": [
+    {
+      "symbol": "2330",
+      "date": "2026-05-06",
+      "per": 28.4,
+      "pbr": 6.1,
+      "dividend_yield_pct": 1.82,
+      "market_cap": 21965000000000
+    }
+  ]
 }`,
   },
   {
-    id: "institutional_flows",
-    title: "籌碼與法人",
-    description: "三大法人買賣超，適合觀察市場資金方向",
-    responseLabel: "institutional_flows",
+    id: "capital_flow",
+    title: "籌碼與資金",
+    description: "三大法人買賣、融資融券與資金流向",
+    responseLabel: "institutional_flow",
     status: "200 OK",
     responseTitle: "2330",
     code: `{
-  "dataset": "institutional_flows",
+  "dataset": "institutional_flow",
   "source_role": "canonical",
   "lineage": {
     "provider": "TWSE"
   },
-  "data": [
+  "rows": [
     {
-      "ticker": "2330",
-      "date": "2026-04-18",
-      "net_flow": {
-        "foreign_investors": 12843,
-        "investment_trust": -512,
-        "dealer": 238,
-        "total": 12569
-      },
-      "shareholding_ratio_pct": {
-        "foreign_investors": 73.8,
-        "investment_trust": 1.2,
-        "dealer": 0.6
-      },
-      "top_brokers_by_buy": [
-        "摩根士丹利",
-        "美林",
-        "凱基台北"
-      ]
+      "symbol": "2330",
+      "date": "2026-05-06",
+      "foreign_net_buy": 12843,
+      "investment_trust_net_buy": -512,
+      "dealer_net_buy": 238,
+      "total_net_buy": 12569
     }
-  ]
-}`,
-  },
-  {
-    id: "margin_short",
-    title: "融資融券",
-    description: "融資餘額、融券餘額與變化，適合籌碼分析",
-    responseLabel: "margin_short",
-    status: "200 OK",
-    responseTitle: "2330",
-    code: `{
-  "dataset": "margin_short",
-  "source_role": "canonical",
-  "freshness": "T+0",
-  "lineage": {
-    "provider": "TWSE"
-  },
-  "data": [
-    {
-      "ticker": "2330",
-      "date": "2026-04-18",
-      "margin_balance": 1245000,
-      "margin_buy": 84200,
-      "margin_sell": 75500,
-      "short_balance": 315000,
-      "short_sell": 18200,
-      "short_cover": 16900,
-      "margin_short_ratio": 0.253
-    }
-  ]
-}`,
-  },
-  {
-    id: "lineage_metadata",
-    title: "來源與 lineage",
-    description: "保留 provider、source role、freshness、lineage 等欄位",
-    responseLabel: "lineage_metadata",
-    status: "200 OK",
-    responseTitle: "monthly_revenue",
-    code: `{
-  "dataset": "monthly_revenue",
-  "source_role": "canonical",
-  "meta": {
-    "freshness": "T+0",
-    "provider": "MOPS",
-    "source_document": "mops_monthly_revenue_2026_03",
-    "trace_id": "rev_2330_2026_03",
-    "ingested_at": "2026-04-18T09:02:11+08:00",
-    "audit": {
-      "checksum": "sha256:caf0d9e3",
-      "verified": true
-    }
-  },
-  "records": [
-    {
-      "ticker": "2330",
-      "period": "2026-03",
-      "revenue": 195234000000,
-      "is_estimated": false
-    }
-  ]
-}`,
-  },
-  {
-    id: "source_role_policy",
-    title: "canonical / fallback / helper",
-    description: "資料來源分層，避免混源與不可追溯問題",
-    responseLabel: "source_role_policy",
-    status: "200 OK",
-    responseTitle: "policy",
-    code: `{
-  "dataset": "source_role_policy",
-  "policy_version": "v1",
-  "enforced": true,
-  "updated_at": "2026-04-18T08:40:00+08:00",
-  "rules": {
-    "monthly_revenue": {
-      "canonical": ["MOPS"],
-      "fallback": [],
-      "helper": ["Yahoo"],
-      "allow_unmarked_merge": false
-    },
-    "price_daily": {
-      "canonical": ["TWSE", "TPEx"],
-      "fallback": [],
-      "helper": ["twstock", "Yahoo"],
-      "allow_unmarked_merge": false
-    }
-  },
-  "principles": [
-    "official/public-first",
-    "canonical 與 helper 分層",
-    "避免跨來源混用未標記資料"
   ],
-  "exceptions": []
+  "related_datasets": [
+    "margin_short"
+  ]
+}`,
+  },
+  {
+    id: "company_events",
+    title: "公司事件",
+    description: "公司基本資料、公告、事件日曆、公司行動與股利",
+    responseLabel: "issuer_announcements",
+    status: "200 OK",
+    responseTitle: "2330",
+    code: `{
+  "dataset": "issuer_announcements",
+  "source_role": "canonical",
+  "lineage": {
+    "provider": "MOPS"
+  },
+  "rows": [
+    {
+      "symbol": "2330",
+      "announcement_date": "2026-05-06",
+      "headline": "公告董事會通過季度財務報告",
+      "category": "重大訊息"
+    }
+  ],
+  "related_datasets": [
+    "issuer_profile",
+    "events",
+    "corporate_actions",
+    "dividends"
+  ]
+}`,
+  },
+  {
+    id: "classification_query",
+    title: "分類與查詢",
+    description: "主題分類、指數分類、Search API、Query API 與 Screener",
+    responseLabel: "theme_taxonomy",
+    status: "200 OK",
+    responseTitle: "2330",
+    code: `{
+  "dataset": "theme_taxonomy",
+  "source_role": "canonical",
+  "lineage": {
+    "provider": "TW Market Data"
+  },
+  "rows": [
+    {
+      "symbol": "2330",
+      "themes": ["先進製程", "AI 供應鏈"],
+      "index_classifications": ["台灣50", "電子類股"]
+    }
+  ],
+  "related_endpoints": [
+    "/v2/search",
+    "/v2/query",
+    "/v2/datasets/screener"
+  ]
 }`,
   },
 ] as const;

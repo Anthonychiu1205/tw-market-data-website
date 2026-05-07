@@ -50,29 +50,23 @@ export function AiAgentWorkflowSection() {
           </p>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-6">
           {WORKFLOW_STEPS.map((step) => (
             <article
               key={step.id}
-              className="relative rounded-lg border border-slate-200 bg-slate-50/60 px-4 py-4"
+              className="h-full rounded-2xl border border-slate-200 bg-white p-5 transition-colors hover:border-slate-300 hover:bg-slate-50/60"
             >
-              <div className="mb-2 inline-flex h-6 min-w-[2rem] items-center justify-center rounded-md border border-slate-300 bg-white px-2 text-xs font-semibold text-slate-700">
+              <div className="inline-flex h-7 min-w-7 items-center justify-center rounded-lg border border-slate-200 bg-white px-2 text-sm font-medium text-slate-700">
                 {step.id}
               </div>
-              <h3 className="text-sm font-semibold text-slate-900">{step.title}</h3>
-              <p className="mt-2 text-xs leading-6 text-slate-600">{step.description}</p>
-              {step.id < WORKFLOW_STEPS.length ? (
-                <span className="pointer-events-none absolute -right-2 top-1/2 hidden -translate-y-1/2 text-slate-300 xl:block" aria-hidden="true">
-                  →
-                </span>
-              ) : null}
+              <h3 className="mt-5 text-base font-semibold text-slate-950">{step.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-slate-500">{step.description}</p>
             </article>
           ))}
         </div>
 
-        <p className="text-sm text-slate-600">可追溯、可驗證、可程式化、AI Ready</p>
+        <p className="text-sm text-slate-600">可追溯、可驗證、可程式化，適合 agent workflow。</p>
       </MarketingContainer>
     </section>
   );
 }
-

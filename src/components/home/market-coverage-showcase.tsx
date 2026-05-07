@@ -21,7 +21,7 @@ const MARKET_COVERAGE_DEMO_CONFIG: AgentWorkflowDemoConfig = {
 
 export function MarketCoverageShowcase() {
   return (
-    <section className="border-b border-slate-200 bg-white py-20 lg:py-24">
+    <section className="bg-white py-20 lg:py-24">
       <MarketingContainer>
         <div className="grid items-start gap-7 lg:grid-cols-[34%_66%] lg:gap-5">
           <div className="order-1 lg:border-r lg:border-slate-200 lg:pr-4">

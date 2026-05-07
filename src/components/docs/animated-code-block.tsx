@@ -120,10 +120,10 @@ export function AnimatedCodeBlock({ tabs, lineDelayMs = 60, className }: Animate
           transform: panelVisible ? "translateY(0px)" : "translateY(10px)",
         }}
       >
-        <pre className="min-h-[220px] overflow-x-auto p-4 text-xs leading-7 text-slate-700">
+        <pre className="min-h-[220px] whitespace-pre-wrap break-words p-4 text-xs leading-7 text-slate-700">
           <code>
             {visibleLines.map((line, index) => (
-              <div key={`${activeTab?.id ?? "code"}-${index}`} className="whitespace-pre">
+              <div key={`${activeTab?.id ?? "code"}-${index}`} className="whitespace-pre-wrap break-words">
                 {line.length > 0 ? line : "\u00A0"}
               </div>
             ))}

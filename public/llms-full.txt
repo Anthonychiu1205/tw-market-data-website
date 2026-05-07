@@ -1,0 +1,71 @@
+# TW Market Data - LLM Full Index
+
+TW Market Data 提供台股資料 API，採 official/public-first 與 controlled rollout。
+
+## Canonical Docs Entry
+- /docs/introduction
+- /docs/quick-start
+- /docs/data-provenance
+- /docs/market-coverage
+- /docs/openapi-spec
+- /docs/tools-mcp
+
+## Endpoint Groups
+
+### Market Prices
+- GET /v2/datasets/twse-daily-price
+- GET /v2/datasets/tpex-daily-price
+- GET /v2/datasets/index-data
+- GET /v2/datasets/market-breadth
+- GET /v2/datasets/interest-rate-snapshot
+- GET /v2/datasets/technical-indicators
+
+### Financials and Growth
+- GET /v2/datasets/monthly-revenue
+- GET /v2/datasets/income-statement
+- GET /v2/datasets/balance-sheet
+- GET /v2/datasets/cash-flow-statement
+- GET /v2/datasets/valuation-data
+
+### Capital Flow
+- GET /v2/datasets/institutional-flow
+- GET /v2/datasets/margin-short
+
+### Company and Events
+- GET /v2/datasets/issuer-profile
+- GET /v2/datasets/issuer-announcements
+- GET /v2/datasets/events
+- GET /v2/datasets/structured-events
+- GET /v2/datasets/corporate-actions
+- GET /v2/datasets/dividends
+
+### Classification and Mapping
+- GET /v2/datasets/theme-taxonomy
+- GET /v2/datasets/index-classification
+
+### Strategy and Quant
+- GET /v2/datasets/features
+- GET /v2/datasets/factor-data
+- GET /v2/datasets/time-alignment
+- POST /v2/datasets/screener
+
+### Query Tools
+- GET /v2/search
+- GET /v2/query
+- GET /v2/query/fields
+- GET /v2/query/examples
+
+## Preview Datasets
+- GET /v2/datasets/company-news
+- GET /v2/datasets/market-news
+
+## Not Marketed as Available-Now
+- Additional future topics outside the current public boundary are not advertised as available-now.
+
+## Usage Policy Notes
+- API key access, rate limits, and dataset scope depend on plan and rollout stage.
+- Use documentation and OpenAPI contract as the source of truth for active endpoints.
+- Do not rely on private dashboard data, private tokens, or raw backend payloads.
+
+## Contact
+avenra.platform@gmail.com

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function CompanyProfilesRedirectPage() {
-  redirect("/docs/api/company-profile");
+  redirect("/docs/api/company/issuer-profile");
 }

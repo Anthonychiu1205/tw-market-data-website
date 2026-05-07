@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 
 import { BlogArticle } from "@/src/components/blog/blog-article";
 import { siteConfig } from "@/src/config/site";
-import { getAllBlogDetailSlugs, getBlogDetailBySlug } from "@/src/lib/blog-detail-adapter";
+import { getAllBlogPosts, getBlogPostBySlug } from "@/src/content/blog-posts";
 
 type BlogDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -18,12 +18,12 @@ function toAbsoluteUrl(pathname: string) {
 }
 
 export async function generateStaticParams() {
-  return getAllBlogDetailSlugs().map((slug) => ({ slug }));
+  return getAllBlogPosts().map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: BlogDetailPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogDetailBySlug(slug);
+  const post = getBlogPostBySlug(slug);
 
   if (!post) {
     return {
@@ -50,13 +50,20 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
       modifiedTime: post.updatedAt,
       authors: [post.author],
       tags: post.tags,
+      images: [toAbsoluteUrl(siteConfig.ogImagePath)],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.seoTitle,
+      description: post.description,
+      images: [toAbsoluteUrl(siteConfig.ogImagePath)],
     },
   };
 }
 
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const { slug } = await params;
-  const post = getBlogDetailBySlug(slug);
+  const post = getBlogPostBySlug(slug);
 
   if (!post) {
     notFound();
