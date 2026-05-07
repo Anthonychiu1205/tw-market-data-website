@@ -13,6 +13,7 @@ type ApiKeysManagerProps = {
 };
 
 export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysManagerProps) {
+  const issuanceEnabled = false;
   const [keys, setKeys] = useState(initialKeys);
   const [newKeyName, setNewKeyName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,7 +22,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [createdPlainKey, setCreatedPlainKey] = useState<string | null>(null);
 
-  const canSubmit = canCreate && !isSubmitting;
+  const canSubmit = issuanceEnabled && canCreate && !isSubmitting;
   const hasKeys = keys.length > 0;
 
   function publishKeysUpdate(nextKeys: ApiKeyItem[]) {
@@ -117,9 +118,9 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
   }
 
   const disabledHint = useMemo(() => {
-    if (canCreate) return null;
-    return "目前方案或環境未開放建立金鑰。";
-  }, [canCreate]);
+    if (issuanceEnabled && canCreate) return null;
+    return "此 Beta 帳戶尚未啟用 API 金鑰發放，請聯繫我們開通。";
+  }, [issuanceEnabled, canCreate]);
 
   return (
     <div className="space-y-3">
@@ -178,7 +179,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
       <div className="flex items-center justify-end">
         <button
           type="button"
-          disabled={!canCreate}
+          disabled={!issuanceEnabled || !canCreate}
           onClick={() => {
             setErrorMessage(null);
             setCreatedPlainKey(null);
@@ -198,7 +199,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
         </p>
       ) : null}
 
-      {isModalOpen ? (
+      {isModalOpen && issuanceEnabled ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 px-4">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5">
             <h3 className="text-base font-semibold text-slate-900">建立新的 API 金鑰</h3>

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { auth } from "./src/auth";
+import { getSafeRedirectTarget } from "./src/lib/security/safe-redirect";
 
 export const proxy = auth((request) => {
   const { pathname } = request.nextUrl;
@@ -13,8 +14,10 @@ export const proxy = auth((request) => {
     pathname.startsWith("/account");
 
   if (isProtectedPath && !session) {
+    const requestedPath = `${pathname}${request.nextUrl.search}`;
+    const safeNext = getSafeRedirectTarget(requestedPath, "/dashboard");
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
+    loginUrl.searchParams.set("next", safeNext);
     return NextResponse.redirect(loginUrl);
   }
 

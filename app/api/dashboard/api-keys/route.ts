@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getSession } from "@/src/auth/session";
-import { createApiKey, getApiKeysSummary } from "@/src/lib/backend-adapter";
+import { getApiKeysSummary } from "@/src/lib/backend-adapter";
 
 export async function GET() {
   const session = await getSession();
@@ -14,22 +14,17 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  void request;
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  let payload: { name?: string } = {};
-  try {
-    payload = (await request.json()) as { name?: string };
-  } catch {
-    payload = {};
-  }
-
-  const result = await createApiKey(session.email, payload.name);
-  if (!result) {
-    return NextResponse.json({ error: "api_key_create_unavailable" }, { status: 503 });
-  }
-
-  return NextResponse.json(result, { status: 201 });
+  return NextResponse.json(
+    {
+      error: "api_key_issuance_disabled_beta",
+      message: "API key issuance is not enabled for this beta account yet. Contact us to enable access.",
+    },
+    { status: 403 },
+  );
 }

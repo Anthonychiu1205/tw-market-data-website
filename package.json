@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:safe-redirect": "node scripts/check_safe_redirect.mjs",
+    "check:public-secrets": "node scripts/check_no_demo_credentials_in_public_build.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
@@ -18,7 +20,8 @@
     "prisma": "^6.9.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "recharts": "^3.8.1"
+    "recharts": "^3.8.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

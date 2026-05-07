@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/src/auth/session";
 import { GoogleSignInButton } from "@/src/components/auth/google-sign-in-button";
 import { EncryptedTextRotator, type LoginHeadlinePhrase } from "@/src/components/ui/encrypted-text-rotator";
+import { getSafeRedirectTarget } from "@/src/lib/security/safe-redirect";
 
 export const metadata: Metadata = {
   title: "登入",
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 type LoginPageProps = {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 };
 
 const LOGIN_PHRASES: LoginHeadlinePhrase[] = [
@@ -46,6 +47,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   const params = await searchParams;
   const hasError = Boolean(params.error);
+  const callbackUrl = getSafeRedirectTarget(params.next, "/dashboard");
 
   return (
     <main className="fixed inset-x-0 top-[73px] bottom-0 overflow-hidden bg-white">
@@ -66,7 +68,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               ) : null}
 
               <div className="mt-6 grid gap-3">
-                <GoogleSignInButton />
+                <GoogleSignInButton callbackUrl={callbackUrl} />
               </div>
 
               <p className="mt-5 text-center text-xs text-slate-500">

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 import { productMegaMenuColumns } from "../../content/mega-menu-links";
 import { ContactModal } from "./contact-modal";
@@ -18,7 +18,7 @@ const navItems = [
 ];
 
 export function SiteHeader() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [isProductsMenuOpen, setIsProductsMenuOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const hasHydratedRef = useRef(false);
@@ -161,16 +161,6 @@ export function SiteHeader() {
                 <Link href="/dashboard" className={buttonClass("primary")}>
                   Dashboard
                 </Link>
-                <span className="hidden rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 lg:inline-flex">
-                  {session.user?.name ?? session.user?.email ?? "Account"}
-                </span>
-                <button
-                  type="button"
-                  className={buttonClass("secondary")}
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                >
-                  Logout
-                </button>
               </>
             ) : status === "loading" ? (
               <span className="inline-flex h-10 w-[160px] animate-pulse rounded-md bg-slate-200" aria-hidden="true" />

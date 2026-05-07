@@ -20,6 +20,7 @@ import { BillingCreditsPage } from "@/src/components/dashboard/billing-credits-p
 import { UsagePageShell } from "@/src/components/dashboard/usage-page-shell";
 import { RequestResponsePlayground } from "@/src/components/dashboard/request-response-playground";
 import { OverviewUsageChart } from "@/src/components/dashboard/overview-usage-chart";
+import { AccountProfileForm } from "@/src/components/dashboard/account-profile-form";
 
 type DashboardConsoleProps = {
   email: string;
@@ -214,34 +215,10 @@ function SettingsPanel({ email, account }: { email: string; account: AccountSumm
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold tracking-wide text-slate-900">個人資料</h2>
+        <h2 className="text-sm font-semibold tracking-wide text-slate-900">帳戶資料</h2>
         <DashboardCard className="border-slate-200/80 bg-slate-50/70 p-0 shadow-none">
-          <div className="divide-y divide-slate-200">
-            <p className="px-5 py-4 text-sm text-slate-600">你的帳號資料目前為示意版，之後可接入真實帳號系統。</p>
-            <div className="grid items-center gap-3 px-5 py-4 sm:grid-cols-[160px_minmax(0,1fr)]">
-              <p className="text-sm font-medium text-slate-900">Email</p>
-              <input
-                value={email}
-                readOnly
-                className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-500"
-              />
-            </div>
-            <div className="grid items-center gap-3 px-5 py-4 sm:grid-cols-[160px_minmax(0,1fr)]">
-              <p className="text-sm font-medium text-slate-900">名字</p>
-              <input
-                value="Ant"
-                readOnly
-                className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-500"
-              />
-            </div>
-            <div className="grid items-center gap-3 px-5 py-4 sm:grid-cols-[160px_minmax(0,1fr)]">
-              <p className="text-sm font-medium text-slate-900">姓氏</p>
-              <input
-                value="User"
-                readOnly
-                className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-500"
-              />
-            </div>
+          <div className="px-5 py-4">
+            <AccountProfileForm email={email} />
           </div>
         </DashboardCard>
       </section>
