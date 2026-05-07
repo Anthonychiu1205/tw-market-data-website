@@ -1,13 +1,3 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "crons": [
-    {
-      "path": "/api/market-marquee?refresh=1",
-      "schedule": "0 1-5 * * 1-5"
-    },
-    {
-      "path": "/api/market-marquee?refresh=1",
-      "schedule": "0 7-10 * * 1-5"
-    }
-  ]
+  "$schema": "https://openapi.vercel.sh/vercel.json"
 }
