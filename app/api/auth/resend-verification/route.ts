@@ -69,7 +69,7 @@ export async function POST(request: Request) {
   });
 
   if (!sendResult.ok) {
-    return NextResponse.json({ ok: false, error: sendResult.error }, { status: sendResult.status });
+    return NextResponse.json({ ok: false, code: sendResult.code }, { status: sendResult.status });
   }
 
   return NextResponse.json(GENERIC_RESPONSE);

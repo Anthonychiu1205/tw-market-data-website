@@ -9,7 +9,7 @@ type SendVerificationCodeEmailInput = {
 
 type SendVerificationCodeEmailResult =
   | { ok: true }
-  | { ok: false; status: number; error: string };
+  | { ok: false; status: number; code: "email_service_not_configured" | "email_delivery_failed" };
 
 function emailDeliveryConfig() {
   const apiKey = process.env.RESEND_API_KEY?.trim();
@@ -17,7 +17,6 @@ function emailDeliveryConfig() {
   return {
     apiKey,
     from,
-    isProduction: process.env.NODE_ENV === "production",
   };
 }
 
@@ -28,15 +27,11 @@ export async function sendVerificationCodeEmail({
   const config = emailDeliveryConfig();
 
   if (!config.apiKey || !config.from) {
-    if (config.isProduction) {
-      return {
-        ok: false,
-        status: 503,
-        error: "email_delivery_unavailable",
-      };
-    }
-
-    return { ok: true };
+    return {
+      ok: false,
+      status: 503,
+      code: "email_service_not_configured",
+    };
   }
 
   const resend = new Resend(config.apiKey);
@@ -60,8 +55,8 @@ export async function sendVerificationCodeEmail({
   } catch {
     return {
       ok: false,
-      status: 502,
-      error: "email_delivery_failed",
+      status: 503,
+      code: "email_delivery_failed",
     };
   }
 }

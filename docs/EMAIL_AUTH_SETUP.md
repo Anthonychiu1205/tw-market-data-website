@@ -10,10 +10,13 @@ Email+Password signup requires a 6-digit verification code before account activa
 2. Add these environment variables in Vercel:
    - `RESEND_API_KEY`
    - `EMAIL_FROM`
-3. Recommended initial sender:
+3. Confirm the API key has **Sending access**.
+4. Verify sender settings:
+   - `onboarding@resend.dev` is suitable for testing only.
+   - For production, verify the `twmarketdata.com` domain and switch to:
+     - `EMAIL_FROM=\"TW Market Data <no-reply@twmarketdata.com>\"`
+5. Recommended initial sender:
    - `EMAIL_FROM="TW Market Data <onboarding@resend.dev>"`
-4. After domain sender verification:
-   - `EMAIL_FROM="TW Market Data <no-reply@twmarketdata.com>"`
 
 ## Required Env (Auth)
 - `DATABASE_URL`
@@ -39,6 +42,13 @@ Email+Password signup requires a 6-digit verification code before account activa
    - Verify code and ensure redirect to `/dashboard`
 
 If `RESEND_API_KEY` is missing in production, registration/resend endpoints return `503`.
+
+## Registration Failure Troubleshooting
+If `/register` fails, check these first:
+- `RESEND_API_KEY` exists in Vercel env and is valid.
+- `EMAIL_FROM` exists in Vercel env and matches an allowed sender.
+- Resend key permissions include **Sending access**.
+- If using `onboarding@resend.dev`, confirm you are in test flow. For production traffic, use verified domain sender.
 
 ## Production Smoke Test
 1. Open `/register`
