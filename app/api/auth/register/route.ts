@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { checkEmailAuthRuntimeEnv } from "@/src/auth/env";
@@ -12,7 +13,11 @@ import {
   normalizeEmail,
 } from "@/src/lib/auth/email-verification";
 
-const GENERIC_RESPONSE = { ok: true };
+const GENERIC_RESPONSE = { ok: true } as const;
+
+type RegisterSuccess =
+  | { ok: true }
+  | { ok: true; next: "login_or_reset" };
 
 type RegisterErrorCode =
   | "email_service_not_configured"
@@ -24,10 +29,14 @@ function errorResponse(status: number, code: RegisterErrorCode) {
   return NextResponse.json({ ok: false, code }, { status });
 }
 
+function successResponse(payload: RegisterSuccess = GENERIC_RESPONSE) {
+  return NextResponse.json(payload);
+}
+
 export async function POST(request: Request) {
   const envCheck = checkEmailAuthRuntimeEnv();
   if (!envCheck.ok) {
-    console.error("[auth/register] email auth env missing");
+    console.error("[auth/register] runtime env missing");
     return errorResponse(503, "registration_unavailable");
   }
 
@@ -41,16 +50,17 @@ export async function POST(request: Request) {
     return errorResponse(400, "invalid_registration_input");
   }
 
-  try {
-    const normalizedEmail = normalizeEmail(parsed.data.email);
-    const passwordHash = await hashPassword(parsed.data.password);
+  const normalizedEmail = normalizeEmail(parsed.data.email);
+  const pendingPasswordHash = await hashPassword(parsed.data.password);
 
+  try {
     const existingUser = await prisma.user.findUnique({
       where: { email: normalizedEmail },
       select: {
         id: true,
         emailVerifiedAt: true,
         emailVerified: true,
+        passwordHash: true,
       },
     });
 
@@ -60,28 +70,21 @@ export async function POST(request: Request) {
       await prisma.user.create({
         data: {
           email: normalizedEmail,
-          passwordHash,
         },
       });
-    } else if (!isVerified) {
-      await prisma.user.update({
-        where: { id: existingUser.id },
-        data: {
-          passwordHash,
-        },
-      });
-    }
-
-    if (isVerified) {
-      return NextResponse.json(GENERIC_RESPONSE);
+    } else if (isVerified && existingUser.passwordHash) {
+      return successResponse({ ok: true, next: "login_or_reset" });
     }
 
     const canSend = await canSendAnotherVerificationCode(normalizedEmail);
     if (!canSend.ok) {
-      return NextResponse.json(GENERIC_RESPONSE);
+      return successResponse();
     }
 
-    const codeResult = await createEmailVerificationCode(normalizedEmail);
+    const codeResult = await createEmailVerificationCode(normalizedEmail, {
+      pendingPasswordHash,
+    });
+
     const sendResult = await sendVerificationCodeEmail({
       email: normalizedEmail,
       code: codeResult.code,
@@ -93,10 +96,14 @@ export async function POST(request: Request) {
       return errorResponse(sendResult.status, failureType);
     }
 
-    return NextResponse.json(GENERIC_RESPONSE);
+    return successResponse();
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      return successResponse();
+    }
+
     const errorName = error instanceof Error ? error.name : "unknown";
-    console.error(`[auth/register] registration_unavailable error=${errorName}`);
+    console.error(`[auth/register] registration unavailable type=${errorName}`);
     return errorResponse(500, "registration_unavailable");
   }
 }

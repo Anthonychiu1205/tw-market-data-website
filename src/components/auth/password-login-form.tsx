@@ -106,6 +106,12 @@ export function PasswordLoginForm({ callbackPath }: PasswordLoginFormProps) {
       </button>
 
       <p className="text-center text-xs text-slate-500">
+        <Link href="/forgot-password" className="underline decoration-slate-300 underline-offset-2 hover:text-slate-700">
+          忘記密碼？
+        </Link>
+      </p>
+
+      <p className="text-center text-xs text-slate-500">
         還沒有帳戶？
         <Link href="/register" className="ml-1 underline decoration-slate-300 underline-offset-2 hover:text-slate-700">
           註冊

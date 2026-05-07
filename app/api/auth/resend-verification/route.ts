@@ -45,6 +45,7 @@ export async function POST(request: Request) {
       id: true,
       emailVerifiedAt: true,
       emailVerified: true,
+      passwordHash: true,
     },
   });
 
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
   }
 
   const isVerified = Boolean(user.emailVerifiedAt || user.emailVerified);
-  if (isVerified) {
+  if (isVerified && user.passwordHash) {
     return NextResponse.json(GENERIC_RESPONSE);
   }
 

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 type LoginPageProps = {
-  searchParams: Promise<{ error?: string; next?: string }>;
+  searchParams: Promise<{ error?: string; next?: string; reset?: string }>;
 };
 
 const LOGIN_PHRASES: LoginHeadlinePhrase[] = [
@@ -48,6 +48,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   const params = await searchParams;
   const hasError = Boolean(params.error);
+  const hasResetNotice = params.reset === "1";
   const callbackUrl = getSafeRedirectTarget(params.next, "/dashboard");
 
   return (
@@ -66,6 +67,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
               {hasError ? (
                 <p className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">登入失敗，請稍後再試一次。</p>
+              ) : null}
+              {hasResetNotice ? (
+                <p className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">密碼已更新，請重新登入。</p>
               ) : null}
 
               <div className="mt-6 grid gap-3">

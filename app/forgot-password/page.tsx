@@ -1,0 +1,47 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+
+import { getSession } from "@/src/auth/session";
+import { ForgotPasswordForm } from "@/src/components/auth/forgot-password-form";
+
+export const metadata: Metadata = {
+  title: "忘記密碼",
+  description: "寄送重設密碼連結。",
+};
+
+export default async function ForgotPasswordPage() {
+  const session = await getSession();
+  if (session) {
+    redirect("/dashboard");
+  }
+
+  return (
+    <main className="fixed inset-x-0 top-[73px] bottom-0 overflow-hidden bg-white">
+      <div className="h-full overflow-hidden">
+        <div className="grid h-full grid-cols-1 lg:grid-cols-[1.55fr_0.95fr]">
+          <section className="hidden h-full items-center bg-white px-8 md:px-12 lg:flex lg:px-20">
+            <div className="max-w-3xl -translate-y-4">
+              <p className="text-4xl font-semibold leading-tight text-slate-900 lg:text-5xl">忘記密碼</p>
+              <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
+                輸入帳戶 Email，我們會寄送重設密碼連結。
+              </p>
+            </div>
+          </section>
+
+          <section className="flex h-full items-center justify-center bg-slate-50 px-8">
+            <div className="w-full max-w-md">
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-900">重設密碼</h2>
+              <p className="mt-3 text-sm leading-7 text-slate-600">
+                請輸入你的帳戶 Email。
+              </p>
+
+              <div className="mt-6">
+                <ForgotPasswordForm />
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  );
+}

@@ -69,8 +69,22 @@ model EmailVerificationCode {
   id         String   @id @default(cuid())
   email      String
   codeHash   String
+  pendingPasswordHash String?
   expiresAt  DateTime
   attempts   Int      @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([email])
+  @@index([expiresAt])
+  @@index([consumedAt])
+}
+
+model PasswordResetToken {
+  id         String   @id @default(cuid())
+  email      String
+  tokenHash  String
+  expiresAt  DateTime
   consumedAt DateTime?
   createdAt  DateTime @default(now())
 

@@ -54,6 +54,8 @@ Not collected in this batch:
 - Verification code constraints: 10-minute expiry, one-time use, max 5 attempts.
 - Register/resend endpoints use generic responses to reduce account enumeration.
 - Resend API key is server-side only and required in production for verification email delivery.
+- Forgot-password flow uses one-time reset links with `PasswordResetToken.tokenHash` only.
+- Reset token constraints: 30-minute expiry, single-use with `consumedAt`.
 
 ## Pending / Follow-up Hardening
 - Real API key lifecycle (secure generation, hashing, rotation, revocation audit)

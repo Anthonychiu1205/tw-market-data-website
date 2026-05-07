@@ -11,6 +11,8 @@
 8. Added secure password hashing and verification code hashing.
 9. Added rate limits for verification code resend/attempt windows.
 10. Added email-auth security verification script for schema/build checks.
+11. Added forgot-password and reset-password flow with hashed reset tokens.
+12. Added neutral account-enumeration-safe responses for register/forgot-password paths.
 
 ## Risk Levels
 - High: Open redirect risk from untrusted `next/callback` params → mitigated via allowlisted safe redirect helper.

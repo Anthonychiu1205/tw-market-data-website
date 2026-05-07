@@ -4,6 +4,7 @@
 This project supports Google OAuth and Email+Password authentication.
 
 Email+Password signup requires a 6-digit verification code before account activation.
+Forgot password uses one-time reset links with hashed reset tokens.
 
 ## Resend Setup
 1. Create a Resend account and generate an API key.
@@ -50,6 +51,15 @@ If `/register` fails, check these first:
 - Resend key permissions include **Sending access**.
 - If using `onboarding@resend.dev`, confirm you are in test flow. For production traffic, use verified domain sender.
 
+Register API error codes:
+- `email_service_not_configured`
+- `email_delivery_failed`
+- `invalid_registration_input`
+- `registration_unavailable`
+
+If an email may already be registered, frontend should show neutral guidance:
+- 「如果這個 Email 已經註冊，請直接登入或使用忘記密碼。」
+
 ## Production Smoke Test
 1. Open `/register`
 2. Submit email + password
@@ -58,6 +68,9 @@ If `/register` fails, check these first:
 5. Confirm redirect to `/dashboard`
 6. Logout and test `/login` with email/password
 7. Confirm unverified users cannot login (must verify first)
+8. Open `/forgot-password`, submit email, verify neutral response message.
+9. Open reset link from email (`/reset-password?token=...`) and set a new password.
+10. Confirm login works with the new password.
 
 ## Security Notes
 - Passwords are stored as `passwordHash` only.
@@ -66,3 +79,6 @@ If `/register` fails, check these first:
 - Max attempts per code: 5.
 - Used/expired code cannot be reused.
 - Register/resend endpoints return generic responses to reduce account enumeration.
+- Password reset token is stored as `tokenHash` only (no plaintext token in DB).
+- Reset token expires in 30 minutes and is single-use (`consumedAt`).
+- Forgot password endpoint avoids account enumeration by always returning `{ ok: true }`.

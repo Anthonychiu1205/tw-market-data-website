@@ -85,11 +85,19 @@ export async function getLatestVerificationCodeRecord(email: string) {
   });
 }
 
-export async function createEmailVerificationCode(email: string) {
+export async function createEmailVerificationCode(
+  email: string,
+  options?: { pendingPasswordHash?: string | null },
+) {
   const normalizedEmail = normalizeEmail(email);
+  const latest = await getLatestVerificationCodeRecord(normalizedEmail);
   const code = generateVerificationCode();
   const codeHash = hashVerificationCode(normalizedEmail, code);
   const expiresAt = new Date(Date.now() + VERIFICATION_CODE_TTL_MS);
+  const pendingPasswordHash =
+    options?.pendingPasswordHash === undefined
+      ? (latest?.pendingPasswordHash ?? null)
+      : options.pendingPasswordHash;
 
   await prisma.emailVerificationCode.updateMany({
     where: {
@@ -105,6 +113,7 @@ export async function createEmailVerificationCode(email: string) {
     data: {
       email: normalizedEmail,
       codeHash,
+      pendingPasswordHash: pendingPasswordHash ?? null,
       expiresAt,
     },
   });
@@ -205,5 +214,9 @@ export async function consumeVerificationCodeIfValid(email: string, code: string
 
   return {
     ok: true as const,
+    verification: {
+      email: record.email,
+      pendingPasswordHash: record.pendingPasswordHash ?? null,
+    },
   };
 }

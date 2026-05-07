@@ -28,18 +28,29 @@ assert(schema.includes("emailVerifiedAt"), "User.emailVerifiedAt is missing in p
 assert(schema.includes("model EmailVerificationCode"), "EmailVerificationCode model is missing in prisma/schema.prisma");
 assert(schema.includes("codeHash"), "EmailVerificationCode.codeHash is missing");
 assert(!/\n\s*code\s+String/.test(schema), "EmailVerificationCode must not store plaintext `code` field");
+assert(schema.includes("pendingPasswordHash"), "EmailVerificationCode.pendingPasswordHash is missing");
+assert(schema.includes("model PasswordResetToken"), "PasswordResetToken model is missing in prisma/schema.prisma");
+assert(schema.includes("tokenHash"), "PasswordResetToken.tokenHash is missing");
+const passwordResetBlockMatch = schema.match(/model PasswordResetToken \{[\s\S]*?\n\}/);
+assert(passwordResetBlockMatch, "Unable to read PasswordResetToken model block");
+assert(
+  !/\n\s*token\s+String/.test(passwordResetBlockMatch[0]),
+  "PasswordResetToken must not store plaintext `token` field",
+);
 
 const routeFiles = [
   "app/api/auth/register/route.ts",
   "app/api/auth/verify-email/route.ts",
   "app/api/auth/password-login/route.ts",
   "app/api/auth/resend-verification/route.ts",
+  "app/api/auth/forgot-password/route.ts",
+  "app/api/auth/reset-password/route.ts",
 ];
 
 for (const file of routeFiles) {
   const content = readFileSync(file, "utf8");
-  assert(!/console\.log\s*\([^\n]*(password|code)/i.test(content), `Sensitive console.log found in ${file}`);
-  assert(!/console\.error\s*\([^\n]*(password|code)/i.test(content), `Sensitive console.error found in ${file}`);
+  assert(!/console\.log\s*\([^\n]*(password|code|token)/i.test(content), `Sensitive console.log found in ${file}`);
+  assert(!/console\.error\s*\([^\n]*(password|code|token)/i.test(content), `Sensitive console.error found in ${file}`);
 }
 
 const staticDir = ".next/static";

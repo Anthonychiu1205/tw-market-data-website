@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { checkEmailAuthRuntimeEnv } from "@/src/auth/env";
 import { verifyEmailBodySchema } from "@/src/lib/auth/email-auth-schema";
-import { badRequest, createAuthenticatedJsonResponse, readJsonBody } from "@/src/lib/auth/email-auth-route";
+import { createAuthenticatedJsonResponse, readJsonBody } from "@/src/lib/auth/email-auth-route";
 import { prisma } from "@/src/lib/auth/prisma";
 import { consumeVerificationCodeIfValid, normalizeEmail } from "@/src/lib/auth/email-verification";
 
@@ -22,12 +22,12 @@ export async function POST(request: Request) {
 
   const body = await readJsonBody(request);
   if (!body) {
-    return badRequest("invalid_json");
+    return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
   }
 
   const parsed = verifyEmailBodySchema.safeParse(body);
   if (!parsed.success) {
-    return badRequest("invalid_payload");
+    return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
   }
 
   const normalizedEmail = normalizeEmail(parsed.data.email);
@@ -49,11 +49,17 @@ export async function POST(request: Request) {
     update: {
       emailVerifiedAt: verifiedAt,
       emailVerified: verifiedAt,
+      ...(verificationResult.verification.pendingPasswordHash
+        ? { passwordHash: verificationResult.verification.pendingPasswordHash }
+        : {}),
     },
     create: {
       email: normalizedEmail,
       emailVerifiedAt: verifiedAt,
       emailVerified: verifiedAt,
+      ...(verificationResult.verification.pendingPasswordHash
+        ? { passwordHash: verificationResult.verification.pendingPasswordHash }
+        : {}),
     },
     select: {
       id: true,

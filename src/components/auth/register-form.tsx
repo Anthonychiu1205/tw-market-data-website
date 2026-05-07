@@ -11,6 +11,7 @@ export function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showLoginOrResetHint, setShowLoginOrResetHint] = useState(false);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -18,6 +19,7 @@ export function RegisterForm() {
 
     setIsSubmitting(true);
     setErrorMessage(null);
+    setShowLoginOrResetHint(false);
 
     const trimmedEmail = email.trim().toLowerCase();
 
@@ -45,7 +47,7 @@ export function RegisterForm() {
         }),
       });
 
-      const payload = (await response.json()) as { ok?: boolean; error?: string; code?: string };
+      const payload = (await response.json()) as { ok?: boolean; error?: string; code?: string; next?: string };
 
       if (!response.ok || !payload.ok) {
         const errorCode = payload.code ?? payload.error;
@@ -65,7 +67,18 @@ export function RegisterForm() {
           setErrorMessage("目前無法完成註冊，請稍後再試。");
           return;
         }
+        if (errorCode === "login_or_reset") {
+          setErrorMessage("如果這個 Email 已經註冊，請直接登入或使用忘記密碼。");
+          setShowLoginOrResetHint(true);
+          return;
+        }
         setErrorMessage("目前無法完成註冊，請稍後再試。");
+        return;
+      }
+
+      if (payload.next === "login_or_reset") {
+        setErrorMessage("如果這個 Email 已經註冊，請直接登入或使用忘記密碼。");
+        setShowLoginOrResetHint(true);
         return;
       }
 
@@ -130,6 +143,17 @@ export function RegisterForm() {
       </div>
 
       {errorMessage ? <p className="text-xs text-red-600">{errorMessage}</p> : null}
+      {showLoginOrResetHint ? (
+        <p className="text-xs text-slate-600">
+          <Link href="/login" className="underline decoration-slate-300 underline-offset-2 hover:text-slate-800">
+            前往登入
+          </Link>
+          <span className="mx-1">或</span>
+          <Link href="/forgot-password" className="underline decoration-slate-300 underline-offset-2 hover:text-slate-800">
+            忘記密碼
+          </Link>
+        </p>
+      ) : null}
 
       <button type="submit" disabled={isSubmitting} className={buttonClass("primary", "h-11 text-sm")}>
         {isSubmitting ? "送出中..." : "註冊並取得驗證碼"}

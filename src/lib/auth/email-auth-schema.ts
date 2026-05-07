@@ -28,3 +28,19 @@ export const resendVerificationBodySchema = z
     email: z.string().trim().email().max(EMAIL_MAX_LENGTH),
   })
   .strict();
+
+export const forgotPasswordBodySchema = z
+  .object({
+    email: z.string().trim().email().max(EMAIL_MAX_LENGTH),
+  })
+  .strict();
+
+export const resetPasswordBodySchema = z
+  .object({
+    token: z.string().trim().min(32).max(512),
+    password: z
+      .string()
+      .min(PASSWORD_RULE.minLength)
+      .max(PASSWORD_RULE.maxLength),
+  })
+  .strict();
