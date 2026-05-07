@@ -12,7 +12,8 @@ Out of scope for this round:
 - Stripe/billing payment security
 
 ## Current Auth Architecture
-- Authentication: Google OAuth via Auth.js / NextAuth v5
+- Authentication: Google OAuth + Email/Password verification code flow
+- Auth runtime: Auth.js / NextAuth v5 (database session strategy)
 - Session persistence: Prisma adapter + PostgreSQL session tables
 - Route protection: middleware/proxy guard on dashboard/account/billing/usage paths
 - Server-side session checks in dashboard page shell and protected API routes
@@ -25,6 +26,8 @@ Stored profile fields are minimized for B2B API onboarding:
 - `userRole` (optional enum)
 - `useCase` (optional enum)
 - `onboardingCompleted` (boolean)
+- `passwordHash` (optional, hash only)
+- `emailVerifiedAt` (optional)
 
 Not collected in this batch:
 - phone number
@@ -46,6 +49,11 @@ Not collected in this batch:
 - Auth runtime env checks return explicit error when required env is missing.
 - Prisma-backed session persistence is enabled.
 - Existing security headers remain in `next.config.ts`.
+- Password login requires verified email.
+- Verification code flow stores only `codeHash` (no plaintext code in DB).
+- Verification code constraints: 10-minute expiry, one-time use, max 5 attempts.
+- Register/resend endpoints use generic responses to reduce account enumeration.
+- Resend API key is server-side only and required in production for verification email delivery.
 
 ## Pending / Follow-up Hardening
 - Real API key lifecycle (secure generation, hashing, rotation, revocation audit)

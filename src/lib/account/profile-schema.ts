@@ -60,4 +60,8 @@ export type AccountProfileResponse = {
   userRole: (typeof USER_ROLE_OPTIONS)[number] | null;
   useCase: (typeof USE_CASE_OPTIONS)[number] | null;
   onboardingCompleted: boolean;
+  connectedAccounts: {
+    google: boolean;
+    password: boolean;
+  };
 };

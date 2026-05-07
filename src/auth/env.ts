@@ -32,3 +32,20 @@ export function checkAuthRuntimeEnv(): AuthRuntimeEnvCheck {
     missing: [...missing],
   };
 }
+
+export function checkEmailAuthRuntimeEnv(): AuthRuntimeEnvCheck {
+  const requiredKeys = ["DATABASE_URL", "AUTH_SECRET"] as const;
+  const missing = requiredKeys.filter((key) => !process.env[key] || !process.env[key]?.trim());
+
+  if (missing.length === 0) {
+    return { ok: true };
+  }
+
+  return {
+    ok: false,
+    status: 503,
+    message:
+      "Email authentication is not configured. Missing required environment variables.",
+    missing: [...missing],
+  };
+}

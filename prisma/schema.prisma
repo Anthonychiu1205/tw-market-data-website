@@ -17,6 +17,8 @@ model User {
   onboardingCompleted Boolean @default(false)
   email         String?   @unique
   emailVerified DateTime?
+  emailVerifiedAt DateTime?
+  passwordHash  String?
   image         String?
   role          String    @default("user")
   accounts      Account[]
@@ -61,4 +63,18 @@ model VerificationToken {
   expires    DateTime
 
   @@id([identifier, token])
+}
+
+model EmailVerificationCode {
+  id         String   @id @default(cuid())
+  email      String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int      @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@index([email])
+  @@index([expiresAt])
+  @@index([consumedAt])
 }

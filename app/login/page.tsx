@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { getSession } from "@/src/auth/session";
 import { GoogleSignInButton } from "@/src/components/auth/google-sign-in-button";
+import { PasswordLoginForm } from "@/src/components/auth/password-login-form";
 import { EncryptedTextRotator, type LoginHeadlinePhrase } from "@/src/components/ui/encrypted-text-rotator";
 import { getSafeRedirectTarget } from "@/src/lib/security/safe-redirect";
 
@@ -69,6 +70,16 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
               <div className="mt-6 grid gap-3">
                 <GoogleSignInButton callbackUrl={callbackUrl} />
+              </div>
+
+              <div className="mt-5 flex items-center gap-3">
+                <div className="h-px flex-1 bg-slate-200" />
+                <span className="text-[11px] uppercase tracking-wide text-slate-400">或</span>
+                <div className="h-px flex-1 bg-slate-200" />
+              </div>
+
+              <div className="mt-5">
+                <PasswordLoginForm callbackPath={callbackUrl} />
               </div>
 
               <p className="mt-5 text-center text-xs text-slate-500">

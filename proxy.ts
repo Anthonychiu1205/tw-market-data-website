@@ -21,7 +21,7 @@ export const proxy = auth((request) => {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (pathname === "/login" && session) {
+  if ((pathname === "/login" || pathname === "/register" || pathname === "/verify-email") && session) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
@@ -36,5 +36,7 @@ export const config = {
     "/settings/:path*",
     "/account/:path*",
     "/login",
+    "/register",
+    "/verify-email",
   ],
 };

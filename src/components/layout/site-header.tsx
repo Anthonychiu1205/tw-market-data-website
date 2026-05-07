@@ -169,7 +169,7 @@ export function SiteHeader() {
                 <Link href="/login" className={buttonClass("secondary")}>
                   登入
                 </Link>
-                <Link href="/login" className={buttonClass("primary")}>
+                <Link href="/register" className={buttonClass("primary")}>
                   註冊
                 </Link>
               </>

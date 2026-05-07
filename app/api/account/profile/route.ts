@@ -15,6 +15,8 @@ function serializeProfile(user: {
   userRole: string | null;
   useCase: string | null;
   onboardingCompleted: boolean;
+  passwordHash?: string | null;
+  accounts?: Array<{ provider: string }>;
 }) {
   return {
     email: user.email ?? "",
@@ -23,6 +25,10 @@ function serializeProfile(user: {
     userRole: user.userRole,
     useCase: user.useCase,
     onboardingCompleted: user.onboardingCompleted,
+    connectedAccounts: {
+      google: Boolean(user.accounts?.some((account) => account.provider === "google")),
+      password: Boolean(user.passwordHash),
+    },
   };
 }
 
@@ -41,6 +47,12 @@ export async function GET() {
       userRole: true,
       useCase: true,
       onboardingCompleted: true,
+      passwordHash: true,
+      accounts: {
+        select: {
+          provider: true,
+        },
+      },
     },
   });
 
@@ -90,6 +102,12 @@ export async function PATCH(request: Request) {
         userRole: true,
         useCase: true,
         onboardingCompleted: true,
+        passwordHash: true,
+        accounts: {
+          select: {
+            provider: true,
+          },
+        },
       },
     });
 
@@ -113,6 +131,12 @@ export async function PATCH(request: Request) {
       userRole: true,
       useCase: true,
       onboardingCompleted: true,
+      passwordHash: true,
+      accounts: {
+        select: {
+          provider: true,
+        },
+      },
     },
   });
 

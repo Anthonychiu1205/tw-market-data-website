@@ -40,6 +40,8 @@ export function AccountProfileForm({ email }: AccountProfileFormProps) {
   const [companyName, setCompanyName] = useState("");
   const [userRole, setUserRole] = useState("");
   const [useCase, setUseCase] = useState("");
+  const [googleLinked, setGoogleLinked] = useState(false);
+  const [passwordConfigured, setPasswordConfigured] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -60,6 +62,8 @@ export function AccountProfileForm({ email }: AccountProfileFormProps) {
         setCompanyName(payload.profile.companyName ?? "");
         setUserRole(payload.profile.userRole ?? "");
         setUseCase(payload.profile.useCase ?? "");
+        setGoogleLinked(payload.profile.connectedAccounts.google);
+        setPasswordConfigured(payload.profile.connectedAccounts.password);
       } catch {
         if (!active) return;
         setErrorMessage("目前無法讀取帳戶資料，請稍後再試。");
@@ -107,6 +111,8 @@ export function AccountProfileForm({ email }: AccountProfileFormProps) {
       setCompanyName(payload.profile.companyName ?? "");
       setUserRole(payload.profile.userRole ?? "");
       setUseCase(payload.profile.useCase ?? "");
+      setGoogleLinked(payload.profile.connectedAccounts.google);
+      setPasswordConfigured(payload.profile.connectedAccounts.password);
       setSuccessMessage("帳戶資料已更新。");
     } catch {
       setErrorMessage("目前無法儲存帳戶資料，請稍後再試。");
@@ -124,6 +130,12 @@ export function AccountProfileForm({ email }: AccountProfileFormProps) {
           readOnly
           className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-500"
         />
+      </div>
+
+      <div className="grid gap-2 rounded-lg border border-slate-200 bg-white px-3 py-3 text-xs text-slate-600">
+        <p className="font-medium text-slate-900">帳號連結狀態</p>
+        <p>Google：{googleLinked ? "已連結" : "未連結"}</p>
+        <p>Email/password：{passwordConfigured ? "已設定" : "未設定"}</p>
       </div>
 
       <label className="grid gap-1 text-sm text-slate-700">
