@@ -7,7 +7,7 @@ const isProduction = process.env.NODE_ENV === "production";
 const cspDirectives = [
   "default-src 'self'",
   "base-uri 'self'",
-  "form-action 'self' mailto:",
+  "form-action 'self' mailto: https://payment-stage.ecpay.com.tw https://payment.ecpay.com.tw",
   "frame-ancestors 'none'",
   "object-src 'none'",
   "img-src 'self' data: blob:",

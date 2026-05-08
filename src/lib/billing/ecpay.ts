@@ -241,30 +241,131 @@ export function buildPeriodActionParams(input: {
   return params;
 }
 
-export function renderAutoSubmitForm(actionUrl: string, params: Record<string, string>) {
+export function renderAutoSubmitForm(
+  actionUrl: string,
+  params: Record<string, string>,
+  diagnostics?: {
+    planCode?: string;
+    billingCycle?: string;
+    amount?: number | string;
+  },
+) {
   const inputHtml = Object.entries(params)
     .map(([name, value]) => `<input type="hidden" name="${htmlEscape(name)}" value="${htmlEscape(value)}" />`)
     .join("\n");
 
   const escapedActionUrl = htmlEscape(actionUrl);
+  const env = normalizeEcpayEnv();
+  const merchantTradeNo = htmlEscape(params.MerchantTradeNo ?? "");
+  const amount = htmlEscape(String(diagnostics?.amount ?? params.TotalAmount ?? ""));
+  const itemName = htmlEscape(params.ItemName ?? "");
+  const billingCycle = htmlEscape(
+    diagnostics?.billingCycle ?? (params.PeriodType === "Y" ? "yearly" : "monthly"),
+  );
+  const planCode = htmlEscape(diagnostics?.planCode ?? "unknown");
 
   return `<!doctype html>
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Redirecting to ECPay</title>
+  <title>前往綠界付款</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    .container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .panel {
+      width: 100%;
+      max-width: 560px;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      padding: 28px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+    }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.35;
+      font-weight: 650;
+      color: #020617;
+    }
+    p {
+      margin: 10px 0 0;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #475569;
+    }
+    .button {
+      margin-top: 20px;
+      width: 100%;
+      height: 44px;
+      border: 0;
+      border-radius: 12px;
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .button:hover { background: #1e293b; }
+    .diagnostics {
+      margin-top: 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #f8fafc;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #64748b;
+    }
+    .diagnostics code { color: #0f172a; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .helper {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #64748b;
+    }
+  </style>
 </head>
 <body>
-  <form id="ecpay-checkout-form" method="post" action="${escapedActionUrl}">
-    ${inputHtml}
-    <noscript>
-      <p>若頁面未自動跳轉，請點擊下方按鈕繼續付款。</p>
-      <button type="submit">前往綠界付款</button>
-    </noscript>
-  </form>
+  <div class="container">
+    <div class="panel">
+      <h1>正在前往綠界付款頁面</h1>
+      <p>系統會自動跳轉到綠界金流。若未自動跳轉，請點擊下方按鈕繼續。</p>
+      <form id="ecpay-checkout-form" method="post" action="${escapedActionUrl}">
+        ${inputHtml}
+        <button class="button" type="submit">前往綠界付款</button>
+      </form>
+      <p class="helper">提示：付款狀態以伺服器端 ReturnURL / PeriodReturnURL 通知為準。</p>
+      <div class="diagnostics" role="status" aria-live="polite">
+        <div>checkout environment: <code>${htmlEscape(env)}</code></div>
+        <div>planCode: <code>${htmlEscape(planCode)}</code></div>
+        <div>billingCycle: <code>${htmlEscape(billingCycle)}</code></div>
+        <div>amount: <code>${amount}</code></div>
+        <div>order: <code>${merchantTradeNo}</code></div>
+        <div>item: <code>${itemName}</code></div>
+      </div>
+      <noscript>
+        <p class="helper">你目前停用了 JavaScript，請直接點上方按鈕前往付款。</p>
+      </noscript>
+    </div>
+  </div>
   <script>
-    document.getElementById('ecpay-checkout-form')?.submit();
+    window.setTimeout(function () {
+      document.getElementById('ecpay-checkout-form')?.submit();
+    }, 120);
   </script>
 </body>
 </html>`;
