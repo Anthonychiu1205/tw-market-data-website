@@ -108,6 +108,8 @@ npx prisma migrate deploy
 - Initial auth callback: `POST /api/billing/ecpay/notify`
 - Recurring callback: `POST /api/billing/ecpay/period-notify`
 - Cancel recurring: `POST /api/billing/ecpay/cancel`
+- Credits one-time checkout: `POST /api/billing/ecpay/credits/create`
+- Credits one-time callback: `POST /api/billing/ecpay/credits/notify`
 
 ## Callback URL Requirements
 
@@ -129,6 +131,74 @@ Both routes validate `CheckMacValue` and return plain text `1|OK` only after val
 5. Server returns auto-submit HTML form to ECPay checkout URL.
 6. ECPay calls server callbacks (`notify` / `period-notify`) to finalize status.
 7. `/billing/thank-you` is UX-only; callback is source of truth.
+
+## Credits Top-up Flow (One-time Payment)
+
+Credits 儲值與訂閱是兩條獨立流程：
+
+- 訂閱方案：使用 ECPay periodic (定期定額)
+- Credits 儲值：使用 ECPay one-time payment (單次付款)
+
+### Credits Packages
+
+| Package | 金額 | 最終入帳 credits | 額外加值（已含） |
+| --- | --- | --- | --- |
+| Starter | NT$500 | 10,000 | 0 |
+| Builder | NT$1,000 | 25,000 | 5,000 |
+| Pro | NT$3,000 | 90,000 | 30,000 |
+| Scale | NT$10,000 | 350,000 | 150,000 |
+| Enterprise | NT$30,000 | 1,200,000 | 600,000 |
+
+### Credits one-time checkout params
+
+Credits create route 只使用一次性付款參數：
+
+- `MerchantID`
+- `MerchantTradeNo`
+- `MerchantTradeDate`
+- `PaymentType=aio`
+- `TotalAmount`
+- `TradeDesc=TW Market Data Credits`
+- `ItemName=TW Market Data Credits {credits}`
+- `ReturnURL=/api/billing/ecpay/credits/notify`
+- `ClientBackURL=/billing/credits`
+- `ChoosePayment=Credit`
+- `EncryptType=1`
+- `CheckMacValue`
+
+**不會帶入**定期定額參數：
+
+- `PeriodAmount`
+- `PeriodType`
+- `Frequency`
+- `ExecTimes`
+
+### Credits callback behavior
+
+`/api/billing/ecpay/credits/notify` 是 credits 入帳唯一 truth source：
+
+1. 驗證 `CheckMacValue`
+2. 依 `MerchantTradeNo` 找本地 pending 交易
+3. 驗證回傳金額與本地 `amountTwd` 一致
+4. `RtnCode=1` 時才會入帳 wallet
+5. 更新交易狀態與 `balanceAfter`
+
+`ClientBackURL` 只作為 UX 返回，不可視為付款成功依據。
+
+### SimulatePaid behavior
+
+若 ECPay 回傳 `SimulatePaid=1`：
+
+- 交易只標記為 `simulated`（或保留 pending with simulation record）
+- **不會**增加 wallet credits
+- callback 仍回 `1|OK`
+
+### Idempotency
+
+- `CreditTransaction.merchantTradeNo` 唯一
+- callback 會先檢查是否已 `completed`
+- 已完成交易重複通知時直接回 `1|OK`
+- 避免重複入帳
 
 ## Cancellation Flow Summary
 
@@ -160,3 +230,18 @@ Both routes validate `CheckMacValue` and return plain text `1|OK` only after val
 11. Simulate duplicate callback and confirm idempotent behavior.
 12. Verify recurring callback creates another `BillingPayment` row.
 13. Submit cancel from `/billing` and confirm cancel fields update.
+
+## Credits One-time Test Checklist
+
+1. 設定 `ECPAY_ENV=stage`
+2. 設定 `ECPAY_MERCHANT_ID` / `ECPAY_HASH_KEY` / `ECPAY_HASH_IV`
+3. 設定可公開 HTTPS 的 `NEXT_PUBLIC_SITE_URL`
+4. 完成 Prisma migration（包含 wallet / transactions）
+5. 登入後前往 `/billing/credits`
+6. 開啟「購買 credits」，選擇一個 package
+7. 確認新分頁打開綠界付款頁
+8. 完成 stage 測試付款
+9. 確認 callback 命中 `/api/billing/ecpay/credits/notify`
+10. 確認 DB 交易狀態 `pending -> completed`，wallet balance 正確增加
+11. 重送同一 callback，確認不會重複入帳
+12. 測試 `SimulatePaid=1`，確認不會增加 credits

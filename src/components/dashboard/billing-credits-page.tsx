@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Area,
   AreaChart,
@@ -94,13 +95,70 @@ function monthLabel(key: string) {
   return `${year}年${Number(month)}月`;
 }
 
-export function BillingCreditsPage() {
+type BillingCreditsPageProps = {
+  walletBalance: number;
+  transactions: Array<{
+    id: string;
+    type: string;
+    status: string;
+    amountTwd: number | null;
+    credits: number;
+    balanceAfter: number | null;
+    packageCode: string | null;
+    description: string | null;
+    createdAt: string;
+  }>;
+};
+
+function getTransactionTypeLabel(type: string) {
+  if (type === "purchase") return "儲值";
+  if (type === "usage") return "使用";
+  if (type === "adjustment") return "調整";
+  return "其他";
+}
+
+function getTransactionStatusLabel(status: string) {
+  if (status === "completed") return "已完成";
+  if (status === "pending") return "確認中";
+  if (status === "failed") return "失敗";
+  if (status === "cancelled") return "已取消";
+  if (status === "simulated") return "模擬";
+  return "待確認";
+}
+
+function formatTransactionDate(value: string) {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "—";
+  return new Intl.DateTimeFormat("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(parsed);
+}
+
+export function BillingCreditsPage({ walletBalance, transactions }: BillingCreditsPageProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"market" | "fundamentals" | "events">("market");
   const [activeMonthIndex, setActiveMonthIndex] = useState(MONTH_KEYS.length - 1);
   const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
+  const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
   const activeMonthKey = MONTH_KEYS[activeMonthIndex];
   const spendSeries = SPEND_SERIES[activeMonthKey] ?? [];
-  const packages = getCreditPackageViews();
+  const packages = useMemo(() => getCreditPackageViews(), []);
+
+  useEffect(() => {
+    function handleFocus() {
+      router.refresh();
+    }
+
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [router]);
 
   return (
     <div className="space-y-4">
@@ -108,11 +166,22 @@ export function BillingCreditsPage() {
         <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
           <p className="text-[15px] font-medium text-slate-900">餘額</p>
           <p className="mt-1 text-sm text-slate-600">可用 credits 餘額</p>
-          <p className="mt-5 text-5xl font-semibold tracking-tight text-slate-900">0</p>
+          <p className="mt-5 text-5xl font-semibold tracking-tight text-slate-900">{formatCredits(walletBalance)}</p>
           <p className="mt-2 text-xs text-slate-500">尚未建立 wallet 時，餘額預設顯示為 0。</p>
           <button
             type="button"
-            onClick={() => setIsPurchaseDialogOpen(true)}
+            onClick={() => router.refresh()}
+            className={buttonClass("secondary", "mt-3 h-10 rounded-xl px-4 text-xs")}
+          >
+            刷新餘額
+          </button>
+          {checkoutMessage ? <p className="mt-2 text-xs text-slate-600">{checkoutMessage}</p> : null}
+          <button
+            type="button"
+            onClick={() => {
+              setCheckoutMessage(null);
+              setIsPurchaseDialogOpen(true);
+            }}
             className={buttonClass("primary", "mt-6 h-12 rounded-2xl px-5 text-sm font-semibold")}
           >
             購買 credits
@@ -310,22 +379,61 @@ export function BillingCreditsPage() {
             <table className="min-w-full text-sm">
               <thead className="text-sm font-medium text-slate-500">
                 <tr>
-                  <th className="px-2 py-3 text-left font-medium">Description</th>
-                  <th className="px-2 py-3 text-left font-medium">金額</th>
+                  <th className="px-2 py-3 text-left font-medium">類型 / 狀態</th>
+                  <th className="px-2 py-3 text-left font-medium">金額 / credits</th>
                   <th className="px-2 py-3 text-left font-medium">日期</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-t border-slate-100">
-                  <td colSpan={3} className="px-2 py-6 text-center text-slate-500">No transactions yet</td>
-                </tr>
+                {transactions.length > 0
+                  ? transactions.map((transaction) => (
+                      <tr key={transaction.id} className="border-t border-slate-100">
+                        <td className="px-2 py-3 text-sm text-slate-700">
+                          {getTransactionTypeLabel(transaction.type)}
+                          {transaction.packageCode ? (
+                            <span className="ml-1 text-xs text-slate-500">· {transaction.packageCode}</span>
+                          ) : null}
+                          <span className="ml-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600">
+                            {getTransactionStatusLabel(transaction.status)}
+                          </span>
+                          {transaction.description ? (
+                            <p className="mt-1 text-xs text-slate-500">{transaction.description}</p>
+                          ) : null}
+                        </td>
+                        <td className="px-2 py-3 text-sm text-slate-700">
+                          {transaction.amountTwd ? formatTwd(transaction.amountTwd) : "—"}
+                          <span className="ml-2 text-xs text-slate-500">
+                            {transaction.credits >= 0
+                              ? `+${formatCredits(transaction.credits)} credits`
+                              : `${formatCredits(transaction.credits)} credits`}
+                          </span>
+                        </td>
+                        <td className="px-2 py-3 text-sm text-slate-700">
+                          {formatTransactionDate(transaction.createdAt)}
+                        </td>
+                      </tr>
+                    ))
+                  : null}
+                {transactions.length === 0 ? (
+                  <tr className="border-t border-slate-100">
+                    <td colSpan={3} className="px-2 py-6 text-center text-slate-500">
+                      尚無 credits 交易紀錄。
+                    </td>
+                  </tr>
+                ) : null}
               </tbody>
             </table>
           </div>
         </DashboardCard>
       </section>
 
-      <CreditPurchaseDialog open={isPurchaseDialogOpen} onOpenChange={setIsPurchaseDialogOpen} />
+      <CreditPurchaseDialog
+        open={isPurchaseDialogOpen}
+        onOpenChange={setIsPurchaseDialogOpen}
+        onCheckoutOpened={(message) => {
+          setCheckoutMessage(message);
+        }}
+      />
     </div>
   );
 }

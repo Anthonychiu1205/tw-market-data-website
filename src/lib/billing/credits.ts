@@ -9,6 +9,9 @@ export type CreditPackage = {
   highlight?: "best_value";
 };
 
+export type CreditTransactionStatus = "pending" | "completed" | "failed" | "cancelled" | "simulated";
+export type CreditTransactionType = "purchase" | "usage" | "adjustment";
+
 export const CREDIT_PACKAGES: Record<CreditPackageCode, CreditPackage> = {
   starter: {
     packageCode: "starter",
@@ -60,8 +63,12 @@ export function isCreditPackageCode(value: string): value is CreditPackageCode {
   return Object.prototype.hasOwnProperty.call(CREDIT_PACKAGES, value);
 }
 
-export function getCreditPackageByCode(packageCode: CreditPackageCode) {
+export function getCreditPackage(packageCode: CreditPackageCode) {
   return CREDIT_PACKAGES[packageCode];
+}
+
+export function getCreditPackageByCode(packageCode: CreditPackageCode) {
+  return getCreditPackage(packageCode);
 }
 
 export function getCreditPackageViews() {
@@ -74,4 +81,67 @@ export function formatTwd(value: number) {
 
 export function formatCredits(value: number) {
   return new Intl.NumberFormat("en-US").format(value);
+}
+
+async function loadPrisma() {
+  if (typeof window !== "undefined") {
+    throw new Error("Credit wallet helpers are server-only");
+  }
+
+  const { prisma } = await import("@/src/lib/auth/prisma");
+  return prisma;
+}
+
+export async function getCreditWalletForUser(userId: string) {
+  const prisma = await loadPrisma();
+  return prisma.creditWallet.findUnique({
+    where: { userId },
+    select: {
+      id: true,
+      userId: true,
+      balance: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
+export async function getCreditTransactionsForUser(userId: string, limit = 10) {
+  const prisma = await loadPrisma();
+  return prisma.creditTransaction.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    take: Math.max(1, Math.min(limit, 50)),
+    select: {
+      id: true,
+      type: true,
+      status: true,
+      amountTwd: true,
+      credits: true,
+      balanceAfter: true,
+      provider: true,
+      merchantTradeNo: true,
+      providerTradeNo: true,
+      packageCode: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
+export async function getOrCreateCreditWallet(userId: string) {
+  const prisma = await loadPrisma();
+  return prisma.creditWallet.upsert({
+    where: { userId },
+    create: { userId, balance: 0 },
+    update: {},
+    select: {
+      id: true,
+      userId: true,
+      balance: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
 }

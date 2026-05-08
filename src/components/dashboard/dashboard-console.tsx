@@ -50,6 +50,18 @@ type DashboardConsoleProps = {
     cancelReason: string | null;
     cancelReasonDetail: string | null;
   } | null;
+  creditWalletBalance: number;
+  creditTransactions: Array<{
+    id: string;
+    type: string;
+    status: string;
+    amountTwd: number | null;
+    credits: number;
+    balanceAfter: number | null;
+    packageCode: string | null;
+    description: string | null;
+    createdAt: string;
+  }>;
 };
 
 type CreditState = "normal" | "low" | "exhausted";
@@ -399,7 +411,14 @@ function renderSection(section: DashboardSection, props: DashboardConsoleProps) 
         />
       );
     }
-    if (props.currentPath === "/billing/credits") return <BillingCreditsPage />;
+    if (props.currentPath === "/billing/credits") {
+      return (
+        <BillingCreditsPage
+          walletBalance={props.creditWalletBalance}
+          transactions={props.creditTransactions}
+        />
+      );
+    }
     return <BillingLandingPage subscription={props.subscription} />;
   }
   if (section === "usage") return <UsagePageShell usageRequests={props.usageRequests} creditState={creditState} />;

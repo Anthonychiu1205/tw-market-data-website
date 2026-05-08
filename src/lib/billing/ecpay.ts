@@ -235,6 +235,35 @@ export function buildPeriodicCheckoutParams(input: {
   return params;
 }
 
+export function buildEcpayCreditsCheckoutPayload(input: {
+  merchantTradeNo: string;
+  amountTwd: number;
+  credits: number;
+  clientBackPath?: string;
+}) {
+  const { merchantId } = getRequiredEcpayConfig();
+  const siteUrl = getSiteUrl();
+
+  const params: Record<string, string> = {
+    MerchantID: merchantId,
+    MerchantTradeNo: input.merchantTradeNo,
+    MerchantTradeDate: formatEcpayTradeDate(),
+    PaymentType: "aio",
+    TotalAmount: String(input.amountTwd),
+    TradeDesc: "TW Market Data Credits",
+    ItemName: `TW Market Data Credits ${input.credits}`,
+    ReturnURL: `${siteUrl}/api/billing/ecpay/credits/notify`,
+    ClientBackURL: `${siteUrl}${input.clientBackPath ?? "/billing/credits"}`,
+    ChoosePayment: "Credit",
+    EncryptType: "1",
+    NeedExtraPaidInfo: "N",
+    Language: "CHT",
+  };
+
+  params.CheckMacValue = generateCheckMacValue(params);
+  return params;
+}
+
 export function buildPeriodActionParams(input: {
   merchantTradeNo: string;
   action: "Cancel";
@@ -259,6 +288,12 @@ export function renderAutoSubmitForm(
     planCode?: string;
     billingCycle?: string;
     amount?: number | string;
+    packageCode?: string;
+    credits?: number | string;
+    title?: string;
+    description?: string;
+    helperText?: string;
+    submitLabel?: string;
   },
 ) {
   const inputHtml = Object.entries(params)
@@ -284,6 +319,16 @@ export function renderAutoSubmitForm(
     diagnostics?.billingCycle ?? (params.PeriodType === "Y" ? "yearly" : "monthly"),
   );
   const planCode = htmlEscape(diagnostics?.planCode ?? "unknown");
+  const packageCode = htmlEscape(diagnostics?.packageCode ?? "");
+  const credits = htmlEscape(String(diagnostics?.credits ?? ""));
+  const title = htmlEscape(diagnostics?.title ?? "正在前往綠界付款頁面");
+  const description = htmlEscape(
+    diagnostics?.description ?? "系統會自動跳轉到綠界金流。若未自動跳轉，請點擊下方按鈕繼續。",
+  );
+  const helperText = htmlEscape(
+    diagnostics?.helperText ?? "提示：付款狀態以伺服器端 ReturnURL / PeriodReturnURL 通知為準。",
+  );
+  const submitLabel = htmlEscape(diagnostics?.submitLabel ?? "前往綠界付款");
 
   return `<!doctype html>
 <html lang="zh-Hant">
@@ -363,13 +408,13 @@ export function renderAutoSubmitForm(
 <body>
   <div class="container">
     <div class="panel">
-      <h1>正在前往綠界付款頁面</h1>
-      <p>系統會自動跳轉到綠界金流。若未自動跳轉，請點擊下方按鈕繼續。</p>
+      <h1>${title}</h1>
+      <p>${description}</p>
       <form id="ecpay-checkout-form" method="post" action="${escapedActionUrl}">
         ${inputHtml}
-        <button class="button" type="submit">前往綠界付款</button>
+        <button class="button" type="submit">${submitLabel}</button>
       </form>
-      <p class="helper">提示：付款狀態以伺服器端 ReturnURL / PeriodReturnURL 通知為準。</p>
+      <p class="helper">${helperText}</p>
       <div class="diagnostics" role="status" aria-live="polite">
         <div>ECPAY_ENV: <code>${htmlEscape(env)}</code></div>
         <div>checkoutUrl host: <code>${htmlEscape(checkoutHost)}</code></div>
@@ -377,7 +422,9 @@ export function renderAutoSubmitForm(
         <div>ChoosePayment: <code>${choosePayment}</code></div>
         <div>planCode: <code>${htmlEscape(planCode)}</code></div>
         <div>billingCycle: <code>${htmlEscape(billingCycle)}</code></div>
+        <div>packageCode: <code>${packageCode || "n/a"}</code></div>
         <div>TotalAmount: <code>${amount}</code></div>
+        <div>credits: <code>${credits || "n/a"}</code></div>
         <div>PeriodAmount: <code>${periodAmount}</code></div>
         <div>PeriodType: <code>${periodType}</code></div>
         <div>Frequency: <code>${frequency}</code></div>

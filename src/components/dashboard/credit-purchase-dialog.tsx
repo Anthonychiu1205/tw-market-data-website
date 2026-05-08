@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { buttonClass } from "@/src/components/ui/button";
 import {
@@ -13,10 +13,96 @@ import { cn } from "@/src/lib/cn";
 type CreditPurchaseDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCheckoutOpened?: (message: string) => void;
 };
 
-export function CreditPurchaseDialog({ open, onOpenChange }: CreditPurchaseDialogProps) {
+function renderWindowLoadingHtml() {
+  return `<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>準備付款中</title>
+  <style>
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif; background: #f8fafc; color: #0f172a; }
+    .container { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+    .panel { width: 100%; max-width: 520px; border-radius: 20px; border: 1px solid #e2e8f0; background: #fff; padding: 28px; }
+    h1 { margin: 0; font-size: 20px; font-weight: 650; }
+    p { margin: 10px 0 0; color: #475569; font-size: 14px; line-height: 1.7; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="panel">
+      <h1>準備付款中...</h1>
+      <p>正在建立綠界付款請求，請稍候。</p>
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+export function CreditPurchaseDialog({
+  open,
+  onOpenChange,
+  onCheckoutOpened,
+}: CreditPurchaseDialogProps) {
   const packages = useMemo(() => getCreditPackageViews(), []);
+  const [loadingPackageCode, setLoadingPackageCode] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  async function handleCheckout(packageCode: string) {
+    setErrorMessage(null);
+    setLoadingPackageCode(packageCode);
+
+    const checkoutWindow = window.open("", "_blank");
+    if (!checkoutWindow) {
+      setErrorMessage("無法開啟付款視窗，請允許彈出視窗後再試一次。");
+      setLoadingPackageCode(null);
+      return;
+    }
+
+    checkoutWindow.document.open();
+    checkoutWindow.document.write(renderWindowLoadingHtml());
+    checkoutWindow.document.close();
+
+    try {
+      const response = await fetch("/api/billing/ecpay/credits/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ packageCode }),
+      });
+
+      const html = await response.text();
+      checkoutWindow.document.open();
+      checkoutWindow.document.write(html);
+      checkoutWindow.document.close();
+
+      if (response.redirected && response.url.includes("/login")) {
+        setErrorMessage("登入已過期，請重新登入後再試一次。");
+        onCheckoutOpened?.("登入已過期，請重新登入後再試一次。");
+        return;
+      }
+
+      if (response.ok) {
+        const successMessage = "已開啟付款頁。付款完成後請回到此頁刷新餘額。";
+        onCheckoutOpened?.(successMessage);
+        onOpenChange(false);
+        return;
+      }
+
+      setErrorMessage("付款頁開啟失敗，請稍後再試。");
+      onCheckoutOpened?.("付款頁開啟失敗，請稍後再試。");
+    } catch {
+      checkoutWindow.close();
+      setErrorMessage("目前無法連線到付款服務，請稍後再試。");
+      onCheckoutOpened?.("付款頁開啟失敗，請稍後再試。");
+    } finally {
+      setLoadingPackageCode(null);
+    }
+  }
 
   if (!open) {
     return null;
@@ -84,24 +170,24 @@ export function CreditPurchaseDialog({ open, onOpenChange }: CreditPurchaseDialo
               </div>
               <button
                 type="button"
-                disabled
+                disabled={loadingPackageCode !== null}
+                onClick={() => handleCheckout(pkg.packageCode)}
                 className={cn(
                   buttonClass(
                     "primary",
                     "mt-4 h-10 w-full rounded-lg bg-slate-900 text-sm font-medium text-white transition-colors hover:bg-slate-800",
                   ),
-                  "cursor-not-allowed bg-slate-300 text-slate-600 opacity-70 hover:bg-slate-300",
+                  loadingPackageCode !== null &&
+                    "cursor-not-allowed bg-slate-300 text-slate-600 opacity-70 hover:bg-slate-300",
                 )}
               >
-                前往付款
+                {loadingPackageCode === pkg.packageCode ? "準備付款中..." : "前往付款"}
               </button>
             </div>
           ))}
         </div>
 
-        <p className="mt-4 text-xs text-slate-500">
-          付款功能即將開放，開通後可直接前往綠界完成付款。
-        </p>
+        {errorMessage ? <p className="mt-4 text-xs text-red-600">{errorMessage}</p> : null}
         <p className="mt-1 text-xs text-slate-500">
           注意：client 僅會提交 packageCode，付款金額與入帳 credits 一律由 server 端 catalog 驗證。
         </p>

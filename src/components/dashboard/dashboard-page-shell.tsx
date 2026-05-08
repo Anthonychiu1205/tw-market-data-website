@@ -12,6 +12,7 @@ import {
   getBillingDisplaySubscriptionForUser,
   getDashboardEntitlementForUser,
 } from "@/src/lib/billing/subscription";
+import { getCreditTransactionsForUser, getCreditWalletForUser } from "@/src/lib/billing/credits";
 
 type DashboardPageShellProps = {
   section: DashboardSection;
@@ -28,13 +29,27 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
     return null;
   });
 
-  const [account, billing, usage, usageRequests, apiKeys, billingDisplaySubscription] = await Promise.all([
+  const creditWalletPromise = getCreditWalletForUser(session.id).catch((error) => {
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    console.warn(`[dashboard] failed to fetch credit wallet (${errorName})`);
+    return null;
+  });
+
+  const creditTransactionsPromise = getCreditTransactionsForUser(session.id, 10).catch((error) => {
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    console.warn(`[dashboard] failed to fetch credit transactions (${errorName})`);
+    return [];
+  });
+
+  const [account, billing, usage, usageRequests, apiKeys, billingDisplaySubscription, creditWallet, creditTransactions] = await Promise.all([
     getAccountSummary(session.email),
     getBillingSummary(session.email),
     getUsageSummary(session.email),
     getUsageRequestRows(session.email),
     getApiKeysSummary(session.email),
     billingDisplaySubscriptionPromise,
+    creditWalletPromise,
+    creditTransactionsPromise,
   ]);
 
   const entitlement = await getDashboardEntitlementForUser({
@@ -69,6 +84,18 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
               }
             : null
         }
+        creditWalletBalance={creditWallet?.balance ?? 0}
+        creditTransactions={creditTransactions.map((item) => ({
+          id: item.id,
+          type: item.type,
+          status: item.status,
+          amountTwd: item.amountTwd,
+          credits: item.credits,
+          balanceAfter: item.balanceAfter,
+          packageCode: item.packageCode,
+          description: item.description,
+          createdAt: item.createdAt.toISOString(),
+        }))}
       />
     </div>
   );
