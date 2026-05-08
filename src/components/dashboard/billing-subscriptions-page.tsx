@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import {
   Activity,
@@ -49,8 +47,6 @@ type PlanItem = {
   featured?: boolean;
 };
 
-const CURRENT_PLAN: PlanId = "developer";
-
 const plans: PlanItem[] = [
   {
     id: "team",
@@ -72,7 +68,7 @@ const plans: PlanItem[] = [
       { text: "進階監控", icon: "cpu" },
     ],
     cta: "選擇團隊方案",
-    href: "/billing/subscriptions",
+    href: "/pricing",
     featured: true,
   },
   {
@@ -92,7 +88,7 @@ const plans: PlanItem[] = [
       { text: "優先更新頻率", icon: "sparkles" },
     ],
     cta: "選擇專業方案",
-    href: "/billing/subscriptions",
+    href: "/pricing",
   },
   {
     id: "developer",
@@ -109,7 +105,7 @@ const plans: PlanItem[] = [
       { text: "簡化 dataset breakdown", icon: "layers3" },
     ],
     cta: "選擇開發者方案",
-    href: "/billing/subscriptions",
+    href: "/pricing",
   },
 ];
 
@@ -132,7 +128,11 @@ const ICON_MAP = {
 const CARD_CTA_BASE_CLASS = "inline-flex h-12 w-full items-center justify-center rounded-2xl border px-5 text-sm font-medium transition-colors duration-150";
 const CARD_CTA_CLASS = `${CARD_CTA_BASE_CLASS} border-slate-200 bg-white text-slate-950 hover:border-slate-300 hover:bg-slate-50 active:bg-slate-100`;
 
-export function BillingSubscriptionsPage() {
+type BillingSubscriptionsPageProps = {
+  currentPlanId: PlanId | null;
+};
+
+export function BillingSubscriptionsPage({ currentPlanId }: BillingSubscriptionsPageProps) {
   return (
     <div className="py-8">
       <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 xl:grid-cols-3">
@@ -163,7 +163,7 @@ export function BillingSubscriptionsPage() {
                 <p className="text-sm font-normal leading-6 text-slate-600">{plan.summary}</p>
 
                 <div className="pt-2">
-                  {plan.id === CURRENT_PLAN ? (
+                  {plan.id === currentPlanId ? (
                     <button
                       type="button"
                       disabled

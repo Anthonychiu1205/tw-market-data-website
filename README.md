@@ -71,6 +71,11 @@ npm run build
 - Semantic execution / analytical response / agent workflow 屬逐步開放能力
 - Changelog 區塊為 placeholder
 
+## Billing Integration
+
+- ECPay periodic credit-card checkout is integrated for `/pricing` paid plans.
+- Setup and callback details: `docs/BILLING_ECPAY_SETUP.md`
+
 ## 產品敘事範圍
 
 本站內容反映：

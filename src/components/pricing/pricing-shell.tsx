@@ -470,7 +470,7 @@ export function PricingShell() {
                     <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{plan.usageMultiplier}</span>
                   </div>
 
-                  <div className="mt-10 min-h-[64px]">
+                <div className="mt-10 min-h-[64px]">
                     {plan.id === "enterprise" ? (
                       <>
                         <p className="whitespace-nowrap text-4xl font-medium tracking-tight text-slate-900">聯絡我們</p>
@@ -487,9 +487,19 @@ export function PricingShell() {
                   <p className="mt-6 text-sm font-normal leading-6 text-slate-600">{plan.summary}</p>
 
                   <div className="mt-auto pt-4">
-                    <Link href={plan.href} className={CARD_CTA_CLASS}>
-                      {plan.cta}
-                    </Link>
+                    {plan.id === "enterprise" ? (
+                      <Link href={plan.href} className={CARD_CTA_CLASS}>
+                        {plan.cta}
+                      </Link>
+                    ) : (
+                      <form action="/api/billing/ecpay/checkout" method="post">
+                        <input type="hidden" name="planCode" value={plan.id} />
+                        <input type="hidden" name="billingCycle" value={mode} />
+                        <button type="submit" className={CARD_CTA_CLASS}>
+                          {plan.cta}
+                        </button>
+                      </form>
+                    )}
                   </div>
                 </div>
 
@@ -510,12 +520,15 @@ export function PricingShell() {
                 {plan.id === "enterprise" ? (
                   <p className="mt-6 text-xs text-slate-500">可依團隊需求客製資料、配額與支援層級。</p>
                 ) : (
-                  <p className="mt-6 text-xs text-slate-500">可隨需求升級，維持同一套 API 介面。</p>
+                  <p className="mt-6 text-xs text-slate-500">信用卡定期扣款，可於帳務頁取消。</p>
                 )}
               </div>
             </article>
           ))}
         </div>
+        <p className="text-center text-xs text-slate-500">
+          本服務提供資料 API、工具與文件，不提供投資建議、個股推薦或交易訊號。
+        </p>
       </section>
 
       <section className="space-y-4 border-t border-slate-200 pt-8">

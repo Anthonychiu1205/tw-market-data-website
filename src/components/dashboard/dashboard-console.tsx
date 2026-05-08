@@ -32,6 +32,14 @@ type DashboardConsoleProps = {
   usage: UsageSummary;
   usageRequests: UsageRequestsSummary;
   apiKeys: ApiKeysSummary;
+  subscription: {
+    id: string;
+    planCode: string;
+    status: string;
+    billingCycle: string;
+    currentPeriodEnd: Date | null;
+    cancelAtPeriodEnd: boolean;
+  } | null;
 };
 
 type CreditState = "normal" | "low" | "exhausted";
@@ -308,9 +316,15 @@ function renderSection(section: DashboardSection, props: DashboardConsoleProps) 
     return <OverviewPanel account={props.account} usage={props.usage} apiKeys={props.apiKeys} creditState={creditState} />;
   }
   if (section === "billing") {
-    if (props.currentPath === "/billing/subscriptions") return <BillingSubscriptionsPage />;
+    if (props.currentPath === "/billing/subscriptions") {
+      const currentPlanId = props.subscription?.planCode;
+      if (currentPlanId === "developer" || currentPlanId === "pro" || currentPlanId === "team") {
+        return <BillingSubscriptionsPage currentPlanId={currentPlanId} />;
+      }
+      return <BillingSubscriptionsPage currentPlanId={null} />;
+    }
     if (props.currentPath === "/billing/credits") return <BillingCreditsPage />;
-    return <BillingLandingPage />;
+    return <BillingLandingPage subscription={props.subscription} />;
   }
   if (section === "usage") return <UsagePageShell usageRequests={props.usageRequests} creditState={creditState} />;
   if (section === "keys") return <KeysPanel apiKeys={props.apiKeys} />;

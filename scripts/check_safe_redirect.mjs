@@ -3,6 +3,7 @@ import { getSafeRedirectTarget } from "../src/lib/security/safe-redirect-impl.mj
 const cases = [
   ["/dashboard", "/dashboard"],
   ["/dashboard/settings", "/dashboard/settings"],
+  ["/pricing?plan=developer&billingCycle=monthly", "/pricing?plan=developer&billingCycle=monthly"],
   ["https://evil.com", "/dashboard"],
   ["//evil.com", "/dashboard"],
   ["%2F%2Fevil.com", "/dashboard"],

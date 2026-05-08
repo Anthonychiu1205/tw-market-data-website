@@ -1,6 +1,6 @@
 const DEFAULT_FALLBACK = "/dashboard";
 
-const ALLOWED_BASE_PATHS = ["/dashboard", "/account", "/billing", "/usage", "/settings"];
+const ALLOWED_BASE_PATHS = ["/dashboard", "/account", "/billing", "/usage", "/settings", "/pricing"];
 
 function normalizeRawValue(input) {
   if (!input) return "";

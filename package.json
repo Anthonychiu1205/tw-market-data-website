@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "check:safe-redirect": "node scripts/check_safe_redirect.mjs",
+    "check:ecpay-checkmac": "node scripts/check_ecpay_checkmac.mjs",
     "check:public-secrets": "node scripts/check_no_demo_credentials_in_public_build.mjs",
     "check:email-auth-security": "node scripts/check_email_auth_security.mjs"
   },

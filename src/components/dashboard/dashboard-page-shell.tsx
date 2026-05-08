@@ -8,6 +8,7 @@ import {
   getUsageRequestRows,
   getUsageSummary,
 } from "@/src/lib/backend-adapter";
+import { getLatestSubscriptionForUser } from "@/src/lib/billing/subscription";
 
 type DashboardPageShellProps = {
   section: DashboardSection;
@@ -18,12 +19,13 @@ type DashboardPageShellProps = {
 export async function DashboardPageShell({ section, currentPath, currentHref }: DashboardPageShellProps) {
   const session = await getRequiredSession();
 
-  const [account, billing, usage, usageRequests, apiKeys] = await Promise.all([
+  const [account, billing, usage, usageRequests, apiKeys, subscription] = await Promise.all([
     getAccountSummary(session.email),
     getBillingSummary(session.email),
     getUsageSummary(session.email),
     getUsageRequestRows(session.email),
     getApiKeysSummary(session.email),
+    getLatestSubscriptionForUser(session.id),
   ]);
 
   return (
@@ -38,6 +40,18 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
         usage={usage}
         usageRequests={usageRequests}
         apiKeys={apiKeys}
+        subscription={
+          subscription
+            ? {
+                id: subscription.id,
+                planCode: subscription.planCode,
+                status: subscription.status,
+                billingCycle: subscription.billingCycle,
+                currentPeriodEnd: subscription.currentPeriodEnd,
+                cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+              }
+            : null
+        }
       />
     </div>
   );
