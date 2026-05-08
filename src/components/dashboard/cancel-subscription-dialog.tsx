@@ -32,7 +32,7 @@ type CancelSubscriptionDialogProps = {
 };
 
 function isCancelableStatus(status: string) {
-  return ["active", "pending", "trialing", "paid"].includes(status);
+  return status === "active";
 }
 
 export function CancelSubscriptionDialog({ subscription }: CancelSubscriptionDialogProps) {
@@ -90,14 +90,6 @@ export function CancelSubscriptionDialog({ subscription }: CancelSubscriptionDia
 
   return (
     <div className="mt-5 space-y-3">
-      {subscription.cancelAtPeriodEnd ? (
-        <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          {subscription.currentPeriodEnd
-            ? "已排定取消，服務可使用至目前週期結束。"
-            : "已排定取消，系統將依付款狀態更新使用期限。"}
-        </p>
-      ) : null}
-
       {successMessage ? (
         <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
           {successMessage}

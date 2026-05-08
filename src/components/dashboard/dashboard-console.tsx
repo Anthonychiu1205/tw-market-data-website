@@ -321,9 +321,35 @@ function renderSection(section: DashboardSection, props: DashboardConsoleProps) 
     if (props.currentPath === "/billing/subscriptions") {
       const currentPlanId = props.subscription?.planCode;
       if (currentPlanId === "developer" || currentPlanId === "pro" || currentPlanId === "team") {
-        return <BillingSubscriptionsPage currentPlanId={currentPlanId} />;
+        return (
+          <BillingSubscriptionsPage
+            currentPlanId={currentPlanId}
+            subscription={
+              props.subscription
+                ? {
+                    status: props.subscription.status,
+                    cancelAtPeriodEnd: props.subscription.cancelAtPeriodEnd,
+                    currentPeriodEnd: props.subscription.currentPeriodEnd,
+                  }
+                : null
+            }
+          />
+        );
       }
-      return <BillingSubscriptionsPage currentPlanId={null} />;
+      return (
+        <BillingSubscriptionsPage
+          currentPlanId={null}
+          subscription={
+            props.subscription
+              ? {
+                  status: props.subscription.status,
+                  cancelAtPeriodEnd: props.subscription.cancelAtPeriodEnd,
+                  currentPeriodEnd: props.subscription.currentPeriodEnd,
+                }
+              : null
+          }
+        />
+      );
     }
     if (props.currentPath === "/billing/credits") return <BillingCreditsPage />;
     return <BillingLandingPage subscription={props.subscription} />;

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ComponentType } from "react";
 import {
   Activity,
   BarChart3,
@@ -16,100 +17,21 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/src/lib/cn";
+import {
+  formatPlanCurrency,
+  getBillingSubscriptionPlanViews,
+  type PlanCode,
+  type PlanHighlightIcon,
+} from "@/src/lib/billing/plans";
+import {
+  getSubscriptionStatusDescription,
+  getSubscriptionStatusLabel,
+  getSubscriptionStatusTone,
+  isPendingAuthorization,
+  needsPlanRetryAction,
+} from "@/src/lib/billing/status";
 
-type PlanId = "team" | "pro" | "developer";
-
-type PlanItem = {
-  id: PlanId;
-  name: string;
-  summary: string;
-  monthly: string;
-  usageMultiplier: string;
-  highlights: Array<{
-    text: string;
-    icon:
-      | "database"
-      | "key"
-      | "gauge"
-      | "activity"
-      | "layers3"
-      | "shield"
-      | "barChart3"
-      | "clock3"
-      | "users"
-      | "cpu"
-      | "workflow"
-      | "zap"
-      | "sparkles";
-  }>;
-  cta: string;
-  href: string;
-  featured?: boolean;
-};
-
-const plans: PlanItem[] = [
-  {
-    id: "team",
-    name: "Team",
-    summary: "全量資料與團隊級用量。",
-    monthly: "NT$6,000",
-    usageMultiplier: "20x",
-    highlights: [
-      { text: "全部 26 個資料集", icon: "database" },
-      { text: "API Keys 10", icon: "key" },
-      { text: "RPM 600", icon: "gauge" },
-      { text: "每日 20,000 / 每月 500,000", icon: "activity" },
-      { text: "高頻 API 存取", icon: "zap" },
-      { text: "團隊協作支援", icon: "users" },
-      { text: "多 API key 管理", icon: "workflow" },
-      { text: "低延遲資料更新", icon: "clock3" },
-      { text: "團隊 usage 管理", icon: "layers3" },
-      { text: "優先支援", icon: "shield" },
-      { text: "進階監控", icon: "cpu" },
-    ],
-    cta: "選擇團隊方案",
-    href: "/pricing",
-    featured: true,
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    summary: "進階資料與正式商業使用。",
-    monthly: "NT$1,490",
-    usageMultiplier: "5x",
-    highlights: [
-      { text: "20 個資料集可用", icon: "database" },
-      { text: "API Keys 5", icon: "key" },
-      { text: "RPM 120", icon: "gauge" },
-      { text: "每日 4,000 / 每月 100,000", icon: "activity" },
-      { text: "商業使用", icon: "shield" },
-      { text: "API key usage insights", icon: "barChart3" },
-      { text: "歷史資料存取", icon: "clock3" },
-      { text: "優先更新頻率", icon: "sparkles" },
-    ],
-    cta: "選擇專業方案",
-    href: "/pricing",
-  },
-  {
-    id: "developer",
-    name: "Developer",
-    summary: "開發驗證與輕量整合。",
-    monthly: "NT$690",
-    usageMultiplier: "1x",
-    highlights: [
-      { text: "10 個資料集可用", icon: "database" },
-      { text: "API Keys 2", icon: "key" },
-      { text: "RPM 30", icon: "gauge" },
-      { text: "每日 800 / 每月 20,000", icon: "activity" },
-      { text: "基本使用量監控", icon: "barChart3" },
-      { text: "簡化 dataset breakdown", icon: "layers3" },
-    ],
-    cta: "選擇開發者方案",
-    href: "/pricing",
-  },
-];
-
-const ICON_MAP = {
+const ICON_MAP: Record<PlanHighlightIcon, ComponentType<{ size?: number; strokeWidth?: number }>> = {
   database: Database,
   key: KeyRound,
   gauge: Gauge,
@@ -123,22 +45,86 @@ const ICON_MAP = {
   workflow: Workflow,
   zap: Zap,
   sparkles: Sparkles,
-} as const;
+  briefcase: Users,
+  headphones: Shield,
+  server: Cpu,
+};
 
 const CARD_CTA_BASE_CLASS = "inline-flex h-12 w-full items-center justify-center rounded-2xl border px-5 text-sm font-medium transition-colors duration-150";
 const CARD_CTA_CLASS = `${CARD_CTA_BASE_CLASS} border-slate-200 bg-white text-slate-950 hover:border-slate-300 hover:bg-slate-50 active:bg-slate-100`;
 
 type BillingSubscriptionsPageProps = {
-  currentPlanId: PlanId | null;
+  currentPlanId: Exclude<PlanCode, "enterprise"> | null;
+  subscription: {
+    status: string;
+    cancelAtPeriodEnd: boolean;
+    currentPeriodEnd: Date | null;
+  } | null;
 };
 
-export function BillingSubscriptionsPage({ currentPlanId }: BillingSubscriptionsPageProps) {
+function getToneClass(tone: ReturnType<typeof getSubscriptionStatusTone>) {
+  if (tone === "success") return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  if (tone === "info") return "border-sky-200 bg-sky-50 text-sky-700";
+  if (tone === "warning") return "border-amber-200 bg-amber-50 text-amber-800";
+  if (tone === "danger") return "border-red-200 bg-red-50 text-red-700";
+  return "border-slate-200 bg-slate-50 text-slate-700";
+}
+
+export function BillingSubscriptionsPage({ currentPlanId, subscription }: BillingSubscriptionsPageProps) {
+  const plans = getBillingSubscriptionPlanViews();
+  const statusLabel = subscription
+    ? getSubscriptionStatusLabel(subscription.status, subscription.cancelAtPeriodEnd)
+    : null;
+  const statusDescription = subscription
+    ? getSubscriptionStatusDescription({
+        status: subscription.status,
+        cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+        currentPeriodEnd: subscription.currentPeriodEnd,
+      })
+    : null;
+  const statusTone = subscription
+    ? getSubscriptionStatusTone(subscription.status, subscription.cancelAtPeriodEnd)
+    : null;
+  const showPendingHint = subscription ? isPendingAuthorization(subscription.status) : false;
+  const showRetryAction = subscription ? needsPlanRetryAction(subscription.status) : false;
+
   return (
     <div className="py-8">
+      {subscription && statusLabel && statusDescription && statusTone ? (
+        <section className={`mb-5 rounded-2xl border px-4 py-3 ${getToneClass(statusTone)}`}>
+          <p className="text-sm font-medium">目前狀態：{statusLabel}</p>
+          <p className="mt-1 text-sm">{statusDescription}</p>
+          {showPendingHint ? (
+            <Link
+              href="/billing"
+              className="mt-3 inline-flex h-9 items-center rounded-lg border border-current/20 px-3 text-xs font-medium transition hover:bg-white/50"
+            >
+              付款確認中，請稍候
+            </Link>
+          ) : null}
+          {showRetryAction ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                href="/pricing"
+                className="inline-flex h-9 items-center rounded-lg border border-current/20 px-3 text-xs font-medium transition hover:bg-white/50"
+              >
+                重新選擇方案
+              </Link>
+              <Link
+                href="/contact"
+                className="inline-flex h-9 items-center rounded-lg border border-current/20 px-3 text-xs font-medium transition hover:bg-white/50"
+              >
+                聯繫我們
+              </Link>
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+
       <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 xl:grid-cols-3">
         {plans.map((plan) => (
           <article
-            key={plan.id}
+            key={plan.planCode}
             className={cn(
               "h-full min-h-[600px] rounded-2xl border bg-white p-6 sm:p-7",
               plan.featured ? "border-slate-900" : "border-slate-200",
@@ -147,7 +133,7 @@ export function BillingSubscriptionsPage({ currentPlanId }: BillingSubscriptions
             <div className="flex h-full flex-col">
               <div className="flex-1 space-y-6">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="text-[1.65rem] font-medium tracking-tight text-slate-900">{plan.name}</h3>
+                  <h3 className="text-[1.65rem] font-medium tracking-tight text-slate-900">{plan.displayName}</h3>
                   <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
                     {plan.usageMultiplier}
                   </span>
@@ -155,7 +141,7 @@ export function BillingSubscriptionsPage({ currentPlanId }: BillingSubscriptions
 
                 <div className="pt-1">
                   <p className="whitespace-nowrap text-4xl font-medium tracking-tight text-slate-900">
-                    {plan.monthly}
+                    {formatPlanCurrency(plan.monthlyAmount)}
                     <span className="ml-1.5 inline-block align-baseline text-sm font-normal text-slate-400"> / 月</span>
                   </p>
                 </div>
@@ -163,7 +149,7 @@ export function BillingSubscriptionsPage({ currentPlanId }: BillingSubscriptions
                 <p className="text-sm font-normal leading-6 text-slate-600">{plan.summary}</p>
 
                 <div className="pt-2">
-                  {plan.id === currentPlanId ? (
+                  {plan.planCode === currentPlanId ? (
                     <button
                       type="button"
                       disabled
@@ -175,8 +161,8 @@ export function BillingSubscriptionsPage({ currentPlanId }: BillingSubscriptions
                       目前方案
                     </button>
                   ) : (
-                    <Link href={plan.href} className={CARD_CTA_CLASS}>
-                      {plan.cta}
+                    <Link href="/pricing" className={CARD_CTA_CLASS}>
+                      {plan.ctaLabel}
                     </Link>
                   )}
                 </div>
@@ -185,7 +171,7 @@ export function BillingSubscriptionsPage({ currentPlanId }: BillingSubscriptions
                   {plan.highlights.map((item) => {
                     const Icon = ICON_MAP[item.icon];
                     return (
-                      <li key={`${plan.id}-${item.text}`} className="flex items-start gap-3">
+                      <li key={`${plan.planCode}-${item.text}`} className="flex items-start gap-3">
                         <span className="mt-0.5 inline-flex h-5 w-5 items-center justify-center text-slate-400">
                           <Icon size={15} strokeWidth={1.65} />
                         </span>
