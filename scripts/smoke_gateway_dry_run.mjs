@@ -21,9 +21,23 @@ async function extractErrorCode(response) {
   }
 }
 
+async function extractErrorPayload(response) {
+  try {
+    const body = await response.clone().json();
+    return {
+      code: typeof body?.error?.code === "string" ? body.error.code : "-",
+      message: typeof body?.error?.message === "string" ? body.error.message : "-",
+      requestId: typeof body?.requestId === "string" ? body.requestId : "-",
+    };
+  } catch {
+    return { code: "-", message: "-", requestId: "-" };
+  }
+}
+
 async function runRequest(label, url, options = {}) {
   const response = await fetch(url, options);
   const errorCode = await extractErrorCode(response);
+  const errorPayload = await extractErrorPayload(response);
 
   console.log(`\n[${label}]`);
   console.log(`status=${response.status}`);
@@ -33,13 +47,20 @@ async function runRequest(label, url, options = {}) {
   console.log(`x-twmd-credits-cost=${readHeader(response.headers, "x-twmd-credits-cost")}`);
   console.log(`x-twmd-dry-run=${readHeader(response.headers, "x-twmd-dry-run")}`);
   console.log(`content-type=${readHeader(response.headers, "content-type")}`);
+  if (response.status >= 500) {
+    console.log(`error.message=${errorPayload.message}`);
+    console.log(`error.requestId=${errorPayload.requestId}`);
+  }
 
   return {
     status: response.status,
     errorCode,
     requestId: readHeader(response.headers, "x-request-id"),
+    plan: readHeader(response.headers, "x-twmd-plan"),
     creditsCost: readHeader(response.headers, "x-twmd-credits-cost"),
     dryRun: readHeader(response.headers, "x-twmd-dry-run"),
+    bodyRequestId: errorPayload.requestId,
+    bodyMessage: errorPayload.message,
   };
 }
 
@@ -92,24 +113,54 @@ async function main() {
   if (missingKeyResult.status !== 401 || missingKeyResult.errorCode !== "invalid_api_key") {
     failures.push("missing-key should return 401 invalid_api_key");
   }
+  if (missingKeyResult.requestId === "-") {
+    failures.push("missing-key response should include X-Request-Id");
+  }
 
   if (unsupportedResult.status !== 404 || unsupportedResult.errorCode !== "dataset_not_found") {
     failures.push("unsupported-dataset should return 404 dataset_not_found");
+  }
+  if (unsupportedResult.requestId === "-") {
+    failures.push("unsupported-dataset response should include X-Request-Id");
   }
 
   if (malformedResult.status !== 401 || malformedResult.errorCode !== "invalid_api_key") {
     failures.push("malformed-key should return 401 invalid_api_key");
   }
+  if (malformedResult.requestId === "-") {
+    failures.push("malformed-key response should include X-Request-Id");
+  }
 
   if (validResult.dryRun !== "true" || validResult.requestId === "-" || validResult.creditsCost === "-") {
-    failures.push("valid-key should include dry-run gateway headers");
+    failures.push("valid-key should include X-Request-Id, X-TWMD-Dry-Run, and X-TWMD-Credits-Cost");
+  }
+
+  if (validResult.requestId === "-") {
+    failures.push("valid-key response should always include X-Request-Id");
   }
 
   if (validResult.status === 502 || validResult.status === 504) {
     console.log("[WARN] gateway-auth-ok-upstream-failed");
   } else if (validResult.status === 401 || validResult.status === 403) {
     failures.push("valid-key request should not return auth failure");
+  } else if (validResult.status >= 500) {
+    failures.push("valid-key request returned 5xx; inspect requestId/stage in server logs");
   }
+
+  console.log("\n[SUMMARY]");
+  console.log(
+    `valid-key: status=${validResult.status} code=${validResult.errorCode} requestId=${validResult.requestId} dryRun=${validResult.dryRun} plan=${validResult.plan} credits=${validResult.creditsCost}`,
+  );
+  console.log(
+    `missing-key: status=${missingKeyResult.status} code=${missingKeyResult.errorCode} requestId=${missingKeyResult.requestId}`,
+  );
+  console.log(
+    `malformed-key: status=${malformedResult.status} code=${malformedResult.errorCode} requestId=${malformedResult.requestId}`,
+  );
+  console.log(
+    `unsupported-dataset: status=${unsupportedResult.status} code=${unsupportedResult.errorCode} requestId=${unsupportedResult.requestId}`,
+  );
+  console.log("revoked-key: not covered by default smoke (requires dedicated revoked key)");
 
   if (failures.length > 0) {
     console.error("\n[FAILED]");

@@ -32,21 +32,35 @@ export async function authenticateApiKey(request: Request): Promise<GatewayAuthC
   const rawApiKey = parseApiKeyFromRequest(request);
   const keyHash = hashApiKey(rawApiKey);
 
-  const apiKey = await prisma.apiKey.findUnique({
-    where: { keyHash },
-    select: {
-      id: true,
-      userId: true,
-      status: true,
-      keyPrefix: true,
-      lastUsedAt: true,
-      user: {
-        select: {
-          email: true,
+  let apiKey: {
+    id: string;
+    userId: string;
+    status: string;
+    keyPrefix: string;
+    lastUsedAt: Date | null;
+    user: { email: string | null };
+  } | null = null;
+  try {
+    apiKey = await prisma.apiKey.findUnique({
+      where: { keyHash },
+      select: {
+        id: true,
+        userId: true,
+        status: true,
+        keyPrefix: true,
+        lastUsedAt: true,
+        user: {
+          select: {
+            email: true,
+          },
         },
       },
-    },
-  });
+    });
+  } catch {
+    throw new GatewayHttpError(500, "internal_error", "API key lookup failed.", {
+      stage: "auth_lookup",
+    });
+  }
 
   if (!apiKey) {
     throw new GatewayHttpError(401, "invalid_api_key");
@@ -56,6 +70,7 @@ export async function authenticateApiKey(request: Request): Promise<GatewayAuthC
     throw new GatewayHttpError(403, "api_key_revoked", undefined, {
       userId: apiKey.userId,
       apiKeyId: apiKey.id,
+      stage: "auth_lookup",
     });
   }
 

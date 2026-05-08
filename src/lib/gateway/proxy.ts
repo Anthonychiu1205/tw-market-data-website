@@ -22,7 +22,9 @@ export type ProxyDatasetResult = {
 function resolveBackendBaseUrl() {
   const rawBaseUrl = process.env.BACKEND_API_BASE_URL?.trim();
   if (!rawBaseUrl) {
-    throw new GatewayHttpError(500, "internal_error");
+    throw new GatewayHttpError(502, "upstream_error", "Backend base URL is not configured.", {
+      stage: "proxy",
+    });
   }
   return rawBaseUrl.replace(/\/$/, "");
 }
@@ -101,11 +103,13 @@ export async function proxyDatasetRequest(input: ProxyDatasetRequestInput): Prom
     };
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
-      throw new GatewayHttpError(504, "upstream_timeout");
+      throw new GatewayHttpError(504, "upstream_timeout", undefined, { stage: "proxy" });
     }
-    throw new GatewayHttpError(502, "upstream_error");
+    if (error instanceof GatewayHttpError) {
+      throw error;
+    }
+    throw new GatewayHttpError(502, "upstream_error", undefined, { stage: "proxy" });
   } finally {
     clearTimeout(timeoutId);
   }
 }
-

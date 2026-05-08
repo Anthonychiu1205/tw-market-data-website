@@ -1,6 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/src/lib/auth/prisma";
+import { sanitizeGatewayErrorMessage } from "@/src/lib/gateway/errors";
 
 type CreateApiUsageEventInput = {
   userId: string;
@@ -53,7 +54,13 @@ export async function createApiUsageEvent(input: CreateApiUsageEventInput) {
     });
   } catch (error) {
     const errorName = error instanceof Error ? error.name : "UnknownError";
-    console.warn(`[gateway-usage] failed to write usage event (${errorName})`);
+    const sanitizedMessage = sanitizeGatewayErrorMessage(error);
+    console.warn("[gateway]", {
+      requestId: input.requestId,
+      stage: "usage_logging",
+      errorName,
+      message: sanitizedMessage,
+    });
   }
 }
 

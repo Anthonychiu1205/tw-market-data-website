@@ -1,7 +1,7 @@
 import "server-only";
 
 import { getActiveSubscriptionForUser } from "@/src/lib/billing/subscription";
-import { GatewayHttpError } from "@/src/lib/gateway/errors";
+import { GatewayHttpError, sanitizeGatewayErrorMessage } from "@/src/lib/gateway/errors";
 import { isPlanAllowed, normalizePlanCode, type DatasetPolicy, type GatewayPlanCode } from "@/src/lib/gateway/policies";
 
 export type GatewayEntitlementResult = {
@@ -20,12 +20,24 @@ function isPublicApiFreeTierEnabled() {
 }
 
 export async function resolveUserPlanCode(userId: string): Promise<{ planCode: GatewayPlanCode; source: "subscription" | "fallback" }> {
-  const activeSubscription = await getActiveSubscriptionForUser(userId);
-  if (activeSubscription) {
-    return {
-      planCode: normalizePlanCode(activeSubscription.planCode),
-      source: "subscription",
-    };
+  try {
+    const activeSubscription = await getActiveSubscriptionForUser(userId);
+    if (activeSubscription) {
+      return {
+        planCode: normalizePlanCode(activeSubscription.planCode),
+        source: "subscription",
+      };
+    }
+  } catch (error) {
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    const message = sanitizeGatewayErrorMessage(error);
+    console.warn("[gateway]", {
+      requestId: "n/a",
+      stage: "entitlement",
+      errorName,
+      message,
+    });
+    // Fail-open to free tier for gateway reads; avoids internal errors when subscription storage is unavailable.
   }
 
   return {
