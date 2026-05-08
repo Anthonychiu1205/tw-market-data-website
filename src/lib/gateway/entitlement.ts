@@ -11,6 +11,14 @@ export type GatewayEntitlementResult = {
   source: "subscription" | "fallback";
 };
 
+function isPublicApiFreeTierEnabled() {
+  const raw = process.env.PUBLIC_API_FREE_TIER_ENABLED?.trim().toLowerCase();
+  if (!raw) {
+    return true;
+  }
+  return raw === "1" || raw === "true" || raw === "yes" || raw === "on";
+}
+
 export async function resolveUserPlanCode(userId: string): Promise<{ planCode: GatewayPlanCode; source: "subscription" | "fallback" }> {
   const activeSubscription = await getActiveSubscriptionForUser(userId);
   if (activeSubscription) {
@@ -31,6 +39,10 @@ export async function assertDatasetEntitlement(input: {
   datasetPolicy: DatasetPolicy;
 }): Promise<GatewayEntitlementResult> {
   const resolved = await resolveUserPlanCode(input.userId);
+  if (resolved.planCode === "free" && !isPublicApiFreeTierEnabled()) {
+    throw new GatewayHttpError(403, "plan_not_entitled");
+  }
+
   const datasetAllowed = isPlanAllowed(resolved.planCode, input.datasetPolicy.requiredPlan);
 
   if (!datasetAllowed) {
@@ -44,4 +56,3 @@ export async function assertDatasetEntitlement(input: {
     source: resolved.source,
   };
 }
-

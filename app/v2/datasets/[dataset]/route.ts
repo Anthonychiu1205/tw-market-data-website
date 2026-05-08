@@ -90,6 +90,10 @@ export async function GET(request: Request, context: Context) {
       userEmail: authContext.userEmail,
     });
 
+    if (upstream.status >= 500) {
+      throw new GatewayHttpError(502, "upstream_error");
+    }
+
     const headers = new Headers(upstream.headers);
     applyGatewayHeaders(headers, {
       requestId,
@@ -155,4 +159,3 @@ export async function GET(request: Request, context: Context) {
     });
   }
 }
-

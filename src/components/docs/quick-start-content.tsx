@@ -206,6 +206,9 @@ export function QuickStartContent() {
           <p className="text-xs text-slate-500">
             回應 headers 會包含 X-TWMD-Plan、X-TWMD-Credits-Cost、X-TWMD-Dry-Run 與 X-Request-Id。
           </p>
+          <p className="text-xs text-slate-500">
+            此階段為 dry-run，不會扣除 credits。常見錯誤碼包含 invalid_api_key、plan_not_entitled 與 dataset_not_found。
+          </p>
         </div>
       </section>
 

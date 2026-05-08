@@ -62,6 +62,25 @@ Current phase behavior:
 - Request is proxied to backend with internal credentials.
 - Metering is dry-run only (no credit deduction, no usage ledger write).
 
+### Gateway Dry-Run Smoke Test
+
+Set local test env (do not commit real keys):
+
+- `GATEWAY_SMOKE_BASE_URL` (default `http://localhost:3000`)
+- `GATEWAY_SMOKE_API_KEY` (a real key created from dashboard)
+
+Run:
+
+```bash
+npm run smoke:gateway-dry-run
+```
+
+Expected checks:
+
+- valid key + supported dataset returns upstream response
+- missing key returns `401 invalid_api_key`
+- unsupported dataset returns `404 dataset_not_found`
+
 ### Standardized Error Shape
 
 ```json
@@ -81,8 +100,19 @@ Current phase behavior:
 - `X-TWMD-Credits-Cost`
 - `X-TWMD-Dry-Run`
 
+### Error Codes
+
+- `401 invalid_api_key`
+- `403 api_key_revoked`
+- `403 plan_not_entitled`
+- `404 dataset_not_found`
+- `504 upstream_timeout`
+- `502 upstream_error`
+- `500 internal_error`
+
 ## Notes
 
 - API key lifecycle is local and production-safe (hash-only storage).
 - Public gateway is currently skeleton mode with dry-run metering.
 - Credits deduction and usage DB logging are not enabled in this phase.
+- `PUBLIC_API_FREE_TIER_ENABLED` can control whether free-tier API access is allowed in this dry-run phase (default enabled).
