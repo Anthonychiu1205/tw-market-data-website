@@ -3,7 +3,6 @@ import { DashboardConsole } from "@/src/components/dashboard/dashboard-console";
 import { type DashboardSection } from "@/src/content/dashboard";
 import {
   getAccountSummary,
-  getApiKeysSummary,
   getBillingSummary,
   getUsageRequestRows,
   getUsageSummary,
@@ -13,6 +12,7 @@ import {
   getDashboardEntitlementForUser,
 } from "@/src/lib/billing/subscription";
 import { getCreditTransactionsForUser, getCreditWalletForUser } from "@/src/lib/billing/credits";
+import { getApiKeysSummaryForUser } from "@/src/lib/api-keys/service";
 
 type DashboardPageShellProps = {
   section: DashboardSection;
@@ -46,7 +46,7 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
     getBillingSummary(session.email),
     getUsageSummary(session.email),
     getUsageRequestRows(session.email),
-    getApiKeysSummary(session.email),
+    getApiKeysSummaryForUser(session.id),
     billingDisplaySubscriptionPromise,
     creditWalletPromise,
     creditTransactionsPromise,

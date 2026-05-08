@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useState } from "react";
 
 import type { ApiKeyItem } from "@/src/lib/backend-adapter";
 import { buttonClass } from "@/src/components/ui/button";
@@ -12,17 +12,38 @@ type ApiKeysManagerProps = {
   canRevoke: boolean;
 };
 
+type CreateApiKeyResponse = {
+  apiKey: ApiKeyItem;
+  secret: string;
+  message?: string;
+};
+
+function formatDateTime(raw: string | null | undefined) {
+  if (!raw || raw === "-") return "—";
+  const date = new Date(raw);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+}
+
 export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysManagerProps) {
-  const issuanceEnabled = false;
   const [keys, setKeys] = useState(initialKeys);
   const [newKeyName, setNewKeyName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [createdPlainKey, setCreatedPlainKey] = useState<string | null>(null);
+  const [createdSecret, setCreatedSecret] = useState<string | null>(null);
+  const [createdSecretApiKey, setCreatedSecretApiKey] = useState<ApiKeyItem | null>(null);
+  const [secretCopied, setSecretCopied] = useState(false);
 
-  const canSubmit = issuanceEnabled && canCreate && !isSubmitting;
+  const canSubmit = canCreate && !isSubmitting;
   const hasKeys = keys.length > 0;
 
   function publishKeysUpdate(nextKeys: ApiKeyItem[]) {
@@ -36,7 +57,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
 
     setIsSubmitting(true);
     setErrorMessage(null);
-    setCreatedPlainKey(null);
+    setSecretCopied(false);
 
     try {
       const response = await fetch("/api/dashboard/api-keys", {
@@ -45,69 +66,100 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: newKeyName.trim() || undefined,
+          name: newKeyName.trim(),
         }),
       });
 
-      if (!response.ok) {
+      const payload = (await response.json().catch(() => null)) as CreateApiKeyResponse & { error?: string } | null;
+
+      if (!response.ok || !payload?.apiKey || !payload.secret) {
+        if (payload?.error === "invalid_api_key_name") {
+          throw new Error("invalid_api_key_name");
+        }
+        if (payload?.error === "api_key_limit_reached") {
+          throw new Error("api_key_limit_reached");
+        }
         throw new Error("create_failed");
       }
 
-      const payload = (await response.json()) as {
-        key: ApiKeyItem;
-        plainTextKey?: string;
+      const nextKey: ApiKeyItem = {
+        ...payload.apiKey,
+        keyValue: payload.secret,
+        lastUsed: payload.apiKey.lastUsed ?? "-",
       };
 
       setKeys((prev) => {
-        const next = [payload.key, ...prev];
+        const next = [nextKey, ...prev];
         publishKeysUpdate(next);
         return next;
       });
+      setCreatedSecret(payload.secret);
+      setCreatedSecretApiKey(nextKey);
       setNewKeyName("");
-      setCreatedPlainKey(payload.plainTextKey ?? null);
       setIsModalOpen(false);
-    } catch {
-      setErrorMessage("目前無法建立金鑰，請稍後再試。");
+    } catch (error) {
+      if (error instanceof Error && error.message === "invalid_api_key_name") {
+        setErrorMessage("請輸入 1 到 40 字的金鑰名稱。");
+      } else if (error instanceof Error && error.message === "api_key_limit_reached") {
+        setErrorMessage("目前最多只能保留 5 把啟用中的 API 金鑰。");
+      } else {
+        setErrorMessage("目前無法建立金鑰，請稍後再試。");
+      }
     } finally {
       setIsSubmitting(false);
     }
   }
 
-  async function handleDeleteKey(keyId: string) {
-    if (!canRevoke || isSubmitting) return;
+  async function handleRevokeKey(item: ApiKeyItem) {
+    if (!canRevoke || isSubmitting || item.status === "revoked") return;
+
+    const confirmed = window.confirm(`確定要撤銷 API 金鑰「${item.name}」嗎？撤銷後不可恢復。`);
+    if (!confirmed) return;
 
     setIsSubmitting(true);
     setErrorMessage(null);
 
     try {
-      const response = await fetch(`/api/dashboard/api-keys/${encodeURIComponent(keyId)}`, {
+      const response = await fetch(`/api/dashboard/api-keys/${encodeURIComponent(item.id)}`, {
         method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error("delete_failed");
+        throw new Error("revoke_failed");
       }
 
+      const payload = (await response.json().catch(() => null)) as { apiKey?: ApiKeyItem } | null;
+      const updated = payload?.apiKey ?? { ...item, status: "revoked", revokedAt: new Date().toISOString() };
+
       setKeys((prev) => {
-        const next = prev.filter((item) => item.id !== keyId);
+        const next = prev.map((key) =>
+          key.id === item.id
+            ? {
+                ...key,
+                ...updated,
+                keyValue: undefined,
+              }
+            : key,
+        );
         publishKeysUpdate(next);
         return next;
       });
-      if (copiedKeyId === keyId) {
+
+      if (copiedKeyId === item.id) {
         setCopiedKeyId(null);
       }
     } catch {
-      setErrorMessage("目前無法刪除金鑰，請稍後再試。");
+      setErrorMessage("目前無法撤銷金鑰，請稍後再試。");
     } finally {
       setIsSubmitting(false);
     }
   }
 
   async function handleCopy(item: ApiKeyItem) {
-    const value = item.keyValue ?? item.maskedKey;
+    if (!item.keyValue) return;
 
     try {
-      await navigator.clipboard.writeText(value);
+      await navigator.clipboard.writeText(item.keyValue);
       setCopiedKeyId(item.id);
       window.setTimeout(() => {
         setCopiedKeyId((prev) => (prev === item.id ? null : prev));
@@ -117,57 +169,95 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
     }
   }
 
-  const disabledHint = useMemo(() => {
-    if (issuanceEnabled && canCreate) return null;
-    return "此 Beta 帳戶尚未啟用 API 金鑰發放，請聯繫我們開通。";
-  }, [issuanceEnabled, canCreate]);
+  async function copyCreatedSecret() {
+    if (!createdSecret) return;
+    try {
+      await navigator.clipboard.writeText(createdSecret);
+      setSecretCopied(true);
+      window.setTimeout(() => setSecretCopied(false), 1500);
+    } catch {
+      setErrorMessage("無法複製金鑰，請檢查瀏覽器權限。");
+    }
+  }
 
   return (
     <div className="space-y-3">
+      {createdSecret && createdSecretApiKey ? (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+          <p className="text-sm font-semibold text-amber-900">新 API 金鑰已建立</p>
+          <p className="mt-1 text-xs text-amber-800">請立即複製，離開此頁後不會再次顯示完整金鑰。</p>
+          <p className="mt-2 font-mono text-xs text-amber-900 break-all">{createdSecret}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={copyCreatedSecret}
+              className={buttonClass("secondary", "h-8 rounded-md px-3 text-xs")}
+            >
+              {secretCopied ? "已複製" : "複製完整金鑰"}
+            </button>
+            <span className="text-xs text-amber-800">遮罩：{createdSecretApiKey.maskedKey}</span>
+          </div>
+        </div>
+      ) : null}
+
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[620px] text-sm">
+        <table className="w-full min-w-[760px] text-sm">
           <thead className="text-left text-slate-500">
             <tr>
               <th className="border-b border-slate-200 px-2 py-2">名稱</th>
               <th className="border-b border-slate-200 px-2 py-2">金鑰</th>
+              <th className="border-b border-slate-200 px-2 py-2">狀態</th>
+              <th className="border-b border-slate-200 px-2 py-2">建立時間</th>
               <th className="border-b border-slate-200 px-2 py-2">最近使用</th>
               <th className="border-b border-slate-200 px-2 py-2 text-right">操作</th>
             </tr>
           </thead>
           <tbody className="text-slate-700">
             {hasKeys ? (
-              keys.map((item) => (
-                <tr key={item.id}>
-                  <td className="border-b border-slate-100 px-2 py-2">{item.name}</td>
-                  <td className="border-b border-slate-100 px-2 py-2 font-mono text-xs">{item.maskedKey}</td>
-                  <td className="border-b border-slate-100 px-2 py-2">{item.lastUsed}</td>
-                  <td className="border-b border-slate-100 px-2 py-2">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(item)}
+              keys.map((item) => {
+                const revoked = item.status === "revoked";
+                return (
+                  <tr key={item.id} className={cn(revoked && "bg-slate-50 text-slate-400")}>
+                    <td className="border-b border-slate-100 px-2 py-2">{item.name}</td>
+                    <td className="border-b border-slate-100 px-2 py-2 font-mono text-xs">{item.maskedKey}</td>
+                    <td className="border-b border-slate-100 px-2 py-2">
+                      <span
                         className={cn(
-                          buttonClass("secondary", "h-9 rounded-lg px-3"),
-                          copiedKeyId === item.id && "border-emerald-300 text-emerald-700",
+                          "inline-flex rounded-full border px-2 py-0.5 text-xs font-medium",
+                          revoked ? "border-slate-200 bg-slate-100 text-slate-500" : "border-emerald-200 bg-emerald-50 text-emerald-700",
                         )}
                       >
-                        {copiedKeyId === item.id ? "已複製" : "複製"}
-                      </button>
-                      <button
-                        type="button"
-                        disabled={!canRevoke || isSubmitting}
-                        onClick={() => handleDeleteKey(item.id)}
-                        className={buttonClass("danger-secondary", "h-9 rounded-lg px-3")}
-                      >
-                        刪除
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                        {revoked ? "已撤銷" : "啟用中"}
+                      </span>
+                    </td>
+                    <td className="border-b border-slate-100 px-2 py-2">{formatDateTime(item.createdAt)}</td>
+                    <td className="border-b border-slate-100 px-2 py-2">{formatDateTime(item.lastUsed)}</td>
+                    <td className="border-b border-slate-100 px-2 py-2">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(item)}
+                          disabled={!item.keyValue}
+                          className={buttonClass("secondary", "h-9 rounded-lg px-3 disabled:cursor-not-allowed")}
+                        >
+                          {copiedKeyId === item.id ? "已複製" : "複製"}
+                        </button>
+                        <button
+                          type="button"
+                          disabled={!canRevoke || isSubmitting || revoked}
+                          onClick={() => handleRevokeKey(item)}
+                          className={buttonClass("danger-secondary", "h-9 rounded-lg px-3")}
+                        >
+                          撤銷
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
-                <td className="px-2 py-4 text-sm text-slate-500" colSpan={4}>
+                <td className="px-2 py-4 text-sm text-slate-500" colSpan={6}>
                   尚無 API key。
                 </td>
               </tr>
@@ -179,10 +269,9 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
       <div className="flex items-center justify-end">
         <button
           type="button"
-          disabled={!issuanceEnabled || !canCreate}
+          disabled={!canCreate}
           onClick={() => {
             setErrorMessage(null);
-            setCreatedPlainKey(null);
             setIsModalOpen(true);
           }}
           className={buttonClass("primary", "h-10 rounded-lg px-4 text-sm")}
@@ -191,15 +280,12 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
         </button>
       </div>
 
-      {disabledHint ? <p className="text-xs text-slate-500">{disabledHint}</p> : null}
+      <p className="text-xs text-slate-500">
+        API key 只會在建立當下顯示一次完整值；系統僅保存 hash，無法再次查看明文。
+      </p>
       {errorMessage ? <p className="text-xs text-red-600">{errorMessage}</p> : null}
-      {createdPlainKey ? (
-        <p className="text-xs text-slate-700">
-          新金鑰：<span className="font-mono">{createdPlainKey}</span>
-        </p>
-      ) : null}
 
-      {isModalOpen && issuanceEnabled ? (
+      {isModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 px-4">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5">
             <h3 className="text-base font-semibold text-slate-900">建立新的 API 金鑰</h3>
@@ -212,6 +298,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
                   placeholder="例如 research-bot"
                   className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
                   disabled={!canCreate || isSubmitting}
+                  maxLength={40}
                 />
               </label>
 
@@ -222,7 +309,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
                   className={buttonClass("secondary", "h-10 rounded-lg px-4 text-sm")}
                   disabled={isSubmitting}
                 >
-                  Cancel
+                  取消
                 </button>
                 <button type="submit" disabled={!canSubmit} className={buttonClass("primary", "h-10 rounded-lg px-4 text-sm")}>
                   {isSubmitting ? "建立中..." : "建立"}
@@ -235,3 +322,4 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
     </div>
   );
 }
+

@@ -76,6 +76,11 @@ npm run build
 - ECPay periodic credit-card checkout is integrated for `/pricing` paid plans.
 - Setup and callback details: `docs/BILLING_ECPAY_SETUP.md`
 
+## API Keys Lifecycle
+
+- Dashboard API keys now use local DB lifecycle with hash-only storage.
+- Setup and behavior details: `docs/API_KEYS_SETUP.md`
+
 ## 產品敘事範圍
 
 本站內容反映：

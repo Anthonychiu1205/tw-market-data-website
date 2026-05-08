@@ -45,8 +45,12 @@ export type UsageRequestsSummary = {
 export type ApiKeyItem = {
   id: string;
   name: string;
+  keyPrefix?: string;
   maskedKey: string;
+  status?: string;
   lastUsed: string;
+  createdAt?: string;
+  revokedAt?: string | null;
   keyValue?: string;
 };
 
@@ -205,11 +209,17 @@ function normalizeApiKeyItem(item: unknown, index: number): ApiKeyItem {
   const row = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
   const rawValue = getString(row.key || row.apiKey || row.plainTextKey || row.token || row.value);
   const fallbackMasked = rawValue ? `${rawValue.slice(0, 8)}••••••` : "twmd_••••••••";
+  const createdAt = getString(row.createdAt || row.created_at);
+  const revokedAt = getString(row.revokedAt || row.revoked_at);
   return {
     id: getString(row.id || row.keyId, `key-${index}`),
     name: getString(row.name || row.label, `api-key-${index + 1}`),
+    keyPrefix: getString(row.keyPrefix || row.key_prefix),
     maskedKey: getString(row.maskedKey || row.masked_key, fallbackMasked),
+    status: getString(row.status, "active"),
     lastUsed: getString(row.lastUsed || row.last_used || row.lastUsedAt || row.last_used_at, "-"),
+    createdAt: createdAt || undefined,
+    revokedAt: revokedAt || null,
     keyValue: rawValue || undefined,
   };
 }
