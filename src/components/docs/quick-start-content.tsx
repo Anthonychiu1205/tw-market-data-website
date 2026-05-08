@@ -190,6 +190,23 @@ export function QuickStartContent() {
             回應通常包含 dataset、rows 與 count。不同 dataset 會有不同欄位，但 response pattern 會盡量保持一致。
           </p>
         </div>
+
+        <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-4">
+          <p className="text-sm font-medium text-slate-800">Gateway dry-run（Beta）</p>
+          <p className="text-sm leading-7 text-slate-600">
+            目前可透過官網路徑測試 gateway skeleton：
+            <code className="mx-1 rounded bg-white px-1 py-0.5 text-xs">GET /v2/datasets/:dataset</code>。
+            此階段僅做 entitlement 與成本試算，不會實際扣除 credits。
+          </p>
+          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-white p-4 text-xs leading-6 text-slate-700">
+            <code>{`curl \\
+  -H "X-API-Key: twmd_live_xxx" \\
+  "https://twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=5"`}</code>
+          </pre>
+          <p className="text-xs text-slate-500">
+            回應 headers 會包含 X-TWMD-Plan、X-TWMD-Credits-Cost、X-TWMD-Dry-Run 與 X-Request-Id。
+          </p>
+        </div>
       </section>
 
       <section className="space-y-4 border-b border-slate-200 pb-8">

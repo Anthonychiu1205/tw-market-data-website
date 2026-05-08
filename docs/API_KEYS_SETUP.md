@@ -41,8 +41,48 @@ If `API_KEY_HASH_SECRET` is missing:
 
 Auth is required for all routes.
 
+## Public Gateway (Phase 2a)
+
+Gateway beta route (dry-run metering):
+
+- `GET /v2/datasets/:dataset`
+
+Example:
+
+```bash
+curl \
+  -H "X-API-Key: twmd_live_xxx" \
+  "https://twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=5"
+```
+
+Current phase behavior:
+
+- API key authentication is required.
+- Dataset entitlement is checked by plan policy.
+- Request is proxied to backend with internal credentials.
+- Metering is dry-run only (no credit deduction, no usage ledger write).
+
+### Standardized Error Shape
+
+```json
+{
+  "error": {
+    "code": "invalid_api_key",
+    "message": "Invalid API key."
+  },
+  "requestId": "..."
+}
+```
+
+### Response Headers
+
+- `X-Request-Id`
+- `X-TWMD-Plan`
+- `X-TWMD-Credits-Cost`
+- `X-TWMD-Dry-Run`
+
 ## Notes
 
-- This phase only establishes key lifecycle and secure storage.
-- Public customer API gateway (`X-API-Key` auth, entitlement, metering, deduction) is planned in later phases.
-
+- API key lifecycle is local and production-safe (hash-only storage).
+- Public gateway is currently skeleton mode with dry-run metering.
+- Credits deduction and usage DB logging are not enabled in this phase.
