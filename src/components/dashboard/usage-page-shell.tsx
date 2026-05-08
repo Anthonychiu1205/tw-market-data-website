@@ -15,10 +15,11 @@ import {
 
 import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
-import type { UsageRequestsSummary } from "@/src/lib/backend-adapter";
+import type { UsageRequestsSummary, UsageSummary } from "@/src/lib/backend-adapter";
 
 type UsagePageShellProps = {
   usageRequests: UsageRequestsSummary;
+  usageSummary: UsageSummary;
   creditState: "normal" | "low" | "exhausted";
 };
 
@@ -89,7 +90,7 @@ function inferApiLabel(dataset: string, endpoint: string): string {
   return parts.at(-1) ?? "-";
 }
 
-export function UsagePageShell({ usageRequests, creditState }: UsagePageShellProps) {
+export function UsagePageShell({ usageRequests, usageSummary, creditState }: UsagePageShellProps) {
   const rows = usageRequests.rows;
 
   const monthKeys = useMemo(() => {
@@ -114,7 +115,11 @@ export function UsagePageShell({ usageRequests, creditState }: UsagePageShellPro
     date: formatTimestamp(row.requestTimestamp),
     api: inferApiLabel(row.dataset, row.endpoint),
     endpoint: row.endpoint || "-",
+    symbol: row.symbol || "—",
     status: row.statusCode ?? "-",
+    credits: row.creditsCharged ?? 0,
+    latencyMs: row.latencyMs,
+    errorCode: row.errorCode || null,
   }));
 
   const endpointUsageRows = useMemo(() => {
@@ -139,6 +144,30 @@ export function UsagePageShell({ usageRequests, creditState }: UsagePageShellPro
 
   return (
     <div className="space-y-4">
+      <DashboardCard className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-none">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <p className="text-xs text-slate-500">今日 request</p>
+            <p className="mt-1 text-lg font-semibold text-slate-900">{(usageSummary.requestsToday ?? 0).toLocaleString()}</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500">30 天 request</p>
+            <p className="mt-1 text-lg font-semibold text-slate-900">{(usageSummary.requests30d ?? usageSummary.monthlyUsed).toLocaleString()}</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500">30 天 dry-run credits</p>
+            <p className="mt-1 text-lg font-semibold text-slate-900">{(usageSummary.estimatedCreditsUsage30d ?? 0).toLocaleString()}</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500">Top datasets</p>
+            <p className="mt-1 text-sm text-slate-700">
+              {usageSummary.topEndpoints.length ? usageSummary.topEndpoints.slice(0, 2).join("、") : "尚無資料"}
+            </p>
+          </div>
+        </div>
+        <p className="mt-3 text-xs text-slate-500">目前為 dry-run usage：僅記錄估算成本，尚未正式扣點。</p>
+      </DashboardCard>
+
       {creditState === "exhausted" ? (
         <section className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
           <p className="text-sm font-semibold text-amber-900">您的使用額度已用完</p>
@@ -262,8 +291,11 @@ export function UsagePageShell({ usageRequests, creditState }: UsagePageShellPro
                 <tr>
                   <th className="px-2 py-3 text-left font-medium">日期</th>
                   <th className="px-2 py-3 text-left font-medium">API</th>
+                  <th className="px-2 py-3 text-left font-medium">Symbol</th>
                   <th className="px-2 py-3 text-left font-medium">端點</th>
                   <th className="px-2 py-3 text-left font-medium">狀態</th>
+                  <th className="px-2 py-3 text-left font-medium">dry-run credits</th>
+                  <th className="px-2 py-3 text-left font-medium">Latency</th>
                 </tr>
               </thead>
               <tbody>
@@ -272,15 +304,27 @@ export function UsagePageShell({ usageRequests, creditState }: UsagePageShellPro
                     <tr key={`${row.date}-${row.endpoint}-${index}`} className="border-t border-slate-100">
                       <td className="px-2 py-3 text-sm text-slate-700">{row.date}</td>
                       <td className="px-2 py-3 text-sm text-slate-700">{row.api}</td>
+                      <td className="px-2 py-3 text-sm text-slate-700">{row.symbol}</td>
                       <td className="px-2 py-3">
                         <span className="inline-flex rounded-lg bg-slate-100 px-2 py-1 text-xs font-mono text-slate-600">{row.endpoint}</span>
                       </td>
-                      <td className="px-2 py-3 text-sm text-slate-700">{row.status}</td>
+                      <td className="px-2 py-3 text-sm text-slate-700">
+                        {row.status}
+                        {row.errorCode ? (
+                          <span className="ml-2 rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">
+                            {row.errorCode}
+                          </span>
+                        ) : null}
+                      </td>
+                      <td className="px-2 py-3 text-sm text-slate-700">{row.credits.toLocaleString()}</td>
+                      <td className="px-2 py-3 text-sm text-slate-700">
+                        {typeof row.latencyMs === "number" ? `${row.latencyMs} ms` : "—"}
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr className="border-t border-slate-100">
-                    <td colSpan={4} className="px-2 py-6 text-center text-slate-500">尚無請求記錄</td>
+                    <td colSpan={7} className="px-2 py-6 text-center text-slate-500">尚無 API request usage。</td>
                   </tr>
                 )}
               </tbody>

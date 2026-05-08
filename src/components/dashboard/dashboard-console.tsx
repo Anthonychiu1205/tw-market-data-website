@@ -129,6 +129,10 @@ function UsageActivityCard({ usage }: { usage: UsageSummary }) {
     date: item.date.slice(5),
     requests: item.count,
   }));
+  const requestsToday = usage.requestsToday ?? 0;
+  const requests30d = usage.requests30d ?? monthlyUsed;
+  const estimatedCreditsUsage30d = usage.estimatedCreditsUsage30d ?? 0;
+  const recentErrors = usage.recentErrors ?? [];
 
   return (
     <DashboardCard className="rounded-3xl border border-slate-200/70 bg-white p-6 shadow-none">
@@ -153,9 +157,22 @@ function UsageActivityCard({ usage }: { usage: UsageSummary }) {
         <OverviewUsageChart data={chartData} />
       </div>
 
+      <div className="mt-4 grid gap-3 text-xs text-slate-600 sm:grid-cols-3">
+        <p>今日 request：{requestsToday.toLocaleString()}</p>
+        <p>30 天 request：{requests30d.toLocaleString()}</p>
+        <p>30 天 dry-run credits：{estimatedCreditsUsage30d.toLocaleString()}</p>
+      </div>
+
+      {recentErrors.length > 0 ? (
+        <p className="mt-2 text-xs text-slate-500">
+          最近錯誤：{recentErrors.slice(0, 3).map((item) => `${item.code} (${item.count})`).join("、")}
+        </p>
+      ) : null}
+
       <p className="mt-3 text-xs text-slate-500">
         {hasEvents ? `最近活躍：${latestActive?.date} · ${latestActive?.count.toLocaleString()} 次` : "目前尚無足夠活動資料。"}
       </p>
+      <p className="mt-1 text-xs text-slate-500">目前為 dry-run usage：僅記錄估算成本，尚未正式扣點。</p>
     </DashboardCard>
   );
 }
@@ -421,7 +438,7 @@ function renderSection(section: DashboardSection, props: DashboardConsoleProps) 
     }
     return <BillingLandingPage subscription={props.subscription} />;
   }
-  if (section === "usage") return <UsagePageShell usageRequests={props.usageRequests} creditState={creditState} />;
+  if (section === "usage") return <UsagePageShell usageRequests={props.usageRequests} usageSummary={props.usage} creditState={creditState} />;
   if (section === "keys") return <KeysPanel apiKeys={props.apiKeys} />;
   if (section === "settings") return <SettingsPanel email={props.email} entitlement={props.entitlement} />;
   if (section === "docs") return <DocsPanel />;

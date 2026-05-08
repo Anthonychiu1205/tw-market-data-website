@@ -2,11 +2,12 @@ import { randomUUID } from "crypto";
 
 import { authenticateApiKey } from "@/src/lib/gateway/auth";
 import { assertDatasetEntitlement } from "@/src/lib/gateway/entitlement";
-import { createGatewayErrorResponse, GatewayHttpError } from "@/src/lib/gateway/errors";
+import { createGatewayErrorResponse, GatewayHttpError, type GatewayErrorCode } from "@/src/lib/gateway/errors";
 import { resolveDryRunMetering } from "@/src/lib/gateway/metering";
 import { resolveDatasetPolicy } from "@/src/lib/gateway/policies";
 import { proxyDatasetRequest } from "@/src/lib/gateway/proxy";
 import { applyGatewayHeaders, mergeMetaField } from "@/src/lib/gateway/response";
+import { createApiUsageEvent, deriveSymbolFromSearchParams } from "@/src/lib/gateway/usage";
 
 export const runtime = "nodejs";
 
@@ -60,12 +61,26 @@ export async function GET(request: Request, context: Context) {
   let planCode = "unknown";
   let creditsCost = 0;
   const dryRun = true;
+  const startedAt = Date.now();
+  let authUserId: string | null = null;
+  let authApiKeyId: string | null = null;
+  let datasetSlugForLog = "unknown";
+  let endpointForLog = "/v2/datasets/unknown";
+  const searchParams = new URL(request.url).searchParams;
+  const symbol = deriveSymbolFromSearchParams(searchParams);
+  let statusCodeForLog = 500;
+  let errorCodeForLog: GatewayErrorCode | null = null;
 
   try {
     const params = await context.params;
     const datasetSlug = params.dataset;
+    datasetSlugForLog = datasetSlug;
+    endpointForLog = `/v2/datasets/${datasetSlug}`;
+
     const datasetPolicy = resolveDatasetPolicy(datasetSlug);
     if (!datasetPolicy) {
+      statusCodeForLog = 404;
+      errorCodeForLog = "dataset_not_found";
       return createGatewayErrorResponse({
         status: 404,
         code: "dataset_not_found",
@@ -74,6 +89,8 @@ export async function GET(request: Request, context: Context) {
     }
 
     const authContext = await authenticateApiKey(request);
+    authUserId = authContext.userId;
+    authApiKeyId = authContext.apiKeyId;
     const entitlement = await assertDatasetEntitlement({
       userId: authContext.userId,
       datasetPolicy,
@@ -93,6 +110,8 @@ export async function GET(request: Request, context: Context) {
     if (upstream.status >= 500) {
       throw new GatewayHttpError(502, "upstream_error");
     }
+
+    statusCodeForLog = upstream.status;
 
     const headers = new Headers(upstream.headers);
     applyGatewayHeaders(headers, {
@@ -126,6 +145,14 @@ export async function GET(request: Request, context: Context) {
     });
   } catch (error) {
     if (error instanceof GatewayHttpError) {
+      if (!authUserId) {
+        authUserId = error.details?.userId ?? null;
+      }
+      if (!authApiKeyId) {
+        authApiKeyId = error.details?.apiKeyId ?? null;
+      }
+      statusCodeForLog = error.status;
+      errorCodeForLog = error.code;
       const errorHeaders = new Headers();
       applyGatewayHeaders(errorHeaders, {
         requestId,
@@ -150,6 +177,8 @@ export async function GET(request: Request, context: Context) {
       creditsCost,
       dryRun,
     });
+    statusCodeForLog = 500;
+    errorCodeForLog = "internal_error";
 
     return createGatewayErrorResponse({
       status: 500,
@@ -157,5 +186,22 @@ export async function GET(request: Request, context: Context) {
       requestId,
       headers: errorHeaders,
     });
+  } finally {
+    if (authUserId) {
+      const latencyMs = Date.now() - startedAt;
+      await createApiUsageEvent({
+        userId: authUserId,
+        apiKeyId: authApiKeyId,
+        datasetSlug: datasetSlugForLog,
+        endpoint: endpointForLog,
+        method: "GET",
+        symbol,
+        creditsCharged: creditsCost,
+        statusCode: statusCodeForLog,
+        latencyMs,
+        requestId,
+        errorCode: errorCodeForLog,
+      });
+    }
   }
 }

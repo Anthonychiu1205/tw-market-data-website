@@ -6,6 +6,8 @@ import {
   getBillingSummary,
   getUsageRequestRows,
   getUsageSummary,
+  type UsageRequestsSummary,
+  type UsageSummary,
 } from "@/src/lib/backend-adapter";
 import {
   getBillingDisplaySubscriptionForUser,
@@ -13,6 +15,44 @@ import {
 } from "@/src/lib/billing/subscription";
 import { getCreditTransactionsForUser, getCreditWalletForUser } from "@/src/lib/billing/credits";
 import { getApiKeysSummaryForUser } from "@/src/lib/api-keys/service";
+import { getRecentApiUsageForUser, getUsageSummaryForUser } from "@/src/lib/gateway/usage";
+
+function toDashboardUsageSummary(localSummary: Awaited<ReturnType<typeof getUsageSummaryForUser>>): UsageSummary {
+  return {
+    monthlyUsed: localSummary.requests30d,
+    monthlyQuota: 250000,
+    rateLimitPerMin: 60,
+    topEndpoints: localSummary.topDatasets.map((item) => item.dataset),
+    dailyUsage: localSummary.dailyUsage,
+    integrationMode: "live",
+    requestsToday: localSummary.requestsToday,
+    requests30d: localSummary.requests30d,
+    estimatedCreditsUsage30d: localSummary.estimatedCreditsUsage30d,
+    recentErrors: localSummary.recentErrors,
+    isDryRun: true,
+  };
+}
+
+function toDashboardUsageRequests(localRows: Awaited<ReturnType<typeof getRecentApiUsageForUser>>): UsageRequestsSummary {
+  return {
+    rows: localRows.map((item) => ({
+      requestTimestamp: item.requestTimestamp,
+      dataset: item.dataset,
+      endpoint: item.endpoint,
+      statusCode: item.statusCode,
+      rowCount: null,
+      planCode: "-",
+      symbol: item.symbol,
+      creditsCharged: item.creditsCharged,
+      latencyMs: item.latencyMs,
+      errorCode: item.errorCode,
+      requestId: item.requestId,
+    })),
+    integrationMode: "live",
+    insufficientCredits: false,
+    isDryRun: true,
+  };
+}
 
 type DashboardPageShellProps = {
   section: DashboardSection;
@@ -41,7 +81,19 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
     return [];
   });
 
-  const [account, billing, usage, usageRequests, apiKeys, billingDisplaySubscription, creditWallet, creditTransactions] = await Promise.all([
+  const localUsageSummaryPromise = getUsageSummaryForUser(session.id).catch((error) => {
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    console.warn(`[dashboard] failed to fetch local usage summary (${errorName})`);
+    return null;
+  });
+
+  const localUsageRowsPromise = getRecentApiUsageForUser(session.id, 100).catch((error) => {
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    console.warn(`[dashboard] failed to fetch local usage rows (${errorName})`);
+    return [];
+  });
+
+  const [account, billing, usage, usageRequests, apiKeys, billingDisplaySubscription, creditWallet, creditTransactions, localUsageSummary, localUsageRows] = await Promise.all([
     getAccountSummary(session.email),
     getBillingSummary(session.email),
     getUsageSummary(session.email),
@@ -50,7 +102,13 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
     billingDisplaySubscriptionPromise,
     creditWalletPromise,
     creditTransactionsPromise,
+    localUsageSummaryPromise,
+    localUsageRowsPromise,
   ]);
+
+  const hasLocalUsage = Boolean(localUsageSummary && localUsageSummary.requests30d > 0) || localUsageRows.length > 0;
+  const resolvedUsage = hasLocalUsage && localUsageSummary ? toDashboardUsageSummary(localUsageSummary) : usage;
+  const resolvedUsageRequests = hasLocalUsage ? toDashboardUsageRequests(localUsageRows) : usageRequests;
 
   const entitlement = await getDashboardEntitlementForUser({
     userId: session.id,
@@ -66,8 +124,8 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
         currentPath={currentPath}
         currentHref={currentHref}
         billing={billing}
-        usage={usage}
-        usageRequests={usageRequests}
+        usage={resolvedUsage}
+        usageRequests={resolvedUsageRequests}
         apiKeys={apiKeys}
         entitlement={entitlement}
         subscription={

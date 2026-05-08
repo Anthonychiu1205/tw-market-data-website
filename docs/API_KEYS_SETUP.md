@@ -62,6 +62,12 @@ Current phase behavior:
 - Request is proxied to backend with internal credentials.
 - Metering is dry-run only (no credit deduction, no usage ledger write).
 
+Phase 3 update:
+
+- Gateway now writes `ApiUsageEvent` as dry-run usage ledger for observability.
+- Each request gets a `requestId` for trace/debug.
+- Dry-run usage means estimated credits are recorded, but wallet balance is not deducted.
+
 ### Gateway Dry-Run Smoke Test
 
 Set local test env (do not commit real keys):
@@ -100,6 +106,20 @@ Expected checks:
 - `X-TWMD-Credits-Cost`
 - `X-TWMD-Dry-Run`
 
+Example:
+
+```bash
+curl \
+  -H "X-API-Key: twmd_live_xxx" \
+  "https://twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330"
+```
+
+You should see gateway headers including:
+
+- `X-TWMD-Credits-Cost`
+- `X-TWMD-Dry-Run`
+- `X-Request-Id`
+
 ### Error Codes
 
 - `401 invalid_api_key`
@@ -114,5 +134,6 @@ Expected checks:
 
 - API key lifecycle is local and production-safe (hash-only storage).
 - Public gateway is currently skeleton mode with dry-run metering.
-- Credits deduction and usage DB logging are not enabled in this phase.
+- Credits deduction is not enabled in this phase.
+- Usage logging is dry-run only and does not perform wallet deduction.
 - `PUBLIC_API_FREE_TIER_ENABLED` can control whether free-tier API access is allowed in this dry-run phase (default enabled).

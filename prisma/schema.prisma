@@ -28,6 +28,7 @@ model User {
   creditWallet        CreditWallet?
   creditTransactions  CreditTransaction[]
   apiKeys             ApiKey[]
+  apiUsageEvents      ApiUsageEvent[]
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
 }
@@ -209,9 +210,35 @@ model ApiKey {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usageEvents ApiUsageEvent[]
 
   @@index([userId])
   @@index([userId, status])
   @@index([keyPrefix])
+}
+
+model ApiUsageEvent {
+  id             String   @id @default(cuid())
+  userId         String
+  apiKeyId       String?
+  datasetSlug    String
+  endpoint       String
+  method         String
+  symbol         String?
+  creditsCharged Int
+  statusCode     Int
+  latencyMs      Int?
+  requestId      String
+  errorCode      String?
+  createdAt      DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiKey ApiKey? @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([apiKeyId])
+  @@index([datasetSlug])
+  @@index([createdAt])
+  @@index([requestId])
 }

@@ -25,6 +25,11 @@ export type UsageSummary = {
   topEndpoints: string[];
   dailyUsage: Array<{ date: string; count: number }>;
   integrationMode: IntegrationMode;
+  requestsToday?: number;
+  requests30d?: number;
+  estimatedCreditsUsage30d?: number;
+  recentErrors?: Array<{ code: string; count: number }>;
+  isDryRun?: boolean;
 };
 
 export type UsageRequestRow = {
@@ -34,12 +39,18 @@ export type UsageRequestRow = {
   statusCode: number | null;
   rowCount: number | null;
   planCode: string;
+  symbol?: string | null;
+  creditsCharged?: number | null;
+  latencyMs?: number | null;
+  errorCode?: string | null;
+  requestId?: string | null;
 };
 
 export type UsageRequestsSummary = {
   rows: UsageRequestRow[];
   integrationMode: IntegrationMode;
   insufficientCredits?: boolean;
+  isDryRun?: boolean;
 };
 
 export type ApiKeyItem = {
@@ -415,6 +426,15 @@ function normalizeUsageRequestRow(item: unknown): UsageRequestRow | null {
     statusCode: Number.isFinite(statusCode) ? statusCode : null,
     rowCount: Number.isFinite(rowCount) ? rowCount : null,
     planCode: planCode || "-",
+    symbol: getString(row.symbol || row.stock_id || row.ticker) || null,
+    creditsCharged: Number.isFinite(getNumber(row.credits_charged ?? row.credits, Number.NaN))
+      ? getNumber(row.credits_charged ?? row.credits, Number.NaN)
+      : null,
+    latencyMs: Number.isFinite(getNumber(row.latency_ms ?? row.latency, Number.NaN))
+      ? getNumber(row.latency_ms ?? row.latency, Number.NaN)
+      : null,
+    errorCode: getString(row.error_code || row.errorCode) || null,
+    requestId: getString(row.request_id || row.requestId) || null,
   };
 }
 

@@ -24,11 +24,18 @@ const DEFAULT_MESSAGES: Record<GatewayErrorCode, string> = {
 export class GatewayHttpError extends Error {
   status: number;
   code: GatewayErrorCode;
+  details?: Record<string, string | null | undefined>;
 
-  constructor(status: number, code: GatewayErrorCode, message?: string) {
+  constructor(
+    status: number,
+    code: GatewayErrorCode,
+    message?: string,
+    details?: Record<string, string | null | undefined>,
+  ) {
     super(message ?? DEFAULT_MESSAGES[code]);
     this.status = status;
     this.code = code;
+    this.details = details;
   }
 }
 
@@ -56,4 +63,3 @@ export function createGatewayErrorResponse(input: {
     },
   );
 }
-

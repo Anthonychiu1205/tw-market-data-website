@@ -53,7 +53,10 @@ export async function authenticateApiKey(request: Request): Promise<GatewayAuthC
   }
 
   if (apiKey.status !== "active") {
-    throw new GatewayHttpError(403, "api_key_revoked");
+    throw new GatewayHttpError(403, "api_key_revoked", undefined, {
+      userId: apiKey.userId,
+      apiKeyId: apiKey.id,
+    });
   }
 
   const now = Date.now();
@@ -78,4 +81,3 @@ export async function authenticateApiKey(request: Request): Promise<GatewayAuthC
     keyPrefix: apiKey.keyPrefix,
   };
 }
-
