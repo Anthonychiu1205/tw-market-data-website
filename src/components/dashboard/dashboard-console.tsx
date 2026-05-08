@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import type {
-  AccountSummary,
   ApiKeysSummary,
   BillingSummary,
   UsageRequestsSummary,
@@ -27,11 +26,20 @@ type DashboardConsoleProps = {
   section: DashboardSection;
   currentPath: string;
   currentHref: string;
-  account: AccountSummary;
   billing: BillingSummary;
   usage: UsageSummary;
   usageRequests: UsageRequestsSummary;
   apiKeys: ApiKeysSummary;
+  entitlement: {
+    planCode: string;
+    planName: string;
+    source: "subscription" | "backend" | "fallback";
+    subscriptionStatus?: string;
+    isEntitled: boolean;
+    apiKeyLimit?: number | null;
+    datasetLimit?: string | null;
+    requestLimitLabel?: string | null;
+  };
   subscription: {
     id: string;
     planCode: string;
@@ -141,18 +149,35 @@ function UsageActivityCard({ usage }: { usage: UsageSummary }) {
 }
 
 function OverviewPanel({
-  account,
+  entitlement,
   usage,
   apiKeys,
   creditState,
 }: {
-  account: AccountSummary;
+  entitlement: DashboardConsoleProps["entitlement"];
   usage: UsageSummary;
   apiKeys: ApiKeysSummary;
   creditState: CreditState;
 }) {
+  const entitlementSourceCopy =
+    entitlement.source === "subscription"
+      ? "方案資料已同步"
+      : entitlement.source === "backend"
+        ? "方案資料暫以帳戶摘要顯示"
+        : "目前尚未啟用付費方案";
+
   return (
     <div className="space-y-3">
+      <DashboardCard className="border-slate-200/80 bg-slate-50/60">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-medium text-slate-900">
+            目前方案：{entitlement.planName}
+            {entitlement.isEntitled ? "（使用中）" : ""}
+          </p>
+          <p className="text-xs text-slate-500">{entitlementSourceCopy}</p>
+        </div>
+      </DashboardCard>
+
       {creditState === "exhausted" ? (
         <DashboardCard className="border-amber-200 bg-amber-50">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -180,7 +205,12 @@ function OverviewPanel({
 
       <UsageActivityCard usage={usage} />
 
-      <RequestResponsePlayground apiKeys={apiKeys.keys} plan={account.plan} />
+      <RequestResponsePlayground
+        apiKeys={apiKeys.keys}
+        planCode={entitlement.planCode}
+        isEntitled={entitlement.isEntitled}
+        planName={entitlement.planName}
+      />
     </div>
   );
 }
@@ -206,20 +236,38 @@ function KeysPanel({ apiKeys }: { apiKeys: ApiKeysSummary }) {
   );
 }
 
-function SettingsPanel({ email, account }: { email: string; account: AccountSummary }) {
+function SettingsPanel({
+  email,
+  entitlement,
+}: {
+  email: string;
+  entitlement: DashboardConsoleProps["entitlement"];
+}) {
   return (
     <div className="space-y-5">
 
       <section className="space-y-2">
         <h2 className="text-sm font-semibold tracking-wide text-slate-900">方案</h2>
         <DashboardCard className="border-slate-200/80 bg-slate-50/70 p-0 shadow-none">
-          <div className="flex items-center justify-between gap-4 px-5 py-3">
+          <div className="space-y-2 px-5 py-3">
             <div>
-              <p className="text-sm font-medium text-slate-900">目前方案：{account.plan}</p>
+              <p className="text-sm font-medium text-slate-900">
+                目前方案：{entitlement.planName}
+                {entitlement.isEntitled ? "（使用中）" : ""}
+              </p>
+              <p className="text-xs text-slate-500">
+                {entitlement.source === "subscription"
+                  ? "方案資料已同步"
+                  : entitlement.source === "backend"
+                    ? "方案資料暫以帳戶摘要顯示"
+                    : "目前尚未啟用付費方案"}
+              </p>
             </div>
-            <Link href="/billing/subscriptions" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
-              管理方案
-            </Link>
+            <div>
+              <Link href="/billing/subscriptions" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
+                管理方案
+              </Link>
+            </div>
           </div>
         </DashboardCard>
       </section>
@@ -315,7 +363,7 @@ function renderSection(section: DashboardSection, props: DashboardConsoleProps) 
       : "normal";
 
   if (section === "overview") {
-    return <OverviewPanel account={props.account} usage={props.usage} apiKeys={props.apiKeys} creditState={creditState} />;
+    return <OverviewPanel entitlement={props.entitlement} usage={props.usage} apiKeys={props.apiKeys} creditState={creditState} />;
   }
   if (section === "billing") {
     if (props.currentPath === "/billing/subscriptions") {
@@ -356,10 +404,10 @@ function renderSection(section: DashboardSection, props: DashboardConsoleProps) 
   }
   if (section === "usage") return <UsagePageShell usageRequests={props.usageRequests} creditState={creditState} />;
   if (section === "keys") return <KeysPanel apiKeys={props.apiKeys} />;
-  if (section === "settings") return <SettingsPanel email={props.email} account={props.account} />;
+  if (section === "settings") return <SettingsPanel email={props.email} entitlement={props.entitlement} />;
   if (section === "docs") return <DocsPanel />;
   if (section === "support") return <SupportPanel />;
-  return <OverviewPanel account={props.account} usage={props.usage} apiKeys={props.apiKeys} creditState={creditState} />;
+  return <OverviewPanel entitlement={props.entitlement} usage={props.usage} apiKeys={props.apiKeys} creditState={creditState} />;
 }
 
 export function DashboardConsole(props: DashboardConsoleProps) {
@@ -369,7 +417,7 @@ export function DashboardConsole(props: DashboardConsoleProps) {
         <DashboardSidebar
           email={props.email}
           section={props.section}
-          plan={props.account.plan}
+          plan={props.entitlement.planName}
           currentPath={props.currentPath}
           currentHref={props.currentHref}
         />

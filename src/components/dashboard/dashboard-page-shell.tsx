@@ -8,7 +8,10 @@ import {
   getUsageRequestRows,
   getUsageSummary,
 } from "@/src/lib/backend-adapter";
-import { getLatestSubscriptionForUser } from "@/src/lib/billing/subscription";
+import {
+  getDashboardEntitlementForUser,
+  getLatestSubscriptionForUser,
+} from "@/src/lib/billing/subscription";
 
 type DashboardPageShellProps = {
   section: DashboardSection;
@@ -19,14 +22,26 @@ type DashboardPageShellProps = {
 export async function DashboardPageShell({ section, currentPath, currentHref }: DashboardPageShellProps) {
   const session = await getRequiredSession();
 
+  const latestSubscriptionPromise = getLatestSubscriptionForUser(session.id).catch((error) => {
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    console.warn(`[dashboard] failed to fetch latest subscription (${errorName})`);
+    return null;
+  });
+
   const [account, billing, usage, usageRequests, apiKeys, subscription] = await Promise.all([
     getAccountSummary(session.email),
     getBillingSummary(session.email),
     getUsageSummary(session.email),
     getUsageRequestRows(session.email),
     getApiKeysSummary(session.email),
-    getLatestSubscriptionForUser(session.id),
+    latestSubscriptionPromise,
   ]);
+
+  const entitlement = await getDashboardEntitlementForUser({
+    userId: session.id,
+    email: session.email,
+    backendPlan: account.plan,
+  });
 
   return (
     <div className="h-[calc(100dvh-73px)] overflow-hidden px-4 py-4 lg:px-8 lg:py-6">
@@ -35,11 +50,11 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
         section={section}
         currentPath={currentPath}
         currentHref={currentHref}
-        account={account}
         billing={billing}
         usage={usage}
         usageRequests={usageRequests}
         apiKeys={apiKeys}
+        entitlement={entitlement}
         subscription={
           subscription
             ? {

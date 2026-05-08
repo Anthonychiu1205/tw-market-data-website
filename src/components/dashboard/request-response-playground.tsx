@@ -54,24 +54,29 @@ type PlaygroundResponse = {
 
 type RequestResponsePlaygroundProps = {
   apiKeys: ApiKeyItem[];
-  plan: string;
+  planCode: string;
+  planName: string;
+  isEntitled: boolean;
 };
 
-function normalizePlanCode(plan: string): PlanCode {
-  const normalized = plan.trim().toLowerCase();
-  if (normalized.includes("enterprise")) return "enterprise";
-  if (normalized.includes("team")) return "team";
-  if (normalized.includes("pro")) return "pro";
-  if (normalized.includes("developer")) return "developer";
+function normalizePlanCode(planCode: string): PlanCode {
+  const normalized = planCode.trim().toLowerCase();
+  if (normalized === "enterprise") return "enterprise";
+  if (normalized === "team") return "team";
+  if (normalized === "pro") return "pro";
+  if (normalized === "developer") return "developer";
   return "free";
 }
 
-export function RequestResponsePlayground({ apiKeys, plan }: RequestResponsePlaygroundProps) {
-  const userPlan = normalizePlanCode(plan);
+export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntitled }: RequestResponsePlaygroundProps) {
+  const userPlan = normalizePlanCode(planCode);
   const availableEndpoints = useMemo(() => {
+    if (!isEntitled) {
+      return [] as (typeof PLAYGROUND_ENDPOINTS)[number][];
+    }
     const currentPlanLevel = PLAN_LEVEL[userPlan];
     return PLAYGROUND_ENDPOINTS.filter((item) => PLAN_LEVEL[item.minPlan] <= currentPlanLevel);
-  }, [userPlan]);
+  }, [isEntitled, userPlan]);
 
   const [endpoint, setEndpoint] = useState<string>(availableEndpoints[0]?.value ?? PLAYGROUND_ENDPOINTS[0].value);
   const [localKeys, setLocalKeys] = useState<ApiKeyItem[]>(apiKeys);
@@ -211,6 +216,7 @@ export function RequestResponsePlayground({ apiKeys, plan }: RequestResponsePlay
         <form onSubmit={handleSubmit} className="rounded-xl border border-slate-200 bg-slate-50/50 p-8">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-slate-900">Request</h3>
+            <p className="text-xs text-slate-500">目前方案：{planName}</p>
           </div>
           <div className="space-y-6">
             <label className="space-y-2.5 text-sm font-medium text-slate-500">
@@ -320,9 +326,10 @@ export function RequestResponsePlayground({ apiKeys, plan }: RequestResponsePlay
             >
               {submitting ? "送出中..." : "發送"}
             </button>
-            {!hasKeyOptions ? <p className="mt-3 text-sm text-slate-500">請先建立 API 金鑰。</p> : null}
+            {!hasKeyOptions && isEntitled ? <p className="mt-3 text-sm text-slate-500">請先建立 API 金鑰。</p> : null}
           </div>
-          {!hasAvailableEndpoints ? <p className="mt-2 text-sm text-slate-500">目前方案尚無可用 playground endpoint。</p> : null}
+          {!isEntitled ? <p className="mt-2 text-sm text-slate-500">目前方案尚未啟用，請選擇方案。</p> : null}
+          {isEntitled && !hasAvailableEndpoints ? <p className="mt-2 text-sm text-slate-500">目前方案尚無可用 playground endpoint。</p> : null}
           {errorMessage ? <p className="mt-2 text-sm text-red-600">{errorMessage}</p> : null}
         </form>
 
