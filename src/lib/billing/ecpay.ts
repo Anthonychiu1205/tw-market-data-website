@@ -116,6 +116,17 @@ function htmlEscape(value: string) {
     .replace(/'/g, "&#39;");
 }
 
+function getUrlHostPath(value: string | undefined) {
+  if (!value) return "unknown";
+
+  try {
+    const url = new URL(value);
+    return `${url.host}${url.pathname}`;
+  } catch {
+    return "invalid-url";
+  }
+}
+
 export function getSiteUrl() {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL;
   const vercelEnv = process.env.VERCEL_ENV;
@@ -256,9 +267,19 @@ export function renderAutoSubmitForm(
 
   const escapedActionUrl = htmlEscape(actionUrl);
   const env = normalizeEcpayEnv();
+  const checkoutHost = getUrlHostPath(actionUrl).split("/")[0] ?? "unknown";
+  const merchantId = htmlEscape(params.MerchantID ?? "");
+  const choosePayment = htmlEscape(params.ChoosePayment ?? "");
   const merchantTradeNo = htmlEscape(params.MerchantTradeNo ?? "");
   const amount = htmlEscape(String(diagnostics?.amount ?? params.TotalAmount ?? ""));
+  const periodAmount = htmlEscape(params.PeriodAmount ?? "");
+  const periodType = htmlEscape(params.PeriodType ?? "");
+  const frequency = htmlEscape(params.Frequency ?? "");
+  const execTimes = htmlEscape(params.ExecTimes ?? "");
   const itemName = htmlEscape(params.ItemName ?? "");
+  const tradeDesc = htmlEscape(params.TradeDesc ?? "");
+  const returnUrlHostPath = htmlEscape(getUrlHostPath(params.ReturnURL));
+  const periodReturnUrlHostPath = htmlEscape(getUrlHostPath(params.PeriodReturnURL));
   const billingCycle = htmlEscape(
     diagnostics?.billingCycle ?? (params.PeriodType === "Y" ? "yearly" : "monthly"),
   );
@@ -350,12 +371,22 @@ export function renderAutoSubmitForm(
       </form>
       <p class="helper">提示：付款狀態以伺服器端 ReturnURL / PeriodReturnURL 通知為準。</p>
       <div class="diagnostics" role="status" aria-live="polite">
-        <div>checkout environment: <code>${htmlEscape(env)}</code></div>
+        <div>ECPAY_ENV: <code>${htmlEscape(env)}</code></div>
+        <div>checkoutUrl host: <code>${htmlEscape(checkoutHost)}</code></div>
+        <div>MerchantID: <code>${merchantId}</code></div>
+        <div>ChoosePayment: <code>${choosePayment}</code></div>
         <div>planCode: <code>${htmlEscape(planCode)}</code></div>
         <div>billingCycle: <code>${htmlEscape(billingCycle)}</code></div>
-        <div>amount: <code>${amount}</code></div>
+        <div>TotalAmount: <code>${amount}</code></div>
+        <div>PeriodAmount: <code>${periodAmount}</code></div>
+        <div>PeriodType: <code>${periodType}</code></div>
+        <div>Frequency: <code>${frequency}</code></div>
+        <div>ExecTimes: <code>${execTimes}</code></div>
+        <div>ItemName: <code>${itemName}</code></div>
+        <div>TradeDesc: <code>${tradeDesc}</code></div>
+        <div>ReturnURL: <code>${returnUrlHostPath}</code></div>
+        <div>PeriodReturnURL: <code>${periodReturnUrlHostPath}</code></div>
         <div>order: <code>${merchantTradeNo}</code></div>
-        <div>item: <code>${itemName}</code></div>
       </div>
       <noscript>
         <p class="helper">你目前停用了 JavaScript，請直接點上方按鈕前往付款。</p>
