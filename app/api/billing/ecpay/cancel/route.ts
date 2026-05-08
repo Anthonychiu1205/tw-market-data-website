@@ -12,8 +12,30 @@ export const runtime = "nodejs";
 
 type ParsedInput = {
   subscriptionId: string | null;
+  reason: string | null;
+  reasonDetail: string | null;
   expectsJson: boolean;
 };
+
+const ALLOWED_CANCEL_REASONS = new Set([
+  "price_too_high",
+  "temporarily_not_needed",
+  "dataset_not_fit",
+  "api_or_docs_issue",
+  "switching_tool_or_plan",
+  "other",
+]);
+
+function normalizeOptionalText(value: unknown, maxLength: number) {
+  if (typeof value !== "string") {
+    return null;
+  }
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+  return trimmed.slice(0, maxLength);
+}
 
 async function parseInput(request: Request): Promise<ParsedInput> {
   const contentType = request.headers.get("content-type") ?? "";
@@ -23,6 +45,8 @@ async function parseInput(request: Request): Promise<ParsedInput> {
     const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
     return {
       subscriptionId: typeof body?.subscriptionId === "string" ? body.subscriptionId : null,
+      reason: normalizeOptionalText(body?.reason, 80),
+      reasonDetail: normalizeOptionalText(body?.reasonDetail, 500),
       expectsJson,
     };
   }
@@ -30,6 +54,8 @@ async function parseInput(request: Request): Promise<ParsedInput> {
   const formData = await request.formData();
   return {
     subscriptionId: String(formData.get("subscriptionId") ?? "") || null,
+    reason: normalizeOptionalText(formData.get("reason"), 80),
+    reasonDetail: normalizeOptionalText(formData.get("reasonDetail"), 500),
     expectsJson,
   };
 }
@@ -67,7 +93,7 @@ function parsePeriodActionResponse(rawText: string) {
 }
 
 export async function POST(request: Request) {
-  const { subscriptionId, expectsJson } = await parseInput(request);
+  const { subscriptionId, reason, reasonDetail, expectsJson } = await parseInput(request);
 
   const session = await auth();
   const userId = session?.user?.id;
@@ -85,7 +111,9 @@ export async function POST(request: Request) {
     where: {
       id: subscriptionId ?? undefined,
       userId,
-      status: "active",
+      status: {
+        in: ["active", "pending", "paid", "trialing"],
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -94,6 +122,12 @@ export async function POST(request: Request) {
     return expectsJson
       ? NextResponse.json({ ok: false, error: "subscription_not_found" }, { status: 404 })
       : redirectBilling(request, "error", "subscription_not_found");
+  }
+
+  if (reason && !ALLOWED_CANCEL_REASONS.has(reason)) {
+    return expectsJson
+      ? NextResponse.json({ ok: false, error: "invalid_cancel_reason" }, { status: 400 })
+      : redirectBilling(request, "error", "invalid_reason");
   }
 
   if (subscription.cancelAtPeriodEnd) {
@@ -166,6 +200,8 @@ export async function POST(request: Request) {
       status: "cancelled",
       cancelAtPeriodEnd: true,
       cancelledAt: new Date(),
+      cancelReason: reason,
+      cancelReasonDetail: reason === "other" ? reasonDetail : null,
     },
   });
 

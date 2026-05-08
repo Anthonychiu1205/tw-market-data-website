@@ -1,7 +1,8 @@
 import Link from "next/link";
 
-import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
+import { buttonClass } from "@/src/components/ui/button";
+import { CancelSubscriptionDialog } from "@/src/components/dashboard/cancel-subscription-dialog";
 import { BILLING_PLANS, type PlanCode } from "@/src/lib/billing/plans";
 
 type BillingLandingPageProps = {
@@ -12,6 +13,8 @@ type BillingLandingPageProps = {
     billingCycle: string;
     currentPeriodEnd: Date | null;
     cancelAtPeriodEnd: boolean;
+    cancelReason: string | null;
+    cancelReasonDetail: string | null;
   } | null;
 };
 
@@ -52,14 +55,7 @@ export function BillingLandingPage({ subscription }: BillingLandingPageProps) {
         ) : (
           <p className="mt-3 text-sm text-slate-600">目前尚未啟用付費訂閱方案。</p>
         )}
-        {subscription && subscription.status === "active" && !subscription.cancelAtPeriodEnd ? (
-          <form action="/api/billing/ecpay/cancel" method="post" className="mt-5">
-            <input type="hidden" name="subscriptionId" value={subscription.id} />
-            <button type="submit" className={buttonClass("secondary")}>
-              取消定期扣款
-            </button>
-          </form>
-        ) : null}
+        {subscription ? <CancelSubscriptionDialog subscription={subscription} /> : null}
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">

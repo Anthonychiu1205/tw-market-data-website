@@ -39,6 +39,8 @@ type DashboardConsoleProps = {
     billingCycle: string;
     currentPeriodEnd: Date | null;
     cancelAtPeriodEnd: boolean;
+    cancelReason: string | null;
+    cancelReasonDetail: string | null;
   } | null;
 };
 

@@ -49,6 +49,8 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
                 billingCycle: subscription.billingCycle,
                 currentPeriodEnd: subscription.currentPeriodEnd,
                 cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+                cancelReason: subscription.cancelReason,
+                cancelReasonDetail: subscription.cancelReasonDetail,
               }
             : null
         }

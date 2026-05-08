@@ -133,12 +133,17 @@ Both routes validate `CheckMacValue` and return plain text `1|OK` only after val
 ## Cancellation Flow Summary
 
 1. User submits cancel from `/billing`.
-2. Server verifies ownership and active subscription.
-3. Server posts cancel action to ECPay `CreditCardPeriodAction` endpoint.
-4. On success, local subscription sets:
+2. User confirms in modal and can provide cancellation reason payload:
+   - `reason`
+   - `reasonDetail` (optional, only for `other`)
+3. Server verifies ownership and active subscription.
+4. Server posts cancel action to ECPay `CreditCardPeriodAction` endpoint.
+5. On success, local subscription sets:
    - `status=cancelled`
    - `cancelAtPeriodEnd=true`
    - `cancelledAt=now`
+   - `cancelReason`
+   - `cancelReasonDetail` (optional)
 
 ## First Test Checklist
 
