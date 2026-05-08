@@ -55,7 +55,7 @@ export function CreditPurchaseDialog({ open, onOpenChange }: CreditPurchaseDialo
             <div
               key={pkg.packageCode}
               className={cn(
-                "rounded-xl border p-4",
+                "flex h-full flex-col rounded-xl border p-4",
                 pkg.highlight === "best_value"
                   ? "border-slate-900 bg-slate-50"
                   : "border-slate-200 bg-white",
@@ -65,28 +65,44 @@ export function CreditPurchaseDialog({ open, onOpenChange }: CreditPurchaseDialo
                 <p className="text-sm font-semibold text-slate-900">{pkg.label}</p>
                 {pkg.highlight === "best_value" ? (
                   <span className="rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-semibold text-white">
-                    Best value
+                    最划算
                   </span>
                 ) : null}
               </div>
-              <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">{formatTwd(pkg.priceTwd)}</p>
-              <p className="mt-1 text-sm text-slate-600">入帳 {formatCredits(pkg.credits)} credits</p>
-              <p className="mt-1 text-xs text-slate-500">含 bonus {formatCredits(pkg.bonusCredits)}（已計入入帳總額）</p>
+              <div className="flex-1">
+                <p className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
+                  {formatTwd(pkg.priceTwd)}
+                </p>
+                <p className="mt-1 text-sm text-slate-600">入帳 {formatCredits(pkg.credits)} credits</p>
+                {pkg.bonusCredits > 0 ? (
+                  <p className="mt-1 text-xs text-slate-500">
+                    含額外加值 {formatCredits(pkg.bonusCredits)} credits（已計入入帳總額）
+                  </p>
+                ) : (
+                  <p className="mt-1 text-xs text-slate-500">標準入帳</p>
+                )}
+              </div>
               <button
                 type="button"
                 disabled
                 className={cn(
-                  buttonClass("secondary", "mt-4 h-10 w-full rounded-lg text-xs"),
-                  "cursor-not-allowed opacity-70",
+                  buttonClass(
+                    "primary",
+                    "mt-4 h-10 w-full rounded-lg bg-slate-900 text-sm font-medium text-white transition-colors hover:bg-slate-800",
+                  ),
+                  "cursor-not-allowed bg-slate-300 text-slate-600 opacity-70 hover:bg-slate-300",
                 )}
               >
-                付款流程準備中
+                前往付款
               </button>
             </div>
           ))}
         </div>
 
         <p className="mt-4 text-xs text-slate-500">
+          付款功能即將開放，開通後可直接前往綠界完成付款。
+        </p>
+        <p className="mt-1 text-xs text-slate-500">
           注意：client 僅會提交 packageCode，付款金額與入帳 credits 一律由 server 端 catalog 驗證。
         </p>
       </div>

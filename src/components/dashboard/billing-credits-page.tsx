@@ -123,39 +123,49 @@ export function BillingCreditsPage() {
           <p className="text-[15px] font-medium text-slate-900">API 端點</p>
           <p className="mt-1 text-sm text-slate-600">每次 API 呼叫的 credits 成本</p>
 
-          <div className="mt-5 inline-flex rounded-2xl border border-slate-200 p-1">
-            {TAB_LABELS.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`h-9 rounded-xl px-4 text-sm font-medium ${activeTab === tab.id ? "bg-white text-slate-900 shadow-sm" : "text-slate-600"}`}
-              >
-                {tab.label}
-              </button>
-            ))}
+          <div className="-mx-1 mt-5 overflow-x-auto px-1">
+            <div className="inline-flex min-w-max rounded-xl bg-slate-100 p-1">
+              {TAB_LABELS.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`h-9 rounded-lg px-4 text-sm font-medium transition ${activeTab === tab.id ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="mt-5 overflow-x-auto">
+          <div className="mt-5 overflow-x-auto rounded-2xl bg-slate-50/70">
             <table className="min-w-full text-sm">
               <thead className="text-sm font-medium text-slate-500">
                 <tr>
-                  <th className="px-2 py-3 text-left font-medium">資源</th>
-                  <th className="px-2 py-3 text-left font-medium">Path</th>
-                  <th className="px-2 py-3 text-left font-medium">使用成本</th>
-                  <th className="px-2 py-3 text-left font-medium">文件</th>
+                  <th className="px-3 py-3 text-left font-medium">資源</th>
+                  <th className="px-3 py-3 text-left font-medium">Path</th>
+                  <th className="px-3 py-3 text-left font-medium">使用成本</th>
+                  <th className="px-3 py-3 text-left font-medium">文件</th>
                 </tr>
               </thead>
               <tbody>
                 {ENDPOINT_ROWS[activeTab].map((row) => (
-                  <tr key={`${row.resource}-${row.path}`} className="border-t border-slate-100">
-                    <td className="px-2 py-3 text-sm text-slate-700">{row.resource}</td>
-                    <td className="px-2 py-3">
-                      <span className="inline-flex rounded-lg bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600">{row.path}</span>
+                  <tr
+                    key={`${row.resource}-${row.path}`}
+                    className="border-t border-slate-200/70 transition hover:bg-white/70"
+                  >
+                    <td className="px-3 py-3 text-sm text-slate-700">{row.resource}</td>
+                    <td className="px-3 py-3">
+                      <span className="inline-flex rounded-md bg-slate-100/70 px-2 py-1 font-mono text-xs text-slate-500 ring-1 ring-slate-200/70">
+                        {row.path}
+                      </span>
                     </td>
-                    <td className="px-2 py-3 text-sm text-slate-700">{row.usageCost}</td>
-                    <td className="px-2 py-3">
-                      <Link href={row.docHref} className="text-sm font-medium text-slate-700 hover:text-black">
+                    <td className="px-3 py-3 text-sm text-slate-700">{row.usageCost}</td>
+                    <td className="px-3 py-3">
+                      <Link
+                        href={row.docHref}
+                        className="text-sm font-medium text-slate-700 underline-offset-4 transition hover:text-black hover:underline"
+                      >
                         {row.docLabel}
                       </Link>
                     </td>
@@ -171,30 +181,35 @@ export function BillingCreditsPage() {
       <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
         <p className="text-[15px] font-medium text-slate-900">儲值方案</p>
         <p className="mt-1 text-sm text-slate-600">彈性補充用量，價格高於訂閱 included credits，適合短期尖峰需求。</p>
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4 overflow-x-auto rounded-2xl bg-slate-50/70">
           <table className="min-w-full text-sm">
             <thead className="text-sm font-medium text-slate-500">
               <tr>
-                <th className="px-2 py-3 text-left font-medium">方案</th>
-                <th className="px-2 py-3 text-left font-medium">金額</th>
-                <th className="px-2 py-3 text-left font-medium">入帳 credits</th>
-                <th className="px-2 py-3 text-left font-medium">bonus（已含）</th>
+                <th className="px-3 py-3 text-left font-medium">方案</th>
+                <th className="px-3 py-3 text-left font-medium">金額</th>
+                <th className="px-3 py-3 text-left font-medium">入帳 credits</th>
+                <th className="px-3 py-3 text-left font-medium">額外加值</th>
               </tr>
             </thead>
             <tbody>
               {packages.map((pkg) => (
-                <tr key={pkg.packageCode} className="border-t border-slate-100">
-                  <td className="px-2 py-3 text-sm font-medium text-slate-700">
+                <tr
+                  key={pkg.packageCode}
+                  className="border-t border-slate-200/70 transition hover:bg-white/70"
+                >
+                  <td className="px-3 py-3 text-sm font-medium text-slate-700">
                     {pkg.label}
                     {pkg.highlight === "best_value" ? (
-                      <span className="ml-2 rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-semibold text-white">
-                        Best value
+                      <span className="ml-2 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
+                        最划算
                       </span>
                     ) : null}
                   </td>
-                  <td className="px-2 py-3 text-sm text-slate-700">{formatTwd(pkg.priceTwd)}</td>
-                  <td className="px-2 py-3 text-sm text-slate-700">{formatCredits(pkg.credits)}</td>
-                  <td className="px-2 py-3 text-sm text-slate-700">{formatCredits(pkg.bonusCredits)}</td>
+                  <td className="px-3 py-3 text-sm text-slate-700">{formatTwd(pkg.priceTwd)}</td>
+                  <td className="px-3 py-3 text-sm text-slate-700">{formatCredits(pkg.credits)}</td>
+                  <td className="px-3 py-3 text-sm text-slate-700">
+                    {pkg.bonusCredits > 0 ? `${formatCredits(pkg.bonusCredits)} credits` : "標準入帳"}
+                  </td>
                 </tr>
               ))}
             </tbody>
