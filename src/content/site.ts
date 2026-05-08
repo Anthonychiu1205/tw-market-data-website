@@ -79,8 +79,8 @@ export const platformCapabilities = [
 export const pricingPlans = [
   {
     name: "Enterprise",
-    monthly: "聯絡我們",
-    yearly: "聯絡我們",
+    monthly: "聯繫我們",
+    yearly: "聯繫我們",
     summary: "全量 available-now 能力 + 客製擴充。",
     features: ["available-now datasets 全開通", "Custom API key / quota / rpm", "SLA / support / custom access"],
     cta: "聯繫我們",

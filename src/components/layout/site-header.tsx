@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
+import { Menu, X } from "lucide-react";
 
 import { productMegaMenuColumns } from "../../content/mega-menu-links";
-import { ContactModal } from "./contact-modal";
 import { MarketingContainer } from "../ui/marketing-container";
 import { buttonClass } from "../ui/button";
 
@@ -17,10 +17,20 @@ const navItems = [
   { href: "/blog", label: "觀點文章" },
 ];
 
-export function SiteHeader() {
+const mobileNavItems = [
+  { href: "/pricing", label: "方案價格" },
+  { href: "/docs", label: "文件" },
+  { href: "/blog", label: "觀點文章" },
+];
+
+type SiteHeaderProps = {
+  onContactClick: () => void;
+};
+
+export function SiteHeader({ onContactClick }: SiteHeaderProps) {
   const { status } = useSession();
   const [isProductsMenuOpen, setIsProductsMenuOpen] = useState(false);
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const hasHydratedRef = useRef(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -48,6 +58,26 @@ export function SiteHeader() {
     hasHydratedRef.current = true;
     return () => clearCloseTimer();
   }, [clearCloseTimer]);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMobileMenuOpen]);
 
   return (
     <>
@@ -152,32 +182,112 @@ export function SiteHeader() {
             <button
               type="button"
               className={buttonClass("secondary")}
-              onClick={() => setIsContactModalOpen(true)}
+              onClick={onContactClick}
             >
             聯繫我們
             </button>
             {status === "authenticated" ? (
               <>
-                <Link href="/dashboard" className={buttonClass("primary")}>
+                <Link href="/dashboard" className={`${buttonClass("primary")} hidden md:inline-flex`}>
                   Dashboard
                 </Link>
               </>
             ) : status === "loading" ? (
-              <span className="inline-flex h-10 w-[160px] animate-pulse rounded-md bg-slate-200" aria-hidden="true" />
+              <span className="hidden h-10 w-[160px] animate-pulse rounded-md bg-slate-200 md:inline-flex" aria-hidden="true" />
             ) : (
               <>
-                <Link href="/login" className={buttonClass("secondary")}>
+                <Link href="/login" className={`${buttonClass("secondary")} hidden md:inline-flex`}>
                   登入
                 </Link>
-                <Link href="/register" className={buttonClass("primary")}>
+                <Link href="/register" className={`${buttonClass("primary")} hidden md:inline-flex`}>
                   註冊
                 </Link>
               </>
             )}
+            <button
+              type="button"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="site-mobile-menu"
+              aria-label={isMobileMenuOpen ? "關閉選單" : "開啟選單"}
+              onClick={() => setIsMobileMenuOpen((previous) => !previous)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 md:hidden"
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </MarketingContainer>
       </header>
-      <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
+
+      {isMobileMenuOpen ? (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <button
+            type="button"
+            aria-label="關閉選單背景"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="absolute inset-0 bg-slate-950/45"
+          />
+          <div
+            id="site-mobile-menu"
+            className="absolute right-0 top-0 flex h-full w-[min(86vw,360px)] flex-col border-l border-slate-200 bg-white p-5 shadow-2xl"
+          >
+            <div className="flex items-center justify-between pb-4">
+              <p className="text-sm font-semibold text-slate-900">網站導覽</p>
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                aria-label="關閉選單"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <nav className="space-y-1 border-t border-slate-200 pt-4">
+              {mobileNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+
+            <div className="mt-5 space-y-2 border-t border-slate-200 pt-4">
+              {status === "authenticated" ? (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`${buttonClass("primary")} w-full justify-center`}
+                >
+                  Dashboard
+                </Link>
+              ) : status === "loading" ? (
+                <span className="inline-flex h-10 w-full animate-pulse rounded-md bg-slate-200" aria-hidden="true" />
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`${buttonClass("secondary")} w-full justify-center`}
+                  >
+                    登入
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`${buttonClass("primary")} w-full justify-center`}
+                  >
+                    註冊
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

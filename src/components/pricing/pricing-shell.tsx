@@ -1,11 +1,14 @@
 "use client";
 
 import { Fragment, useMemo, useState } from "react";
+import type { ComponentType } from "react";
 import Link from "next/link";
 import {
   Activity,
+  BarChart3,
   Briefcase,
   Clock3,
+  Cpu,
   Database,
   Gauge,
   Headphones,
@@ -20,42 +23,18 @@ import {
 } from "lucide-react";
 
 import { buttonClass } from "@/src/components/ui/button";
+import {
+  formatPlanCurrency,
+  getPlanAmountByCycle,
+  getPricingPlanView,
+  getPricingPlanViews,
+  type BillingCycle,
+  type PlanHighlightIcon,
+  type PricingPlanView,
+} from "@/src/lib/billing/plans";
 import { cn } from "@/src/lib/cn";
 
-type BillingMode = "monthly" | "yearly";
-type PlanId = "enterprise" | "team" | "pro" | "developer" | "free";
-
-type PlanItem = {
-  id: PlanId;
-  name: string;
-  summary: string;
-  monthly: string;
-  yearly: string;
-  monthlyHint: string;
-  yearlyHint: string;
-  highlights: Array<{
-    text: string;
-    icon:
-      | "database"
-      | "key"
-      | "gauge"
-      | "activity"
-      | "shield"
-      | "users"
-      | "zap"
-      | "clock3"
-      | "layers3"
-      | "workflow"
-      | "briefcase"
-      | "sparkles"
-      | "headphones"
-      | "server";
-  }>;
-  usageMultiplier: string;
-  cta: string;
-  href: string;
-  featured?: boolean;
-};
+type BillingMode = BillingCycle;
 
 type ComparisonRow = {
   feature: string;
@@ -79,118 +58,34 @@ type ExpandableDatasetCell = {
 
 type ComparisonValue = string | ExpandableDatasetCell;
 const DATASET_LIST_FEATURE = "可用資料集清單";
-
-const plans: PlanItem[] = [
-  {
-    id: "enterprise",
-    name: "Enterprise",
-    summary: "全量 available-now 能力與客製化方案。",
-    monthly: "聯絡我們",
-    yearly: "聯絡我們",
-    monthlyHint: "客製合約",
-    yearlyHint: "客製合約",
-    usageMultiplier: "Custom",
-    highlights: [
-      { text: "available-now datasets 完整可用", icon: "database" },
-      { text: "API key / 配額 / RPM 可客製", icon: "key" },
-      { text: "商業使用與進階權限", icon: "shield" },
-      { text: "SLA 與專屬支援可談", icon: "headphones" },
-      { text: "客製資料供應", icon: "layers3" },
-      { text: "高頻 production 支援", icon: "server" },
-      { text: "專屬導入協助", icon: "briefcase" },
-    ],
-    cta: "聯繫我們",
-    href: "/contact",
-  },
-  {
-    id: "team",
-    name: "Team",
-    summary: "全量資料與團隊級用量。",
-    monthly: "NT$6,000",
-    yearly: "NT$72,000",
-    monthlyHint: "月付方案",
-    yearlyHint: "年付方案",
-    usageMultiplier: "20x",
-    highlights: [
-      { text: "available-now datasets 完整可用", icon: "database" },
-      { text: "API Keys 10", icon: "key" },
-      { text: "RPM 600", icon: "gauge" },
-      { text: "每日 20,000 / 每月 500,000", icon: "activity" },
-      { text: "高頻 API 存取", icon: "zap" },
-      { text: "團隊協作支援", icon: "users" },
-      { text: "多 API key 管理", icon: "workflow" },
-      { text: "低延遲資料更新", icon: "clock3" },
-      { text: "優先支援", icon: "headphones" },
-    ],
-    cta: "選擇團隊方案",
-    href: "/dashboard",
-    featured: true,
-  },
-  {
-    id: "pro",
-    name: "Pro",
-    summary: "進階資料與正式商業使用。",
-    monthly: "NT$1,490",
-    yearly: "NT$17,880",
-    monthlyHint: "月付方案",
-    yearlyHint: "年付方案",
-    usageMultiplier: "5x",
-    highlights: [
-      { text: "20 個資料集可用", icon: "database" },
-      { text: "API Keys 5", icon: "key" },
-      { text: "RPM 120", icon: "gauge" },
-      { text: "每日 4,000 / 每月 100,000", icon: "activity" },
-      { text: "商業使用", icon: "shield" },
-      { text: "API key usage insights", icon: "layers3" },
-      { text: "歷史資料存取", icon: "clock3" },
-    ],
-    cta: "選擇專業方案",
-    href: "/dashboard",
-  },
-  {
-    id: "developer",
-    name: "Developer",
-    summary: "開發驗證與輕量整合。",
-    monthly: "NT$690",
-    yearly: "NT$8,280",
-    monthlyHint: "月付方案",
-    yearlyHint: "年付方案",
-    usageMultiplier: "1x",
-    highlights: [
-      { text: "10 個資料集可用", icon: "database" },
-      { text: "API Keys 2", icon: "key" },
-      { text: "RPM 30", icon: "gauge" },
-      { text: "每日 800 / 每月 20,000", icon: "activity" },
-      { text: "基本用量總覽", icon: "sparkles" },
-    ],
-    cta: "選擇開發者方案",
-    href: "/dashboard",
-  },
-  {
-    id: "free",
-    name: "Free",
-    summary: "5 個資料集，快速接入與測試。",
-    monthly: "免費",
-    yearly: "免費",
-    monthlyHint: "免費方案",
-    yearlyHint: "免費方案",
-    usageMultiplier: "—",
-    highlights: [
-      { text: "5 個資料集：twse_daily_price、tpex_daily_price、adjusted_prices、issuer_profile、monthly_revenue", icon: "database" },
-      { text: "API Keys 1 把、RPM 10", icon: "key" },
-      { text: "基本 usage 顯示", icon: "sparkles" },
-    ],
-    cta: "開始使用",
-    href: "/dashboard",
-  },
-];
+const ENTERPRISE_PLAN = getPricingPlanView("enterprise");
+const TEAM_PLAN = getPricingPlanView("team");
+const PRO_PLAN = getPricingPlanView("pro");
+const DEVELOPER_PLAN = getPricingPlanView("developer");
+const TEAM_API_KEY_LIMIT = TEAM_PLAN.apiKeyLimit?.toString() ?? "—";
+const PRO_API_KEY_LIMIT = PRO_PLAN.apiKeyLimit?.toString() ?? "—";
+const DEVELOPER_API_KEY_LIMIT = DEVELOPER_PLAN.apiKeyLimit?.toString() ?? "—";
 
 const comparisonSections: ComparisonSection[] = [
   {
     title: "PRICING & ACCESS",
     rows: [
-      { feature: "價格", enterprise: "聯絡我們", team: "NT$6,000 / 月", pro: "NT$1,490 / 月", developer: "NT$690 / 月", free: "免費" },
-      { feature: "可用資料集數量", enterprise: "全量 + 客製", team: "全量", pro: "進階", developer: "核心", free: "基礎" },
+      {
+        feature: "價格",
+        enterprise: "聯繫我們",
+        team: `${formatPlanCurrency(TEAM_PLAN.monthlyAmount)} / 月`,
+        pro: `${formatPlanCurrency(PRO_PLAN.monthlyAmount)} / 月`,
+        developer: `${formatPlanCurrency(DEVELOPER_PLAN.monthlyAmount)} / 月`,
+        free: "免費",
+      },
+      {
+        feature: "可用資料集數量",
+        enterprise: ENTERPRISE_PLAN.datasetLimit,
+        team: TEAM_PLAN.datasetLimit,
+        pro: PRO_PLAN.datasetLimit,
+        developer: DEVELOPER_PLAN.datasetLimit,
+        free: "5 個資料集",
+      },
       {
         feature: "可用資料集清單",
         enterprise: {
@@ -312,11 +207,11 @@ const comparisonSections: ComparisonSection[] = [
   {
     title: "LIMITS",
     rows: [
-      { feature: "API Keys", enterprise: "Custom", team: "10", pro: "5", developer: "2", free: "1" },
+      { feature: "API Keys", enterprise: "Custom", team: TEAM_API_KEY_LIMIT, pro: PRO_API_KEY_LIMIT, developer: DEVELOPER_API_KEY_LIMIT, free: "1" },
       { feature: "每日配額", enterprise: "Custom", team: "20,000", pro: "4,000", developer: "800", free: "100" },
       { feature: "每月配額", enterprise: "Custom", team: "500,000", pro: "100,000", developer: "20,000", free: "2,000" },
       { feature: "RPM", enterprise: "Custom", team: "600", pro: "120", developer: "30", free: "10" },
-      { feature: "使用量倍數", enterprise: "Custom", team: "20x", pro: "5x", developer: "1x", free: "—" },
+      { feature: "使用量倍數", enterprise: "Custom", team: TEAM_PLAN.usageMultiplier, pro: PRO_PLAN.usageMultiplier, developer: DEVELOPER_PLAN.usageMultiplier, free: "—" },
       { feature: "商業使用", enterprise: "是", team: "是", pro: "是", developer: "否", free: "否" },
     ],
   },
@@ -342,19 +237,14 @@ const creditsRows = [
   { dataset: "主題分類", endpoint: "/v2/datasets/theme-taxonomy", cost: "1 credit / request" },
 ];
 
-function getDisplayPrice(plan: PlanItem, mode: BillingMode) {
-  if (plan.id === "free") return "免費";
-  if (plan.id === "enterprise") return "聯絡我們";
-  return mode === "monthly" ? plan.monthly : plan.yearly;
+function getDisplayPrice(plan: PricingPlanView, mode: BillingMode) {
+  if (plan.planCode === "free") return "免費";
+  return formatPlanCurrency(getPlanAmountByCycle(plan, mode));
 }
 
-function getUnit(plan: PlanItem, mode: BillingMode) {
-  if (plan.id === "free" || plan.id === "enterprise") return "";
+function getUnit(plan: PricingPlanView, mode: BillingMode) {
+  if (plan.planCode === "free" || plan.isContactOnly) return "";
   return mode === "monthly" ? " / 月" : " / 年";
-}
-
-function getHint(plan: PlanItem, mode: BillingMode) {
-  return mode === "monthly" ? plan.monthlyHint : plan.yearlyHint;
 }
 
 function normalizeComparisonValue(value: string) {
@@ -380,25 +270,27 @@ const HIGHLIGHT_ICON_MAP = {
   sparkles: Sparkles,
   headphones: Headphones,
   server: Server,
-} as const;
+  barChart3: BarChart3,
+  cpu: Cpu,
+} satisfies Record<PlanHighlightIcon, ComponentType<{ size?: number; strokeWidth?: number }>>;
 
 const CARD_CTA_CLASS = buttonClass("primary", "h-14 w-full rounded-2xl px-5 text-base font-medium leading-none");
 
 export function PricingShell() {
   const [mode, setMode] = useState<BillingMode>("monthly");
   const [datasetListExpanded, setDatasetListExpanded] = useState(false);
+  const pricingPlanViews = useMemo(() => getPricingPlanViews(), []);
 
   const planRows = useMemo(
     () =>
-      plans.map((plan) => ({
+      pricingPlanViews.map((plan) => ({
         ...plan,
         displayPrice: getDisplayPrice(plan, mode),
         unit: getUnit(plan, mode),
-        hint: getHint(plan, mode),
       })),
-    [mode],
+    [mode, pricingPlanViews],
   );
-  const cardPlanRows = useMemo(() => planRows.filter((plan) => plan.id !== "free"), [planRows]);
+  const cardPlanRows = useMemo(() => planRows.filter((plan) => plan.planCode !== "free"), [planRows]);
 
   function isExpandableCell(value: ComparisonValue): value is ExpandableDatasetCell {
     return typeof value === "object" && value !== null && value.kind === "dataset-list";
@@ -457,7 +349,7 @@ export function PricingShell() {
         <div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-4">
           {cardPlanRows.map((plan) => (
             <article
-              key={plan.id}
+              key={plan.planCode}
               className={cn(
                 "h-full min-h-[600px] rounded-2xl border bg-white p-6 sm:p-7",
                 plan.featured ? "border-slate-900" : "border-slate-200",
@@ -466,14 +358,14 @@ export function PricingShell() {
               <div className="flex h-full flex-col">
                 <div className="flex min-h-[320px] flex-col">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-[1.65rem] font-medium tracking-tight text-slate-900">{plan.name}</h3>
+                    <h3 className="text-[1.65rem] font-medium tracking-tight text-slate-900">{plan.displayName}</h3>
                     <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{plan.usageMultiplier}</span>
                   </div>
 
                 <div className="mt-10 min-h-[64px]">
-                    {plan.id === "enterprise" ? (
+                    {plan.isContactOnly ? (
                       <>
-                        <p className="whitespace-nowrap text-4xl font-medium tracking-tight text-slate-900">聯絡我們</p>
+                        <p className="whitespace-nowrap text-4xl font-medium tracking-tight text-slate-900">聯繫我們</p>
                         <p className="mt-2 text-xs text-slate-400">客製合約</p>
                       </>
                     ) : (
@@ -487,16 +379,16 @@ export function PricingShell() {
                   <p className="mt-6 text-sm font-normal leading-6 text-slate-600">{plan.summary}</p>
 
                   <div className="mt-auto pt-4">
-                    {plan.id === "enterprise" ? (
+                    {plan.isContactOnly ? (
                       <Link href={plan.href} className={CARD_CTA_CLASS}>
-                        {plan.cta}
+                        {plan.ctaLabel}
                       </Link>
                     ) : (
                       <form action="/api/billing/ecpay/checkout" method="post">
-                        <input type="hidden" name="planCode" value={plan.id} />
+                        <input type="hidden" name="planCode" value={plan.planCode} />
                         <input type="hidden" name="billingCycle" value={mode} />
                         <button type="submit" className={CARD_CTA_CLASS}>
-                          {plan.cta}
+                          {plan.ctaLabel}
                         </button>
                       </form>
                     )}
@@ -517,7 +409,7 @@ export function PricingShell() {
                   })}
                 </ul>
 
-                {plan.id === "enterprise" ? (
+                {plan.isContactOnly ? (
                   <p className="mt-6 text-xs text-slate-500">可依團隊需求客製資料、配額與支援層級。</p>
                 ) : (
                   <p className="mt-6 text-xs text-slate-500">信用卡定期扣款，可於帳務頁取消。</p>
