@@ -15,6 +15,8 @@ import { Download } from "lucide-react";
 
 import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
+import { CreditPurchaseDialog } from "@/src/components/dashboard/credit-purchase-dialog";
+import { formatCredits, formatTwd, getCreditPackageViews } from "@/src/lib/billing/credits";
 
 type EndpointRow = {
   resource: string;
@@ -95,8 +97,10 @@ function monthLabel(key: string) {
 export function BillingCreditsPage() {
   const [activeTab, setActiveTab] = useState<"market" | "fundamentals" | "events">("market");
   const [activeMonthIndex, setActiveMonthIndex] = useState(MONTH_KEYS.length - 1);
+  const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
   const activeMonthKey = MONTH_KEYS[activeMonthIndex];
   const spendSeries = SPEND_SERIES[activeMonthKey] ?? [];
+  const packages = getCreditPackageViews();
 
   return (
     <div className="space-y-4">
@@ -104,8 +108,15 @@ export function BillingCreditsPage() {
         <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
           <p className="text-[15px] font-medium text-slate-900">餘額</p>
           <p className="mt-1 text-sm text-slate-600">可用 credits 餘額</p>
-          <p className="mt-5 text-5xl font-semibold tracking-tight text-slate-900">12,480</p>
-          <button className={buttonClass("primary", "mt-6 h-12 rounded-2xl px-5 text-sm font-semibold")}>購買 credits</button>
+          <p className="mt-5 text-5xl font-semibold tracking-tight text-slate-900">0</p>
+          <p className="mt-2 text-xs text-slate-500">尚未建立 wallet 時，餘額預設顯示為 0。</p>
+          <button
+            type="button"
+            onClick={() => setIsPurchaseDialogOpen(true)}
+            className={buttonClass("primary", "mt-6 h-12 rounded-2xl px-5 text-sm font-semibold")}
+          >
+            購買 credits
+          </button>
         </DashboardCard>
 
         <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
@@ -156,6 +167,40 @@ export function BillingCreditsPage() {
           <p className="mt-4 text-xs text-slate-500">credits 使用量取決於端點成本與請求量。</p>
         </DashboardCard>
       </section>
+
+      <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
+        <p className="text-[15px] font-medium text-slate-900">儲值方案</p>
+        <p className="mt-1 text-sm text-slate-600">彈性補充用量，價格高於訂閱 included credits，適合短期尖峰需求。</p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="text-sm font-medium text-slate-500">
+              <tr>
+                <th className="px-2 py-3 text-left font-medium">方案</th>
+                <th className="px-2 py-3 text-left font-medium">金額</th>
+                <th className="px-2 py-3 text-left font-medium">入帳 credits</th>
+                <th className="px-2 py-3 text-left font-medium">bonus（已含）</th>
+              </tr>
+            </thead>
+            <tbody>
+              {packages.map((pkg) => (
+                <tr key={pkg.packageCode} className="border-t border-slate-100">
+                  <td className="px-2 py-3 text-sm font-medium text-slate-700">
+                    {pkg.label}
+                    {pkg.highlight === "best_value" ? (
+                      <span className="ml-2 rounded-full bg-slate-900 px-2 py-0.5 text-[10px] font-semibold text-white">
+                        Best value
+                      </span>
+                    ) : null}
+                  </td>
+                  <td className="px-2 py-3 text-sm text-slate-700">{formatTwd(pkg.priceTwd)}</td>
+                  <td className="px-2 py-3 text-sm text-slate-700">{formatCredits(pkg.credits)}</td>
+                  <td className="px-2 py-3 text-sm text-slate-700">{formatCredits(pkg.bonusCredits)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </DashboardCard>
 
       <DashboardCard className="rounded-3xl border-slate-200/70 bg-white px-6 py-5 shadow-none">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -264,6 +309,8 @@ export function BillingCreditsPage() {
           </div>
         </DashboardCard>
       </section>
+
+      <CreditPurchaseDialog open={isPurchaseDialogOpen} onOpenChange={setIsPurchaseDialogOpen} />
     </div>
   );
 }

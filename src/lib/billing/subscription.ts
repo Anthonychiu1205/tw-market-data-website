@@ -20,10 +20,10 @@ export type DashboardEntitlement = {
 };
 
 const REQUEST_LIMIT_LABELS: Record<string, string> = {
-  free: "每日 100 / 每月 2,000 / RPM 10",
-  developer: "每日 800 / 每月 20,000 / RPM 30",
-  pro: "每日 4,000 / 每月 100,000 / RPM 120",
-  team: "每日 20,000 / 每月 500,000 / RPM 600",
+  free: "每日上限 100 credits / 每月 included 2,000 credits / RPM 10",
+  developer: "每日上限 800 credits / 每月 included 20,000 credits / RPM 30",
+  pro: "每日上限 4,000 credits / 每月 included 100,000 credits / RPM 120",
+  team: "每日上限 20,000 credits / 每月 included 500,000 credits / RPM 600",
   enterprise: "客製配額",
 };
 
