@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { checkEmailAuthRuntimeEnv } from "@/src/auth/env";
+import {
+  buildAuthRuntimeErrorPayload,
+  checkEmailAuthRuntimeEnv,
+  logAuthRuntimeEnvMissing,
+} from "@/src/auth/env";
 import { verifyEmailBodySchema } from "@/src/lib/auth/email-auth-schema";
 import { createAuthenticatedJsonResponse, readJsonBody } from "@/src/lib/auth/email-auth-route";
 import { prisma } from "@/src/lib/auth/prisma";
@@ -9,13 +13,9 @@ import { consumeVerificationCodeIfValid, normalizeEmail } from "@/src/lib/auth/e
 export async function POST(request: Request) {
   const envCheck = checkEmailAuthRuntimeEnv();
   if (!envCheck.ok) {
+    logAuthRuntimeEnvMissing("api/auth/verify-email:POST", envCheck);
     return NextResponse.json(
-      {
-        ok: false,
-        error: "email_auth_env_missing",
-        message: envCheck.message,
-        missing: envCheck.missing,
-      },
+      buildAuthRuntimeErrorPayload(envCheck, { devErrorCode: "email_auth_env_missing" }),
       { status: envCheck.status },
     );
   }

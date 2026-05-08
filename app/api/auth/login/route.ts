@@ -1,20 +1,17 @@
 import { NextResponse } from "next/server";
 
-import { checkAuthRuntimeEnv } from "@/src/auth/env";
+import {
+  buildAuthRuntimeErrorPayload,
+  checkAuthRuntimeEnv,
+  logAuthRuntimeEnvMissing,
+} from "@/src/auth/env";
 import { getSafeRedirectTarget } from "@/src/lib/security/safe-redirect";
 
 export async function POST(request: Request) {
   const check = checkAuthRuntimeEnv();
   if (!check.ok) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: "auth_runtime_env_missing",
-        message: check.message,
-        missing: check.missing,
-      },
-      { status: check.status },
-    );
+    logAuthRuntimeEnvMissing("api/auth/login:POST", check);
+    return NextResponse.json(buildAuthRuntimeErrorPayload(check), { status: check.status });
   }
 
   const requestUrl = new URL(request.url);

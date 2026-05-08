@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { checkEmailAuthRuntimeEnv } from "@/src/auth/env";
+import {
+  buildAuthRuntimeErrorPayload,
+  checkEmailAuthRuntimeEnv,
+  logAuthRuntimeEnvMissing,
+} from "@/src/auth/env";
 import { passwordLoginBodySchema } from "@/src/lib/auth/email-auth-schema";
 import { badRequest, createAuthenticatedJsonResponse, readJsonBody } from "@/src/lib/auth/email-auth-route";
 import { verifyPasswordHash } from "@/src/lib/auth/email-password";
@@ -11,13 +15,9 @@ import { getSafeRedirectTarget } from "@/src/lib/security/safe-redirect";
 export async function POST(request: Request) {
   const envCheck = checkEmailAuthRuntimeEnv();
   if (!envCheck.ok) {
+    logAuthRuntimeEnvMissing("api/auth/password-login:POST", envCheck);
     return NextResponse.json(
-      {
-        ok: false,
-        error: "email_auth_env_missing",
-        message: envCheck.message,
-        missing: envCheck.missing,
-      },
+      buildAuthRuntimeErrorPayload(envCheck, { devErrorCode: "email_auth_env_missing" }),
       { status: envCheck.status },
     );
   }
