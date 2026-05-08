@@ -14,6 +14,8 @@ const REQUIRED_TABLES = [
   "PasswordResetToken",
   "Subscription",
   "BillingPayment",
+  "CreditWallet",
+  "CreditTransaction",
   "_prisma_migrations",
 ] as const;
 
@@ -93,6 +95,8 @@ async function checkTableExistence(client: PrismaClient) {
       PasswordResetToken: false,
       Subscription: false,
       BillingPayment: false,
+      CreditWallet: false,
+      CreditTransaction: false,
       _prisma_migrations: false,
     },
   );
