@@ -98,6 +98,63 @@ export async function getLatestSubscriptionForUser(userId: string) {
   });
 }
 
+function isFutureDate(date: Date | null) {
+  if (!date) return false;
+  const value = date.getTime();
+  return Number.isFinite(value) && value > Date.now();
+}
+
+function isBillingEffectiveSubscription(subscription: Pick<Subscription, "status" | "currentPeriodEnd" | "cancelAtPeriodEnd">) {
+  const status = subscription.status.toLowerCase();
+  const hasFuturePeriod = isFutureDate(subscription.currentPeriodEnd);
+
+  if (status === "active" && (hasFuturePeriod || !subscription.currentPeriodEnd)) {
+    return true;
+  }
+
+  if (status === "cancelled" && (subscription.cancelAtPeriodEnd || hasFuturePeriod) && hasFuturePeriod) {
+    return true;
+  }
+
+  return false;
+}
+
+export async function getBillingDisplaySubscriptionForUser(userId: string) {
+  const subscriptions = await prisma.subscription.findMany({
+    where: { userId },
+    orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+  });
+
+  let latestPending: Subscription | null = null;
+  let latestPastDueOrFailed: Subscription | null = null;
+  let latestCancelled: Subscription | null = null;
+
+  for (const subscription of subscriptions) {
+    const status = subscription.status.toLowerCase();
+
+    if (isBillingEffectiveSubscription(subscription)) {
+      return subscription;
+    }
+
+    if (status === "pending" && !latestPending) {
+      latestPending = subscription;
+      continue;
+    }
+
+    if ((status === "past_due" || status === "failed") && !latestPastDueOrFailed) {
+      latestPastDueOrFailed = subscription;
+      continue;
+    }
+
+    if (status === "cancelled" && !latestCancelled) {
+      latestCancelled = subscription;
+      continue;
+    }
+  }
+
+  return latestPending ?? latestPastDueOrFailed ?? latestCancelled ?? null;
+}
+
 export async function getUserPlanCode(userId: string) {
   const subscription = await getActiveSubscriptionForUser(userId);
   return subscription?.planCode ?? null;

@@ -9,8 +9,8 @@ import {
   getUsageSummary,
 } from "@/src/lib/backend-adapter";
 import {
+  getBillingDisplaySubscriptionForUser,
   getDashboardEntitlementForUser,
-  getLatestSubscriptionForUser,
 } from "@/src/lib/billing/subscription";
 
 type DashboardPageShellProps = {
@@ -22,19 +22,19 @@ type DashboardPageShellProps = {
 export async function DashboardPageShell({ section, currentPath, currentHref }: DashboardPageShellProps) {
   const session = await getRequiredSession();
 
-  const latestSubscriptionPromise = getLatestSubscriptionForUser(session.id).catch((error) => {
+  const billingDisplaySubscriptionPromise = getBillingDisplaySubscriptionForUser(session.id).catch((error) => {
     const errorName = error instanceof Error ? error.name : "UnknownError";
-    console.warn(`[dashboard] failed to fetch latest subscription (${errorName})`);
+    console.warn(`[dashboard] failed to fetch billing display subscription (${errorName})`);
     return null;
   });
 
-  const [account, billing, usage, usageRequests, apiKeys, subscription] = await Promise.all([
+  const [account, billing, usage, usageRequests, apiKeys, billingDisplaySubscription] = await Promise.all([
     getAccountSummary(session.email),
     getBillingSummary(session.email),
     getUsageSummary(session.email),
     getUsageRequestRows(session.email),
     getApiKeysSummary(session.email),
-    latestSubscriptionPromise,
+    billingDisplaySubscriptionPromise,
   ]);
 
   const entitlement = await getDashboardEntitlementForUser({
@@ -56,16 +56,16 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
         apiKeys={apiKeys}
         entitlement={entitlement}
         subscription={
-          subscription
+          billingDisplaySubscription
             ? {
-                id: subscription.id,
-                planCode: subscription.planCode,
-                status: subscription.status,
-                billingCycle: subscription.billingCycle,
-                currentPeriodEnd: subscription.currentPeriodEnd,
-                cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-                cancelReason: subscription.cancelReason,
-                cancelReasonDetail: subscription.cancelReasonDetail,
+                id: billingDisplaySubscription.id,
+                planCode: billingDisplaySubscription.planCode,
+                status: billingDisplaySubscription.status,
+                billingCycle: billingDisplaySubscription.billingCycle,
+                currentPeriodEnd: billingDisplaySubscription.currentPeriodEnd,
+                cancelAtPeriodEnd: billingDisplaySubscription.cancelAtPeriodEnd,
+                cancelReason: billingDisplaySubscription.cancelReason,
+                cancelReasonDetail: billingDisplaySubscription.cancelReasonDetail,
               }
             : null
         }
