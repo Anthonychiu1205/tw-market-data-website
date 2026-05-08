@@ -86,6 +86,27 @@ Expected checks:
 - valid key + supported dataset returns upstream response
 - missing key returns `401 invalid_api_key`
 - unsupported dataset returns `404 dataset_not_found`
+- malformed key returns `401 invalid_api_key`
+- if upstream is temporarily failing, script may report `gateway-auth-ok-upstream-failed` while still confirming gateway auth + headers.
+
+### Usage Ledger Check
+
+Check latest dry-run usage events from local DB:
+
+```bash
+npm run check:usage-ledger
+```
+
+Optional envs:
+
+- `USAGE_CHECK_USER_EMAIL`
+- `USAGE_CHECK_API_KEY_PREFIX`
+
+Notes:
+
+- Script prints sanitized event fields only (`createdAt`, `datasetSlug`, `statusCode`, `creditsCharged`, `requestId`, `errorCode`, `latencyMs`).
+- It never prints raw API key or key hash.
+- Empty result is allowed and will not fail the script.
 
 ### Standardized Error Shape
 
@@ -137,3 +158,5 @@ You should see gateway headers including:
 - Credits deduction is not enabled in this phase.
 - Usage logging is dry-run only and does not perform wallet deduction.
 - `PUBLIC_API_FREE_TIER_ENABLED` can control whether free-tier API access is allowed in this dry-run phase (default enabled).
+- Missing/malformed API key requests may not enter per-user usage ledger because user identity cannot be resolved.
+- Phase 4 is where credits deduction will be implemented.
