@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { authenticateApiKey } from "@/src/lib/gateway/auth";
 import { assertDatasetEntitlement } from "@/src/lib/gateway/entitlement";
 import {
-  createGatewayErrorResponse,
+  createGatewayErrorBody,
   GatewayHttpError,
   logGatewayIssue,
   type GatewayErrorCode,
@@ -11,7 +11,7 @@ import {
 import { resolveDryRunMetering } from "@/src/lib/gateway/metering";
 import { resolveDatasetPolicy } from "@/src/lib/gateway/policies";
 import { proxyDatasetRequest } from "@/src/lib/gateway/proxy";
-import { applyGatewayHeaders, mergeMetaField } from "@/src/lib/gateway/response";
+import { gatewayJsonResponse, gatewayProxyResponse } from "@/src/lib/gateway/response";
 import { createApiUsageEvent, deriveSymbolFromSearchParams } from "@/src/lib/gateway/usage";
 
 export const runtime = "nodejs";
@@ -66,7 +66,7 @@ export async function GET(request: Request, context: Context) {
   let planCode: string | undefined;
   let creditsCost: number | undefined;
   const dryRun = true;
-  let stage = "init";
+  let stage = "dataset_policy";
   const startedAt = Date.now();
   let authUserId: string | null = null;
   let authApiKeyId: string | null = null;
@@ -76,21 +76,8 @@ export async function GET(request: Request, context: Context) {
   const symbol = deriveSymbolFromSearchParams(searchParams);
   let statusCodeForLog = 500;
   let errorCodeForLog: GatewayErrorCode | null = null;
-  let requestHeaders = new Headers();
-
-  const buildGatewayMetaHeaders = () => {
-    const headers = new Headers();
-    applyGatewayHeaders(headers, {
-      requestId,
-      planCode,
-      creditsCost,
-      dryRun,
-    });
-    return headers;
-  };
 
   try {
-    stage = "route_params";
     const params = await context.params;
     const datasetSlug = params.dataset;
     datasetSlugForLog = datasetSlug;
@@ -101,16 +88,20 @@ export async function GET(request: Request, context: Context) {
     if (!datasetPolicy) {
       statusCodeForLog = 404;
       errorCodeForLog = "dataset_not_found";
-      return createGatewayErrorResponse({
-        status: 404,
+      return gatewayJsonResponse(createGatewayErrorBody({
         code: "dataset_not_found",
         requestId,
-        headers: buildGatewayMetaHeaders(),
         stage,
+      }), {
+        status: 404,
+        requestId,
+        planCode,
+        creditsCost,
+        dryRun,
       });
     }
 
-    stage = "auth_lookup";
+    stage = "api_key_auth";
     const authContext = await authenticateApiKey(request);
     authUserId = authContext.userId;
     authApiKeyId = authContext.apiKeyId;
@@ -118,6 +109,7 @@ export async function GET(request: Request, context: Context) {
     const entitlement = await assertDatasetEntitlement({
       userId: authContext.userId,
       datasetPolicy,
+      requestId,
     });
 
     planCode = entitlement.planCode;
@@ -133,42 +125,21 @@ export async function GET(request: Request, context: Context) {
     });
 
     if (upstream.status >= 500) {
-      throw new GatewayHttpError(502, "upstream_error");
+      throw new GatewayHttpError(502, "upstream_error", undefined, { stage: "proxy" });
     }
 
     statusCodeForLog = upstream.status;
-
-    const headers = new Headers(upstream.headers);
-    applyGatewayHeaders(headers, {
+    stage = "response_build";
+    return gatewayProxyResponse({
+      upstreamStatus: upstream.status,
+      upstreamPayload: upstream.payload,
+      upstreamRawText: upstream.rawText,
+      upstreamIsJson: upstream.isJson,
+      upstreamHeaders: upstream.headers,
       requestId,
       planCode,
       creditsCost,
       dryRun,
-    });
-
-    if (!upstream.isJson) {
-      stage = "response";
-      return new Response(upstream.rawText ?? "", {
-        status: upstream.status,
-        headers,
-      });
-    }
-
-    const mergedPayload = mergeMetaField(upstream.payload, {
-      creditsCost,
-      dryRun,
-      requestId,
-      planCode,
-    });
-
-    if (!headers.has("Content-Type")) {
-      headers.set("Content-Type", "application/json; charset=utf-8");
-    }
-
-    stage = "response";
-    return new Response(JSON.stringify(mergedPayload), {
-      status: upstream.status,
-      headers,
     });
   } catch (error) {
     if (error instanceof GatewayHttpError) {
@@ -181,7 +152,6 @@ export async function GET(request: Request, context: Context) {
       statusCodeForLog = error.status;
       errorCodeForLog = error.code;
       stage = error.details?.stage ?? stage;
-      requestHeaders = buildGatewayMetaHeaders();
       logGatewayIssue({
         level: error.status >= 500 ? "error" : "warn",
         requestId,
@@ -189,17 +159,20 @@ export async function GET(request: Request, context: Context) {
         error,
       });
 
-      return createGatewayErrorResponse({
-        status: error.status,
+      return gatewayJsonResponse(createGatewayErrorBody({
         code: error.code,
         message: error.message,
         requestId,
-        headers: requestHeaders,
         stage,
+      }), {
+        status: error.status,
+        requestId,
+        planCode,
+        creditsCost,
+        dryRun,
       });
     }
 
-    requestHeaders = buildGatewayMetaHeaders();
     statusCodeForLog = 500;
     errorCodeForLog = "internal_error";
     stage = "unknown_internal";
@@ -210,12 +183,16 @@ export async function GET(request: Request, context: Context) {
       error,
     });
 
-    return createGatewayErrorResponse({
-      status: 500,
+    return gatewayJsonResponse(createGatewayErrorBody({
       code: "internal_error",
       requestId,
-      headers: requestHeaders,
       stage,
+    }), {
+      status: 500,
+      requestId,
+      planCode,
+      creditsCost,
+      dryRun,
     });
   } finally {
     if (authUserId) {

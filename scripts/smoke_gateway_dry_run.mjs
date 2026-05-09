@@ -38,15 +38,21 @@ async function runRequest(label, url, options = {}) {
   const response = await fetch(url, options);
   const errorCode = await extractErrorCode(response);
   const errorPayload = await extractErrorPayload(response);
+  const headerRequestId = readHeader(response.headers, "x-request-id");
+  const effectiveRequestId = headerRequestId !== "-" ? headerRequestId : errorPayload.requestId;
+  const headerMissingRequestId = headerRequestId === "-" && errorPayload.requestId !== "-";
 
   console.log(`\n[${label}]`);
   console.log(`status=${response.status}`);
   console.log(`errorCode=${errorCode}`);
-  console.log(`x-request-id=${readHeader(response.headers, "x-request-id")}`);
+  console.log(`x-request-id=${headerRequestId}`);
   console.log(`x-twmd-plan=${readHeader(response.headers, "x-twmd-plan")}`);
   console.log(`x-twmd-credits-cost=${readHeader(response.headers, "x-twmd-credits-cost")}`);
   console.log(`x-twmd-dry-run=${readHeader(response.headers, "x-twmd-dry-run")}`);
   console.log(`content-type=${readHeader(response.headers, "content-type")}`);
+  if (headerMissingRequestId) {
+    console.log("header_missing_request_id=true");
+  }
   if (response.status >= 500) {
     console.log(`error.message=${errorPayload.message}`);
     console.log(`error.requestId=${errorPayload.requestId}`);
@@ -55,7 +61,9 @@ async function runRequest(label, url, options = {}) {
   return {
     status: response.status,
     errorCode,
-    requestId: readHeader(response.headers, "x-request-id"),
+    requestId: effectiveRequestId,
+    headerRequestId,
+    headerMissingRequestId,
     plan: readHeader(response.headers, "x-twmd-plan"),
     creditsCost: readHeader(response.headers, "x-twmd-credits-cost"),
     dryRun: readHeader(response.headers, "x-twmd-dry-run"),
@@ -116,6 +124,9 @@ async function main() {
   if (missingKeyResult.requestId === "-") {
     failures.push("missing-key response should include X-Request-Id");
   }
+  if (missingKeyResult.headerMissingRequestId) {
+    failures.push("missing-key response missing X-Request-Id header (body requestId present)");
+  }
 
   if (unsupportedResult.status !== 404 || unsupportedResult.errorCode !== "dataset_not_found") {
     failures.push("unsupported-dataset should return 404 dataset_not_found");
@@ -123,12 +134,18 @@ async function main() {
   if (unsupportedResult.requestId === "-") {
     failures.push("unsupported-dataset response should include X-Request-Id");
   }
+  if (unsupportedResult.headerMissingRequestId) {
+    failures.push("unsupported-dataset response missing X-Request-Id header (body requestId present)");
+  }
 
   if (malformedResult.status !== 401 || malformedResult.errorCode !== "invalid_api_key") {
     failures.push("malformed-key should return 401 invalid_api_key");
   }
   if (malformedResult.requestId === "-") {
     failures.push("malformed-key response should include X-Request-Id");
+  }
+  if (malformedResult.headerMissingRequestId) {
+    failures.push("malformed-key response missing X-Request-Id header (body requestId present)");
   }
 
   if (validResult.dryRun !== "true" || validResult.requestId === "-" || validResult.creditsCost === "-") {
@@ -138,27 +155,32 @@ async function main() {
   if (validResult.requestId === "-") {
     failures.push("valid-key response should always include X-Request-Id");
   }
+  if (validResult.headerMissingRequestId) {
+    failures.push("valid-key response missing X-Request-Id header (body requestId present)");
+  }
 
   if (validResult.status === 502 || validResult.status === 504) {
     console.log("[WARN] gateway-auth-ok-upstream-failed");
   } else if (validResult.status === 401 || validResult.status === 403) {
     failures.push("valid-key request should not return auth failure");
   } else if (validResult.status >= 500) {
-    failures.push("valid-key request returned 5xx; inspect requestId/stage in server logs");
+    failures.push(
+      `valid-key request returned 5xx (requestId=${validResult.requestId}, error=${validResult.errorCode}); inspect requestId/stage in server logs`,
+    );
   }
 
   console.log("\n[SUMMARY]");
   console.log(
-    `valid-key: status=${validResult.status} code=${validResult.errorCode} requestId=${validResult.requestId} dryRun=${validResult.dryRun} plan=${validResult.plan} credits=${validResult.creditsCost}`,
+    `valid-key: status=${validResult.status} code=${validResult.errorCode} requestId=${validResult.requestId} headerRequestId=${validResult.headerRequestId} dryRun=${validResult.dryRun} plan=${validResult.plan} credits=${validResult.creditsCost}`,
   );
   console.log(
-    `missing-key: status=${missingKeyResult.status} code=${missingKeyResult.errorCode} requestId=${missingKeyResult.requestId}`,
+    `missing-key: status=${missingKeyResult.status} code=${missingKeyResult.errorCode} requestId=${missingKeyResult.requestId} headerRequestId=${missingKeyResult.headerRequestId}`,
   );
   console.log(
-    `malformed-key: status=${malformedResult.status} code=${malformedResult.errorCode} requestId=${malformedResult.requestId}`,
+    `malformed-key: status=${malformedResult.status} code=${malformedResult.errorCode} requestId=${malformedResult.requestId} headerRequestId=${malformedResult.headerRequestId}`,
   );
   console.log(
-    `unsupported-dataset: status=${unsupportedResult.status} code=${unsupportedResult.errorCode} requestId=${unsupportedResult.requestId}`,
+    `unsupported-dataset: status=${unsupportedResult.status} code=${unsupportedResult.errorCode} requestId=${unsupportedResult.requestId} headerRequestId=${unsupportedResult.headerRequestId}`,
   );
   console.log("revoked-key: not covered by default smoke (requires dedicated revoked key)");
 

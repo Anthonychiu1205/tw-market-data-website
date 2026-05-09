@@ -19,7 +19,10 @@ function isPublicApiFreeTierEnabled() {
   return raw === "1" || raw === "true" || raw === "yes" || raw === "on";
 }
 
-export async function resolveUserPlanCode(userId: string): Promise<{ planCode: GatewayPlanCode; source: "subscription" | "fallback" }> {
+export async function resolveUserPlanCode(
+  userId: string,
+  requestId = "n/a",
+): Promise<{ planCode: GatewayPlanCode; source: "subscription" | "fallback" }> {
   try {
     const activeSubscription = await getActiveSubscriptionForUser(userId);
     if (activeSubscription) {
@@ -32,7 +35,7 @@ export async function resolveUserPlanCode(userId: string): Promise<{ planCode: G
     const errorName = error instanceof Error ? error.name : "UnknownError";
     const message = sanitizeGatewayErrorMessage(error);
     console.warn("[gateway]", {
-      requestId: "n/a",
+      requestId,
       stage: "entitlement",
       errorName,
       message,
@@ -49,8 +52,9 @@ export async function resolveUserPlanCode(userId: string): Promise<{ planCode: G
 export async function assertDatasetEntitlement(input: {
   userId: string;
   datasetPolicy: DatasetPolicy;
+  requestId?: string;
 }): Promise<GatewayEntitlementResult> {
-  const resolved = await resolveUserPlanCode(input.userId);
+  const resolved = await resolveUserPlanCode(input.userId, input.requestId);
   if (resolved.planCode === "free" && !isPublicApiFreeTierEnabled()) {
     throw new GatewayHttpError(403, "plan_not_entitled");
   }

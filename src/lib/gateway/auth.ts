@@ -58,7 +58,7 @@ export async function authenticateApiKey(request: Request): Promise<GatewayAuthC
     });
   } catch {
     throw new GatewayHttpError(500, "internal_error", "API key lookup failed.", {
-      stage: "auth_lookup",
+      stage: "api_key_auth",
     });
   }
 
@@ -70,7 +70,7 @@ export async function authenticateApiKey(request: Request): Promise<GatewayAuthC
     throw new GatewayHttpError(403, "api_key_revoked", undefined, {
       userId: apiKey.userId,
       apiKeyId: apiKey.id,
-      stage: "auth_lookup",
+      stage: "api_key_auth",
     });
   }
 

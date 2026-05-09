@@ -80,19 +80,12 @@ function shouldExposeDebugStage() {
   return process.env.NODE_ENV !== "production" || process.env.GATEWAY_DEBUG === "true";
 }
 
-export function createGatewayErrorResponse(input: {
-  status: number;
+export function createGatewayErrorBody(input: {
   code: GatewayErrorCode;
-  requestId: string;
   message?: string;
-  headers?: HeadersInit;
+  requestId: string;
   stage?: string;
 }) {
-  const headers = new Headers(input.headers ?? undefined);
-  if (!headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json; charset=utf-8");
-  }
-
   const body: Record<string, unknown> = {
     error: {
       code: input.code,
@@ -103,12 +96,5 @@ export function createGatewayErrorResponse(input: {
   if (input.stage && shouldExposeDebugStage()) {
     body.debug = { stage: input.stage };
   }
-
-  return new Response(
-    JSON.stringify(body),
-    {
-      status: input.status,
-      headers,
-    },
-  );
+  return body;
 }

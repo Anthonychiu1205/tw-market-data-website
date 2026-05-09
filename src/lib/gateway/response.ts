@@ -4,12 +4,26 @@ type GatewayResponseHeaderInput = {
   requestId: string;
   planCode?: string;
   creditsCost?: number;
-  dryRun: boolean;
+  dryRun?: boolean;
 };
 
+export type GatewayResponseOptions = GatewayResponseHeaderInput & {
+  status: number;
+  headers?: HeadersInit;
+};
+
+export type GatewayProxyResponseInput = {
+  upstreamStatus: number;
+  upstreamPayload: unknown;
+  upstreamRawText: string | null;
+  upstreamIsJson: boolean;
+  upstreamHeaders?: HeadersInit;
+} & GatewayResponseHeaderInput;
+
 export function applyGatewayHeaders(headers: Headers, input: GatewayResponseHeaderInput) {
+  const dryRun = input.dryRun ?? true;
   headers.set("X-Request-Id", input.requestId);
-  headers.set("X-TWMD-Dry-Run", input.dryRun ? "true" : "false");
+  headers.set("X-TWMD-Dry-Run", dryRun ? "true" : "false");
   if (typeof input.planCode === "string" && input.planCode.trim()) {
     headers.set("X-TWMD-Plan", input.planCode.trim());
   }
@@ -18,19 +32,65 @@ export function applyGatewayHeaders(headers: Headers, input: GatewayResponseHead
   }
 }
 
-export function createGatewayHeaders(input: GatewayResponseHeaderInput) {
+export function buildGatewayHeaders(input: GatewayResponseHeaderInput) {
   const headers = new Headers();
   applyGatewayHeaders(headers, input);
   return headers;
 }
 
+function mergeHeaders(baseHeaders: Headers, extraHeaders?: HeadersInit) {
+  if (!extraHeaders) return;
+  const extra = new Headers(extraHeaders);
+  extra.forEach((value, key) => {
+    baseHeaders.set(key, value);
+  });
+}
+
+export function gatewayJsonResponse(body: unknown, options: GatewayResponseOptions) {
+  const headers = buildGatewayHeaders(options);
+  mergeHeaders(headers, options.headers);
+  if (!headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json; charset=utf-8");
+  }
+  return new Response(JSON.stringify(body), {
+    status: options.status,
+    headers,
+  });
+}
+
+export function gatewayProxyResponse(input: GatewayProxyResponseInput) {
+  const headers = buildGatewayHeaders(input);
+  mergeHeaders(headers, input.upstreamHeaders);
+
+  if (input.upstreamIsJson) {
+    const payload = mergeMetaField(input.upstreamPayload, {
+      creditsCost: input.creditsCost,
+      dryRun: input.dryRun ?? true,
+      requestId: input.requestId,
+      planCode: input.planCode,
+    });
+    if (!headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json; charset=utf-8");
+    }
+    return new Response(JSON.stringify(payload), {
+      status: input.upstreamStatus,
+      headers,
+    });
+  }
+
+  return new Response(input.upstreamRawText ?? "", {
+    status: input.upstreamStatus,
+    headers,
+  });
+}
+
 export function mergeMetaField(
   upstreamPayload: unknown,
   meta: {
-    creditsCost: number;
+    creditsCost?: number;
     dryRun: boolean;
     requestId: string;
-    planCode: string;
+    planCode?: string;
   },
 ) {
   if (!upstreamPayload || typeof upstreamPayload !== "object" || Array.isArray(upstreamPayload)) {
@@ -47,10 +107,14 @@ export function mergeMetaField(
     ...record,
     meta: {
       ...existingMeta,
-      creditsCost: meta.creditsCost,
+      ...(typeof meta.creditsCost === "number" && Number.isFinite(meta.creditsCost)
+        ? { creditsCost: meta.creditsCost }
+        : {}),
       dryRun: meta.dryRun,
       requestId: meta.requestId,
-      planCode: meta.planCode,
+      ...(typeof meta.planCode === "string" && meta.planCode.trim()
+        ? { planCode: meta.planCode.trim() }
+        : {}),
     },
   };
 }
