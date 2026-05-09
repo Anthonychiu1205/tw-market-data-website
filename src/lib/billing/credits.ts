@@ -11,6 +11,47 @@ export type CreditPackage = {
 
 export type CreditTransactionStatus = "pending" | "completed" | "failed" | "cancelled" | "simulated";
 export type CreditTransactionType = "purchase" | "usage" | "adjustment";
+const CREDIT_WALLET_CACHE_TTL_MS = 8_000;
+
+type CreditWalletCacheValue = {
+  id: string;
+  userId: string;
+  balance: number;
+  createdAt: Date;
+  updatedAt: Date;
+} | null;
+
+type CreditWalletCacheEntry = {
+  value: CreditWalletCacheValue;
+  expiresAt: number;
+};
+
+const creditWalletCache = new Map<string, CreditWalletCacheEntry>();
+
+function nowMs() {
+  return Date.now();
+}
+
+function getCachedWallet(userId: string): CreditWalletCacheValue | undefined {
+  const entry = creditWalletCache.get(userId);
+  if (!entry) return undefined;
+  if (entry.expiresAt <= nowMs()) {
+    creditWalletCache.delete(userId);
+    return undefined;
+  }
+  return entry.value;
+}
+
+function setCachedWallet(userId: string, value: CreditWalletCacheValue) {
+  creditWalletCache.set(userId, {
+    value,
+    expiresAt: nowMs() + CREDIT_WALLET_CACHE_TTL_MS,
+  });
+}
+
+function invalidateWalletCache(userId: string) {
+  creditWalletCache.delete(userId);
+}
 
 export const CREDIT_PACKAGES: Record<CreditPackageCode, CreditPackage> = {
   starter: {
@@ -93,8 +134,13 @@ async function loadPrisma() {
 }
 
 export async function getCreditWalletForUser(userId: string) {
+  const cached = getCachedWallet(userId);
+  if (cached !== undefined) {
+    return cached;
+  }
+
   const prisma = await loadPrisma();
-  return prisma.creditWallet.findUnique({
+  const wallet = await prisma.creditWallet.findUnique({
     where: { userId },
     select: {
       id: true,
@@ -104,6 +150,8 @@ export async function getCreditWalletForUser(userId: string) {
       updatedAt: true,
     },
   });
+  setCachedWallet(userId, wallet);
+  return wallet;
 }
 
 export async function getCreditTransactionsForUser(userId: string, limit = 10) {
@@ -131,8 +179,9 @@ export async function getCreditTransactionsForUser(userId: string, limit = 10) {
 }
 
 export async function getOrCreateCreditWallet(userId: string) {
+  invalidateWalletCache(userId);
   const prisma = await loadPrisma();
-  return prisma.creditWallet.upsert({
+  const wallet = await prisma.creditWallet.upsert({
     where: { userId },
     create: { userId, balance: 0 },
     update: {},
@@ -144,4 +193,6 @@ export async function getOrCreateCreditWallet(userId: string) {
       updatedAt: true,
     },
   });
+  setCachedWallet(userId, wallet);
+  return wallet;
 }

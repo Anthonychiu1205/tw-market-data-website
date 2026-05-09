@@ -3,6 +3,19 @@ import "server-only";
 import { prisma } from "@/src/lib/auth/prisma";
 import { sanitizeGatewayErrorMessage } from "@/src/lib/gateway/errors";
 
+const USAGE_SUMMARY_CACHE_TTL_MS = 8_000;
+
+type UsageSummaryCacheEntry = {
+  value: ApiUsageSummary;
+  expiresAt: number;
+};
+
+const usageSummaryCache = new Map<string, UsageSummaryCacheEntry>();
+
+function nowMs() {
+  return Date.now();
+}
+
 type CreateApiUsageEventInput = {
   userId: string;
   apiKeyId?: string | null;
@@ -124,6 +137,11 @@ export type ApiUsageSummary = {
 };
 
 export async function getUsageSummaryForUser(userId: string): Promise<ApiUsageSummary> {
+  const cached = usageSummaryCache.get(userId);
+  if (cached && cached.expiresAt > nowMs()) {
+    return cached.value;
+  }
+
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfWindow = new Date(startOfToday);
@@ -180,7 +198,7 @@ export async function getUsageSummaryForUser(userId: string): Promise<ApiUsageSu
     };
   });
 
-  return {
+  const result: ApiUsageSummary = {
     requestsToday,
     requests30d: events.length,
     estimatedCreditsUsage30d: creditsTotal,
@@ -194,4 +212,9 @@ export async function getUsageSummaryForUser(userId: string): Promise<ApiUsageSu
       .slice(0, 8),
     dailyUsage,
   };
+  usageSummaryCache.set(userId, {
+    value: result,
+    expiresAt: nowMs() + USAGE_SUMMARY_CACHE_TTL_MS,
+  });
+  return result;
 }

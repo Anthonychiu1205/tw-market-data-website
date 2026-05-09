@@ -31,6 +31,15 @@ export default function DashboardLoading() {
             </section>
             <section className="rounded-2xl border border-slate-200 bg-white p-6">
               <Pulse className="h-5 w-28" />
+              <div className="mt-4 space-y-2">
+                <Pulse className="h-10 w-full" />
+                <Pulse className="h-10 w-full" />
+                <Pulse className="h-10 w-full" />
+                <Pulse className="h-10 w-full" />
+              </div>
+            </section>
+            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+              <Pulse className="h-5 w-28" />
               <Pulse className="mt-4 h-56 w-full" />
             </section>
           </div>

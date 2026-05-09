@@ -11,13 +11,22 @@ import {
 import {
   checkCreditsAvailabilityForApiUsage,
   deductCreditsForApiUsage,
-  isCreditsDeductionEnabled,
 } from "@/src/lib/gateway/credits-deduction";
+import { isCreditsDeductionEnabled } from "@/src/lib/billing/credits-mode";
 import { resolveDryRunMetering } from "@/src/lib/gateway/metering";
 import { resolveDatasetPolicy } from "@/src/lib/gateway/policies";
 import { proxyDatasetRequest } from "@/src/lib/gateway/proxy";
 import { gatewayJsonResponse, gatewayProxyResponse } from "@/src/lib/gateway/response";
 import { createApiUsageEvent, deriveSymbolFromSearchParams } from "@/src/lib/gateway/usage";
+import {
+  beginGatewayCacheRefresh,
+  buildGatewayCacheKey,
+  endGatewayCacheRefresh,
+  getGatewayCacheEntry,
+  getGatewayCacheMaxStaleMs,
+  getGatewayCacheTtlMs,
+  upsertGatewayCacheEntry,
+} from "@/src/lib/gateway/cache";
 
 export const runtime = "nodejs";
 
@@ -66,6 +75,60 @@ function buildAllowedQueryString(request: Request) {
   return searchParams.toString();
 }
 
+function applyGatewayCacheHeaders(response: Response, input: {
+  cacheStatus: "HIT" | "MISS" | "STALE";
+  ageMs: number;
+  deductionEnabled: boolean;
+}) {
+  const headers = new Headers(response.headers);
+  headers.set("X-TWMD-Cache", input.cacheStatus);
+  headers.set("X-TWMD-Cache-Age", String(Math.max(0, Math.trunc(input.ageMs))));
+
+  if (!input.deductionEnabled && response.status >= 200 && response.status < 300) {
+    const ttlSeconds = Math.max(1, Math.floor(getGatewayCacheTtlMs() / 1000));
+    const staleSeconds = Math.max(1, Math.floor(getGatewayCacheMaxStaleMs() / 1000));
+    headers.set("Cache-Control", `private, max-age=${ttlSeconds}, stale-while-revalidate=${staleSeconds}`);
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    headers,
+  });
+}
+
+async function refreshGatewayCacheInBackground(input: {
+  cacheKey: string;
+  backendPath: string;
+  queryString: string;
+  userEmail: string | null;
+}) {
+  if (!beginGatewayCacheRefresh(input.cacheKey)) {
+    return;
+  }
+
+  try {
+    const upstream = await proxyDatasetRequest({
+      backendPath: input.backendPath,
+      queryString: input.queryString,
+      userEmail: input.userEmail,
+    });
+
+    if (upstream.status === 200) {
+      upsertGatewayCacheEntry(input.cacheKey, {
+        upstreamStatus: upstream.status,
+        upstreamPayload: upstream.payload,
+        upstreamRawText: upstream.rawText,
+        upstreamIsJson: upstream.isJson,
+        upstreamHeaders: Array.from(upstream.headers.entries()),
+      });
+    }
+  } catch {
+    // Ignore refresh failure and keep stale value.
+  } finally {
+    endGatewayCacheRefresh(input.cacheKey);
+  }
+}
+
 export async function GET(request: Request, context: Context) {
   const requestId = randomUUID();
   const deductionEnabled = isCreditsDeductionEnabled();
@@ -84,6 +147,8 @@ export async function GET(request: Request, context: Context) {
   const symbol = deriveSymbolFromSearchParams(searchParams);
   let statusCodeForLog = 500;
   let errorCodeForLog: GatewayErrorCode | null = null;
+  let cacheStatusForLog: "HIT" | "MISS" | "STALE" = "MISS";
+  let cacheAgeMsForLog = 0;
 
   try {
     const params = await context.params;
@@ -127,6 +192,49 @@ export async function GET(request: Request, context: Context) {
       creditsForUsageEvent = creditsCost;
     }
 
+    const queryString = buildAllowedQueryString(request);
+    const cacheKey = buildGatewayCacheKey({
+      datasetSlug,
+      normalizedQueryString: queryString,
+    });
+
+    if (!deductionEnabled) {
+      const cacheLookup = getGatewayCacheEntry(cacheKey);
+      if (cacheLookup.status === "fresh" || cacheLookup.status === "stale") {
+        cacheStatusForLog = cacheLookup.status === "fresh" ? "HIT" : "STALE";
+        cacheAgeMsForLog = cacheLookup.ageMs;
+        statusCodeForLog = cacheLookup.payload.upstreamStatus;
+
+        if (cacheLookup.status === "stale") {
+          void refreshGatewayCacheInBackground({
+            cacheKey,
+            backendPath: datasetPolicy.backendPath,
+            queryString,
+            userEmail: authContext.userEmail,
+          });
+        }
+
+        const cachedResponse = gatewayProxyResponse({
+          upstreamStatus: cacheLookup.payload.upstreamStatus,
+          upstreamPayload: cacheLookup.payload.upstreamPayload,
+          upstreamRawText: cacheLookup.payload.upstreamRawText,
+          upstreamIsJson: cacheLookup.payload.upstreamIsJson,
+          upstreamHeaders: cacheLookup.payload.upstreamHeaders,
+          requestId,
+          planCode,
+          creditsCost,
+          creditsCharged: undefined,
+          dryRun,
+        });
+
+        return applyGatewayCacheHeaders(cachedResponse, {
+          cacheStatus: cacheStatusForLog,
+          ageMs: cacheAgeMsForLog,
+          deductionEnabled,
+        });
+      }
+    }
+
     if (deductionEnabled && authUserId && creditsCost > 0) {
       stage = "credits_precheck";
       const availability = await checkCreditsAvailabilityForApiUsage({
@@ -153,7 +261,6 @@ export async function GET(request: Request, context: Context) {
     }
 
     stage = "proxy";
-    const queryString = buildAllowedQueryString(request);
 
     const upstream = await proxyDatasetRequest({
       backendPath: datasetPolicy.backendPath,
@@ -166,6 +273,18 @@ export async function GET(request: Request, context: Context) {
     }
 
     statusCodeForLog = upstream.status;
+
+    if (!deductionEnabled && upstream.status === 200) {
+      upsertGatewayCacheEntry(cacheKey, {
+        upstreamStatus: upstream.status,
+        upstreamPayload: upstream.payload,
+        upstreamRawText: upstream.rawText,
+        upstreamIsJson: upstream.isJson,
+        upstreamHeaders: Array.from(upstream.headers.entries()),
+      });
+      cacheStatusForLog = "MISS";
+      cacheAgeMsForLog = 0;
+    }
 
     if (deductionEnabled && authUserId && upstream.status >= 200 && upstream.status < 300 && (creditsCost ?? 0) > 0) {
       stage = "credits_deduction";
@@ -205,7 +324,7 @@ export async function GET(request: Request, context: Context) {
     }
 
     stage = "response_build";
-    return gatewayProxyResponse({
+    const upstreamResponse = gatewayProxyResponse({
       upstreamStatus: upstream.status,
       upstreamPayload: upstream.payload,
       upstreamRawText: upstream.rawText,
@@ -216,6 +335,11 @@ export async function GET(request: Request, context: Context) {
       creditsCost,
       creditsCharged: deductionEnabled ? creditsCharged : undefined,
       dryRun,
+    });
+    return applyGatewayCacheHeaders(upstreamResponse, {
+      cacheStatus: deductionEnabled ? "MISS" : cacheStatusForLog,
+      ageMs: deductionEnabled ? 0 : cacheAgeMsForLog,
+      deductionEnabled,
     });
   } catch (error) {
     if (error instanceof GatewayHttpError) {
@@ -235,7 +359,7 @@ export async function GET(request: Request, context: Context) {
         error,
       });
 
-      return gatewayJsonResponse(createGatewayErrorBody({
+      const errorResponse = gatewayJsonResponse(createGatewayErrorBody({
         code: error.code,
         message: error.message,
         requestId,
@@ -247,6 +371,11 @@ export async function GET(request: Request, context: Context) {
         creditsCost,
         creditsCharged: deductionEnabled ? creditsCharged : undefined,
         dryRun,
+      });
+      return applyGatewayCacheHeaders(errorResponse, {
+        cacheStatus: "MISS",
+        ageMs: 0,
+        deductionEnabled,
       });
     }
 
@@ -260,7 +389,7 @@ export async function GET(request: Request, context: Context) {
       error,
     });
 
-    return gatewayJsonResponse(createGatewayErrorBody({
+    const internalErrorResponse = gatewayJsonResponse(createGatewayErrorBody({
       code: "internal_error",
       requestId,
       stage,
@@ -271,6 +400,11 @@ export async function GET(request: Request, context: Context) {
       creditsCost,
       creditsCharged: deductionEnabled ? creditsCharged : undefined,
       dryRun,
+    });
+    return applyGatewayCacheHeaders(internalErrorResponse, {
+      cacheStatus: "MISS",
+      ageMs: 0,
+      deductionEnabled,
     });
   } finally {
     if (authUserId) {

@@ -12,14 +12,10 @@ import {
   getDashboardEntitlementForUser,
 } from "@/src/lib/billing/subscription";
 import { getCreditTransactionsForUser, getCreditWalletForUser } from "@/src/lib/billing/credits";
+import { assertCreditsDeductionRuntimeSafe } from "@/src/lib/billing/credits-mode";
+import { getUsageCreditReconciliationForUser } from "@/src/lib/billing/reconciliation";
 import { getApiKeysSummaryForUser } from "@/src/lib/api-keys/service";
 import { getRecentApiUsageForUser, getUsageSummaryForUser } from "@/src/lib/gateway/usage";
-
-const TRUTHY = new Set(["1", "true", "yes", "on"]);
-
-function isCreditsDeductionEnabled() {
-  return TRUTHY.has(String(process.env.PUBLIC_API_CREDITS_DEDUCTION_ENABLED ?? "").trim().toLowerCase());
-}
 
 function nowMs() {
   return Date.now();
@@ -109,22 +105,29 @@ function toDashboardUsageSummary(
 
 function toDashboardUsageRequests(
   localRows: Awaited<ReturnType<typeof getRecentApiUsageForUser>>,
+  linkedByRequestId: Map<string, { linked: boolean; transactionStatus: string | null; transactionCredits: number }>,
   isDryRun: boolean,
 ): UsageRequestsSummary {
   return {
-    rows: localRows.map((item) => ({
-      requestTimestamp: item.requestTimestamp,
-      dataset: item.dataset,
-      endpoint: item.endpoint,
-      statusCode: item.statusCode,
-      rowCount: null,
-      planCode: "-",
-      symbol: item.symbol,
-      creditsCharged: item.creditsCharged,
-      latencyMs: item.latencyMs,
-      errorCode: item.errorCode,
-      requestId: item.requestId,
-    })),
+    rows: localRows.map((item) => {
+      const linkage = linkedByRequestId.get(item.requestId);
+      return {
+        requestTimestamp: item.requestTimestamp,
+        dataset: item.dataset,
+        endpoint: item.endpoint,
+        statusCode: item.statusCode,
+        rowCount: null,
+        planCode: "-",
+        symbol: item.symbol,
+        creditsCharged: item.creditsCharged,
+        latencyMs: item.latencyMs,
+        errorCode: item.errorCode,
+        requestId: item.requestId,
+        transactionLinked: linkage?.linked ?? null,
+        transactionStatus: linkage?.transactionStatus ?? null,
+        transactionCredits: linkage?.transactionCredits ?? null,
+      };
+    }),
     integrationMode: "live",
     insufficientCredits: false,
     isDryRun,
@@ -139,14 +142,16 @@ type DashboardPageShellProps = {
 
 export async function DashboardPageShell({ section, currentPath, currentHref }: DashboardPageShellProps) {
   const dashboardLoadStartedAt = nowMs();
-  const usageIsDryRun = !isCreditsDeductionEnabled();
+  const creditsModeState = assertCreditsDeductionRuntimeSafe();
+  const usageIsDryRun = !creditsModeState.enabled;
 
   const needsApiKeys = section === "overview" || section === "keys";
   const needsUsageSummary = section === "overview" || section === "usage";
   const needsUsageRows = section === "usage";
   const needsBillingDisplaySubscription = section === "billing";
-  const needsWallet = section === "billing";
+  const needsWallet = section === "billing" || section === "overview" || currentPath === "/billing/credits";
   const needsCreditTransactions = currentPath === "/billing/credits";
+  const needsReconciliation = section === "usage" || currentPath === "/billing/credits";
 
   try {
     const session = await timedStage("auth/session", () => getRequiredSession());
@@ -226,6 +231,14 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
         })
       : Promise.resolve([]);
 
+    const reconciliationPromise = needsReconciliation
+      ? timedStage("creditsReconciliation", () => getUsageCreditReconciliationForUser(session.id, 30)).catch((error) => {
+          const errorName = error instanceof Error ? error.name : "UnknownError";
+          console.warn(`[dashboard] failed to fetch reconciliation (${errorName})`);
+          return null;
+        })
+      : Promise.resolve(null);
+
     const [
       entitlement,
       apiKeys,
@@ -234,6 +247,7 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
       billingDisplaySubscription,
       creditWallet,
       creditTransactions,
+      reconciliation,
     ] = await Promise.all([
       entitlementPromise,
       apiKeysPromise,
@@ -242,7 +256,19 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
       billingDisplaySubscriptionPromise,
       creditWalletPromise,
       creditTransactionsPromise,
+      reconciliationPromise,
     ]);
+
+    const linkedByRequestId = new Map<string, { linked: boolean; transactionStatus: string | null; transactionCredits: number }>();
+    if (reconciliation?.recentRows) {
+      for (const row of reconciliation.recentRows) {
+        linkedByRequestId.set(row.requestId, {
+          linked: row.linked,
+          transactionStatus: row.transactionStatus,
+          transactionCredits: row.transactionCredits,
+        });
+      }
+    }
 
     const resolvedUsage = localUsageSummary
       ? toDashboardUsageSummary(localUsageSummary, usageIsDryRun)
@@ -252,7 +278,7 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
         };
 
     const resolvedUsageRequests = localUsageRows.length
-      ? toDashboardUsageRequests(localUsageRows, usageIsDryRun)
+      ? toDashboardUsageRequests(localUsageRows, linkedByRequestId, usageIsDryRun)
       : {
           ...FALLBACK_USAGE_REQUESTS,
           isDryRun: usageIsDryRun,
@@ -287,6 +313,22 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
               : null
           }
           creditWalletBalance={creditWallet?.balance ?? 0}
+          creditsModeState={creditsModeState}
+          usageReconciliation={
+            reconciliation
+              ? {
+                  windowDays: reconciliation.windowDays,
+                  walletBalance: reconciliation.walletBalance,
+                  totalUsageEvents: reconciliation.totalUsageEvents,
+                  totalChargedCredits: reconciliation.totalChargedCredits,
+                  totalTransactionCredits: reconciliation.totalTransactionCredits,
+                  mismatchedRequestIds: reconciliation.mismatchedRequestIds,
+                  orphanUsageEvents: reconciliation.orphanUsageEvents,
+                  orphanUsageTransactions: reconciliation.orphanUsageTransactions,
+                  duplicateUsageTransactions: reconciliation.duplicateUsageTransactions,
+                }
+              : null
+          }
           creditTransactions={creditTransactions.map((item) => ({
             id: item.id,
             type: item.type,
@@ -294,6 +336,9 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
             amountTwd: item.amountTwd,
             credits: item.credits,
             balanceAfter: item.balanceAfter,
+            provider: item.provider,
+            merchantTradeNo: item.merchantTradeNo,
+            providerTradeNo: item.providerTradeNo,
             packageCode: item.packageCode,
             description: item.description,
             createdAt: item.createdAt.toISOString(),

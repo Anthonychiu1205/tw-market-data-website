@@ -3,17 +3,11 @@ import "server-only";
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/src/lib/auth/prisma";
+import { isCreditsDeductionEnabled as isCreditsDeductionEnabledWithGuard } from "@/src/lib/billing/credits-mode";
 import { sanitizeGatewayErrorMessage } from "@/src/lib/gateway/errors";
 
-const TRUTHY = new Set(["1", "true", "yes", "on"]);
-
-function isTruthy(value: string | undefined) {
-  if (!value) return false;
-  return TRUTHY.has(value.trim().toLowerCase());
-}
-
 export function isCreditsDeductionEnabled() {
-  return isTruthy(process.env.PUBLIC_API_CREDITS_DEDUCTION_ENABLED);
+  return isCreditsDeductionEnabledWithGuard();
 }
 
 function toUsageMerchantTradeNo(requestId: string) {

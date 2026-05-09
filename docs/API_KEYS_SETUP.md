@@ -1,136 +1,160 @@
-# API Keys Lifecycle (Dashboard)
+# TW Market Data Public API Gateway Guide
 
-## Scope
+此文件描述 public API gateway（`/v2/datasets/*`）的正式使用方式、錯誤碼與 credits 模式。
 
-This document covers the local dashboard API key lifecycle only:
+## Authentication
 
-- Create API key
-- List API keys
-- Revoke API key
-- One-time secret reveal
+### 使用方式
 
-It does **not** enable public API gateway access yet.
+- 所有 public API 請求都使用 header：`X-API-Key`。
+- API key 由 Dashboard 建立（`/dashboard` → API 金鑰）。
+- API key 與網站伺服器對 backend 使用的 internal token 不同：
+  - customer request：`X-API-Key: twmd_live_...`
+  - website server → backend：`BACKEND_API_TOKEN`（server-only，不對客戶暴露）
 
-## Security Behavior
+### 建立與撤銷
 
-- API keys are generated in server routes with secure random bytes.
-- Stored fields in DB:
-  - `keyPrefix`
-  - `keyHash`
-  - `encryptedSecret` (AES-256-GCM encrypted)
-  - metadata (`name`, `status`, timestamps)
-- Raw key is **not** stored.
-- Raw key is returned only once at creation time.
-- After leaving the one-time panel, the secret cannot be retrieved again.
-- Revoked keys are marked as `status=revoked` and should be treated as invalid.
-- New version keys can be copied again through authenticated server-side decrypt endpoint.
+- 可在 Dashboard 建立、列出、撤銷 API key。
+- 新版 key 支援再次複製（`encryptedSecret`），舊版 hash-only key 可能無法再次顯示完整值。
+- 撤銷後立即失效。
 
-## Environment Variables
+### API key 安全注意事項
 
-- `AUTH_SECRET` (required in production)
-- `API_KEY_HASH_SECRET` (recommended explicit hash secret)
-- `API_KEY_ENCRYPTION_SECRET` (required for encrypted secret copy workflow)
-- `BACKEND_FETCH_TIMEOUT_MS` (dashboard/backend-adapter fetch timeout, default `2500`)
-- `PUBLIC_API_UPSTREAM_TIMEOUT_MS` (public gateway upstream timeout, default `8000`)
+- 不要把 key 放在前端可公開程式碼庫。
+- 不要把 key 寫進 client log、error log、analytics event。
+- 若疑似外洩，請立刻撤銷並重建。
 
-If `API_KEY_HASH_SECRET` is missing:
+## Requests
 
-- development can fallback to `AUTH_SECRET` (or a dev-only fallback),
-- production should provide `API_KEY_HASH_SECRET` or `AUTH_SECRET`.
+### 基本 endpoint
 
-If `API_KEY_ENCRYPTION_SECRET` is missing:
+- `GET /v2/datasets/twse-daily-price`
 
-- production create/copy secret flow returns safe error,
-- old hash-only keys can still be listed and revoked.
+### 常用 query params
 
-## Current API Routes
+- `symbol`：股票代號（例如 `2330`）
+- `limit`：筆數上限
+- `start_date`：起始日期（`YYYY-MM-DD`）
+- `end_date`：結束日期（`YYYY-MM-DD`）
 
-- `GET /api/dashboard/api-keys`
-- `POST /api/dashboard/api-keys`
-- `DELETE /api/dashboard/api-keys/:id`
-- `GET /api/dashboard/api-keys/:id/secret` (authenticated, active key only, `Cache-Control: no-store`)
-
-Auth is required for all routes.
-
-## Public Gateway (Phase 2a)
-
-Gateway beta route (dry-run metering):
-
-- `GET /v2/datasets/:dataset`
-
-Example:
+### cURL
 
 ```bash
 curl \
   -H "X-API-Key: twmd_live_xxx" \
-  "https://twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=5"
+  "https://twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=1"
 ```
 
-Current phase behavior:
+### JavaScript (fetch)
 
-- API key authentication is required.
-- Dataset entitlement is checked by plan policy.
-- Request is proxied to backend with internal credentials.
-- Metering supports guarded rollout:
-  - default: dry-run only (no wallet deduction)
-  - when `PUBLIC_API_CREDITS_DEDUCTION_ENABLED=true`: successful 2xx requests can charge credits
+```js
+const response = await fetch(
+  "https://twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=1",
+  {
+    headers: {
+      "X-API-Key": "twmd_live_xxx",
+    },
+  },
+);
 
-Phase 3/4 update:
+const requestId = response.headers.get("X-Request-Id");
+const dryRun = response.headers.get("X-TWMD-Dry-Run");
+const creditsCost = response.headers.get("X-TWMD-Credits-Cost");
+const creditsCharged = response.headers.get("X-TWMD-Credits-Charged");
 
-- Gateway now writes `ApiUsageEvent` as dry-run usage ledger for observability.
-- Each request gets a `requestId` for trace/debug.
-- Dry-run usage means estimated credits are recorded, but wallet balance is not deducted.
-- In deduction-enabled mode, only successful 2xx requests are charged.
-- `insufficient_credits` returns HTTP 402 and does not charge wallet.
-
-### Gateway Dry-Run Smoke Test
-
-Set local test env (do not commit real keys):
-
-- `GATEWAY_SMOKE_BASE_URL` (default `http://localhost:3000`)
-- `GATEWAY_SMOKE_API_KEY` (a real key created from dashboard)
-
-Run:
-
-```bash
-npm run smoke:gateway-dry-run
+const body = await response.json();
+console.log({ status: response.status, requestId, dryRun, creditsCost, creditsCharged, body });
 ```
 
-Expected checks:
+### Python (requests)
 
-- valid key + supported dataset returns upstream response
-- missing key returns `401 invalid_api_key`
-- unsupported dataset returns `404 dataset_not_found`
-- malformed key returns `401 invalid_api_key`
-- if upstream is temporarily failing, script may report `gateway-auth-ok-upstream-failed` while still confirming gateway auth + headers.
+```python
+import requests
 
-### Usage Ledger Check
+resp = requests.get(
+    "https://twmarketdata.com/v2/datasets/twse-daily-price",
+    params={"symbol": "2330", "limit": 1},
+    headers={"X-API-Key": "twmd_live_xxx"},
+    timeout=10,
+)
 
-Check latest dry-run usage events from local DB:
+request_id = resp.headers.get("X-Request-Id")
+dry_run = resp.headers.get("X-TWMD-Dry-Run")
+credits_cost = resp.headers.get("X-TWMD-Credits-Cost")
+credits_charged = resp.headers.get("X-TWMD-Credits-Charged")
 
-```bash
-npm run check:usage-ledger
+print(resp.status_code, request_id, dry_run, credits_cost, credits_charged)
+print(resp.json())
 ```
 
-Optional envs:
+## Credits
 
-- `USAGE_CHECK_USER_EMAIL`
-- `USAGE_CHECK_API_KEY_PREFIX`
-- `PUBLIC_API_CREDITS_DEDUCTION_ENABLED` (`false` by default)
+### 模式說明
 
-Notes:
+- 預設：**試算模式（dry-run）**
+  - `PUBLIC_API_CREDITS_DEDUCTION_ENABLED=false`
+  - 會回傳 estimated credits，但不會正式扣點。
+- 正式扣點模式（需明確啟用）：
+  - `PUBLIC_API_CREDITS_DEDUCTION_ENABLED=true`
+  - production 還需要：`PUBLIC_API_CREDITS_DEDUCTION_PRODUCTION_CONFIRM=true`
 
-- Script prints sanitized event fields only (`createdAt`, `datasetSlug`, `statusCode`, `creditsCharged`, `requestId`, `errorCode`, `latencyMs`).
-- It never prints raw API key or key hash.
-- Empty result is allowed and will not fail the script.
+若 production 只開第一個 flag，系統會安全降級為 dry-run，避免誤開正式扣點。
 
-### Timeout Separation (Dashboard vs Gateway)
+### Usage / Credits ledger
 
-- Dashboard server fallback fetches use `BACKEND_FETCH_TIMEOUT_MS` (default `2500ms`) for faster perceived UI response.
-- Public API gateway proxy uses `PUBLIC_API_UPSTREAM_TIMEOUT_MS` (default `8000ms`) because upstream dataset queries can take longer on shared/free runtime.
-- This separation avoids dashboard pages being blocked while reducing false `504 upstream_timeout` on valid public API requests.
+- 每次 request 會寫入 `ApiUsageEvent`（含 `requestId`、status、credits 欄位）。
+- Credits 交易（`CreditTransaction`）類型：
+  - `purchase`
+  - `usage`
+  - `adjustment`
 
-### Standardized Error Shape
+### insufficient credits
+
+當正式扣點模式啟用且餘額不足時，回：`402 insufficient_credits`。
+
+## Response Headers
+
+| Header | Meaning |
+|---|---|
+| `X-Request-Id` | request trace id，用於客服/偵錯追查 |
+| `X-TWMD-Dry-Run` | `true`=試算模式，`false`=正式扣點模式 |
+| `X-TWMD-Credits-Cost` | 此次 request 的估算/計價 credits |
+| `X-TWMD-Credits-Charged` | 實際扣點 credits（只在正式扣點模式、且成功扣點時出現） |
+| `X-TWMD-Plan` | gateway 解析後的方案（例如 `free` / `developer` / `pro`） |
+| `X-TWMD-Cache` | gateway cache 狀態（`HIT` / `MISS` / `STALE`） |
+| `X-TWMD-Cache-Age` | 快取資料齡（毫秒） |
+
+補充：
+- dry-run 模式通常有 `X-TWMD-Credits-Cost`，`X-TWMD-Credits-Charged` 可省略。
+- deduction 模式 2xx 成功且完成扣點時，會帶 `X-TWMD-Credits-Charged`。
+- dry-run mode 啟用短 TTL in-memory cache（預設 30 秒）與 stale-while-revalidate（預設最大 5 分鐘）。
+
+### Public API cache semantics
+
+- 僅在 dry-run mode 的 `GET` + `200` response 會短暫快取。
+- deduction mode（正式扣點）預設 bypass cache。
+- auth / entitlement / dataset not found / upstream error 等錯誤回應不會被快取為 `HIT`。
+- `X-TWMD-Cache`：
+  - `MISS`：本次回應來自 upstream
+  - `HIT`：命中新鮮快取
+  - `STALE`：回傳 stale，並在背景 refresh
+- `X-TWMD-Cache-Age`：快取資料齡（毫秒）
+
+## Errors
+
+所有 gateway 錯誤都使用統一格式：
+
+```json
+{
+  "error": {
+    "code": "...",
+    "message": "..."
+  },
+  "requestId": "..."
+}
+```
+
+### 401 invalid_api_key
 
 ```json
 {
@@ -142,53 +166,194 @@ Notes:
 }
 ```
 
-### Response Headers
+### 402 insufficient_credits
 
-- `X-Request-Id`
-- `X-TWMD-Plan`
-- `X-TWMD-Credits-Cost`
-- `X-TWMD-Dry-Run`
-- `X-TWMD-Credits-Charged` (when deduction mode is enabled)
-
-Example:
-
-```bash
-curl \
-  -H "X-API-Key: twmd_live_xxx" \
-  "https://twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330"
+```json
+{
+  "error": {
+    "code": "insufficient_credits",
+    "message": "Insufficient credits."
+  },
+  "requestId": "..."
+}
 ```
 
-You should see gateway headers including:
+### 403 plan_not_entitled
 
-- `X-TWMD-Credits-Cost`
-- `X-TWMD-Dry-Run`
-- `X-Request-Id`
+```json
+{
+  "error": {
+    "code": "plan_not_entitled",
+    "message": "Current plan is not entitled for this dataset."
+  },
+  "requestId": "..."
+}
+```
 
-When deduction mode is enabled, response headers will also include:
+### 404 dataset_not_found
 
-- `X-TWMD-Credits-Charged`
+```json
+{
+  "error": {
+    "code": "dataset_not_found",
+    "message": "Dataset not found."
+  },
+  "requestId": "..."
+}
+```
 
-### Error Codes
+### 502 upstream_error
 
-- `401 invalid_api_key`
-- `403 api_key_revoked`
-- `403 plan_not_entitled`
-- `402 insufficient_credits`
-- `404 dataset_not_found`
-- `504 upstream_timeout`
-- `502 upstream_error`
-- `500 internal_error`
+```json
+{
+  "error": {
+    "code": "upstream_error",
+    "message": "Upstream service error."
+  },
+  "requestId": "..."
+}
+```
 
-## Notes
+### 504 upstream_timeout
 
-- API key lifecycle is local and production-safe (hash-only storage).
-- Public gateway is currently skeleton mode with dry-run metering.
-- Credits deduction is guarded by env flag:
-  - `PUBLIC_API_CREDITS_DEDUCTION_ENABLED=false` (default) => dry-run only
-  - `PUBLIC_API_CREDITS_DEDUCTION_ENABLED=true` => successful 2xx responses can charge credits
-- Usage logging always writes `ApiUsageEvent`; dry-run mode records estimated cost, deduction mode records charged cost.
-- `PUBLIC_API_FREE_TIER_ENABLED` can control whether free-tier API access is allowed in this dry-run phase (default enabled).
-- Missing/malformed API key requests may not enter per-user usage ledger because user identity cannot be resolved.
-- Run guarded deduction smoke only when explicitly confirmed:
-  - `npm run smoke:gateway-deduction-mode`
-  - requires `PUBLIC_API_CREDITS_DEDUCTION_ENABLED=true` and `CONFIRM_DEDUCTION_SMOKE=true`.
+```json
+{
+  "error": {
+    "code": "upstream_timeout",
+    "message": "Upstream request timed out."
+  },
+  "requestId": "..."
+}
+```
+
+### 500 internal_error
+
+```json
+{
+  "error": {
+    "code": "internal_error",
+    "message": "Internal service error."
+  },
+  "requestId": "..."
+}
+```
+
+### 429 rate_limit_exceeded（future）
+
+目前尚未啟用 production rate limiting，`429` 為規劃中的 future support。
+
+## Request Tracing
+
+- 每次 request 會有 `X-Request-Id`。
+- 發生問題時，請提供：
+  - `requestId`
+  - 請求時間
+  - dataset slug
+  - HTTP status
+- support/debug 可用此 ID 在 usage ledger 與後端 log 追查。
+
+## Usage & Billing
+
+- Usage page 會顯示最近 request、狀態、credits（試算或已扣）。
+- Credits page 會顯示 wallet balance 與交易紀錄。
+- 在 dry-run 模式下，請以「estimated credits」理解 usage 指標。
+
+## Reconciliation & Operations
+
+### Usage / Credits 對帳概念
+
+- 對帳會比對：
+  - `ApiUsageEvent`（request ledger）
+  - `CreditTransaction(type=usage)`（實際扣點交易）
+  - `CreditWallet.balance`
+- 主要檢查：
+  - `usage events` 計價總額 vs `usage transactions` 總額
+  - `requestId` 是否有對應 usage transaction
+  - 是否出現 orphan event / orphan transaction / duplicate usage transaction
+
+### Request tracing
+
+- 每筆 gateway 請求都應帶 `X-Request-Id`。
+- Dashboard usage table 可複製 requestId，用於 support/debug。
+- 若需追查單筆，優先提供：
+  - `requestId`
+  - dataset
+  - status code
+  - request time（UTC+8）
+
+### Wallet integrity check script
+
+```bash
+npm run check:wallet-integrity
+```
+
+- 需 `DATABASE_URL`，否則自動 `SKIPPED`。
+- 只讀檢查，不修改資料庫。
+- 輸出摘要：
+  - total users checked
+  - negative balances
+  - mismatches
+  - duplicate requestId usage transactions
+  - duplicate merchantTradeNo
+
+### Seed wallet test flow（測試用）
+
+```bash
+npm run seed:test-wallet
+```
+
+- 僅在以下 env 皆設定時執行：
+  - `DATABASE_URL`
+  - `SEED_WALLET_USER_EMAIL`
+  - `SEED_WALLET_CREDITS`
+  - `CONFIRM_SEED_TEST_WALLET=true`
+- 會建立 `adjustment` 交易供測試，不會觸發 ECPay。
+
+### Usage CSV export（optional）
+
+```bash
+npm run export:usage-csv
+```
+
+- 匯出最近 usage events 到：
+  - `artifacts/usage_export_<date>.csv`
+- 欄位：
+  - `requestId`, `dataset`, `status`, `credits`, `latencyMs`, `createdAt`
+
+## Supported Datasets (Current Gateway)
+
+| Dataset slug | Required plan | Credits cost / request | Example | Common errors |
+|---|---|---:|---|---|
+| `twse-daily-price` | `free` | 1 | `GET /v2/datasets/twse-daily-price?symbol=2330&limit=1` | `401`, `404`, `502`, `504` |
+| `tpex-daily-price` | `free` | 1 | `GET /v2/datasets/tpex-daily-price?symbol=8069&limit=1` | `401`, `404`, `502`, `504` |
+| `issuer-profile` | `free` | 1 | `GET /v2/datasets/issuer-profile?symbol=2330` | `401`, `404`, `502`, `504` |
+| `adjusted-prices` | `free` | 2 | `GET /v2/datasets/adjusted-prices?symbol=2330&limit=5` | `401`, `404`, `502`, `504` |
+| `technical-indicators` | `developer` | 3 | `GET /v2/datasets/technical-indicators?symbol=2330&limit=20` | `401`, `403`, `404`, `502`, `504` |
+| `valuation-data` | `developer` | 2 | `GET /v2/datasets/valuation-data?symbol=2330&limit=20` | `401`, `403`, `404`, `502`, `504` |
+| `monthly-revenue` | `developer` | 3 | `GET /v2/datasets/monthly-revenue?symbol=2330&limit=12` | `401`, `403`, `404`, `502`, `504` |
+
+## Future Features (Planned)
+
+以下為規劃中，尚未正式提供：
+
+- Rate limits / 429 enforcement
+- Batch query
+- Streaming / websocket delivery
+- Enterprise-only datasets 與更細緻 entitlement
+- Webhook events
+
+## Environment Checklist
+
+- `AUTH_SECRET`
+- `API_KEY_HASH_SECRET`
+- `API_KEY_ENCRYPTION_SECRET`
+- `BACKEND_API_BASE_URL`
+- `BACKEND_API_TOKEN`（或專案採用的 internal backend token env）
+- `BACKEND_FETCH_TIMEOUT_MS`（dashboard 建議 2500）
+- `BACKEND_SUMMARY_CACHE_TTL_MS`（dashboard summary cache，預設 10000）
+- `PUBLIC_API_UPSTREAM_TIMEOUT_MS`（gateway 建議 8000）
+- `PUBLIC_API_CACHE_TTL_MS`（gateway cache TTL，預設 30000）
+- `PUBLIC_API_CACHE_MAX_STALE_MS`（gateway stale window，預設 300000）
+- `PUBLIC_API_CACHE_MAX_ENTRIES`（gateway cache entry 上限，預設 800）
+- `PUBLIC_API_CREDITS_DEDUCTION_ENABLED`（預設 false）
+- `PUBLIC_API_CREDITS_DEDUCTION_PRODUCTION_CONFIRM`（預設 false）

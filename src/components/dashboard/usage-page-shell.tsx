@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { Download } from "lucide-react";
 import {
   Area,
@@ -16,11 +16,21 @@ import {
 import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
 import type { UsageRequestsSummary, UsageSummary } from "@/src/lib/backend-adapter";
+import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
+import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
 
 type UsagePageShellProps = {
   usageRequests: UsageRequestsSummary;
   usageSummary: UsageSummary;
   creditState: "normal" | "low" | "exhausted";
+  creditsModeState: CreditsDeductionRuntimeState;
+  usageReconciliation: {
+    windowDays: number;
+    totalUsageEvents: number;
+    totalChargedCredits: number;
+    totalTransactionCredits: number;
+    mismatchedRequestIds: string[];
+  } | null;
 };
 
 type DailyRequestPoint = {
@@ -90,9 +100,8 @@ function inferApiLabel(dataset: string, endpoint: string): string {
   return parts.at(-1) ?? "-";
 }
 
-export function UsagePageShell({ usageRequests, usageSummary, creditState }: UsagePageShellProps) {
+export function UsagePageShell({ usageRequests, usageSummary, creditState, creditsModeState, usageReconciliation }: UsagePageShellProps) {
   const rows = usageRequests.rows;
-  const isDryRun = usageSummary.isDryRun !== false;
 
   const monthKeys = useMemo(() => {
     const fromRows = Array.from(
@@ -107,6 +116,8 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState }: Usa
   }, [rows]);
 
   const [activeMonthIndex, setActiveMonthIndex] = useState(monthKeys.length - 1);
+  const [copiedRequestId, setCopiedRequestId] = useState<string | null>(null);
+  const [expandedRequestId, setExpandedRequestId] = useState<string | null>(null);
   const resolvedMonthIndex = Math.min(activeMonthIndex, monthKeys.length - 1);
   const activeMonthKey = monthKeys[resolvedMonthIndex];
 
@@ -121,7 +132,33 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState }: Usa
     credits: row.creditsCharged ?? 0,
     latencyMs: row.latencyMs,
     errorCode: row.errorCode || null,
+    requestId: row.requestId || null,
+    transactionLinked: row.transactionLinked ?? null,
+    transactionStatus: row.transactionStatus ?? null,
+    transactionCredits: row.transactionCredits ?? null,
   }));
+
+  function getStatusLabel(status: number | string) {
+    const value = typeof status === "number" ? status : Number(status);
+    if (value === 200) return "成功";
+    if (value === 401 || value === 403) return "未授權";
+    if (value === 402) return "credits 不足";
+    if (value === 500 || value === 502 || value === 504) return "上游錯誤";
+    if (Number.isFinite(value)) return `${value}`;
+    return "待確認";
+  }
+
+  async function copyRequestId(requestId: string) {
+    try {
+      await navigator.clipboard.writeText(requestId);
+      setCopiedRequestId(requestId);
+      window.setTimeout(() => {
+        setCopiedRequestId((prev) => (prev === requestId ? null : prev));
+      }, 1600);
+    } catch {
+      // Ignore clipboard failures in read-only environments.
+    }
+  }
 
   const endpointUsageRows = useMemo(() => {
     const usageMap = new Map<string, number>();
@@ -156,7 +193,7 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState }: Usa
             <p className="mt-1 text-lg font-semibold text-slate-900">{(usageSummary.requests30d ?? usageSummary.monthlyUsed).toLocaleString()}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500">{isDryRun ? "30 天 dry-run credits" : "30 天 credits charged"}</p>
+            <p className="text-xs text-slate-500">{`30 天${getCreditsModeLabel(creditsModeState)}`}</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{(usageSummary.estimatedCreditsUsage30d ?? 0).toLocaleString()}</p>
           </div>
           <div>
@@ -166,11 +203,14 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState }: Usa
             </p>
           </div>
         </div>
-        <p className="mt-3 text-xs text-slate-500">
-          {isDryRun
-            ? "目前為 dry-run usage：僅記錄估算成本，尚未正式扣點。"
-            : "目前已啟用正式扣點：僅成功請求會扣除 credits。"}
-        </p>
+        <p className="mt-3 text-xs text-slate-500">{getCreditsModeDescription(creditsModeState)}</p>
+        {usageReconciliation ? (
+          <p className="mt-1 text-xs text-slate-500">
+            對帳（近 {usageReconciliation.windowDays} 天）：usage={usageReconciliation.totalUsageEvents.toLocaleString()} ·
+            credits={usageReconciliation.totalChargedCredits.toLocaleString()} · tx={usageReconciliation.totalTransactionCredits.toLocaleString()}
+            {usageReconciliation.mismatchedRequestIds.length > 0 ? " · 含待對帳項目" : ""}
+          </p>
+        ) : null}
       </DashboardCard>
 
       {creditState === "exhausted" ? (
@@ -299,37 +339,95 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState }: Usa
                   <th className="px-2 py-3 text-left font-medium">Symbol</th>
                   <th className="px-2 py-3 text-left font-medium">端點</th>
                   <th className="px-2 py-3 text-left font-medium">狀態</th>
-                  <th className="px-2 py-3 text-left font-medium">dry-run credits</th>
+                  <th className="px-2 py-3 text-left font-medium">{getCreditsModeLabel(creditsModeState)}</th>
                   <th className="px-2 py-3 text-left font-medium">Latency</th>
+                  <th className="px-2 py-3 text-left font-medium">Request ID</th>
+                  <th className="px-2 py-3 text-left font-medium">對帳</th>
                 </tr>
               </thead>
               <tbody>
                 {requestRows.length ? (
-                  requestRows.map((row, index) => (
-                    <tr key={`${row.date}-${row.endpoint}-${index}`} className="border-t border-slate-100">
-                      <td className="px-2 py-3 text-sm text-slate-700">{row.date}</td>
-                      <td className="px-2 py-3 text-sm text-slate-700">{row.api}</td>
-                      <td className="px-2 py-3 text-sm text-slate-700">{row.symbol}</td>
-                      <td className="px-2 py-3">
-                        <span className="inline-flex rounded-lg bg-slate-100 px-2 py-1 text-xs font-mono text-slate-600">{row.endpoint}</span>
-                      </td>
-                      <td className="px-2 py-3 text-sm text-slate-700">
-                        {row.status}
-                        {row.errorCode ? (
-                          <span className="ml-2 rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">
-                            {row.errorCode}
-                          </span>
+                  requestRows.map((row, index) => {
+                    const isExpanded = expandedRequestId === row.requestId;
+                    return (
+                      <Fragment key={`${row.date}-${row.endpoint}-${index}`}>
+                        <tr className="border-t border-slate-100">
+                          <td className="px-2 py-3 text-sm text-slate-700">{row.date}</td>
+                          <td className="px-2 py-3 text-sm text-slate-700">{row.api}</td>
+                          <td className="px-2 py-3 text-sm text-slate-700">{row.symbol}</td>
+                          <td className="px-2 py-3">
+                            <span className="inline-flex rounded-lg bg-slate-100 px-2 py-1 text-xs font-mono text-slate-600">{row.endpoint}</span>
+                          </td>
+                          <td className="px-2 py-3 text-sm text-slate-700">
+                            {getStatusLabel(row.status)}
+                            <span className="ml-2 text-xs text-slate-400">({row.status})</span>
+                            {row.errorCode ? (
+                              <span className="ml-2 rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">
+                                {row.errorCode}
+                              </span>
+                            ) : null}
+                          </td>
+                          <td className="px-2 py-3 text-sm text-slate-700">{row.credits.toLocaleString()}</td>
+                          <td className="px-2 py-3 text-sm text-slate-700">
+                            {typeof row.latencyMs === "number" ? `${row.latencyMs} ms` : "—"}
+                          </td>
+                          <td className="px-2 py-3 text-sm text-slate-700">
+                            {row.requestId ? (
+                              <div className="flex items-center gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => void copyRequestId(row.requestId!)}
+                                  className="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600 transition hover:bg-slate-200"
+                                  title="複製完整 requestId"
+                                >
+                                  {row.requestId.slice(0, 8)}
+                                </button>
+                                <button
+                                  type="button"
+                                  className="text-xs text-slate-500 underline-offset-2 hover:underline"
+                                  onClick={() => setExpandedRequestId((prev) => (prev === row.requestId ? null : row.requestId))}
+                                >
+                                  {isExpanded ? "收合" : "詳細"}
+                                </button>
+                                {copiedRequestId === row.requestId ? <span className="text-[10px] text-slate-500">已複製</span> : null}
+                              </div>
+                            ) : (
+                              "—"
+                            )}
+                          </td>
+                          <td className="px-2 py-3 text-xs text-slate-600">
+                            {row.transactionLinked ? (
+                              <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-700">已連結</span>
+                            ) : (
+                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">未扣點</span>
+                            )}
+                          </td>
+                        </tr>
+                        {isExpanded && row.requestId ? (
+                          <tr className="border-t border-slate-50 bg-slate-50/50">
+                            <td colSpan={9} className="px-3 py-3 text-xs text-slate-600">
+                              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                                <p>requestId：<span className="font-mono text-slate-700">{row.requestId}</span></p>
+                                <p>dataset：{row.api}</p>
+                                <p>status：{getStatusLabel(row.status)}</p>
+                                <p>latency：{typeof row.latencyMs === "number" ? `${row.latencyMs} ms` : "—"}</p>
+                                <p>{`${getCreditsModeLabel(creditsModeState)}：${row.credits.toLocaleString()}`}</p>
+                                <p>
+                                  transaction：
+                                  {row.transactionLinked
+                                    ? `${row.transactionStatus ?? "completed"} (${row.transactionCredits ?? 0})`
+                                    : "未扣點（dry-run 或失敗請求）"}
+                                </p>
+                              </div>
+                            </td>
+                          </tr>
                         ) : null}
-                      </td>
-                      <td className="px-2 py-3 text-sm text-slate-700">{row.credits.toLocaleString()}</td>
-                      <td className="px-2 py-3 text-sm text-slate-700">
-                        {typeof row.latencyMs === "number" ? `${row.latencyMs} ms` : "—"}
-                      </td>
-                    </tr>
-                  ))
+                      </Fragment>
+                    );
+                  })
                 ) : (
                   <tr className="border-t border-slate-100">
-                    <td colSpan={7} className="px-2 py-6 text-center text-slate-500">尚無 API request usage。</td>
+                    <td colSpan={9} className="px-2 py-6 text-center text-slate-500">尚無 API request usage。</td>
                   </tr>
                 )}
               </tbody>

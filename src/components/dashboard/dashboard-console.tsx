@@ -20,6 +20,8 @@ import { UsagePageShell } from "@/src/components/dashboard/usage-page-shell";
 import { RequestResponsePlayground } from "@/src/components/dashboard/request-response-playground";
 import { OverviewUsageChart } from "@/src/components/dashboard/overview-usage-chart";
 import { AccountProfileForm } from "@/src/components/dashboard/account-profile-form";
+import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
+import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
 
 type DashboardConsoleProps = {
   email: string;
@@ -51,6 +53,18 @@ type DashboardConsoleProps = {
     cancelReasonDetail: string | null;
   } | null;
   creditWalletBalance: number;
+  creditsModeState: CreditsDeductionRuntimeState;
+  usageReconciliation: {
+    windowDays: number;
+    walletBalance: number;
+    totalUsageEvents: number;
+    totalChargedCredits: number;
+    totalTransactionCredits: number;
+    mismatchedRequestIds: string[];
+    orphanUsageEvents: string[];
+    orphanUsageTransactions: string[];
+    duplicateUsageTransactions: string[];
+  } | null;
   creditTransactions: Array<{
     id: string;
     type: string;
@@ -58,6 +72,9 @@ type DashboardConsoleProps = {
     amountTwd: number | null;
     credits: number;
     balanceAfter: number | null;
+    provider: string | null;
+    merchantTradeNo: string | null;
+    providerTradeNo: string | null;
     packageCode: string | null;
     description: string | null;
     createdAt: string;
@@ -100,10 +117,15 @@ function getLatestActiveUsage(usage: UsageSummary) {
   return latest ?? null;
 }
 
-function UsageActivityCard({ usage }: { usage: UsageSummary }) {
+function UsageActivityCard({
+  usage,
+  creditsModeState,
+}: {
+  usage: UsageSummary;
+  creditsModeState: CreditsDeductionRuntimeState;
+}) {
   const hasEvents = usageHasEvents(usage);
   const latestActive = getLatestActiveUsage(usage);
-  const isDryRun = usage.isDryRun !== false;
 
   const monthlyUsed = Math.max(usage.monthlyUsed, 0);
   const monthlyQuota = Math.max(usage.monthlyQuota, 1);
@@ -161,7 +183,7 @@ function UsageActivityCard({ usage }: { usage: UsageSummary }) {
       <div className="mt-4 grid gap-3 text-xs text-slate-600 sm:grid-cols-3">
         <p>今日 request：{requestsToday.toLocaleString()}</p>
         <p>30 天 request：{requests30d.toLocaleString()}</p>
-        <p>{isDryRun ? "30 天 dry-run credits" : "30 天 credits charged"}：{estimatedCreditsUsage30d.toLocaleString()}</p>
+        <p>{`30 天${getCreditsModeLabel(creditsModeState)}：${estimatedCreditsUsage30d.toLocaleString()}`}</p>
       </div>
 
       {recentErrors.length > 0 ? (
@@ -173,11 +195,7 @@ function UsageActivityCard({ usage }: { usage: UsageSummary }) {
       <p className="mt-3 text-xs text-slate-500">
         {hasEvents ? `最近活躍：${latestActive?.date} · ${latestActive?.count.toLocaleString()} 次` : "目前尚無足夠活動資料。"}
       </p>
-      <p className="mt-1 text-xs text-slate-500">
-        {isDryRun
-          ? "目前為 dry-run usage：僅記錄估算成本，尚未正式扣點。"
-          : "目前已啟用正式扣點：僅成功請求會扣除 credits。"}
-      </p>
+      <p className="mt-1 text-xs text-slate-500">{getCreditsModeDescription(creditsModeState)}</p>
     </DashboardCard>
   );
 }
@@ -187,12 +205,19 @@ function OverviewPanel({
   usage,
   apiKeys,
   creditState,
+  creditWalletBalance,
+  creditsModeState,
 }: {
   entitlement: DashboardConsoleProps["entitlement"];
   usage: UsageSummary;
   apiKeys: ApiKeysSummary;
   creditState: CreditState;
+  creditWalletBalance: number;
+  creditsModeState: CreditsDeductionRuntimeState;
 }) {
+  const activeKeysCount = apiKeys.keys.filter((item) => item.status !== "revoked").length;
+  const requestsToday = usage.requestsToday ?? 0;
+  const requests30d = usage.requests30d ?? usage.monthlyUsed;
   const entitlementSourceCopy =
     entitlement.source === "subscription"
       ? "方案資料已同步"
@@ -212,6 +237,28 @@ function OverviewPanel({
         </div>
       </DashboardCard>
 
+      <DashboardCard className="border-slate-200/80 bg-slate-50/60">
+        <div className="grid gap-3 text-sm text-slate-700 sm:grid-cols-4">
+          <p>
+            API keys
+            <span className="ml-2 font-semibold text-slate-900">{activeKeysCount}</span>
+          </p>
+          <p>
+            今日請求
+            <span className="ml-2 font-semibold text-slate-900">{requestsToday.toLocaleString()}</span>
+          </p>
+          <p>
+            30 天請求
+            <span className="ml-2 font-semibold text-slate-900">{requests30d.toLocaleString()}</span>
+          </p>
+          <p>
+            可用 credits
+            <span className="ml-2 font-semibold text-slate-900">{creditWalletBalance.toLocaleString()}</span>
+          </p>
+        </div>
+        <p className="mt-2 text-xs text-slate-500">目前模式：{getCreditsModeLabel(creditsModeState)}</p>
+      </DashboardCard>
+
       {creditState === "exhausted" ? (
         <DashboardCard className="border-amber-200 bg-amber-50">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -227,7 +274,10 @@ function OverviewPanel({
       ) : null}
 
       <DashboardCard>
-        <h2 className="text-base font-semibold text-slate-900">API 金鑰</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="text-base font-semibold text-slate-900">API 金鑰</h2>
+        <p className="text-xs text-slate-500">啟用中 {activeKeysCount} 把</p>
+        </div>
         <div className="mt-3">
           <ApiKeysManager
             initialKeys={apiKeys.keys}
@@ -237,7 +287,7 @@ function OverviewPanel({
         </div>
       </DashboardCard>
 
-      <UsageActivityCard usage={usage} />
+      <UsageActivityCard usage={usage} creditsModeState={creditsModeState} />
 
       <RequestResponsePlayground
         apiKeys={apiKeys.keys}
@@ -397,7 +447,16 @@ function renderSection(section: DashboardSection, props: DashboardConsoleProps) 
       : "normal";
 
   if (section === "overview") {
-    return <OverviewPanel entitlement={props.entitlement} usage={props.usage} apiKeys={props.apiKeys} creditState={creditState} />;
+    return (
+      <OverviewPanel
+        entitlement={props.entitlement}
+        usage={props.usage}
+        apiKeys={props.apiKeys}
+        creditState={creditState}
+        creditWalletBalance={props.creditWalletBalance}
+        creditsModeState={props.creditsModeState}
+      />
+    );
   }
   if (section === "billing") {
     if (props.currentPath === "/billing/subscriptions") {
@@ -436,19 +495,39 @@ function renderSection(section: DashboardSection, props: DashboardConsoleProps) 
     if (props.currentPath === "/billing/credits") {
       return (
         <BillingCreditsPage
+          creditsModeState={props.creditsModeState}
           walletBalance={props.creditWalletBalance}
           transactions={props.creditTransactions}
+          usageReconciliation={props.usageReconciliation}
         />
       );
     }
     return <BillingLandingPage subscription={props.subscription} />;
   }
-  if (section === "usage") return <UsagePageShell usageRequests={props.usageRequests} usageSummary={props.usage} creditState={creditState} />;
+  if (section === "usage")
+    return (
+      <UsagePageShell
+        usageRequests={props.usageRequests}
+        usageSummary={{ ...props.usage, isDryRun: props.creditsModeState.mode !== "charged" }}
+        creditState={creditState}
+        creditsModeState={props.creditsModeState}
+        usageReconciliation={props.usageReconciliation}
+      />
+    );
   if (section === "keys") return <KeysPanel apiKeys={props.apiKeys} />;
   if (section === "settings") return <SettingsPanel email={props.email} entitlement={props.entitlement} />;
   if (section === "docs") return <DocsPanel />;
   if (section === "support") return <SupportPanel />;
-  return <OverviewPanel entitlement={props.entitlement} usage={props.usage} apiKeys={props.apiKeys} creditState={creditState} />;
+  return (
+    <OverviewPanel
+      entitlement={props.entitlement}
+      usage={props.usage}
+      apiKeys={props.apiKeys}
+      creditState={creditState}
+      creditWalletBalance={props.creditWalletBalance}
+      creditsModeState={props.creditsModeState}
+    />
+  );
 }
 
 export function DashboardConsole(props: DashboardConsoleProps) {

@@ -8,6 +8,39 @@ import { assertValidApiKeyName, generateApiKey, getApiKeyPrefix, hashApiKey, mas
 import { decryptSecret, encryptSecret, getEncryptionVersion } from "@/src/lib/security/secret-encryption";
 
 const MAX_ACTIVE_API_KEYS_PER_USER = 5;
+const API_KEYS_SUMMARY_CACHE_TTL_MS = 8_000;
+
+type ApiKeysSummaryCacheEntry = {
+  value: ApiKeysSummary;
+  expiresAt: number;
+};
+
+const apiKeysSummaryCache = new Map<string, ApiKeysSummaryCacheEntry>();
+
+function nowMs() {
+  return Date.now();
+}
+
+function getApiKeysSummaryCache(userId: string) {
+  const entry = apiKeysSummaryCache.get(userId);
+  if (!entry) return null;
+  if (entry.expiresAt <= nowMs()) {
+    apiKeysSummaryCache.delete(userId);
+    return null;
+  }
+  return entry.value;
+}
+
+function setApiKeysSummaryCache(userId: string, value: ApiKeysSummary) {
+  apiKeysSummaryCache.set(userId, {
+    value,
+    expiresAt: nowMs() + API_KEYS_SUMMARY_CACHE_TTL_MS,
+  });
+}
+
+function invalidateApiKeysSummaryCache(userId: string) {
+  apiKeysSummaryCache.delete(userId);
+}
 
 function toApiKeyItem(row: ApiKey): ApiKeyItem {
   return {
@@ -24,18 +57,25 @@ function toApiKeyItem(row: ApiKey): ApiKeyItem {
 }
 
 export async function getApiKeysSummaryForUser(userId: string): Promise<ApiKeysSummary> {
+  const cached = getApiKeysSummaryCache(userId);
+  if (cached) {
+    return cached;
+  }
+
   const keys = await prisma.apiKey.findMany({
     where: { userId },
     orderBy: [{ createdAt: "desc" }],
   });
   const activeCount = keys.filter((item) => item.status === "active").length;
 
-  return {
+  const result: ApiKeysSummary = {
     keys: keys.map(toApiKeyItem),
     canCreate: activeCount < MAX_ACTIVE_API_KEYS_PER_USER,
     canRevoke: true,
     integrationMode: "live",
   };
+  setApiKeysSummaryCache(userId, result);
+  return result;
 }
 
 export async function createApiKeyForUser(input: { userId: string; name?: string | null }) {
@@ -67,6 +107,8 @@ export async function createApiKeyForUser(input: { userId: string; name?: string
       status: "active",
     },
   });
+
+  invalidateApiKeysSummaryCache(input.userId);
 
   return {
     apiKey: toApiKeyItem(created),
@@ -130,6 +172,8 @@ export async function revokeApiKeyForUser(input: { userId: string; apiKeyId: str
       revokedAt: new Date(),
     },
   });
+
+  invalidateApiKeysSummaryCache(input.userId);
 
   return { ok: true as const, apiKey: toApiKeyItem(updated), alreadyRevoked: false };
 }

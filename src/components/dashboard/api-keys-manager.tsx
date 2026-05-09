@@ -46,7 +46,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
   const [secretCopied, setSecretCopied] = useState(false);
 
   const activeKeys = useMemo(() => keys.filter((item) => item.status !== "revoked"), [keys]);
-  const hasKeys = activeKeys.length > 0;
+  const hasKeys = keys.length > 0;
   const canCreateNow = canCreate && activeKeys.length < MAX_ACTIVE_KEYS;
   const canSubmit = canCreateNow && !isSubmitting;
 
@@ -219,7 +219,9 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
             </button>
           </div>
           <p className="mt-1 break-all font-mono text-xs text-slate-700">{createdSecret}</p>
-          <p className="mt-1 text-xs text-slate-500">請立即複製，離開後不會再次顯示。</p>
+          <p className="mt-1 text-xs text-slate-500">
+            請立即複製並妥善保存。若未保存，可稍後在表格中再次複製新版本金鑰。
+          </p>
         </div>
       ) : null}
 
@@ -235,12 +237,16 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
           </thead>
           <tbody>
             {hasKeys ? (
-              activeKeys.map((item) => {
+              keys.map((item) => {
                 const copied = copiedKeyId === item.id;
                 const copyDisabled = item.status === "revoked" || item.canCopy === false;
+                const rowMuted = item.status === "revoked";
                 return (
-                  <tr key={item.id}>
-                    <td className="border-b border-slate-100 py-3 pr-3 text-slate-900">{item.name}</td>
+                  <tr key={item.id} className={rowMuted ? "opacity-60" : ""}>
+                    <td className="border-b border-slate-100 py-3 pr-3 text-slate-900">
+                      {item.name}
+                      {rowMuted ? <span className="ml-2 text-xs text-slate-500">已撤銷</span> : null}
+                    </td>
                     <td className="border-b border-slate-100 py-3 pr-3">
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-xs text-slate-700">{item.maskedKey}</span>
@@ -253,7 +259,15 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
                             copyDisabled && "cursor-not-allowed text-slate-300 hover:border-transparent hover:bg-transparent hover:text-slate-300",
                           )}
                           aria-label="複製 API 金鑰"
-                          title={copyDisabled ? "此金鑰無法複製" : copied ? "已複製" : "複製"}
+                          title={
+                            item.status === "revoked"
+                              ? "已撤銷金鑰不可複製"
+                              : item.canCopy === false
+                                ? "舊版金鑰無法再次複製，請重新建立"
+                                : copied
+                                  ? "已複製"
+                                  : "複製"
+                          }
                         >
                           <Copy className="h-4 w-4" />
                         </button>
@@ -264,14 +278,15 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
                     <td className="border-b border-slate-100 py-3 text-right">
                       <button
                         type="button"
-                        disabled={!canRevoke || isSubmitting}
+                        disabled={!canRevoke || isSubmitting || item.status === "revoked"}
                         onClick={() => void handleRevokeKey(item)}
                         className={cn(
                           "inline-flex h-8 w-8 items-center justify-center rounded-md border border-transparent text-slate-500 transition hover:border-slate-200 hover:bg-slate-50 hover:text-slate-700",
-                          (!canRevoke || isSubmitting) && "cursor-not-allowed text-slate-300 hover:border-transparent hover:bg-transparent hover:text-slate-300",
+                          (!canRevoke || isSubmitting || item.status === "revoked") &&
+                            "cursor-not-allowed text-slate-300 hover:border-transparent hover:bg-transparent hover:text-slate-300",
                         )}
                         aria-label={`刪除 ${item.name}`}
-                        title="刪除（撤銷）"
+                        title={item.status === "revoked" ? "已撤銷" : "刪除（撤銷）"}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

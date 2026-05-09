@@ -24,6 +24,11 @@ response = requests.get(
     params=params,
 )
 data = response.json()
+print("status:", response.status_code)
+print("requestId:", response.headers.get("X-Request-Id"))
+print("dryRun:", response.headers.get("X-TWMD-Dry-Run"))
+print("creditsCost:", response.headers.get("X-TWMD-Credits-Cost"))
+print("creditsCharged:", response.headers.get("X-TWMD-Credits-Charged"))
 print(data)`,
   },
   {
@@ -43,12 +48,19 @@ const response = await fetch(
   },
 );
 const data = await response.json();
-console.log(data);`,
+console.log({
+  status: response.status,
+  requestId: response.headers.get("X-Request-Id"),
+  dryRun: response.headers.get("X-TWMD-Dry-Run"),
+  creditsCost: response.headers.get("X-TWMD-Credits-Cost"),
+  creditsCharged: response.headers.get("X-TWMD-Credits-Charged"),
+  data,
+});`,
   },
   {
     id: "curl",
     label: "cURL",
-    code: `curl --request GET \\
+    code: `curl -i --request GET \\
   --url "https://api.twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=5" \\
   --header "X-API-Key: your_api_key_here"`,
   },
@@ -198,16 +210,36 @@ export function QuickStartContent() {
             <code className="mx-1 rounded bg-white px-1 py-0.5 text-xs">GET /v2/datasets/:dataset</code>。
             此階段僅做 entitlement 與成本試算，不會實際扣除 credits。
           </p>
+          <p className="text-sm leading-7 text-slate-600">
+            請使用 Dashboard 建立的 customer API key 放在 <code className="rounded bg-white px-1 py-0.5 text-xs">X-API-Key</code>。
+            Gateway 與 backend 溝通使用的是網站伺服器端 internal token（例如 BACKEND_API_TOKEN），與 customer key 不同。
+          </p>
           <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-white p-4 text-xs leading-6 text-slate-700">
             <code>{`curl \\
   -H "X-API-Key: twmd_live_xxx" \\
   "https://twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=5"`}</code>
           </pre>
           <p className="text-xs text-slate-500">
-            回應 headers 會包含 X-TWMD-Plan、X-TWMD-Credits-Cost、X-TWMD-Dry-Run 與 X-Request-Id。
+            dry-run 回應 headers 會包含 X-TWMD-Plan、X-TWMD-Credits-Cost、X-TWMD-Dry-Run=true 與 X-Request-Id。
           </p>
           <p className="text-xs text-slate-500">
-            預設為 dry-run，不會扣除 credits。若部署端啟用扣點模式，會改回傳 X-TWMD-Credits-Charged，並在 credits 不足時回應 402 insufficient_credits。
+            啟用扣點模式後，回應會包含 X-TWMD-Credits-Charged；credits 不足會回 402 insufficient_credits。X-Request-Id 可提供客服追查。
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-slate-800">常見錯誤格式</p>
+          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
+            <code>{`{
+  "error": {
+    "code": "invalid_api_key",
+    "message": "Invalid API key."
+  },
+  "requestId": "..."
+}`}</code>
+          </pre>
+          <p className="text-xs text-slate-500">
+            常見 code：`401 invalid_api_key`、`403 plan_not_entitled`、`402 insufficient_credits`、`404 dataset_not_found`、`502 upstream_error`、`504 upstream_timeout`。
           </p>
         </div>
       </section>
