@@ -1,7 +1,7 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
-import { Copy, Trash2 } from "lucide-react";
+import { FormEvent, useMemo, useRef, useState } from "react";
+import { Check, Copy, Trash2 } from "lucide-react";
 
 import type { ApiKeyItem } from "@/src/lib/backend-adapter";
 import { buttonClass } from "@/src/components/ui/button";
@@ -17,6 +17,12 @@ type CreateApiKeyResponse = {
   apiKey: ApiKeyItem;
   secret: string;
   message?: string;
+};
+
+type ToastItem = {
+  id: string;
+  message: string;
+  exiting: boolean;
 };
 
 const MAX_ACTIVE_KEYS = 5;
@@ -44,15 +50,33 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [createdSecret, setCreatedSecret] = useState<string | null>(null);
   const [secretCopied, setSecretCopied] = useState(false);
+  const [showRevoked, setShowRevoked] = useState(false);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const toastCounterRef = useRef(0);
 
   const activeKeys = useMemo(() => keys.filter((item) => item.status !== "revoked"), [keys]);
-  const hasKeys = keys.length > 0;
+  const revokedCount = keys.length - activeKeys.length;
+  const visibleKeys = useMemo(() => (showRevoked ? keys : activeKeys), [activeKeys, keys, showRevoked]);
+  const hasKeys = visibleKeys.length > 0;
   const canCreateNow = canCreate && activeKeys.length < MAX_ACTIVE_KEYS;
   const canSubmit = canCreateNow && !isSubmitting;
 
   function publishKeysUpdate(nextKeys: ApiKeyItem[]) {
     if (typeof window === "undefined") return;
     window.dispatchEvent(new CustomEvent("dashboard-api-keys-updated", { detail: nextKeys }));
+  }
+
+  function pushToast(message: string) {
+    const id = `toast-${Date.now()}-${toastCounterRef.current++}`;
+    setToasts((prev) => [...prev, { id, message, exiting: false }].slice(-4));
+
+    window.setTimeout(() => {
+      setToasts((prev) => prev.map((item) => (item.id === id ? { ...item, exiting: true } : item)));
+    }, 2400);
+
+    window.setTimeout(() => {
+      setToasts((prev) => prev.filter((item) => item.id !== id));
+    }, 2650);
   }
 
   async function handleCreateKey(event: FormEvent<HTMLFormElement>) {
@@ -185,9 +209,10 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
 
       await navigator.clipboard.writeText(payload.secret);
       setCopiedKeyId(item.id);
+      pushToast("API key 已複製");
       window.setTimeout(() => {
         setCopiedKeyId((prev) => (prev === item.id ? null : prev));
-      }, 1500);
+      }, 1000);
     } catch {
       setErrorMessage("無法複製金鑰，請稍後再試或檢查瀏覽器權限。");
     }
@@ -198,7 +223,8 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
     try {
       await navigator.clipboard.writeText(createdSecret);
       setSecretCopied(true);
-      window.setTimeout(() => setSecretCopied(false), 1500);
+      pushToast("API key 已複製");
+      window.setTimeout(() => setSecretCopied(false), 1000);
     } catch {
       setErrorMessage("無法複製金鑰，請檢查瀏覽器權限。");
     }
@@ -237,7 +263,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
           </thead>
           <tbody>
             {hasKeys ? (
-              keys.map((item) => {
+              visibleKeys.map((item) => {
                 const copied = copiedKeyId === item.id;
                 const copyDisabled = item.status === "revoked" || item.canCopy === false;
                 const rowMuted = item.status === "revoked";
@@ -255,7 +281,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
                           onClick={() => void handleCopy(item)}
                           disabled={copyDisabled}
                           className={cn(
-                            "inline-flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-slate-500 transition hover:border-slate-200 hover:bg-slate-50 hover:text-slate-700",
+                            "inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-transparent text-slate-500 transition duration-150 ease-out hover:border-slate-200 hover:bg-slate-100 hover:text-slate-700 active:scale-95 active:opacity-80",
                             copyDisabled && "cursor-not-allowed text-slate-300 hover:border-transparent hover:bg-transparent hover:text-slate-300",
                           )}
                           aria-label="複製 API 金鑰"
@@ -269,9 +295,8 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
                                   : "複製"
                           }
                         >
-                          <Copy className="h-4 w-4" />
+                          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                         </button>
-                        {copied ? <span className="text-xs text-slate-500">已複製</span> : null}
                       </div>
                     </td>
                     <td className="border-b border-slate-100 py-3 pr-3 text-slate-600">{formatDateTime(item.lastUsed)}</td>
@@ -297,13 +322,25 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
             ) : (
               <tr>
                 <td className="py-4 text-sm text-slate-500" colSpan={4}>
-                  尚無 API key。
+                  目前沒有可用中的 API key。
                 </td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {revokedCount > 0 ? (
+        <div className="flex items-center justify-start">
+          <button
+            type="button"
+            onClick={() => setShowRevoked((prev) => !prev)}
+            className="text-xs text-slate-500 underline-offset-4 transition hover:text-slate-700 hover:underline"
+          >
+            {showRevoked ? "隱藏已撤銷金鑰" : `顯示已撤銷金鑰（${revokedCount}）`}
+          </button>
+        </div>
+      ) : null}
 
       <div className="flex items-center justify-start">
         <button
@@ -358,6 +395,22 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
           </div>
         </div>
       ) : null}
+
+      <div className="pointer-events-none fixed bottom-4 right-4 z-[70] flex w-[min(360px,calc(100vw-2rem))] flex-col-reverse gap-2 sm:bottom-6 sm:right-6">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={cn(
+              "rounded-xl border border-slate-200 bg-white/95 px-3 py-2 text-xs text-slate-700 shadow-sm transition-all duration-200",
+              toast.exiting ? "translate-y-1 opacity-0" : "translate-y-0 opacity-100",
+            )}
+            role="status"
+            aria-live="polite"
+          >
+            {toast.message}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
