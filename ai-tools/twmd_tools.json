@@ -1,0 +1,93 @@
+{
+  "version": "0.1.0-preview",
+  "platform": "TW Market Data",
+  "mode": "local-dev-preview",
+  "notes": [
+    "No LLM dependency required.",
+    "Do not place real secrets in committed files.",
+    "Credits metadata is returned from response headers."
+  ],
+  "tools": [
+    {
+      "name": "twse_daily_price",
+      "description": "Get TWSE daily price rows by symbol.",
+      "endpoint": "/v2/datasets/twse-daily-price",
+      "requiredPlan": "free",
+      "creditsCost": 1,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symbol": { "type": "string", "description": "Stock symbol, e.g. 2330" },
+          "limit": { "type": "number", "description": "Optional max rows" },
+          "start_date": { "type": "string", "description": "Optional YYYY-MM-DD" },
+          "end_date": { "type": "string", "description": "Optional YYYY-MM-DD" }
+        },
+        "required": ["symbol"]
+      },
+      "examplePrompt": "查詢台積電最近 5 筆 TWSE 日線價格"
+    },
+    {
+      "name": "issuer_profile",
+      "description": "Get issuer profile by symbol.",
+      "endpoint": "/v2/datasets/issuer-profile",
+      "requiredPlan": "free",
+      "creditsCost": 1,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symbol": { "type": "string", "description": "Stock symbol" }
+        },
+        "required": ["symbol"]
+      },
+      "examplePrompt": "提供 2330 的公司基本資料摘要"
+    },
+    {
+      "name": "monthly_revenue",
+      "description": "Get monthly revenue rows.",
+      "endpoint": "/v2/datasets/monthly-revenue",
+      "requiredPlan": "developer",
+      "creditsCost": 3,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symbol": { "type": "string" },
+          "limit": { "type": "number" }
+        },
+        "required": ["symbol"]
+      },
+      "examplePrompt": "查詢 2330 近 12 個月營收並輸出趨勢摘要"
+    },
+    {
+      "name": "valuation_data",
+      "description": "Get valuation metrics.",
+      "endpoint": "/v2/datasets/valuation-data",
+      "requiredPlan": "developer",
+      "creditsCost": 2,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symbol": { "type": "string" },
+          "limit": { "type": "number" }
+        },
+        "required": ["symbol"]
+      },
+      "examplePrompt": "查詢 2330 估值資料並列出最新幾筆"
+    },
+    {
+      "name": "technical_indicators",
+      "description": "Get technical indicators.",
+      "endpoint": "/v2/datasets/technical-indicators",
+      "requiredPlan": "developer",
+      "creditsCost": 3,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "symbol": { "type": "string" },
+          "limit": { "type": "number" }
+        },
+        "required": ["symbol"]
+      },
+      "examplePrompt": "查詢 2330 技術指標並輸出短期動能觀察"
+    }
+  ]
+}

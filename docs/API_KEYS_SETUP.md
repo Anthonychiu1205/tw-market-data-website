@@ -258,6 +258,50 @@ print(resp.json())
 - Credits page 會顯示 wallet balance 與交易紀錄。
 - 在 dry-run 模式下，請以「estimated credits」理解 usage 指標。
 
+## SDK Preview (Local)
+
+目前提供 local/dev preview SDK skeleton，尚未發布到 PyPI/npm。
+
+- Python SDK: `packages/python-sdk`
+- JavaScript SDK: `packages/js-sdk`
+
+### Python quickstart
+
+```python
+from twmarketdata import TWMarketDataClient
+
+client = TWMarketDataClient(api_key="twmd_live_xxx")
+result = client.twse_daily_price(symbol="2330", limit=1)
+
+print(result.meta.request_id)
+print(result.meta.dry_run)
+print(result.meta.credits_cost)
+print(result.data)
+```
+
+### JavaScript / TypeScript quickstart
+
+```ts
+import { TWMarketDataClient } from "@twmarketdata/sdk";
+
+const client = new TWMarketDataClient({ apiKey: "twmd_live_xxx" });
+const result = await client.twseDailyPrice({ symbol: "2330", limit: 1 });
+
+console.log(result.meta.requestId);
+console.log(result.meta.dryRun);
+console.log(result.meta.creditsCost);
+console.log(result.data);
+```
+
+### SDK error mapping
+
+- `401` / `invalid_api_key` -> `AuthenticationError`
+- `403` / `plan_not_entitled` -> `EntitlementError`
+- `402` / `insufficient_credits` -> `InsufficientCreditsError`
+- `404` / `dataset_not_found` -> `DatasetNotFoundError`
+- `429` / `rate_limit_exceeded` -> `RateLimitError`
+- `502` / `504` / `upstream_*` -> `UpstreamError`
+
 ## Reconciliation & Operations
 
 ### Usage / Credits 對帳概念
@@ -357,3 +401,23 @@ npm run export:usage-csv
 - `PUBLIC_API_CACHE_MAX_ENTRIES`（gateway cache entry 上限，預設 800）
 - `PUBLIC_API_CREDITS_DEDUCTION_ENABLED`（預設 false）
 - `PUBLIC_API_CREDITS_DEDUCTION_PRODUCTION_CONFIRM`（預設 false）
+
+## AI Agent Preview（Local/Dev）
+
+目前提供 AI agent-ready skeleton（preview）：
+
+- MCP server skeleton：`packages/mcp-server`
+- Tool manifest：`ai-tools/twmd_tools.json`
+- Agent examples：`examples/agents`
+
+### 目標
+
+- 讓 agent 直接以工具方式呼叫 `/v2/datasets/*`
+- 保留 request tracing：`X-Request-Id`
+- 回傳 credits metadata：`X-TWMD-Dry-Run`、`X-TWMD-Credits-Cost`、`X-TWMD-Credits-Charged`、`X-TWMD-Plan`
+
+### 注意事項
+
+- 此區塊僅 local/dev preview，未發布 npm/PyPI/MCP hosted service。
+- 不要在程式碼庫放入真實 API key。
+- customer `X-API-Key` 與 backend `BACKEND_API_TOKEN` 是不同憑證。

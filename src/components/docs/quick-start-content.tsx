@@ -136,6 +136,62 @@ response = requests.post(
 data = response.json()
 print(data)`;
 
+const sdkPythonExample = `from twmarketdata import TWMarketDataClient
+
+client = TWMarketDataClient(api_key="twmd_live_xxx")
+result = client.twse_daily_price(symbol="2330", limit=1)
+
+print(result.meta.request_id)
+print(result.meta.dry_run)
+print(result.meta.credits_cost)
+print(result.data)`;
+
+const sdkTypeScriptExample = `import { TWMarketDataClient } from "@twmarketdata/sdk";
+
+const client = new TWMarketDataClient({
+  apiKey: "twmd_live_xxx",
+  baseUrl: "https://twmarketdata.com",
+  timeoutMs: 10000,
+});
+
+const result = await client.twseDailyPrice({ symbol: "2330", limit: 1 });
+console.log(result.meta.requestId, result.meta.creditsCost, result.meta.dryRun);
+console.log(result.data);`;
+
+const sdkErrorHandlingExample = `import {
+  TWMarketDataClient,
+  AuthenticationError,
+  EntitlementError,
+  InsufficientCreditsError,
+  DatasetNotFoundError,
+  UpstreamError,
+} from "@twmarketdata/sdk";
+
+const client = new TWMarketDataClient({ apiKey: "twmd_live_xxx" });
+
+try {
+  await client.monthlyRevenue({ symbol: "2330", limit: 12 });
+} catch (error) {
+  if (error instanceof AuthenticationError) console.error("API key 無效");
+  else if (error instanceof EntitlementError) console.error("方案未開通");
+  else if (error instanceof InsufficientCreditsError) console.error("credits 不足");
+  else if (error instanceof DatasetNotFoundError) console.error("dataset 不存在");
+  else if (error instanceof UpstreamError) console.error("上游異常");
+}`;
+
+const mcpSkeletonExample = `cd packages/mcp-server
+npm install --ignore-scripts
+npm run build
+
+TWMD_API_KEY=twmd_live_xxx \\
+node dist/index.js get_twse_daily_price '{"symbol":"2330","limit":1}'`;
+
+const agentWorkflowExample = `# TypeScript
+TWMD_API_KEY=twmd_live_xxx node examples/agents/simple_research_agent.ts
+
+# Python
+TWMD_API_KEY=twmd_live_xxx python3 examples/agents/simple_research_agent.py`;
+
 export function QuickStartContent() {
   return (
     <div className="space-y-8 py-8">
@@ -156,6 +212,64 @@ export function QuickStartContent() {
         </p>
         <p className="text-sm leading-7 text-slate-600">
           目前 access 採 controlled rollout。不同方案會影響可用 dataset、rate limit 與月用量上限。
+        </p>
+      </section>
+
+      <section className="space-y-4 border-b border-slate-200 pb-8">
+        <SectionHeading id="sdk-preview">SDK preview（local/dev）</SectionHeading>
+        <p className="text-sm leading-7 text-slate-600">
+          我們已提供 Python 與 JavaScript SDK skeleton，讓你不需要手寫 fetch/curl。此階段僅為 local/dev preview，尚未發布到 PyPI 或 npm。
+        </p>
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-slate-800">Python SDK</p>
+          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
+            <code>{sdkPythonExample}</code>
+          </pre>
+        </div>
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-slate-800">JavaScript / TypeScript SDK</p>
+          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
+            <code>{sdkTypeScriptExample}</code>
+          </pre>
+        </div>
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-slate-800">錯誤處理範例</p>
+          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
+            <code>{sdkErrorHandlingExample}</code>
+          </pre>
+        </div>
+      </section>
+
+      <section className="space-y-4 border-b border-slate-200 pb-8">
+        <SectionHeading id="ai-agent-preview">AI Agent / MCP preview（local/dev）</SectionHeading>
+        <p className="text-sm leading-7 text-slate-600">
+          TW Market Data 提供 MCP server skeleton、tool manifest 與 agent workflow 範例，方便你把資料能力接到 Claude、Cursor 或自建 agent tools。
+        </p>
+        <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
+          <li>
+            MCP skeleton：<code className="rounded bg-slate-100 px-1 py-0.5 text-xs">packages/mcp-server</code>
+          </li>
+          <li>
+            Tool manifest：<code className="rounded bg-slate-100 px-1 py-0.5 text-xs">ai-tools/twmd_tools.json</code>
+          </li>
+          <li>
+            Agent examples：<code className="rounded bg-slate-100 px-1 py-0.5 text-xs">examples/agents</code>
+          </li>
+        </ul>
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-slate-800">MCP skeleton example</p>
+          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
+            <code>{mcpSkeletonExample}</code>
+          </pre>
+        </div>
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-slate-800">Agent workflow example</p>
+          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
+            <code>{agentWorkflowExample}</code>
+          </pre>
+        </div>
+        <p className="text-xs text-slate-500">
+          此區塊為 preview，僅供 local/dev 驗證，未發布為正式套件或託管 MCP service，且不依賴 LLM API key。
         </p>
       </section>
 
