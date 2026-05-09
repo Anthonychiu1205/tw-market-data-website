@@ -14,6 +14,44 @@ class BackendFetchTimeoutError extends Error {
 }
 
 const DEFAULT_BACKEND_FETCH_TIMEOUT_MS = 2500;
+const DEFAULT_BACKEND_SUMMARY_CACHE_TTL_MS = 10_000;
+
+type BackendMemoryCacheEntry<T> = {
+  value: T;
+  expiresAt: number;
+};
+
+const backendMemoryCache = new Map<string, BackendMemoryCacheEntry<unknown>>();
+
+function nowMs() {
+  return Date.now();
+}
+
+function resolveBackendSummaryCacheTtlMs() {
+  const raw = process.env.BACKEND_SUMMARY_CACHE_TTL_MS;
+  const parsed = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (Number.isFinite(parsed) && parsed >= 1000) {
+    return parsed;
+  }
+  return DEFAULT_BACKEND_SUMMARY_CACHE_TTL_MS;
+}
+
+function getBackendCacheValue<T>(key: string) {
+  const cached = backendMemoryCache.get(key) as BackendMemoryCacheEntry<T> | undefined;
+  if (!cached) return null;
+  if (cached.expiresAt <= nowMs()) {
+    backendMemoryCache.delete(key);
+    return null;
+  }
+  return cached.value;
+}
+
+function setBackendCacheValue<T>(key: string, value: T) {
+  backendMemoryCache.set(key, {
+    value,
+    expiresAt: nowMs() + resolveBackendSummaryCacheTtlMs(),
+  });
+}
 
 export type AccountSummary = {
   plan: string;
@@ -57,6 +95,9 @@ export type UsageRequestRow = {
   latencyMs?: number | null;
   errorCode?: string | null;
   requestId?: string | null;
+  transactionLinked?: boolean | null;
+  transactionStatus?: string | null;
+  transactionCredits?: number | null;
 };
 
 export type UsageRequestsSummary = {
@@ -305,6 +346,12 @@ function normalizeCatalogRow(item: unknown): ProductCatalogRow | null {
 }
 
 export async function getAccountSummary(email: string): Promise<AccountSummary> {
+  const cacheKey = `account:${email.toLowerCase()}`;
+  const cached = getBackendCacheValue<AccountSummary>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const live = await fetchFromCandidates<Record<string, unknown>>(email, [
     "/v1/account/summary",
     "/v1/account",
@@ -313,20 +360,24 @@ export async function getAccountSummary(email: string): Promise<AccountSummary> 
 
   if (live?.data) {
     const payload = live.data;
-    return {
+    const result: AccountSummary = {
       plan: getString(payload.plan || payload.plan_name, "Developer"),
       accessStatus: getString(payload.accessStatus || payload.access_status, "Active"),
       enabledDatasets: getNumber(payload.enabledDatasets || payload.enabled_datasets, datasetProducts.length),
       integrationMode: "live",
     };
+    setBackendCacheValue(cacheKey, result);
+    return result;
   }
 
-  return {
+  const fallbackResult: AccountSummary = {
     plan: "Developer",
     accessStatus: "Active",
     enabledDatasets: datasetProducts.length,
     integrationMode: "fallback",
   };
+  setBackendCacheValue(cacheKey, fallbackResult);
+  return fallbackResult;
 }
 
 export async function getBillingSummary(email: string): Promise<BillingSummary> {
@@ -359,6 +410,12 @@ export async function getBillingSummary(email: string): Promise<BillingSummary> 
 }
 
 export async function getUsageSummary(email: string): Promise<UsageSummary> {
+  const cacheKey = `usage-summary:${email.toLowerCase()}`;
+  const cached = getBackendCacheValue<UsageSummary>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const selfServeSummary = await fetchFromCandidates<Record<string, unknown>>(email, [
     "/v2/self-serve/usage-summary",
   ]);
@@ -386,7 +443,7 @@ export async function getUsageSummary(email: string): Promise<UsageSummary> {
       };
     });
 
-    return {
+    const result: UsageSummary = {
       monthlyUsed: getNumber(payload.recent_request_count, 0),
       monthlyQuota: Math.max(getNumber(profile.quota_daily_limit, 0), 1),
       rateLimitPerMin: getNumber(profile.rate_limit_rpm, 60),
@@ -394,6 +451,8 @@ export async function getUsageSummary(email: string): Promise<UsageSummary> {
       dailyUsage: fallbackDailyUsage,
       integrationMode: "live",
     };
+    setBackendCacheValue(cacheKey, result);
+    return result;
   }
 
   const liveSummary = await fetchFromCandidates<Record<string, unknown>>(email, [
@@ -429,7 +488,7 @@ export async function getUsageSummary(email: string): Promise<UsageSummary> {
     const topEndpointsFromDedicated = normalizeEndpointList(liveTopEndpoints?.data);
     const mergedTopEndpoints = (topEndpointsFromSummary.length ? topEndpointsFromSummary : topEndpointsFromDedicated).slice(0, 8);
 
-    return {
+    const result: UsageSummary = {
       monthlyUsed: getNumber(summary.monthlyUsed || summary.monthly_used, 0),
       monthlyQuota: getNumber(summary.monthlyQuota || summary.monthly_quota, 250000),
       rateLimitPerMin: getNumber(summary.rateLimitPerMin || summary.rate_limit_per_min, 60),
@@ -437,6 +496,8 @@ export async function getUsageSummary(email: string): Promise<UsageSummary> {
       dailyUsage,
       integrationMode: "live",
     };
+    setBackendCacheValue(cacheKey, result);
+    return result;
   }
 
   const fallbackDailyUsage = Array.from({ length: 35 }, (_, index) => {
@@ -448,7 +509,7 @@ export async function getUsageSummary(email: string): Promise<UsageSummary> {
     };
   });
 
-  return {
+  const fallbackResult: UsageSummary = {
     monthlyUsed: 0,
     monthlyQuota: 250000,
     rateLimitPerMin: 60,
@@ -456,6 +517,8 @@ export async function getUsageSummary(email: string): Promise<UsageSummary> {
     dailyUsage: fallbackDailyUsage,
     integrationMode: "fallback",
   };
+  setBackendCacheValue(cacheKey, fallbackResult);
+  return fallbackResult;
 }
 
 function normalizeUsageRequestRow(item: unknown): UsageRequestRow | null {
@@ -493,13 +556,21 @@ function normalizeUsageRequestRow(item: unknown): UsageRequestRow | null {
 }
 
 export async function getUsageRequestRows(email: string): Promise<UsageRequestsSummary> {
+  const cacheKey = `usage-rows:${email.toLowerCase()}`;
+  const cached = getBackendCacheValue<UsageRequestsSummary>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   const base = getBase();
   if (!base) {
-    return {
+    const result: UsageRequestsSummary = {
       rows: [],
       integrationMode: "fallback",
       insufficientCredits: false,
     };
+    setBackendCacheValue(cacheKey, result);
+    return result;
   }
 
   try {
@@ -514,36 +585,44 @@ export async function getUsageRequestRows(email: string): Promise<UsageRequestsS
     const payload = (await parseJsonSafe<Record<string, unknown>>(response)) ?? {};
 
     if (response.status === 402 && getString(payload.detail) === "insufficient_credits") {
-      return {
+      const result: UsageRequestsSummary = {
         rows: [],
         integrationMode: "live",
         insufficientCredits: true,
       };
+      setBackendCacheValue(cacheKey, result);
+      return result;
     }
 
     if (!response.ok) {
-      return {
+      const result: UsageRequestsSummary = {
         rows: [],
         integrationMode: "fallback",
         insufficientCredits: false,
       };
+      setBackendCacheValue(cacheKey, result);
+      return result;
     }
 
     const rows = pickArray(payload)
       .map(normalizeUsageRequestRow)
       .filter((row): row is UsageRequestRow => Boolean(row));
     const exhaustedFromRows = rows.some((row) => row.statusCode === 402);
-    return {
+    const result: UsageRequestsSummary = {
       rows,
       integrationMode: "live",
       insufficientCredits: exhaustedFromRows,
     };
+    setBackendCacheValue(cacheKey, result);
+    return result;
   } catch {
-    return {
+    const result: UsageRequestsSummary = {
       rows: [],
       integrationMode: "fallback",
       insufficientCredits: false,
     };
+    setBackendCacheValue(cacheKey, result);
+    return result;
   }
 }
 
