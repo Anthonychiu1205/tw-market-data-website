@@ -9056,6 +9056,433 @@ asyncio.run(main())`,
     ],
   },
   {
+    slug: ["sdk", "release-status"],
+    href: "/docs/sdk/release-status",
+    navLabel: "Release Status",
+    category: "guides",
+    icon: "braces",
+    title: "SDK / MCP Release Status",
+    subtitle: "清楚區分目前可用能力與尚未 GA 的功能，避免整合誤判。",
+    tier: "complete",
+    sections: [
+      {
+        id: "status-matrix",
+        label: "Release Status Matrix",
+        paragraphs: [
+          "目前主要可用入口是 Public API Gateway（X-API-Key）。SDK、MCP、AI tools 相關能力仍以 preview 或 example 為主。",
+        ],
+        codeBlocks: [
+          {
+            language: "text",
+            code: `| Component | Status | Intended Use | Not Yet |
+|---|---|---|---|
+| Public API Gateway | Beta / Live | Direct API calls with X-API-Key | Rate limits GA |
+| Python SDK | Preview | Local/dev usage | PyPI publish, tests |
+| JavaScript SDK | Preview | Local/dev usage | npm publish, dual build |
+| MCP Server | Preview Skeleton | Local adapter exploration | stdio transport, hosted MCP |
+| AI Tool Manifest | Preview | Tool calling registry seed | Official agent runtime |
+| Agent Examples | Example | Workflow demo | Investment advice / trading |`,
+          },
+        ],
+      },
+      {
+        id: "current-default-path",
+        label: "Current Recommended Path",
+        bullets: [
+          "正式資料請求：Public API Gateway `/v2/datasets/*` + `X-API-Key`。",
+          "SDK：目前僅建議 local/dev 使用。",
+          "MCP：目前僅 skeleton，尚未正式 stdio server。",
+          "Agent examples：僅示範 workflow，不是投資建議、個股推薦或交易訊號。",
+        ],
+      },
+      {
+        id: "notes",
+        label: "Notes",
+        paragraphs: [
+          "Python SDK 尚未發布到 PyPI，JavaScript SDK 尚未發布到 npm。",
+          "若需 production integration，請優先依 Public API Gateway 文件整合。",
+        ],
+      },
+    ],
+  },
+  {
+    slug: ["sdk", "python-sdk"],
+    href: "/docs/sdk/python-sdk",
+    navLabel: "Python SDK",
+    category: "guides",
+    icon: "braces",
+    title: "Python SDK",
+    subtitle: "使用 Python client 快速呼叫 TW Market Data public API，並取得 requestId 與 credits metadata。",
+    tier: "complete",
+    sections: [
+      {
+        id: "installation",
+        label: "安裝",
+        paragraphs: [
+          "目前 Python SDK 為 local/dev preview，可用 editable 安裝方式在本機測試。",
+        ],
+        codeBlocks: [
+          {
+            language: "text",
+            code: `cd /Volumes/DEV_USB/Projects/tw-market-data-website
+pip install -e packages/python-sdk`,
+          },
+        ],
+      },
+      {
+        id: "create-client",
+        label: "建立 client",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `from twmarketdata import TWMarketDataClient
+
+client = TWMarketDataClient(
+    api_key="twmd_live_xxx",
+    base_url="https://twmarketdata.com",
+    timeout=10,
+)`,
+          },
+        ],
+      },
+      {
+        id: "examples",
+        label: "資料查詢範例",
+        paragraphs: ["先從 twse_daily_price 與 issuer_profile 兩個常用工具開始。"],
+        codeBlocks: [
+          {
+            language: "python",
+            code: `price = client.twse_daily_price(symbol="2330", limit=1)
+profile = client.issuer_profile(symbol="2330")
+
+print(price.data)
+print(profile.data)`,
+          },
+        ],
+      },
+      {
+        id: "metadata",
+        label: "requestId 與 credits metadata",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `result = client.monthly_revenue(symbol="2330", limit=12)
+
+print(result.meta.request_id)
+print(result.meta.dry_run)
+print(result.meta.credits_cost)
+print(result.meta.credits_charged)
+print(result.meta.plan)`,
+          },
+        ],
+      },
+      {
+        id: "errors",
+        label: "錯誤處理",
+        codeBlocks: [
+          {
+            language: "python",
+            code: `from twmarketdata import (
+    AuthenticationError,
+    EntitlementError,
+    InsufficientCreditsError,
+    DatasetNotFoundError,
+    UpstreamError,
+)
+
+try:
+    result = client.technical_indicators(symbol="2330", limit=20)
+except AuthenticationError:
+    print("API key 無效")
+except EntitlementError:
+    print("目前方案未開通此 dataset")
+except InsufficientCreditsError:
+    print("credits 不足")
+except DatasetNotFoundError:
+    print("dataset 不存在")
+except UpstreamError:
+    print("上游服務異常")`,
+          },
+        ],
+      },
+      {
+        id: "env",
+        label: "環境變數",
+        paragraphs: ["建議在本機與 CI 使用環境變數管理金鑰與 base URL。"],
+        codeBlocks: [
+          {
+            language: "text",
+            code: `export TWMD_API_KEY=twmd_live_xxx
+export TWMD_BASE_URL=https://twmarketdata.com`,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: ["sdk", "javascript-sdk"],
+    href: "/docs/sdk/javascript-sdk",
+    navLabel: "JavaScript / TypeScript SDK",
+    category: "guides",
+    icon: "braces",
+    title: "JavaScript / TypeScript SDK",
+    subtitle: "使用 typed fetch wrapper 呼叫台股資料 API，內建 timeout 與錯誤碼映射。",
+    tier: "complete",
+    sections: [
+      {
+        id: "install",
+        label: "安裝與使用",
+        codeBlocks: [
+          {
+            language: "text",
+            code: `npm install ./packages/js-sdk`,
+          },
+          {
+            language: "javascript",
+            code: `import { TWMarketDataClient } from "@twmarketdata/sdk";
+
+const client = new TWMarketDataClient({
+  apiKey: "twmd_live_xxx",
+  baseUrl: "https://twmarketdata.com",
+  timeoutMs: 10000,
+});`,
+          },
+        ],
+      },
+      {
+        id: "fetch-wrapper",
+        label: "fetch wrapper + AbortController timeout",
+        paragraphs: [
+          "SDK 內建 AbortController timeout，避免長時間等待上游回應造成程序卡住。",
+        ],
+        codeBlocks: [
+          {
+            language: "javascript",
+            code: `const result = await client.twseDailyPrice({
+  symbol: "2330",
+  limit: 1,
+});`,
+          },
+        ],
+      },
+      {
+        id: "typescript",
+        label: "TypeScript typing",
+        codeBlocks: [
+          {
+            language: "javascript",
+            code: `const valuation = await client.valuationData({
+  symbol: "2330",
+  limit: 5,
+});
+
+console.log(valuation.status);
+console.log(valuation.meta.requestId);
+console.log(valuation.meta.creditsCost);`,
+          },
+        ],
+      },
+      {
+        id: "credits-and-tracing",
+        label: "requestId / credits headers",
+        paragraphs: [
+          "SDK 會把 X-Request-Id、X-TWMD-Dry-Run、X-TWMD-Credits-Cost、X-TWMD-Credits-Charged、X-TWMD-Plan 轉成 meta。",
+        ],
+      },
+      {
+        id: "error-handling",
+        label: "錯誤處理",
+        codeBlocks: [
+          {
+            language: "javascript",
+            code: `import {
+  AuthenticationError,
+  EntitlementError,
+  InsufficientCreditsError,
+  DatasetNotFoundError,
+  UpstreamError,
+} from "@twmarketdata/sdk";
+
+try {
+  await client.monthlyRevenue({ symbol: "2330", limit: 12 });
+} catch (error) {
+  if (error instanceof AuthenticationError) console.error("API key 無效");
+  else if (error instanceof EntitlementError) console.error("方案權限不足");
+  else if (error instanceof InsufficientCreditsError) console.error("credits 不足");
+  else if (error instanceof DatasetNotFoundError) console.error("dataset 不存在");
+  else if (error instanceof UpstreamError) console.error("上游服務異常");
+}`,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    slug: ["ai-agents", "mcp-server-preview"],
+    href: "/docs/ai-agents/mcp-server-preview",
+    navLabel: "MCP Server Preview",
+    category: "guides",
+    icon: "advanced",
+    title: "MCP Server Preview",
+    subtitle: "本地 MCP server skeleton，可把台股資料查詢能力轉成 agent 可調用工具。",
+    tier: "complete",
+    sections: [
+      {
+        id: "status",
+        label: "狀態",
+        paragraphs: [
+          "此頁對應 `packages/mcp-server`，目前為 preview / local only。",
+          "尚未提供 production hosted MCP endpoint。",
+        ],
+      },
+      {
+        id: "tools",
+        label: "工具清單",
+        bullets: [
+          "get_twse_daily_price",
+          "get_tpex_daily_price",
+          "get_issuer_profile",
+          "get_monthly_revenue",
+          "get_valuation_data",
+          "get_technical_indicators",
+        ],
+      },
+      {
+        id: "local-usage",
+        label: "本機使用",
+        codeBlocks: [
+          {
+            language: "text",
+            code: `cd packages/mcp-server
+npm install --ignore-scripts
+npm run build
+
+TWMD_API_KEY=twmd_live_xxx \\
+node dist/index.js get_twse_daily_price '{"symbol":"2330","limit":1}'`,
+          },
+        ],
+      },
+      {
+        id: "env",
+        label: "環境變數",
+        bullets: [
+          "TWMD_API_KEY（required）",
+          "TWMD_BASE_URL（optional，default: https://twmarketdata.com）",
+        ],
+      },
+      {
+        id: "roadmap",
+        label: "Future roadmap",
+        bullets: [
+          "stdio transport",
+          "Cursor integration",
+          "Claude integration",
+          "OpenAI tools wiring",
+        ],
+      },
+    ],
+  },
+  {
+    slug: ["ai-agents", "tool-manifest"],
+    href: "/docs/ai-agents/tool-manifest",
+    navLabel: "Tool Manifest",
+    category: "guides",
+    icon: "advanced",
+    title: "Tool Manifest",
+    subtitle: "透過 ai-tools/twmd_tools.json 讓 tool calling framework 讀取可用工具與 schema。",
+    tier: "complete",
+    sections: [
+      {
+        id: "overview",
+        label: "用途",
+        paragraphs: [
+          "`ai-tools/twmd_tools.json` 提供工具名稱、輸入 schema、endpoint mapping、required plan、credits cost 與 example prompt。",
+          "可用於 OpenAI tool calling、LangChain tools 與 custom agent registry。",
+        ],
+      },
+      {
+        id: "example",
+        label: "範例結構",
+        codeBlocks: [
+          {
+            language: "text",
+            code: `{
+  "name": "twse_daily_price",
+  "endpoint": "/v2/datasets/twse-daily-price",
+  "requiredPlan": "free",
+  "creditsCost": 1
+}`,
+          },
+        ],
+      },
+      {
+        id: "credits-aware",
+        label: "credits-aware 工具使用",
+        paragraphs: [
+          "agent 可利用 manifest 先估算成本，再決定是否呼叫高成本資料集。",
+          "正式扣點仍以 gateway 回應與 server callback 規則為準。",
+        ],
+      },
+    ],
+  },
+  {
+    slug: ["ai-agents", "agent-workflow-examples"],
+    href: "/docs/ai-agents/agent-workflow-examples",
+    navLabel: "Agent Workflow Examples",
+    category: "guides",
+    icon: "advanced",
+    title: "Agent Workflow Examples",
+    subtitle: "以 simple research workflow 展示如何組合多個 dataset 查詢並輸出結構化研究上下文。",
+    tier: "complete",
+    sections: [
+      {
+        id: "what-it-is",
+        label: "這是什麼",
+        paragraphs: [
+          "此範例不是 AI 模型本身，而是 financial data retrieval workflow。",
+          "目標是示範 agent 如何把 TW Market Data 當資料工具層。",
+        ],
+      },
+      {
+        id: "included-examples",
+        label: "範例檔案",
+        bullets: [
+          "examples/agents/simple_research_agent.ts",
+          "examples/agents/simple_research_agent.py",
+        ],
+      },
+      {
+        id: "workflow",
+        label: "流程",
+        bullets: [
+          "讀取 TWMD_API_KEY",
+          "查 issuer_profile",
+          "查 twse_daily_price",
+          "查 monthly_revenue",
+          "輸出 structured research context",
+        ],
+      },
+      {
+        id: "traceability",
+        label: "追蹤能力",
+        paragraphs: [
+          "每一步都可取得 requestId 與 credits metadata，方便觀測與客服追查。",
+        ],
+      },
+      {
+        id: "run-locally",
+        label: "本機執行",
+        codeBlocks: [
+          {
+            language: "text",
+            code: `TWMD_API_KEY=twmd_live_xxx node examples/agents/simple_research_agent.ts
+TWMD_API_KEY=twmd_live_xxx python3 examples/agents/simple_research_agent.py`,
+          },
+        ],
+      },
+    ],
+  },
+  {
     slug: ["support"],
     href: "/docs/support",
     navLabel: "Support",
@@ -9948,6 +10375,18 @@ export const docsSidebarGuideItems: DocsSidebarNavItem[] = [
   { title: "看市場狀態", href: "/docs/workflows/market-status", icon: "guide", status: "production" },
   { title: "快速查資料", href: "/docs/workflows/fast-data-access", icon: "guide", status: "production" },
   { title: "做策略 / AI", href: "/docs/workflows/strategy-ai", icon: "guide", status: "production" },
+];
+
+export const docsSidebarSdkItems: DocsSidebarNavItem[] = [
+  { title: "Release Status", href: "/docs/sdk/release-status", icon: "braces", status: "production" },
+  { title: "Python SDK", href: "/docs/sdk/python-sdk", icon: "braces", status: "production" },
+  { title: "JavaScript / TypeScript SDK", href: "/docs/sdk/javascript-sdk", icon: "braces", status: "production" },
+];
+
+export const docsSidebarAiAgentItems: DocsSidebarNavItem[] = [
+  { title: "MCP Server Preview", href: "/docs/ai-agents/mcp-server-preview", icon: "advanced", status: "preview" },
+  { title: "Tool Manifest", href: "/docs/ai-agents/tool-manifest", icon: "advanced", status: "preview" },
+  { title: "Agent Workflow Examples", href: "/docs/ai-agents/agent-workflow-examples", icon: "advanced", status: "preview" },
 ];
 
 export const docsSidebarApiGroups: DocsSidebarNavGroup[] = docsSidebarNav;

@@ -220,6 +220,14 @@ export function QuickStartContent() {
         <p className="text-sm leading-7 text-slate-600">
           我們已提供 Python 與 JavaScript SDK skeleton，讓你不需要手寫 fetch/curl。此階段僅為 local/dev preview，尚未發布到 PyPI 或 npm。
         </p>
+        <p className="text-sm leading-7 text-slate-600">
+          相關文件：<Link href="/docs/sdk/python-sdk" className="underline underline-offset-4">Python SDK</Link>、
+          <Link href="/docs/sdk/javascript-sdk" className="underline underline-offset-4">JavaScript / TypeScript SDK</Link>。
+        </p>
+        <p className="text-sm leading-7 text-slate-600">
+          SDK / MCP 目前為 preview，完整狀態請看
+          <Link href="/docs/sdk/release-status" className="ml-1 underline underline-offset-4">Release Status</Link>。
+        </p>
         <div className="space-y-2">
           <p className="text-sm font-medium text-slate-800">Python SDK</p>
           <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
@@ -244,6 +252,12 @@ export function QuickStartContent() {
         <SectionHeading id="ai-agent-preview">AI Agent / MCP preview（local/dev）</SectionHeading>
         <p className="text-sm leading-7 text-slate-600">
           TW Market Data 提供 MCP server skeleton、tool manifest 與 agent workflow 範例，方便你把資料能力接到 Claude、Cursor 或自建 agent tools。
+        </p>
+        <p className="text-sm leading-7 text-slate-600">
+          相關文件：
+          <Link href="/docs/ai-agents/mcp-server-preview" className="underline underline-offset-4">MCP Server Preview</Link>、
+          <Link href="/docs/ai-agents/tool-manifest" className="underline underline-offset-4">Tool Manifest</Link>、
+          <Link href="/docs/ai-agents/agent-workflow-examples" className="underline underline-offset-4">Agent Workflow Examples</Link>。
         </p>
         <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
           <li>
@@ -270,6 +284,9 @@ export function QuickStartContent() {
         </div>
         <p className="text-xs text-slate-500">
           此區塊為 preview，僅供 local/dev 驗證，未發布為正式套件或託管 MCP service，且不依賴 LLM API key。
+        </p>
+        <p className="text-xs text-slate-500">
+          Release status matrix：<Link href="/docs/sdk/release-status" className="underline underline-offset-4">/docs/sdk/release-status</Link>
         </p>
       </section>
 

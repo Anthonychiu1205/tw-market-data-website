@@ -137,6 +137,23 @@ export default function HomePage() {
                 註冊
               </Link>
             </div>
+            <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-slate-600">
+              <Link href="/docs/sdk/python-sdk" className="hover:text-slate-900">
+                Python SDK
+              </Link>
+              <span className="text-slate-300">|</span>
+              <Link href="/docs/sdk/javascript-sdk" className="hover:text-slate-900">
+                TypeScript SDK
+              </Link>
+              <span className="text-slate-300">|</span>
+              <Link href="/docs/ai-agents/mcp-server-preview" className="hover:text-slate-900">
+                MCP Preview
+              </Link>
+              <span className="text-slate-300">|</span>
+              <Link href="/docs/ai-agents/agent-workflow-examples" className="hover:text-slate-900">
+                AI Agent Workflow
+              </Link>
+            </div>
           </div>
         </MarketingContainer>
       </section>

@@ -30,8 +30,10 @@ import type { DocsSection } from "@/src/content/docs";
 import { normalizeDocsSections } from "@/src/content/docs-sections";
 import {
   docsSidebarApiGroups,
+  docsSidebarAiAgentItems,
   docsSidebarGuideItems,
   docsSidebarOverviewItems,
+  docsSidebarSdkItems,
 } from "@/src/content/docs-sidebar";
 import type { DocsSidebarNavGroup, DocsSidebarNavItem } from "@/src/content/docs-sidebar";
 import { cn } from "@/src/lib/cn";
@@ -159,6 +161,30 @@ function getGuideItemIcon(href: string) {
   }
 }
 
+function getSdkItemIcon(href: string) {
+  switch (href) {
+    case "/docs/sdk/python-sdk":
+      return Braces;
+    case "/docs/sdk/javascript-sdk":
+      return Braces;
+    default:
+      return Braces;
+  }
+}
+
+function getAiAgentItemIcon(href: string) {
+  switch (href) {
+    case "/docs/ai-agents/mcp-server-preview":
+      return Wrench;
+    case "/docs/ai-agents/tool-manifest":
+      return SearchCode;
+    case "/docs/ai-agents/agent-workflow-examples":
+      return Bot;
+    default:
+      return Bot;
+  }
+}
+
 export function DocsPageShell({ page, children, tocSections, rightPanelTitle, rightPanelContent, pageLabel = "文件" }: DocsPageShellProps) {
   const pathname = usePathname();
   const sections: DocsSection[] = useMemo(
@@ -236,12 +262,18 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
     );
   }
 
-  function renderFlatSidebarItems(items: DocsSidebarNavItem[], section: "overview" | "guides") {
+  function renderFlatSidebarItems(items: DocsSidebarNavItem[], section: "overview" | "guides" | "sdks" | "ai-agents") {
     return (
       <div className="space-y-1">
         {items.map((item) => {
           const isActive = isItemActive(item);
-          const Icon = section === "overview" ? getOverviewItemIcon(item.href) : getGuideItemIcon(item.href);
+          const Icon = section === "overview"
+            ? getOverviewItemIcon(item.href)
+            : section === "guides"
+              ? getGuideItemIcon(item.href)
+              : section === "sdks"
+                ? getSdkItemIcon(item.href)
+                : getAiAgentItemIcon(item.href);
           return (
             <Link
               key={item.href}
@@ -318,6 +350,12 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">Guides</p>
               {renderFlatSidebarItems(docsSidebarGuideItems, "guides")}
+
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">SDKs</p>
+              {renderFlatSidebarItems(docsSidebarSdkItems, "sdks")}
+
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">AI Agents</p>
+              {renderFlatSidebarItems(docsSidebarAiAgentItems, "ai-agents")}
             </nav>
             <div className="h-28 shrink-0" aria-hidden="true" />
           </div>

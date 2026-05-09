@@ -131,6 +131,18 @@ export const docsSidebarGuideItems: DocsSidebarNavItem[] = [
   { title: "做策略 / AI", href: "/docs/workflows/strategy-ai" },
 ];
 
+export const docsSidebarSdkItems: DocsSidebarNavItem[] = [
+  { title: "Release Status", href: "/docs/sdk/release-status" },
+  { title: "Python SDK", href: "/docs/sdk/python-sdk" },
+  { title: "JavaScript / TypeScript SDK", href: "/docs/sdk/javascript-sdk" },
+];
+
+export const docsSidebarAiAgentItems: DocsSidebarNavItem[] = [
+  { title: "MCP Server Preview", href: "/docs/ai-agents/mcp-server-preview" },
+  { title: "Tool Manifest", href: "/docs/ai-agents/tool-manifest" },
+  { title: "Agent Workflow Examples", href: "/docs/ai-agents/agent-workflow-examples" },
+];
+
 function getFirstLeafHref(item: DocsSidebarNavItem): string | null {
   if (!item.children?.length) {
     return item.href;
