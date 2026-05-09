@@ -1,6 +1,6 @@
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 
-import { AgentWorkflowDemo } from "./agent-workflow-demo";
+import { LazyAgentWorkflowDemo } from "./lazy-agent-workflow-demo";
 
 export function AgentWorkflowShowcase() {
   return (
@@ -8,7 +8,7 @@ export function AgentWorkflowShowcase() {
       <MarketingContainer>
         <div className="grid items-start gap-7 lg:grid-cols-[66%_34%] lg:gap-5">
           <div className="order-2 w-full min-w-0 max-w-none lg:order-1">
-            <AgentWorkflowDemo />
+            <LazyAgentWorkflowDemo />
           </div>
 
           <div className="order-1 lg:order-2 lg:border-l lg:border-slate-200 lg:pl-4">

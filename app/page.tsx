@@ -3,13 +3,13 @@ import Link from "next/link";
 
 import { AgentDocumentsShowcase } from "@/src/components/home/agent-documents-showcase";
 import { AgentWorkflowShowcase } from "@/src/components/home/agent-workflow-showcase";
-import { ApiDemoSection } from "@/src/components/home/api-demo-section";
+import { ApiDemoSectionDeferred } from "@/src/components/home/api-demo-section-deferred";
 import { HeroMarketIntel } from "@/src/components/home/hero-market-intel";
 import { MarketMarquee } from "@/src/components/home/market-marquee";
 import { MarketCoverageShowcase } from "@/src/components/home/market-coverage-showcase";
 import { AiAgentWorkflowSection } from "@/src/components/home/ai-agent-workflow-section";
 import { buttonClass } from "@/src/components/ui/button";
-import { SourceOfTruthSection } from "@/src/components/home/source-of-truth-section";
+import { SourceOfTruthSectionDeferred } from "@/src/components/home/source-of-truth-section-deferred";
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 
@@ -116,9 +116,9 @@ export default function HomePage() {
       <MarketCoverageShowcase />
       <AgentWorkflowShowcase />
       <AgentDocumentsShowcase />
-      <SourceOfTruthSection />
+      <SourceOfTruthSectionDeferred />
       <AiAgentWorkflowSection />
-      <ApiDemoSection />
+      <ApiDemoSectionDeferred />
 
       <section className="bg-white py-14">
         <MarketingContainer>

@@ -1,6 +1,7 @@
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 
-import { AgentWorkflowDemo, type AgentWorkflowDemoConfig } from "./agent-workflow-demo";
+import type { AgentWorkflowDemoConfig } from "./agent-workflow-demo";
+import { LazyAgentWorkflowDemo } from "./lazy-agent-workflow-demo";
 
 const MARKET_COVERAGE_DEMO_CONFIG: AgentWorkflowDemoConfig = {
   queryPrompt: "找出近一年營收成長與毛利率穩定的股票",
@@ -37,7 +38,7 @@ export function MarketCoverageShowcase() {
           </div>
 
           <div className="order-2 w-full min-w-0 max-w-none">
-            <AgentWorkflowDemo config={MARKET_COVERAGE_DEMO_CONFIG} />
+            <LazyAgentWorkflowDemo config={MARKET_COVERAGE_DEMO_CONFIG} />
           </div>
         </div>
       </MarketingContainer>

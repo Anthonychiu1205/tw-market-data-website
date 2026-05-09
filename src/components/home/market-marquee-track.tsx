@@ -1,7 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-
 import type { MarketMarqueeViewItem } from "@/src/lib/market-marquee-snapshot";
 
 type Props = {
@@ -15,7 +13,7 @@ function trendClass(trend: MarketMarqueeViewItem["trend"]) {
 }
 
 export function MarketMarqueeTrack({ items }: Props) {
-  const duplicated = useMemo(() => [...items, ...items], [items]);
+  const duplicated = [...items, ...items];
 
   return (
     <div className="market-marquee group overflow-hidden">

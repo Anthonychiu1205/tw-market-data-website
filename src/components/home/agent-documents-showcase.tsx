@@ -1,6 +1,6 @@
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 
-import { AgentDocumentsDemo } from "./agent-documents-demo";
+import { LazyAgentDocumentsDemo } from "./lazy-agent-documents-demo";
 
 export function AgentDocumentsShowcase() {
   return (
@@ -19,7 +19,7 @@ export function AgentDocumentsShowcase() {
           </div>
 
           <div className="order-2 w-full min-w-0 max-w-none lg:order-2">
-            <AgentDocumentsDemo />
+            <LazyAgentDocumentsDemo />
           </div>
         </div>
       </MarketingContainer>
