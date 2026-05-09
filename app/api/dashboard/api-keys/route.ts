@@ -46,6 +46,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "api_key_limit_reached" }, { status: 409 });
     }
 
+    if (
+      error instanceof Error &&
+      (error.message === "api_key_encryption_secret_missing" || error.message === "api_key_encryption_secret_too_short")
+    ) {
+      return NextResponse.json({ error: "api_key_encryption_unavailable" }, { status: 503 });
+    }
+
     return NextResponse.json({ error: "api_key_create_failed" }, { status: 500 });
   }
 }

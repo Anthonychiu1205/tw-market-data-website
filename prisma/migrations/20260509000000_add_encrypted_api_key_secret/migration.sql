@@ -1,0 +1,2 @@
+ALTER TABLE "ApiKey" ADD COLUMN IF NOT EXISTS "encryptedSecret" TEXT;
+ALTER TABLE "ApiKey" ADD COLUMN IF NOT EXISTS "encryptionVersion" TEXT DEFAULT 'v1';

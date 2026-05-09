@@ -58,6 +58,7 @@ export type ApiKeyItem = {
   name: string;
   keyPrefix?: string;
   maskedKey: string;
+  canCopy?: boolean;
   status?: string;
   lastUsed: string;
   createdAt?: string;

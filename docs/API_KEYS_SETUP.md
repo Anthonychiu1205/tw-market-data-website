@@ -17,27 +17,36 @@ It does **not** enable public API gateway access yet.
 - Stored fields in DB:
   - `keyPrefix`
   - `keyHash`
+  - `encryptedSecret` (AES-256-GCM encrypted)
   - metadata (`name`, `status`, timestamps)
 - Raw key is **not** stored.
 - Raw key is returned only once at creation time.
 - After leaving the one-time panel, the secret cannot be retrieved again.
 - Revoked keys are marked as `status=revoked` and should be treated as invalid.
+- New version keys can be copied again through authenticated server-side decrypt endpoint.
 
 ## Environment Variables
 
 - `AUTH_SECRET` (required in production)
 - `API_KEY_HASH_SECRET` (recommended explicit hash secret)
+- `API_KEY_ENCRYPTION_SECRET` (required for encrypted secret copy workflow)
 
 If `API_KEY_HASH_SECRET` is missing:
 
 - development can fallback to `AUTH_SECRET` (or a dev-only fallback),
 - production should provide `API_KEY_HASH_SECRET` or `AUTH_SECRET`.
 
+If `API_KEY_ENCRYPTION_SECRET` is missing:
+
+- production create/copy secret flow returns safe error,
+- old hash-only keys can still be listed and revoked.
+
 ## Current API Routes
 
 - `GET /api/dashboard/api-keys`
 - `POST /api/dashboard/api-keys`
 - `DELETE /api/dashboard/api-keys/:id`
+- `GET /api/dashboard/api-keys/:id/secret` (authenticated, active key only, `Cache-Control: no-store`)
 
 Auth is required for all routes.
 
