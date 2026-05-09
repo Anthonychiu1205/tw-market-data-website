@@ -29,6 +29,7 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ onContactClick }: SiteHeaderProps) {
   const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
   const [isProductsMenuOpen, setIsProductsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const hasHydratedRef = useRef(false);
@@ -186,14 +187,12 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
             >
             聯繫我們
             </button>
-            {status === "authenticated" ? (
+            {isAuthenticated ? (
               <>
                 <Link href="/dashboard" className={`${buttonClass("primary")} hidden md:inline-flex`}>
                   Dashboard
                 </Link>
               </>
-            ) : status === "loading" ? (
-              <span className="hidden h-10 w-[160px] animate-pulse rounded-md bg-slate-200 md:inline-flex" aria-hidden="true" />
             ) : (
               <>
                 <Link href="/login" className={`${buttonClass("secondary")} hidden md:inline-flex`}>
@@ -256,7 +255,7 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
             </nav>
 
             <div className="mt-5 space-y-2 border-t border-slate-200 pt-4">
-              {status === "authenticated" ? (
+              {isAuthenticated ? (
                 <Link
                   href="/dashboard"
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -264,8 +263,6 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
                 >
                   Dashboard
                 </Link>
-              ) : status === "loading" ? (
-                <span className="inline-flex h-10 w-full animate-pulse rounded-md bg-slate-200" aria-hidden="true" />
               ) : (
                 <>
                   <Link

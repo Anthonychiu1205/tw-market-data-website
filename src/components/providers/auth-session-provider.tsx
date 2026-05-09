@@ -8,5 +8,9 @@ type AuthSessionProviderProps = {
 };
 
 export function AuthSessionProvider({ children }: AuthSessionProviderProps) {
-  return <SessionProvider>{children}</SessionProvider>;
+  return (
+    <SessionProvider refetchOnWindowFocus={false} refetchWhenOffline={false} refetchInterval={0}>
+      {children}
+    </SessionProvider>
+  );
 }
