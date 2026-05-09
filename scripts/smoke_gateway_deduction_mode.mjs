@@ -5,6 +5,9 @@ const apiKey = process.env.GATEWAY_SMOKE_API_KEY?.trim() || "";
 const deductionEnabled = String(process.env.PUBLIC_API_CREDITS_DEDUCTION_ENABLED || "").trim().toLowerCase() === "true";
 const confirmed = String(process.env.CONFIRM_DEDUCTION_SMOKE || "").trim().toLowerCase() === "true";
 const hasDatabaseUrl = Boolean(process.env.DATABASE_URL?.trim());
+const isProductionRuntime = String(process.env.NODE_ENV || "").trim().toLowerCase() === "production";
+const allowProductionTestScripts =
+  String(process.env.ALLOW_PRODUCTION_TEST_SCRIPTS || "").trim().toLowerCase() === "true";
 
 function maskApiKey(value) {
   const trimmed = (value || "").trim();
@@ -153,6 +156,12 @@ async function countUsageTransactionsByRequestId(prisma, requestId, userId) {
 }
 
 async function main() {
+  if (isProductionRuntime && !allowProductionTestScripts) {
+    console.error("[BLOCKED] deduction smoke is disabled in production runtime.");
+    console.error("[BLOCKED] set ALLOW_PRODUCTION_TEST_SCRIPTS=true only for controlled emergency operations.");
+    process.exit(1);
+  }
+
   const missingReasons = [];
   if (!deductionEnabled) missingReasons.push("PUBLIC_API_CREDITS_DEDUCTION_ENABLED!=true");
   if (!confirmed) missingReasons.push("CONFIRM_DEDUCTION_SMOKE!=true");

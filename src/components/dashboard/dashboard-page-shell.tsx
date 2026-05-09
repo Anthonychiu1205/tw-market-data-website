@@ -1,3 +1,4 @@
+import { AuthRuntimeUnavailableError } from "@/src/auth/session";
 import { getRequiredSession } from "@/src/lib/auth/session";
 import { DashboardConsole } from "@/src/components/dashboard/dashboard-console";
 import { type DashboardSection } from "@/src/content/dashboard";
@@ -154,7 +155,31 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
   const needsReconciliation = section === "usage" || currentPath === "/billing/credits";
 
   try {
-    const session = await timedStage("auth/session", () => getRequiredSession());
+    let session: Awaited<ReturnType<typeof getRequiredSession>>;
+    try {
+      session = await timedStage("auth/session", () => getRequiredSession());
+    } catch (error) {
+      if (error instanceof AuthRuntimeUnavailableError) {
+        logStageDuration("total", dashboardLoadStartedAt, false);
+        return (
+          <div className="h-[calc(100dvh-73px)] overflow-hidden px-4 py-4 lg:px-8 lg:py-6">
+            <div className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)]">
+              <aside className="min-h-0 h-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-4">
+                <p className="text-sm font-semibold text-slate-900">控制台</p>
+                <p className="mt-1 text-xs text-slate-500">服務狀態</p>
+              </aside>
+              <main className="min-h-0 min-w-0 h-full overflow-y-auto pr-1">
+                <section className="rounded-2xl border border-slate-200 bg-white p-6">
+                  <h1 className="text-lg font-semibold tracking-tight text-slate-900">登入服務暫時不可用，請稍後再試。</h1>
+                  <p className="mt-2 text-sm text-slate-600">如果問題持續發生，請聯繫我們協助排查。</p>
+                </section>
+              </main>
+            </div>
+          </div>
+        );
+      }
+      throw error;
+    }
 
     // API keys in dashboard currently use local Prisma source, not backend self-serve list.
     console.info("[dashboard-load] stage=backendApiKeys durationMs=0 ok=true");

@@ -45,8 +45,16 @@ function getGatewayCacheMaxEntries() {
   return parseMs(process.env.PUBLIC_API_CACHE_MAX_ENTRIES, DEFAULT_GATEWAY_CACHE_MAX_ENTRIES, 100);
 }
 
-export function buildGatewayCacheKey(input: { datasetSlug: string; normalizedQueryString: string }) {
-  return `${input.datasetSlug}?${input.normalizedQueryString}`;
+export function buildGatewayCacheKey(input: {
+  datasetSlug: string;
+  normalizedQueryString: string;
+  planCode: string;
+  userCacheScope: string;
+}) {
+  // Cache isolation dimensions:
+  // - planCode prevents free/developer/pro/team cross-plan sharing.
+  // - userCacheScope prevents user-scoped upstream responses from being shared across accounts.
+  return `${input.datasetSlug}?${input.normalizedQueryString}|plan:${input.planCode}|scope:${input.userCacheScope}`;
 }
 
 function shortKey(key: string) {

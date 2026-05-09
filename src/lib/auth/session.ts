@@ -1,12 +1,17 @@
 import { redirect } from "next/navigation";
 
-import type { AppSession } from "@/src/auth/session";
-import { getSession } from "@/src/auth/session";
+import { AuthRuntimeUnavailableError, type AppSession, getSessionWithRuntimeStatus } from "@/src/auth/session";
 
 export async function getRequiredSession(): Promise<AppSession> {
-  const session = await getSession();
-  if (!session) {
+  const resolved = await getSessionWithRuntimeStatus();
+
+  if (resolved.unavailable) {
+    throw new AuthRuntimeUnavailableError();
+  }
+
+  if (!resolved.session) {
     redirect("/login");
   }
-  return session;
+
+  return resolved.session;
 }

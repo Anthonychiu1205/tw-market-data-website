@@ -196,6 +196,8 @@ export async function GET(request: Request, context: Context) {
     const cacheKey = buildGatewayCacheKey({
       datasetSlug,
       normalizedQueryString: queryString,
+      planCode: planCode ?? "unknown",
+      userCacheScope: authContext.userId,
     });
 
     if (!deductionEnabled) {

@@ -15,6 +15,8 @@ export async function GET(_request: Request, context: Context) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
+  // TODO(security): add step-up authentication (recent password/OAuth re-auth) before returning full API key secret.
+
   const params = await context.params;
   const result = await getApiKeySecretForUser({
     userId: session.id,

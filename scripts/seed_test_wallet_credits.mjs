@@ -2,6 +2,9 @@ const confirmed = String(process.env.CONFIRM_SEED_TEST_WALLET || "").trim().toLo
 const databaseUrl = process.env.DATABASE_URL?.trim();
 const userEmail = process.env.SEED_WALLET_USER_EMAIL?.trim().toLowerCase();
 const creditsRaw = process.env.SEED_WALLET_CREDITS?.trim();
+const isProductionRuntime = String(process.env.NODE_ENV || "").trim().toLowerCase() === "production";
+const allowProductionTestScripts =
+  String(process.env.ALLOW_PRODUCTION_TEST_SCRIPTS || "").trim().toLowerCase() === "true";
 
 function maskEmail(email) {
   const [local, domain] = String(email || "").split("@");
@@ -13,6 +16,12 @@ function maskEmail(email) {
 }
 
 async function main() {
+  if (isProductionRuntime && !allowProductionTestScripts) {
+    console.error("[BLOCKED] seed script is disabled in production runtime.");
+    console.error("[BLOCKED] set ALLOW_PRODUCTION_TEST_SCRIPTS=true only for controlled emergency operations.");
+    process.exit(1);
+  }
+
   const missing = [];
   if (!confirmed) missing.push("CONFIRM_SEED_TEST_WALLET!=true");
   if (!databaseUrl) missing.push("DATABASE_URL missing");

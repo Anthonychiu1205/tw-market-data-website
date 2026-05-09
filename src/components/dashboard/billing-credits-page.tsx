@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -181,6 +181,8 @@ function extractUsageMetadata(transaction: BillingCreditsPageProps["transactions
 
 export function BillingCreditsPage({ creditsModeState, walletBalance, usageReconciliation, transactions }: BillingCreditsPageProps) {
   const router = useRouter();
+  const mountedAtRef = useRef<number>(0);
+  const lastFocusRefreshAtRef = useRef<number>(0);
   const [activeTab, setActiveTab] = useState<"market" | "fundamentals" | "events">("market");
   const [activeMonthIndex, setActiveMonthIndex] = useState(MONTH_KEYS.length - 1);
   const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
@@ -201,7 +203,22 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
       usageReconciliation.duplicateUsageTransactions.length > 0);
 
   useEffect(() => {
+    if (mountedAtRef.current === 0) {
+      mountedAtRef.current = Date.now();
+    }
+
+    const MIN_MOUNT_AGE_MS = 3000;
+    const FOCUS_REFRESH_THROTTLE_MS = 20_000;
+
     function handleFocus() {
+      const now = Date.now();
+      if (now - mountedAtRef.current < MIN_MOUNT_AGE_MS) {
+        return;
+      }
+      if (now - lastFocusRefreshAtRef.current < FOCUS_REFRESH_THROTTLE_MS) {
+        return;
+      }
+      lastFocusRefreshAtRef.current = now;
       router.refresh();
     }
 
