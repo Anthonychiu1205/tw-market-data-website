@@ -164,10 +164,12 @@ export async function getDashboardEntitlementForUser({
   userId,
   email,
   backendPlan,
+  skipBackendSummaryLookup = false,
 }: {
   userId: string;
   email: string;
   backendPlan?: string;
+  skipBackendSummaryLookup?: boolean;
 }): Promise<DashboardEntitlement> {
   try {
     const subscription = await getActiveSubscriptionForUser(userId);
@@ -200,6 +202,16 @@ export async function getDashboardEntitlementForUser({
 
   if (backendPlan) {
     return resolveFromBackendPlan(backendPlan);
+  }
+
+  if (skipBackendSummaryLookup) {
+    const fallbackMeta = getPlanMeta("free");
+    return {
+      ...fallbackMeta,
+      source: "fallback",
+      subscriptionStatus: undefined,
+      isEntitled: false,
+    };
   }
 
   try {

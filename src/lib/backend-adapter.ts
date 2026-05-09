@@ -1,6 +1,19 @@
 import { datasetProducts } from "@/src/content/site";
 
 type IntegrationMode = "live" | "fallback";
+class BackendFetchTimeoutError extends Error {
+  stage: string;
+  durationMs: number;
+
+  constructor(stage: string, durationMs: number) {
+    super("backend_fetch_timeout");
+    this.name = "BackendFetchTimeoutError";
+    this.stage = stage;
+    this.durationMs = durationMs;
+  }
+}
+
+const DEFAULT_BACKEND_FETCH_TIMEOUT_MS = 2500;
 
 export type AccountSummary = {
   plan: string;
@@ -94,6 +107,15 @@ type FetchResult<T> = {
   path: string;
 };
 
+function resolveFetchTimeoutMs() {
+  const raw = process.env.BACKEND_FETCH_TIMEOUT_MS;
+  const parsed = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (Number.isFinite(parsed) && parsed >= 300) {
+    return parsed;
+  }
+  return DEFAULT_BACKEND_FETCH_TIMEOUT_MS;
+}
+
 function getBase() {
   const base = process.env.BACKEND_API_BASE_URL;
   if (!base) return null;
@@ -108,6 +130,33 @@ function getHeaders(email: string) {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(selfServeToken ? { "x-self-serve-token": selfServeToken } : {}),
   };
+}
+
+async function fetchWithTimeout(input: {
+  stage: string;
+  url: string;
+  init: RequestInit;
+}) {
+  const timeoutMs = resolveFetchTimeoutMs();
+  const startedAt = Date.now();
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(input.url, {
+      ...input.init,
+      signal: controller.signal,
+    });
+  } catch (error) {
+    const durationMs = Math.max(0, Date.now() - startedAt);
+    if (error instanceof Error && error.name === "AbortError") {
+      console.warn(`[backend-adapter] stage=${input.stage} timeout=true durationMs=${durationMs}`);
+      throw new BackendFetchTimeoutError(input.stage, durationMs);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 async function parseJsonSafe<T>(response: Response): Promise<T | null> {
@@ -130,13 +179,17 @@ async function fetchFromCandidates<T>(
 
   for (const path of paths) {
     try {
-      const response = await fetch(`${base}${path}`, {
-        cache: "no-store",
-        ...init,
-        headers: {
-          ...(init?.method && init.method !== "GET" ? { "Content-Type": "application/json" } : {}),
-          ...getHeaders(email),
-          ...(init?.headers ?? {}),
+      const response = await fetchWithTimeout({
+        stage: `fetch:${path}`,
+        url: `${base}${path}`,
+        init: {
+          cache: "no-store",
+          ...init,
+          headers: {
+            ...(init?.method && init.method !== "GET" ? { "Content-Type": "application/json" } : {}),
+            ...getHeaders(email),
+            ...(init?.headers ?? {}),
+          },
         },
       });
 
@@ -450,9 +503,13 @@ export async function getUsageRequestRows(email: string): Promise<UsageRequestsS
   }
 
   try {
-    const response = await fetch(`${base}/v2/self-serve/usage-events`, {
-      cache: "no-store",
-      headers: getHeaders(email),
+    const response = await fetchWithTimeout({
+      stage: "usage-events",
+      url: `${base}/v2/self-serve/usage-events`,
+      init: {
+        cache: "no-store",
+        headers: getHeaders(email),
+      },
     });
     const payload = (await parseJsonSafe<Record<string, unknown>>(response)) ?? {};
 
