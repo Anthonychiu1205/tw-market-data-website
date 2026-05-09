@@ -181,8 +181,8 @@ function UsageActivityCard({
       </div>
 
       <div className="mt-4 grid gap-3 text-xs text-slate-600 sm:grid-cols-3">
-        <p>今日 request：{requestsToday.toLocaleString()}</p>
-        <p>30 天 request：{requests30d.toLocaleString()}</p>
+        <p>今日請求：{requestsToday.toLocaleString()}</p>
+        <p>30 天請求：{requests30d.toLocaleString()}</p>
         <p>{`30 天${getCreditsModeLabel(creditsModeState)}：${estimatedCreditsUsage30d.toLocaleString()}`}</p>
       </div>
 

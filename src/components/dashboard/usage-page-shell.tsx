@@ -185,11 +185,11 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
       <DashboardCard className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-none">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="text-xs text-slate-500">今日 request</p>
+            <p className="text-xs text-slate-500">今日請求</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{(usageSummary.requestsToday ?? 0).toLocaleString()}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500">30 天 request</p>
+            <p className="text-xs text-slate-500">30 天請求</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{(usageSummary.requests30d ?? usageSummary.monthlyUsed).toLocaleString()}</p>
           </div>
           <div>
@@ -331,18 +331,18 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
           </div>
 
           <div className="mt-5 overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="min-w-[980px] text-sm">
               <thead className="text-sm font-medium text-slate-500">
                 <tr>
-                  <th className="px-2 py-3 text-left font-medium">日期</th>
-                  <th className="px-2 py-3 text-left font-medium">API</th>
-                  <th className="px-2 py-3 text-left font-medium">Symbol</th>
-                  <th className="px-2 py-3 text-left font-medium">端點</th>
-                  <th className="px-2 py-3 text-left font-medium">狀態</th>
-                  <th className="px-2 py-3 text-left font-medium">{getCreditsModeLabel(creditsModeState)}</th>
-                  <th className="px-2 py-3 text-left font-medium">Latency</th>
-                  <th className="px-2 py-3 text-left font-medium">Request ID</th>
-                  <th className="px-2 py-3 text-left font-medium">對帳</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-left font-medium">日期</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-left font-medium">API</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-left font-medium">Symbol</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-left font-medium">端點</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-left font-medium">狀態</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-left font-medium">{getCreditsModeLabel(creditsModeState)}</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-left font-medium">Latency</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-left font-medium">Request ID</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-left font-medium">對帳</th>
                 </tr>
               </thead>
               <tbody>
@@ -352,32 +352,32 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
                     return (
                       <Fragment key={`${row.date}-${row.endpoint}-${index}`}>
                         <tr className="border-t border-slate-100">
-                          <td className="px-2 py-3 text-sm text-slate-700">{row.date}</td>
-                          <td className="px-2 py-3 text-sm text-slate-700">{row.api}</td>
-                          <td className="px-2 py-3 text-sm text-slate-700">{row.symbol}</td>
+                          <td className="whitespace-nowrap px-2 py-3 text-sm text-slate-700">{row.date}</td>
+                          <td className="whitespace-nowrap px-2 py-3 text-sm text-slate-700">{row.api}</td>
+                          <td className="whitespace-nowrap px-2 py-3 text-sm text-slate-700">{row.symbol}</td>
                           <td className="px-2 py-3">
-                            <span className="inline-flex rounded-lg bg-slate-100 px-2 py-1 text-xs font-mono text-slate-600">{row.endpoint}</span>
+                            <span className="inline-flex whitespace-nowrap rounded-lg bg-slate-100 px-2 py-1 text-xs font-mono text-slate-600">{row.endpoint}</span>
                           </td>
-                          <td className="px-2 py-3 text-sm text-slate-700">
-                            {getStatusLabel(row.status)}
-                            <span className="ml-2 text-xs text-slate-400">({row.status})</span>
+                          <td className="whitespace-nowrap px-2 py-3 text-sm text-slate-700">
+                            <span className="whitespace-nowrap">{getStatusLabel(row.status)}</span>
+                            <span className="ml-2 whitespace-nowrap text-xs text-slate-400">({row.status})</span>
                             {row.errorCode ? (
-                              <span className="ml-2 rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">
+                              <span className="ml-2 inline-flex whitespace-nowrap rounded bg-rose-50 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">
                                 {row.errorCode}
                               </span>
                             ) : null}
                           </td>
-                          <td className="px-2 py-3 text-sm text-slate-700">{row.credits.toLocaleString()}</td>
-                          <td className="px-2 py-3 text-sm text-slate-700">
+                          <td className="whitespace-nowrap px-2 py-3 text-sm text-slate-700">{row.credits.toLocaleString()}</td>
+                          <td className="whitespace-nowrap px-2 py-3 text-sm text-slate-700">
                             {typeof row.latencyMs === "number" ? `${row.latencyMs} ms` : "—"}
                           </td>
-                          <td className="px-2 py-3 text-sm text-slate-700">
+                          <td className="whitespace-nowrap px-2 py-3 text-sm text-slate-700">
                             {row.requestId ? (
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center gap-1 whitespace-nowrap">
                                 <button
                                   type="button"
                                   onClick={() => void copyRequestId(row.requestId!)}
-                                  className="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600 transition hover:bg-slate-200"
+                                  className="inline-flex items-center whitespace-nowrap rounded-md bg-slate-100 px-2 py-1 font-mono text-xs text-slate-600 transition hover:bg-slate-200"
                                   title="複製完整 requestId"
                                 >
                                   {row.requestId.slice(0, 8)}
@@ -395,11 +395,11 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
                               "—"
                             )}
                           </td>
-                          <td className="px-2 py-3 text-xs text-slate-600">
+                          <td className="whitespace-nowrap px-2 py-3 text-xs text-slate-600">
                             {row.transactionLinked ? (
-                              <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-700">已連結</span>
+                              <span className="inline-flex whitespace-nowrap rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-700">已連結</span>
                             ) : (
-                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">未扣點</span>
+                              <span className="inline-flex whitespace-nowrap rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">未扣點</span>
                             )}
                           </td>
                         </tr>

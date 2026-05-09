@@ -121,6 +121,8 @@ export const docsSidebarOverviewItems: DocsSidebarNavItem[] = [
   { title: "API 模型", href: "/docs/api-model" },
   { title: "Tools / MCP", href: "/docs/tools-and-mcp" },
   { title: "Support", href: "/docs/support" },
+  { title: "幫助中心", href: "/help" },
+  { title: "常見問題", href: "/faq" },
 ];
 
 export const docsSidebarGuideItems: DocsSidebarNavItem[] = [

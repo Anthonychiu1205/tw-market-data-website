@@ -190,7 +190,7 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
             {isAuthenticated ? (
               <>
                 <Link href="/dashboard" className={`${buttonClass("primary")} hidden md:inline-flex`}>
-                  Dashboard
+                  儀表板
                 </Link>
               </>
             ) : (
@@ -261,7 +261,7 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`${buttonClass("primary")} w-full justify-center`}
                 >
-                  Dashboard
+                  儀表板
                 </Link>
               ) : (
                 <>
