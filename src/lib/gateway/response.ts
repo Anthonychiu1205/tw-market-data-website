@@ -4,6 +4,7 @@ type GatewayResponseHeaderInput = {
   requestId: string;
   planCode?: string;
   creditsCost?: number;
+  creditsCharged?: number;
   dryRun?: boolean;
 };
 
@@ -29,6 +30,9 @@ export function applyGatewayHeaders(headers: Headers, input: GatewayResponseHead
   }
   if (typeof input.creditsCost === "number" && Number.isFinite(input.creditsCost)) {
     headers.set("X-TWMD-Credits-Cost", String(input.creditsCost));
+  }
+  if (typeof input.creditsCharged === "number" && Number.isFinite(input.creditsCharged)) {
+    headers.set("X-TWMD-Credits-Charged", String(input.creditsCharged));
   }
 }
 
@@ -65,6 +69,7 @@ export function gatewayProxyResponse(input: GatewayProxyResponseInput) {
   if (input.upstreamIsJson) {
     const payload = mergeMetaField(input.upstreamPayload, {
       creditsCost: input.creditsCost,
+      creditsCharged: input.creditsCharged,
       dryRun: input.dryRun ?? true,
       requestId: input.requestId,
       planCode: input.planCode,
@@ -88,6 +93,7 @@ export function mergeMetaField(
   upstreamPayload: unknown,
   meta: {
     creditsCost?: number;
+    creditsCharged?: number;
     dryRun: boolean;
     requestId: string;
     planCode?: string;
@@ -109,6 +115,9 @@ export function mergeMetaField(
       ...existingMeta,
       ...(typeof meta.creditsCost === "number" && Number.isFinite(meta.creditsCost)
         ? { creditsCost: meta.creditsCost }
+        : {}),
+      ...(typeof meta.creditsCharged === "number" && Number.isFinite(meta.creditsCharged)
+        ? { creditsCharged: meta.creditsCharged }
         : {}),
       dryRun: meta.dryRun,
       requestId: meta.requestId,

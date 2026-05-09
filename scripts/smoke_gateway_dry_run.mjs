@@ -1,5 +1,6 @@
 const baseUrl = (process.env.GATEWAY_SMOKE_BASE_URL || "http://localhost:3000").replace(/\/$/, "");
 const apiKey = process.env.GATEWAY_SMOKE_API_KEY?.trim();
+const deductionEnabled = String(process.env.PUBLIC_API_CREDITS_DEDUCTION_ENABLED || "").trim().toLowerCase() === "true";
 
 function readHeader(headers, name) {
   return headers.get(name) || "-";
@@ -73,6 +74,11 @@ async function runRequest(label, url, options = {}) {
 }
 
 async function main() {
+  if (deductionEnabled) {
+    console.log("[SKIPPED] dry-run smoke is disabled because PUBLIC_API_CREDITS_DEDUCTION_ENABLED=true.");
+    process.exit(0);
+  }
+
   if (!apiKey) {
     console.log("[SKIPPED] GATEWAY_SMOKE_API_KEY is not set.");
     process.exit(0);

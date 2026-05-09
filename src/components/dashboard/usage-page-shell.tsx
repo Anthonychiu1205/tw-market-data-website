@@ -92,6 +92,7 @@ function inferApiLabel(dataset: string, endpoint: string): string {
 
 export function UsagePageShell({ usageRequests, usageSummary, creditState }: UsagePageShellProps) {
   const rows = usageRequests.rows;
+  const isDryRun = usageSummary.isDryRun !== false;
 
   const monthKeys = useMemo(() => {
     const fromRows = Array.from(
@@ -155,7 +156,7 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState }: Usa
             <p className="mt-1 text-lg font-semibold text-slate-900">{(usageSummary.requests30d ?? usageSummary.monthlyUsed).toLocaleString()}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500">30 天 dry-run credits</p>
+            <p className="text-xs text-slate-500">{isDryRun ? "30 天 dry-run credits" : "30 天 credits charged"}</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{(usageSummary.estimatedCreditsUsage30d ?? 0).toLocaleString()}</p>
           </div>
           <div>
@@ -165,7 +166,11 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState }: Usa
             </p>
           </div>
         </div>
-        <p className="mt-3 text-xs text-slate-500">目前為 dry-run usage：僅記錄估算成本，尚未正式扣點。</p>
+        <p className="mt-3 text-xs text-slate-500">
+          {isDryRun
+            ? "目前為 dry-run usage：僅記錄估算成本，尚未正式扣點。"
+            : "目前已啟用正式扣點：僅成功請求會扣除 credits。"}
+        </p>
       </DashboardCard>
 
       {creditState === "exhausted" ? (

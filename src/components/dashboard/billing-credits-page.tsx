@@ -112,7 +112,7 @@ type BillingCreditsPageProps = {
 
 function getTransactionTypeLabel(type: string) {
   if (type === "purchase") return "儲值";
-  if (type === "usage") return "使用";
+  if (type === "usage") return "API 使用";
   if (type === "adjustment") return "調整";
   return "其他";
 }

@@ -207,7 +207,7 @@ export function QuickStartContent() {
             回應 headers 會包含 X-TWMD-Plan、X-TWMD-Credits-Cost、X-TWMD-Dry-Run 與 X-Request-Id。
           </p>
           <p className="text-xs text-slate-500">
-            此階段為 dry-run，不會扣除 credits。常見錯誤碼包含 invalid_api_key、plan_not_entitled 與 dataset_not_found。
+            預設為 dry-run，不會扣除 credits。若部署端啟用扣點模式，會改回傳 X-TWMD-Credits-Charged，並在 credits 不足時回應 402 insufficient_credits。
           </p>
         </div>
       </section>

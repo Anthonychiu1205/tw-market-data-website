@@ -17,7 +17,16 @@ import { getCreditTransactionsForUser, getCreditWalletForUser } from "@/src/lib/
 import { getApiKeysSummaryForUser } from "@/src/lib/api-keys/service";
 import { getRecentApiUsageForUser, getUsageSummaryForUser } from "@/src/lib/gateway/usage";
 
-function toDashboardUsageSummary(localSummary: Awaited<ReturnType<typeof getUsageSummaryForUser>>): UsageSummary {
+const TRUTHY = new Set(["1", "true", "yes", "on"]);
+
+function isCreditsDeductionEnabled() {
+  return TRUTHY.has(String(process.env.PUBLIC_API_CREDITS_DEDUCTION_ENABLED ?? "").trim().toLowerCase());
+}
+
+function toDashboardUsageSummary(
+  localSummary: Awaited<ReturnType<typeof getUsageSummaryForUser>>,
+  isDryRun: boolean,
+): UsageSummary {
   return {
     monthlyUsed: localSummary.requests30d,
     monthlyQuota: 250000,
@@ -29,11 +38,14 @@ function toDashboardUsageSummary(localSummary: Awaited<ReturnType<typeof getUsag
     requests30d: localSummary.requests30d,
     estimatedCreditsUsage30d: localSummary.estimatedCreditsUsage30d,
     recentErrors: localSummary.recentErrors,
-    isDryRun: true,
+    isDryRun,
   };
 }
 
-function toDashboardUsageRequests(localRows: Awaited<ReturnType<typeof getRecentApiUsageForUser>>): UsageRequestsSummary {
+function toDashboardUsageRequests(
+  localRows: Awaited<ReturnType<typeof getRecentApiUsageForUser>>,
+  isDryRun: boolean,
+): UsageRequestsSummary {
   return {
     rows: localRows.map((item) => ({
       requestTimestamp: item.requestTimestamp,
@@ -50,7 +62,7 @@ function toDashboardUsageRequests(localRows: Awaited<ReturnType<typeof getRecent
     })),
     integrationMode: "live",
     insufficientCredits: false,
-    isDryRun: true,
+    isDryRun,
   };
 }
 
@@ -61,6 +73,7 @@ type DashboardPageShellProps = {
 };
 
 export async function DashboardPageShell({ section, currentPath, currentHref }: DashboardPageShellProps) {
+  const usageIsDryRun = !isCreditsDeductionEnabled();
   const session = await getRequiredSession();
 
   const billingDisplaySubscriptionPromise = getBillingDisplaySubscriptionForUser(session.id).catch((error) => {
@@ -107,8 +120,18 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
   ]);
 
   const hasLocalUsage = Boolean(localUsageSummary && localUsageSummary.requests30d > 0) || localUsageRows.length > 0;
-  const resolvedUsage = hasLocalUsage && localUsageSummary ? toDashboardUsageSummary(localUsageSummary) : usage;
-  const resolvedUsageRequests = hasLocalUsage ? toDashboardUsageRequests(localUsageRows) : usageRequests;
+  const resolvedUsage = hasLocalUsage && localUsageSummary
+    ? toDashboardUsageSummary(localUsageSummary, usageIsDryRun)
+    : {
+        ...usage,
+        isDryRun: usageIsDryRun,
+      };
+  const resolvedUsageRequests = hasLocalUsage
+    ? toDashboardUsageRequests(localUsageRows, usageIsDryRun)
+    : {
+        ...usageRequests,
+        isDryRun: usageIsDryRun,
+      };
 
   const entitlement = await getDashboardEntitlementForUser({
     userId: session.id,

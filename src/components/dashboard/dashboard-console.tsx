@@ -103,6 +103,7 @@ function getLatestActiveUsage(usage: UsageSummary) {
 function UsageActivityCard({ usage }: { usage: UsageSummary }) {
   const hasEvents = usageHasEvents(usage);
   const latestActive = getLatestActiveUsage(usage);
+  const isDryRun = usage.isDryRun !== false;
 
   const monthlyUsed = Math.max(usage.monthlyUsed, 0);
   const monthlyQuota = Math.max(usage.monthlyQuota, 1);
@@ -160,7 +161,7 @@ function UsageActivityCard({ usage }: { usage: UsageSummary }) {
       <div className="mt-4 grid gap-3 text-xs text-slate-600 sm:grid-cols-3">
         <p>今日 request：{requestsToday.toLocaleString()}</p>
         <p>30 天 request：{requests30d.toLocaleString()}</p>
-        <p>30 天 dry-run credits：{estimatedCreditsUsage30d.toLocaleString()}</p>
+        <p>{isDryRun ? "30 天 dry-run credits" : "30 天 credits charged"}：{estimatedCreditsUsage30d.toLocaleString()}</p>
       </div>
 
       {recentErrors.length > 0 ? (
@@ -172,7 +173,11 @@ function UsageActivityCard({ usage }: { usage: UsageSummary }) {
       <p className="mt-3 text-xs text-slate-500">
         {hasEvents ? `最近活躍：${latestActive?.date} · ${latestActive?.count.toLocaleString()} 次` : "目前尚無足夠活動資料。"}
       </p>
-      <p className="mt-1 text-xs text-slate-500">目前為 dry-run usage：僅記錄估算成本，尚未正式扣點。</p>
+      <p className="mt-1 text-xs text-slate-500">
+        {isDryRun
+          ? "目前為 dry-run usage：僅記錄估算成本，尚未正式扣點。"
+          : "目前已啟用正式扣點：僅成功請求會扣除 credits。"}
+      </p>
     </DashboardCard>
   );
 }

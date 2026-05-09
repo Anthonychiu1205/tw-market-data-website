@@ -60,13 +60,17 @@ Current phase behavior:
 - API key authentication is required.
 - Dataset entitlement is checked by plan policy.
 - Request is proxied to backend with internal credentials.
-- Metering is dry-run only (no credit deduction, no usage ledger write).
+- Metering supports guarded rollout:
+  - default: dry-run only (no wallet deduction)
+  - when `PUBLIC_API_CREDITS_DEDUCTION_ENABLED=true`: successful 2xx requests can charge credits
 
-Phase 3 update:
+Phase 3/4 update:
 
 - Gateway now writes `ApiUsageEvent` as dry-run usage ledger for observability.
 - Each request gets a `requestId` for trace/debug.
 - Dry-run usage means estimated credits are recorded, but wallet balance is not deducted.
+- In deduction-enabled mode, only successful 2xx requests are charged.
+- `insufficient_credits` returns HTTP 402 and does not charge wallet.
 
 ### Gateway Dry-Run Smoke Test
 
@@ -101,6 +105,7 @@ Optional envs:
 
 - `USAGE_CHECK_USER_EMAIL`
 - `USAGE_CHECK_API_KEY_PREFIX`
+- `PUBLIC_API_CREDITS_DEDUCTION_ENABLED` (`false` by default)
 
 Notes:
 
@@ -126,6 +131,7 @@ Notes:
 - `X-TWMD-Plan`
 - `X-TWMD-Credits-Cost`
 - `X-TWMD-Dry-Run`
+- `X-TWMD-Credits-Charged` (when deduction mode is enabled)
 
 Example:
 
@@ -141,11 +147,16 @@ You should see gateway headers including:
 - `X-TWMD-Dry-Run`
 - `X-Request-Id`
 
+When deduction mode is enabled, response headers will also include:
+
+- `X-TWMD-Credits-Charged`
+
 ### Error Codes
 
 - `401 invalid_api_key`
 - `403 api_key_revoked`
 - `403 plan_not_entitled`
+- `402 insufficient_credits`
 - `404 dataset_not_found`
 - `504 upstream_timeout`
 - `502 upstream_error`
@@ -155,8 +166,12 @@ You should see gateway headers including:
 
 - API key lifecycle is local and production-safe (hash-only storage).
 - Public gateway is currently skeleton mode with dry-run metering.
-- Credits deduction is not enabled in this phase.
-- Usage logging is dry-run only and does not perform wallet deduction.
+- Credits deduction is guarded by env flag:
+  - `PUBLIC_API_CREDITS_DEDUCTION_ENABLED=false` (default) => dry-run only
+  - `PUBLIC_API_CREDITS_DEDUCTION_ENABLED=true` => successful 2xx responses can charge credits
+- Usage logging always writes `ApiUsageEvent`; dry-run mode records estimated cost, deduction mode records charged cost.
 - `PUBLIC_API_FREE_TIER_ENABLED` can control whether free-tier API access is allowed in this dry-run phase (default enabled).
 - Missing/malformed API key requests may not enter per-user usage ledger because user identity cannot be resolved.
-- Phase 4 is where credits deduction will be implemented.
+- Run guarded deduction smoke only when explicitly confirmed:
+  - `npm run smoke:gateway-deduction-mode`
+  - requires `PUBLIC_API_CREDITS_DEDUCTION_ENABLED=true` and `CONFIRM_DEDUCTION_SMOKE=true`.

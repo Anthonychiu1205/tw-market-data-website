@@ -8,6 +8,11 @@ import {
   logGatewayIssue,
   type GatewayErrorCode,
 } from "@/src/lib/gateway/errors";
+import {
+  checkCreditsAvailabilityForApiUsage,
+  deductCreditsForApiUsage,
+  isCreditsDeductionEnabled,
+} from "@/src/lib/gateway/credits-deduction";
 import { resolveDryRunMetering } from "@/src/lib/gateway/metering";
 import { resolveDatasetPolicy } from "@/src/lib/gateway/policies";
 import { proxyDatasetRequest } from "@/src/lib/gateway/proxy";
@@ -63,9 +68,12 @@ function buildAllowedQueryString(request: Request) {
 
 export async function GET(request: Request, context: Context) {
   const requestId = randomUUID();
+  const deductionEnabled = isCreditsDeductionEnabled();
   let planCode: string | undefined;
   let creditsCost: number | undefined;
-  const dryRun = true;
+  const dryRun = !deductionEnabled;
+  let creditsCharged = 0;
+  let creditsForUsageEvent = 0;
   let stage = "dataset_policy";
   const startedAt = Date.now();
   let authUserId: string | null = null;
@@ -115,6 +123,35 @@ export async function GET(request: Request, context: Context) {
     planCode = entitlement.planCode;
     const metering = resolveDryRunMetering(datasetPolicy);
     creditsCost = metering.creditsCost;
+    if (!deductionEnabled) {
+      creditsForUsageEvent = creditsCost;
+    }
+
+    if (deductionEnabled && authUserId && creditsCost > 0) {
+      stage = "credits_precheck";
+      const availability = await checkCreditsAvailabilityForApiUsage({
+        userId: authUserId,
+        credits: creditsCost,
+      });
+      if (!availability.sufficient) {
+        statusCodeForLog = 402;
+        errorCodeForLog = "insufficient_credits";
+        creditsForUsageEvent = 0;
+        return gatewayJsonResponse(createGatewayErrorBody({
+          code: "insufficient_credits",
+          requestId,
+          stage,
+        }), {
+          status: 402,
+          requestId,
+          planCode,
+          creditsCost,
+          creditsCharged: 0,
+          dryRun,
+        });
+      }
+    }
+
     stage = "proxy";
     const queryString = buildAllowedQueryString(request);
 
@@ -129,6 +166,44 @@ export async function GET(request: Request, context: Context) {
     }
 
     statusCodeForLog = upstream.status;
+
+    if (deductionEnabled && authUserId && upstream.status >= 200 && upstream.status < 300 && (creditsCost ?? 0) > 0) {
+      stage = "credits_deduction";
+      const deduction = await deductCreditsForApiUsage({
+        userId: authUserId,
+        apiKeyId: authApiKeyId,
+        datasetSlug,
+        requestId,
+        credits: creditsCost ?? 0,
+        statusCode: upstream.status,
+      });
+      if (!deduction.ok) {
+        if (deduction.code === "insufficient_credits") {
+          statusCodeForLog = 402;
+          errorCodeForLog = "insufficient_credits";
+          creditsForUsageEvent = 0;
+          return gatewayJsonResponse(createGatewayErrorBody({
+            code: "insufficient_credits",
+            requestId,
+            stage,
+          }), {
+            status: 402,
+            requestId,
+            planCode,
+            creditsCost,
+            creditsCharged: 0,
+            dryRun,
+          });
+        }
+
+        throw new GatewayHttpError(500, "internal_error", "Credits deduction failed.", { stage });
+      }
+      creditsCharged = deduction.chargedCredits;
+      creditsForUsageEvent = deduction.chargedCredits;
+    } else if (deductionEnabled) {
+      creditsForUsageEvent = 0;
+    }
+
     stage = "response_build";
     return gatewayProxyResponse({
       upstreamStatus: upstream.status,
@@ -139,6 +214,7 @@ export async function GET(request: Request, context: Context) {
       requestId,
       planCode,
       creditsCost,
+      creditsCharged: deductionEnabled ? creditsCharged : undefined,
       dryRun,
     });
   } catch (error) {
@@ -169,6 +245,7 @@ export async function GET(request: Request, context: Context) {
         requestId,
         planCode,
         creditsCost,
+        creditsCharged: deductionEnabled ? creditsCharged : undefined,
         dryRun,
       });
     }
@@ -192,6 +269,7 @@ export async function GET(request: Request, context: Context) {
       requestId,
       planCode,
       creditsCost,
+      creditsCharged: deductionEnabled ? creditsCharged : undefined,
       dryRun,
     });
   } finally {
@@ -205,7 +283,7 @@ export async function GET(request: Request, context: Context) {
         endpoint: endpointForLog,
         method: "GET",
         symbol,
-        creditsCharged: creditsCost ?? 0,
+        creditsCharged: creditsForUsageEvent,
         statusCode: statusCodeForLog,
         latencyMs,
         requestId,

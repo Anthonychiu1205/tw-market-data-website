@@ -11,6 +11,7 @@
     "check:ecpay-checkmac": "node scripts/check_ecpay_checkmac.mjs",
     "check:deployment-env": "node scripts/check_deployment_env.mjs",
     "smoke:gateway-dry-run": "node scripts/smoke_gateway_dry_run.mjs",
+    "smoke:gateway-deduction-mode": "node scripts/smoke_gateway_deduction_mode.mjs",
     "check:usage-ledger": "node scripts/check_usage_ledger.mjs",
     "check:public-secrets": "node scripts/check_no_demo_credentials_in_public_build.mjs",
     "check:email-auth-security": "node scripts/check_email_auth_security.mjs"
