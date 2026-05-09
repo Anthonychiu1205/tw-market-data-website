@@ -30,15 +30,26 @@ function resolveBackendBaseUrl() {
 }
 
 function getInternalBackendHeaders(userEmail?: string | null) {
-  const backendToken = process.env.BACKEND_API_TOKEN?.trim();
+  const backendApiKey =
+    process.env.BACKEND_API_TOKEN?.trim() ||
+    process.env.BACKEND_API_KEY?.trim() ||
+    process.env.STAGING_BACKEND_API_TOKEN?.trim();
+  const backendBearerToken = process.env.BACKEND_BEARER_TOKEN?.trim();
   const selfServeToken = process.env.BACKEND_SELF_SERVE_TOKEN?.trim();
 
   const headers: Record<string, string> = {
     Accept: "application/json",
   };
 
-  if (backendToken) {
-    headers.Authorization = `Bearer ${backendToken}`;
+  if (backendApiKey) {
+    headers["x-api-key"] = backendApiKey;
+  }
+
+  if (backendBearerToken) {
+    headers.Authorization = `Bearer ${backendBearerToken}`;
+  } else if (backendApiKey) {
+    // Backward-compatible fallback: some upstream routes accept Bearer token in place of x-api-key.
+    headers.Authorization = `Bearer ${backendApiKey}`;
   }
 
   if (selfServeToken) {

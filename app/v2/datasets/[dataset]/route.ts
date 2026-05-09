@@ -124,7 +124,7 @@ export async function GET(request: Request, context: Context) {
       userEmail: authContext.userEmail,
     });
 
-    if (upstream.status >= 500) {
+    if (upstream.status === 401 || upstream.status === 403 || upstream.status >= 500) {
       throw new GatewayHttpError(502, "upstream_error", undefined, { stage: "proxy" });
     }
 
