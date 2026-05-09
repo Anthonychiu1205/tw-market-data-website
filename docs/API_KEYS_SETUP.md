@@ -30,6 +30,8 @@ It does **not** enable public API gateway access yet.
 - `AUTH_SECRET` (required in production)
 - `API_KEY_HASH_SECRET` (recommended explicit hash secret)
 - `API_KEY_ENCRYPTION_SECRET` (required for encrypted secret copy workflow)
+- `BACKEND_FETCH_TIMEOUT_MS` (dashboard/backend-adapter fetch timeout, default `2500`)
+- `PUBLIC_API_UPSTREAM_TIMEOUT_MS` (public gateway upstream timeout, default `8000`)
 
 If `API_KEY_HASH_SECRET` is missing:
 
@@ -121,6 +123,12 @@ Notes:
 - Script prints sanitized event fields only (`createdAt`, `datasetSlug`, `statusCode`, `creditsCharged`, `requestId`, `errorCode`, `latencyMs`).
 - It never prints raw API key or key hash.
 - Empty result is allowed and will not fail the script.
+
+### Timeout Separation (Dashboard vs Gateway)
+
+- Dashboard server fallback fetches use `BACKEND_FETCH_TIMEOUT_MS` (default `2500ms`) for faster perceived UI response.
+- Public API gateway proxy uses `PUBLIC_API_UPSTREAM_TIMEOUT_MS` (default `8000ms`) because upstream dataset queries can take longer on shared/free runtime.
+- This separation avoids dashboard pages being blocked while reducing false `504 upstream_timeout` on valid public API requests.
 
 ### Standardized Error Shape
 

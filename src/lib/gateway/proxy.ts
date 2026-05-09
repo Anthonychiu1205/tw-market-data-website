@@ -2,7 +2,7 @@ import "server-only";
 
 import { GatewayHttpError } from "@/src/lib/gateway/errors";
 
-const UPSTREAM_TIMEOUT_MS = 4000;
+const DEFAULT_PUBLIC_API_UPSTREAM_TIMEOUT_MS = 8000;
 const SAFE_UPSTREAM_RESPONSE_HEADERS = ["content-type", "cache-control", "content-language", "etag"];
 
 type ProxyDatasetRequestInput = {
@@ -18,6 +18,15 @@ export type ProxyDatasetResult = {
   isJson: boolean;
   headers: Headers;
 };
+
+function resolvePublicApiUpstreamTimeoutMs() {
+  const raw = process.env.PUBLIC_API_UPSTREAM_TIMEOUT_MS;
+  const parsed = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (Number.isFinite(parsed) && parsed >= 500) {
+    return parsed;
+  }
+  return DEFAULT_PUBLIC_API_UPSTREAM_TIMEOUT_MS;
+}
 
 function resolveBackendBaseUrl() {
   const rawBaseUrl = process.env.BACKEND_API_BASE_URL?.trim();
@@ -78,8 +87,9 @@ export async function proxyDatasetRequest(input: ProxyDatasetRequestInput): Prom
   const baseUrl = resolveBackendBaseUrl();
   const targetUrl = `${baseUrl}${input.backendPath}${input.queryString ? `?${input.queryString}` : ""}`;
 
+  const timeoutMs = resolvePublicApiUpstreamTimeoutMs();
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const upstreamResponse = await fetch(targetUrl, {
