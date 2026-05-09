@@ -33,6 +33,7 @@ import {
   type PricingPlanView,
 } from "@/src/lib/billing/plans";
 import { cn } from "@/src/lib/cn";
+import { trackEvent } from "@/src/lib/analytics/client";
 
 type BillingMode = BillingCycle;
 
@@ -380,14 +381,48 @@ export function PricingShell() {
 
                   <div className="mt-auto pt-4">
                     {plan.isContactOnly ? (
-                      <Link href={plan.href} className={CARD_CTA_CLASS}>
+                      <Link
+                        href={plan.href}
+                        className={CARD_CTA_CLASS}
+                        onClick={() => {
+                          void trackEvent(
+                            {
+                              event: "pricing_upgrade_clicked",
+                              properties: {
+                                planCode: plan.planCode,
+                                billingCycle: mode,
+                                contactOnly: true,
+                              },
+                              context: { source: "client", page: "/pricing" },
+                            },
+                            { dedupeKey: `pricing-upgrade:${plan.planCode}:${mode}`, dedupeMs: 2000 },
+                          );
+                        }}
+                      >
                         {plan.ctaLabel}
                       </Link>
                     ) : (
                       <form action="/api/billing/ecpay/checkout" method="post">
                         <input type="hidden" name="planCode" value={plan.planCode} />
                         <input type="hidden" name="billingCycle" value={mode} />
-                        <button type="submit" className={CARD_CTA_CLASS}>
+                        <button
+                          type="submit"
+                          className={CARD_CTA_CLASS}
+                          onClick={() => {
+                            void trackEvent(
+                              {
+                                event: "pricing_upgrade_clicked",
+                                properties: {
+                                  planCode: plan.planCode,
+                                  billingCycle: mode,
+                                  contactOnly: false,
+                                },
+                                context: { source: "client", page: "/pricing" },
+                              },
+                              { dedupeKey: `pricing-upgrade:${plan.planCode}:${mode}`, dedupeMs: 2000 },
+                            );
+                          }}
+                        >
                           {plan.ctaLabel}
                         </button>
                       </form>

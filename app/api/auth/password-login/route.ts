@@ -5,6 +5,7 @@ import {
   checkEmailAuthRuntimeEnv,
   logAuthRuntimeEnvMissing,
 } from "@/src/auth/env";
+import { trackEventServer } from "@/src/lib/analytics/server";
 import { passwordLoginBodySchema } from "@/src/lib/auth/email-auth-schema";
 import { badRequest, createAuthenticatedJsonResponse, readJsonBody } from "@/src/lib/auth/email-auth-route";
 import { verifyPasswordHash } from "@/src/lib/auth/email-password";
@@ -67,6 +68,19 @@ export async function POST(request: Request) {
 
   const requestUrl = new URL(request.url);
   const redirectTo = getSafeRedirectTarget(requestUrl.searchParams.get("next"), "/dashboard");
+
+  void trackEventServer({
+    event: "auth_login_success",
+    context: {
+      source: "server",
+      userId: user.id,
+      page: "/login",
+    },
+    properties: {
+      method: "email_password",
+      redirectTo,
+    },
+  });
 
   return await createAuthenticatedJsonResponse(user.id, {
     ok: true,

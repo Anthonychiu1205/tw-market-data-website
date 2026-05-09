@@ -386,11 +386,58 @@ npm run export:usage-csv
 - Enterprise-only datasets 與更細緻 entitlement
 - Webhook events
 
+## Product Analytics（PostHog-first）
+
+我們僅做 product analytics 與 onboarding analytics，不做廣告 tracking。
+
+- 不使用 Meta Pixel / TikTok Pixel
+- 不做 invasive session replay
+- 不出售資料
+
+### Event taxonomy
+
+- `auth_signup`
+- `auth_login_success`
+- `api_key_created`
+- `api_key_copied`
+- `api_key_revoked`
+- `api_request_success`
+- `api_request_first_success`
+- `api_request_upstream_timeout`
+- `api_request_upstream_error`
+- `pricing_viewed`
+- `pricing_upgrade_clicked`
+- `sdk_docs_viewed`
+- `mcp_docs_viewed`
+- `help_center_viewed`
+
+### Payload safety
+
+- 不送 raw API key、token、password、secret
+- requestId 可用於追蹤
+- userId 會以 mask/hash 方式處理
+- analytics fail 不影響登入、付款或 API 主流程
+
+### Consent（輕量）
+
+- essential cookies 永遠啟用
+- product analytics 可在前端提示中選擇關閉
+- 不使用廣告類別 cookies
+
+### Debug mode
+
+- `NEXT_PUBLIC_ANALYTICS_DEBUG=true` 時，會在 console 顯示 `[analytics]` 事件摘要
+- production 建議維持 `false`
+
 ## Environment Checklist
 
 - `AUTH_SECRET`
 - `API_KEY_HASH_SECRET`
 - `API_KEY_ENCRYPTION_SECRET`
+- `POSTHOG_API_KEY`（可選；未設定時維持本地 abstraction，不阻塞主流程）
+- `POSTHOG_HOST`（預設 `https://us.i.posthog.com`）
+- `NEXT_PUBLIC_ANALYTICS_ENABLED`（預設 true）
+- `NEXT_PUBLIC_ANALYTICS_DEBUG`（預設 false）
 - `BACKEND_API_BASE_URL`
 - `BACKEND_API_TOKEN`（或專案採用的 internal backend token env）
 - `BACKEND_FETCH_TIMEOUT_MS`（dashboard 建議 2500）

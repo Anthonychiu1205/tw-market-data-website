@@ -3,6 +3,7 @@ import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
 import { prisma } from "@/src/lib/auth/prisma";
+import { trackEventServer } from "@/src/lib/analytics/server";
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID ?? process.env.AUTH_GOOGLE_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET ?? process.env.AUTH_GOOGLE_SECRET;
@@ -51,6 +52,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   providers,
   callbacks: {
+    async signIn({ user, account }) {
+      if (!user?.id) return true;
+      void trackEventServer({
+        event: "auth_login_success",
+        context: {
+          source: "server",
+          userId: user.id,
+          page: "/login",
+        },
+        properties: {
+          method: account?.provider ?? "unknown",
+        },
+      });
+      return true;
+    },
     session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 
 import { ContactModal } from "./contact-modal";
+import { AnalyticsControls } from "./analytics-controls";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 
@@ -25,6 +26,7 @@ export function SiteShell({ children }: SiteShellProps) {
       <main className="flex-1 bg-slate-50">{children}</main>
       {!hideFooterForAppShell ? <SiteFooter onContactClick={() => setIsContactModalOpen(true)} /> : null}
       <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
+      <AnalyticsControls />
     </div>
   );
 }

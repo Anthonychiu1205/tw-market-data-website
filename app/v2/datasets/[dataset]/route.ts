@@ -13,6 +13,8 @@ import {
   deductCreditsForApiUsage,
 } from "@/src/lib/gateway/credits-deduction";
 import { isCreditsDeductionEnabled } from "@/src/lib/billing/credits-mode";
+import { trackApiEvent } from "@/src/lib/analytics/server";
+import { prisma } from "@/src/lib/auth/prisma";
 import { resolveDryRunMetering } from "@/src/lib/gateway/metering";
 import { resolveDatasetPolicy } from "@/src/lib/gateway/policies";
 import { proxyDatasetRequest } from "@/src/lib/gateway/proxy";
@@ -425,6 +427,65 @@ export async function GET(request: Request, context: Context) {
         requestId,
         errorCode: errorCodeForLog,
       });
+
+      if (statusCodeForLog >= 200 && statusCodeForLog < 300) {
+        void trackApiEvent({
+          event: "api_request_success",
+          requestId,
+          userId: authUserId,
+          dataset: datasetSlugForLog,
+          status: statusCodeForLog,
+          latencyMs,
+          creditsCost,
+          plan: planCode,
+        });
+
+        // Best-effort first-success signal for onboarding analytics.
+        try {
+          const successCount = await prisma.apiUsageEvent.count({
+            where: {
+              userId: authUserId,
+              statusCode: { gte: 200, lt: 300 },
+            },
+          });
+          if (successCount === 1) {
+            void trackApiEvent({
+              event: "api_request_first_success",
+              requestId,
+              userId: authUserId,
+              dataset: datasetSlugForLog,
+              status: statusCodeForLog,
+              latencyMs,
+              creditsCost,
+              plan: planCode,
+            });
+          }
+        } catch {
+          // ignore analytics-first-success lookup failure
+        }
+      } else if (errorCodeForLog === "upstream_timeout") {
+        void trackApiEvent({
+          event: "api_request_upstream_timeout",
+          requestId,
+          userId: authUserId,
+          dataset: datasetSlugForLog,
+          status: statusCodeForLog,
+          latencyMs,
+          creditsCost,
+          plan: planCode,
+        });
+      } else if (errorCodeForLog === "upstream_error") {
+        void trackApiEvent({
+          event: "api_request_upstream_error",
+          requestId,
+          userId: authUserId,
+          dataset: datasetSlugForLog,
+          status: statusCodeForLog,
+          latencyMs,
+          creditsCost,
+          plan: planCode,
+        });
+      }
     }
   }
 }

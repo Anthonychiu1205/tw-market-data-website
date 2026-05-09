@@ -4,6 +4,7 @@ import { FormEvent, useMemo, useRef, useState } from "react";
 import { Check, Copy, Trash2 } from "lucide-react";
 
 import type { ApiKeyItem } from "@/src/lib/backend-adapter";
+import { trackEvent } from "@/src/lib/analytics/client";
 import { buttonClass } from "@/src/components/ui/button";
 import { cn } from "@/src/lib/cn";
 
@@ -118,6 +119,17 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
         publishKeysUpdate(next);
         return next;
       });
+      void trackEvent(
+        {
+          event: "api_key_created",
+          properties: {
+            keyId: nextKey.id,
+            keyName: nextKey.name,
+          },
+          context: { source: "client", page: "/dashboard?section=api-keys" },
+        },
+        { dedupeKey: `api-key-created:${nextKey.id}` },
+      );
 
       setCreatedSecret(payload.secret);
       setNewKeyName("");
@@ -175,6 +187,17 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
       if (copiedKeyId === item.id) {
         setCopiedKeyId(null);
       }
+      void trackEvent(
+        {
+          event: "api_key_revoked",
+          properties: {
+            keyId: item.id,
+            keyName: item.name,
+          },
+          context: { source: "client", page: "/dashboard?section=api-keys" },
+        },
+        { dedupeKey: `api-key-revoked:${item.id}` },
+      );
     } catch {
       setErrorMessage("目前無法撤銷金鑰，請稍後再試。");
     } finally {
@@ -209,6 +232,17 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
 
       await navigator.clipboard.writeText(payload.secret);
       setCopiedKeyId(item.id);
+      void trackEvent(
+        {
+          event: "api_key_copied",
+          properties: {
+            keyId: item.id,
+            keyName: item.name,
+          },
+          context: { source: "client", page: "/dashboard?section=api-keys" },
+        },
+        { dedupeKey: `api-key-copied:${item.id}`, dedupeMs: 2000 },
+      );
       pushToast("API key 已複製");
       window.setTimeout(() => {
         setCopiedKeyId((prev) => (prev === item.id ? null : prev));

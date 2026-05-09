@@ -10,6 +10,7 @@ const policyLinks = [
 const supportLinks = [
   { href: "/faq", label: "常見問題" },
   { href: "/help", label: "幫助中心" },
+  { href: "/privacy#analytics-cookies", label: "Analytics & Cookies" },
   { href: "/help#system-status", label: "API 狀態" },
   { href: "/docs/sdk/python-sdk", label: "SDK" },
   { href: "/docs/ai-agents/mcp-server-preview", label: "AI Agents" },

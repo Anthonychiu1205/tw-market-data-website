@@ -213,6 +213,9 @@ export function QuickStartContent() {
         <p className="text-sm leading-7 text-slate-600">
           目前 access 採 controlled rollout。不同方案會影響可用 dataset、rate limit 與月用量上限。
         </p>
+        <p className="text-sm leading-7 text-slate-600">
+          平台使用輕量 product analytics（非廣告 tracking）來改善登入、API onboarding 與文件體驗；可於網站 analytics 提示選擇關閉。
+        </p>
       </section>
 
       <section className="space-y-4 border-b border-slate-200 pb-8">

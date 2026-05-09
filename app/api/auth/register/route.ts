@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { checkEmailAuthRuntimeEnv } from "@/src/auth/env";
+import { trackEventServer } from "@/src/lib/analytics/server";
 import { sendVerificationCodeEmail } from "@/src/lib/auth/email-delivery";
 import { registerBodySchema } from "@/src/lib/auth/email-auth-schema";
 import { readJsonBody } from "@/src/lib/auth/email-auth-route";
@@ -95,6 +96,17 @@ export async function POST(request: Request) {
       console.error(`[auth/register] email delivery failure type=${failureType}`);
       return errorResponse(sendResult.status, failureType);
     }
+
+    void trackEventServer({
+      event: "auth_signup",
+      context: {
+        source: "server",
+        page: "/register",
+      },
+      properties: {
+        method: "email_password",
+      },
+    });
 
     return successResponse();
   } catch (error) {

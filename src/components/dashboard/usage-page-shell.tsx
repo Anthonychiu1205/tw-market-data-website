@@ -16,6 +16,7 @@ import {
 import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
 import type { UsageRequestsSummary, UsageSummary } from "@/src/lib/backend-adapter";
+import { trackEvent } from "@/src/lib/analytics/client";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
 import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
 
@@ -217,7 +218,20 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
         <section className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
           <p className="text-sm font-semibold text-amber-900">您的使用額度已用完</p>
           <p className="mt-1 text-sm text-amber-800">請升級方案或購買 credits。</p>
-          <Link href="/billing/subscriptions" className={buttonClass("secondary", "mt-3 h-9 rounded-lg px-4 text-xs")}>
+          <Link
+            href="/billing/subscriptions"
+            className={buttonClass("secondary", "mt-3 h-9 rounded-lg px-4 text-xs")}
+            onClick={() => {
+              void trackEvent(
+                {
+                  event: "pricing_upgrade_clicked",
+                  properties: { source: "usage_exhausted_banner" },
+                  context: { source: "client", page: "/usage" },
+                },
+                { dedupeKey: "usage-upgrade-clicked", dedupeMs: 2000 },
+              );
+            }}
+          >
             升級方案
           </Link>
         </section>
@@ -227,7 +241,20 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
         <section className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
           <p className="text-sm font-semibold text-slate-900">您的使用額度即將用完</p>
           <p className="mt-1 text-sm text-slate-600">建議先升級方案或購買 credits，避免請求中斷。</p>
-          <Link href="/billing/subscriptions" className={buttonClass("secondary", "mt-3 h-9 rounded-lg px-4 text-xs")}>
+          <Link
+            href="/billing/subscriptions"
+            className={buttonClass("secondary", "mt-3 h-9 rounded-lg px-4 text-xs")}
+            onClick={() => {
+              void trackEvent(
+                {
+                  event: "pricing_upgrade_clicked",
+                  properties: { source: "usage_low_credit_banner" },
+                  context: { source: "client", page: "/usage" },
+                },
+                { dedupeKey: "usage-upgrade-clicked", dedupeMs: 2000 },
+              );
+            }}
+          >
             升級方案
           </Link>
         </section>
