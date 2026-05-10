@@ -29,9 +29,9 @@ export function AnalyticsControls() {
 
   return (
     <div className="fixed bottom-4 left-4 z-[65] w-[min(420px,calc(100vw-2rem))] rounded-xl border border-slate-200 bg-white/95 p-3 shadow-sm backdrop-blur">
-      <p className="text-xs font-medium text-slate-900">Analytics & Cookies</p>
+      <p className="text-xs font-medium text-slate-900">Cookies 使用設定</p>
       <p className="mt-1 text-xs leading-5 text-slate-600">
-        我們只使用產品分析來改善登入、API 與文件體驗，不用於廣告追蹤。
+        我們使用必要 cookies 維持登入與安全，並使用分析 cookies 改善產品體驗。不會用於廣告追蹤。
         <Link href="/privacy#analytics-cookies" className="ml-1 underline underline-offset-2">
           了解更多
         </Link>
@@ -43,9 +43,9 @@ export function AnalyticsControls() {
             setAnalyticsConsent(false);
             setConsent(false);
           }}
-          className="h-8 rounded-md border border-slate-200 px-3 text-xs text-slate-600 transition hover:bg-slate-100"
+          className="h-8 min-w-[88px] rounded-md border border-slate-200 px-3 text-xs text-slate-600 transition hover:bg-slate-100"
         >
-          關閉分析
+          拒絕
         </button>
         <button
           type="button"
@@ -56,9 +56,9 @@ export function AnalyticsControls() {
               void trackPage(window.location.pathname);
             }
           }}
-          className="h-8 rounded-md bg-slate-900 px-3 text-xs font-medium text-white transition hover:bg-slate-800"
+          className="h-8 min-w-[138px] rounded-md bg-slate-900 px-3 text-xs font-medium text-white transition hover:bg-slate-800"
         >
-          開啟分析
+          允許所有 cookies
         </button>
       </div>
     </div>

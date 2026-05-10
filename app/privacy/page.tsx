@@ -110,12 +110,13 @@ export default function PrivacyPage() {
         <section id="analytics-cookies" className="scroll-mt-24 space-y-3 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4">
           <h2 className="text-lg font-semibold text-slate-900">Analytics & Cookies（產品分析）</h2>
           <p className="text-sm leading-7 text-slate-600">
-            我們使用輕量 product analytics 來改善 onboarding、登入流程、API 穩定性與文件可用性。此分析僅用於產品優化與營運觀測，不用於廣告追蹤，也不出售個人資料。
+            我們使用必要 cookies 維持登入、安全與網站功能。我們也可能使用分析 cookies 了解產品使用情況，例如登入流程、API key 操作、文件瀏覽與 gateway 錯誤事件。
           </p>
           <ul className="space-y-1 text-sm leading-7 text-slate-600">
-            <li>- 不蒐集 raw API key、token、密碼等敏感欄位。</li>
-            <li>- 僅保留必要事件（例如登入成功、API key 操作、SDK/MCP 文件檢視、gateway 超時事件）。</li>
-            <li>- 可於網站的 analytics 設定提示中選擇關閉產品分析。</li>
+            <li>- 不用於廣告追蹤。</li>
+            <li>- 不出售個人資料。</li>
+            <li>- 不蒐集 raw API key、token、密碼或資料庫連線字串。</li>
+            <li>- 使用者可在 cookie 提示中選擇拒絕或允許分析 cookies。</li>
           </ul>
         </section>
       </div>
