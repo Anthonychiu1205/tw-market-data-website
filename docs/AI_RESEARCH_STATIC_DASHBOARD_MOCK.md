@@ -5,6 +5,11 @@
 - Added static mock route: `/dashboard/ai-research`
 - Scope is UI-only mock for Pro+ feature exploration.
 - No backend/API integration is included in this phase.
+- Visual style is aligned to existing TW Market Data dashboard language:
+  - clean
+  - minimal
+  - low-chroma
+  - professional SaaS workspace
 
 ## What Was Added
 
@@ -15,6 +20,14 @@
 - Dashboard nav entry:
   - `src/content/dashboard.ts`
   - `src/components/dashboard/dashboard-sidebar.tsx`
+
+## Visual QA / Polish Notes
+
+- Reduced card fragmentation by consolidating most content into one primary workspace panel with section dividers.
+- Avoided nested cards and excessive border density.
+- Kept grayscale-first chart and status presentation for dashboard consistency.
+- Improved Analyst Overview readability with compact status badges and spacing.
+- Kept risk/simulation/disclaimer copy explicit and audit-oriented.
 
 ## Static Mock Boundary
 
