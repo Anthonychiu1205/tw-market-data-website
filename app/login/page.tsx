@@ -50,6 +50,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const hasError = Boolean(params.error);
   const hasResetNotice = params.reset === "1";
   const callbackUrl = getSafeRedirectTarget(params.next, "/dashboard");
+  const hasGoogleOAuthConfigured = Boolean(
+    (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) ||
+      (process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET),
+  );
 
   return (
     <main className="fixed inset-x-0 top-[73px] bottom-0 overflow-hidden bg-white">
@@ -72,15 +76,23 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 <p className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">密碼已更新，請重新登入。</p>
               ) : null}
 
-              <div className="mt-6 grid gap-3">
-                <GoogleSignInButton callbackUrl={callbackUrl} />
-              </div>
+              {hasGoogleOAuthConfigured ? (
+                <>
+                  <div className="mt-6 grid gap-3">
+                    <GoogleSignInButton callbackUrl={callbackUrl} />
+                  </div>
 
-              <div className="mt-5 flex items-center gap-3">
-                <div className="h-px flex-1 bg-slate-200" />
-                <span className="text-[11px] uppercase tracking-wide text-slate-400">或</span>
-                <div className="h-px flex-1 bg-slate-200" />
-              </div>
+                  <div className="mt-5 flex items-center gap-3">
+                    <div className="h-px flex-1 bg-slate-200" />
+                    <span className="text-[11px] uppercase tracking-wide text-slate-400">或</span>
+                    <div className="h-px flex-1 bg-slate-200" />
+                  </div>
+                </>
+              ) : (
+                <p className="mt-6 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                  本機未設定 Google OAuth，請使用 Email 與密碼登入。
+                </p>
+              )}
 
               <div className="mt-5">
                 <PasswordLoginForm callbackPath={callbackUrl} />
