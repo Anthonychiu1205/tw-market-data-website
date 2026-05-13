@@ -75,3 +75,14 @@
 - 修正流程區塊文字換行與 overflow，避免節點狀態出現不自然斷行與內部 scrollbar。
 - 仍為 static mock。
 - 無 API / auth / billing / credits / DB 整合。
+
+## W4-B Response Adapter Refactor
+
+- 本輪已將 dashboard static data 改為 tw-ai response-like local mock object：
+  - `src/components/dashboard/ai-research-mock-response.ts`
+- 新增純函式 adapter：
+  - `mapAiResearchResponseToViewModel(response)`
+- `/dashboard/ai-research` 元件改為使用 response → view model 映射資料，不再在 UI 檔案散落硬編資料。
+- 仍未接 API / proxy / server action。
+- 市場資料分析師顯示為 `mock-real`，其餘分析師維持 `placeholder` / `missing`。
+- 無 billing / auth / credits / DB 變更。
