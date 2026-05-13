@@ -96,3 +96,9 @@
 - Market Data Analyst 會依 ticker 顯示不同 mock-real 摘要；其餘分析師維持 placeholder/missing。
 - 仍維持 research-only / simulation-only / not investment advice 邊界。
 - 無 billing / auth / credits / DB 整合。
+
+## W4-D Local Proxy Gate Note
+
+- W4-D 已新增 local mock API proxy gate 文件：`docs/AI_RESEARCH_LOCAL_MOCK_API_PROXY_GATE.md`。
+- 目前 dashboard 仍使用本地 deterministic mock response。
+- 尚未實作 proxy / fetch。
