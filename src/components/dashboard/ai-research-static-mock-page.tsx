@@ -7,6 +7,7 @@ import {
   aiResearchMockResponse,
   buildAiResearchMockResponse,
   mapAiResearchResponseToViewModel,
+  normalizeAiResearchResponse,
   type AiResearchViewModel,
 } from "@/src/components/dashboard/ai-research-mock-response";
 
@@ -25,23 +26,84 @@ function statusBadgeClass(status: AiResearchViewModel["analystRows"][number]["st
 }
 
 export function AiResearchStaticMockPage() {
+  const proxyFeatureEnabled = process.env.NEXT_PUBLIC_AI_RESEARCH_MOCK_PROXY_ENABLED === "true";
   const [tickerInput, setTickerInput] = useState(aiResearchMockResponse.ticker);
   const [asOfDateInput, setAsOfDateInput] = useState(aiResearchMockResponse.as_of_date);
   const [activeResponse, setActiveResponse] = useState(aiResearchMockResponse);
+  const [isRunning, setIsRunning] = useState(false);
+  const [dataSourceLabel, setDataSourceLabel] = useState<"local" | "proxy" | "fallback">("local");
 
   const viewModel = useMemo(
     () => mapAiResearchResponseToViewModel(activeResponse),
     [activeResponse],
   );
 
-  function handleRunResearch() {
-    setActiveResponse(
-      buildAiResearchMockResponse({
-        ticker: tickerInput,
-        asOfDate: asOfDateInput,
-        includeSimulation: true,
-      }),
-    );
+  async function handleRunResearch() {
+    const localFallback = buildAiResearchMockResponse({
+      ticker: tickerInput,
+      asOfDate: asOfDateInput,
+      includeSimulation: true,
+    });
+
+    if (!proxyFeatureEnabled) {
+      setActiveResponse(localFallback);
+      setDataSourceLabel("local");
+      return;
+    }
+
+    setIsRunning(true);
+    try {
+      const response = await fetch("/api/ai-research/mock-ticker", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ticker: tickerInput,
+          as_of_date: asOfDateInput,
+          mode: "mock",
+          include_simulation: true,
+        }),
+      });
+
+      if (!response.ok) {
+        setActiveResponse(localFallback);
+        setDataSourceLabel("fallback");
+        return;
+      }
+
+      const payload = (await response.json()) as {
+        ok?: boolean;
+        data?: unknown;
+        fallback_required?: boolean;
+      };
+
+      if (payload.ok === true && payload.data) {
+        setActiveResponse(
+          normalizeAiResearchResponse(payload.data, {
+            ticker: tickerInput,
+            asOfDate: asOfDateInput,
+            includeSimulation: true,
+          }),
+        );
+        setDataSourceLabel("proxy");
+        return;
+      }
+
+      if (payload.fallback_required) {
+        setActiveResponse(localFallback);
+        setDataSourceLabel("fallback");
+        return;
+      }
+
+      setActiveResponse(localFallback);
+      setDataSourceLabel("fallback");
+    } catch {
+      setActiveResponse(localFallback);
+      setDataSourceLabel("fallback");
+    } finally {
+      setIsRunning(false);
+    }
   }
 
   return (
@@ -95,13 +157,28 @@ export function AiResearchStaticMockPage() {
             </div>
             <div className="space-y-1">
               <span className="text-xs text-transparent">執行</span>
-              <button type="button" onClick={handleRunResearch} className={buttonClass("primary", "h-10 w-full rounded-lg text-sm")}>
+              <button
+                type="button"
+                onClick={handleRunResearch}
+                disabled={isRunning}
+                className={buttonClass("primary", "h-10 w-full rounded-lg text-sm")}
+              >
                 執行研究
               </button>
             </div>
           </div>
         </div>
-        <p className="mt-2 text-xs text-slate-500">目前為本地 mock 模式，不會呼叫後端或扣除 credits。</p>
+        <p className="mt-2 text-xs text-slate-500">
+          目前為本地 mock 優先模式，不扣除 credits。
+          <span className="ml-2">
+            資料來源：
+            {dataSourceLabel === "proxy"
+              ? "tw-ai mock proxy"
+                : dataSourceLabel === "fallback"
+                ? "proxy unavailable, using local mock"
+                : "本地 mock"}
+          </span>
+        </p>
 
         <div className="mt-5 grid gap-4 border-t border-slate-200 pt-4 md:grid-cols-5">
           <div>

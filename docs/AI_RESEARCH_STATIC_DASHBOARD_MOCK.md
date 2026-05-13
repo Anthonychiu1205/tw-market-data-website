@@ -102,3 +102,10 @@
 - W4-D 已新增 local mock API proxy gate 文件：`docs/AI_RESEARCH_LOCAL_MOCK_API_PROXY_GATE.md`。
 - 目前 dashboard 仍使用本地 deterministic mock response。
 - 尚未實作 proxy / fetch。
+
+## W4-E Local-only Proxy Integration
+
+- 新增 website internal route：`POST /api/ai-research/mock-ticker`（local/dev guard）。
+- `/dashboard/ai-research` 在 proxy flag 開啟時可嘗試呼叫 internal route。
+- proxy 不可用時自動回退本地 deterministic mock，不影響頁面可用性。
+- 仍不做 production proxy，不做 auth/billing/credits/DB 整合。

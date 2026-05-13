@@ -128,3 +128,9 @@
 - 不提供投資建議。
 - 不修改 tw-ai。
 - 不修改 tw-feature-engine。
+
+## W4-E Implementation Note
+
+- W4-E 已實作 local-only internal proxy route：`POST /api/ai-research/mock-ticker`。
+- dashboard 在 proxy feature flag 開啟時可呼叫 internal route；失敗時仍回退本地 deterministic mock。
+- 此實作不代表 production integration：仍無 auth/credits/billing/DB 變更。

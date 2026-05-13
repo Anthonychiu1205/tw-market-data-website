@@ -618,6 +618,346 @@ export const aiResearchMockResponse: AiResearchMockResponse = buildAiResearchMoc
   includeSimulation: true,
 });
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function asString(value: unknown): string | null {
+  return typeof value === "string" ? value : null;
+}
+
+function asNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function asBoolean(value: unknown): boolean | null {
+  return typeof value === "boolean" ? value : null;
+}
+
+function asStringArray(value: unknown): string[] | null {
+  if (!Array.isArray(value)) return null;
+  const items = value.filter((item): item is string => typeof item === "string");
+  return items;
+}
+
+function parseAnalystRole(value: unknown): AiResearchAnalystRole | null {
+  const role = asString(value);
+  if (
+    role === "market_data" ||
+    role === "technical" ||
+    role === "monthly_revenue" ||
+    role === "financial_statement" ||
+    role === "valuation" ||
+    role === "news_event" ||
+    role === "chip_institutional" ||
+    role === "macro_sector"
+  ) {
+    return role;
+  }
+  return null;
+}
+
+function parseOutputStatus(value: unknown): AiResearchAnalystStatus | null {
+  const status = asString(value);
+  if (status === "mock_real" || status === "placeholder" || status === "missing") {
+    return status;
+  }
+  if (status === "mock-real") {
+    return "mock_real";
+  }
+  return null;
+}
+
+function parseStance(value: unknown): AiResearchAnalystStance | null {
+  const stance = asString(value);
+  if (stance === "neutral" || stance === "mixed" || stance === "unavailable") {
+    return stance;
+  }
+  return null;
+}
+
+function normalizeAnalyst(
+  raw: unknown,
+  fallback: AiResearchAnalyst,
+): AiResearchAnalyst {
+  if (!isRecord(raw)) {
+    return fallback;
+  }
+
+  const evidence = Array.isArray(raw.evidence)
+    ? raw.evidence
+        .filter(isRecord)
+        .map((item) => ({
+          dataset: asString(item.dataset) ?? fallback.provenance.source_dataset,
+          field: asString(item.field) ?? "field",
+          value:
+            typeof item.value === "string" || typeof item.value === "number"
+              ? item.value
+              : "n/a",
+          interpretation:
+            asString(item.interpretation) ??
+            "來源資料可用，僅供 mock 研究流程顯示。",
+        }))
+    : fallback.evidence;
+
+  const provenance = isRecord(raw.provenance)
+    ? {
+        source_system:
+          asString(raw.provenance.source_system) ?? fallback.provenance.source_system,
+        source_dataset:
+          asString(raw.provenance.source_dataset) ?? fallback.provenance.source_dataset,
+        data_origin:
+          asString(raw.provenance.data_origin) ?? fallback.provenance.data_origin,
+        data_status:
+          asString(raw.provenance.data_status) ?? fallback.provenance.data_status,
+        live_provider_used:
+          asBoolean(raw.provenance.live_provider_used) ??
+          fallback.provenance.live_provider_used,
+        llm_used: asBoolean(raw.provenance.llm_used) ?? fallback.provenance.llm_used,
+        broker_execution:
+          asBoolean(raw.provenance.broker_execution) ??
+          fallback.provenance.broker_execution,
+      }
+    : fallback.provenance;
+
+  const metadata = isRecord(raw.metadata)
+    ? {
+        deterministic:
+          asBoolean(raw.metadata.deterministic) ?? fallback.metadata.deterministic,
+        adapter: asString(raw.metadata.adapter) ?? fallback.metadata.adapter,
+      }
+    : fallback.metadata;
+
+  return {
+    ...fallback,
+    display_name: asString(raw.display_name) ?? fallback.display_name,
+    output_status: parseOutputStatus(raw.output_status) ?? fallback.output_status,
+    stance: parseStance(raw.stance) ?? fallback.stance,
+    score: asNumber(raw.score) ?? fallback.score,
+    confidence: asNumber(raw.confidence) ?? fallback.confidence,
+    summary: asString(raw.summary) ?? fallback.summary,
+    key_points: asStringArray(raw.key_points) ?? fallback.key_points,
+    evidence,
+    data_gaps: asStringArray(raw.data_gaps) ?? fallback.data_gaps,
+    warnings: asStringArray(raw.warnings) ?? fallback.warnings,
+    provenance,
+    metadata,
+  };
+}
+
+function normalizeSimulation(
+  raw: unknown,
+  fallback: AiResearchMockResponse["simulation"],
+): AiResearchMockResponse["simulation"] {
+  if (!isRecord(raw)) {
+    return fallback;
+  }
+
+  if (raw.status === "skipped") {
+    return {
+      order: {
+        ...fallback.order,
+        status: "rejected",
+        reason: "未執行模擬流程。",
+      },
+      fill: null,
+      position: {
+        ...fallback.position,
+        status: "flat",
+      },
+    };
+  }
+
+  if (!isRecord(raw.order) || !isRecord(raw.position)) {
+    return fallback;
+  }
+
+  return {
+    order: {
+      ...fallback.order,
+      status: raw.order.status === "proposed" ? "proposed" : "rejected",
+      quantity: asNumber(raw.order.quantity) ?? fallback.order.quantity,
+      reason: asString(raw.order.reason) ?? fallback.order.reason,
+      simulation_only:
+        asBoolean(raw.order.simulation_only) === true
+          ? true
+          : fallback.order.simulation_only,
+      broker_execution:
+        asBoolean(raw.order.broker_execution) === false
+          ? false
+          : fallback.order.broker_execution,
+    },
+    fill: null,
+    position: {
+      ...fallback.position,
+      ticker: asString(raw.position.ticker) ?? fallback.position.ticker,
+      quantity: asNumber(raw.position.quantity) ?? fallback.position.quantity,
+      average_price:
+        asNumber(raw.position.average_price) ?? fallback.position.average_price,
+      market_value: asNumber(raw.position.market_value) ?? fallback.position.market_value,
+      unrealized_pnl:
+        asNumber(raw.position.unrealized_pnl) ?? fallback.position.unrealized_pnl,
+      status: raw.position.status === "flat" ? "flat" : fallback.position.status,
+    },
+  };
+}
+
+export function normalizeAiResearchResponse(
+  response: unknown,
+  fallbackInput?: BuildAiResearchMockInput,
+): AiResearchMockResponse {
+  const fallback = buildAiResearchMockResponse({
+    ticker: fallbackInput?.ticker ?? "2330",
+    asOfDate: fallbackInput?.asOfDate ?? "2026-05-13",
+    includeSimulation: fallbackInput?.includeSimulation ?? true,
+  });
+
+  if (!isRecord(response)) {
+    return fallback;
+  }
+
+  const ticker = normalizeTicker(asString(response.ticker) ?? fallback.ticker);
+  const asOfDate = normalizeAsOfDate(asString(response.as_of_date) ?? fallback.as_of_date);
+
+  const base = buildAiResearchMockResponse({
+    ticker,
+    asOfDate,
+    includeSimulation: fallbackInput?.includeSimulation ?? true,
+  });
+
+  const decision = isRecord(response.decision)
+    ? {
+        action:
+          response.decision.action === "hold" ||
+          response.decision.action === "avoid" ||
+          response.decision.action === "no_action"
+            ? response.decision.action
+            : base.decision.action,
+        confidence:
+          asNumber(response.decision.confidence) ?? base.decision.confidence,
+        reason: asString(response.decision.reason) ?? base.decision.reason,
+      }
+    : base.decision;
+
+  let analysts = base.research.analysts;
+  if (isRecord(response.research) && Array.isArray(response.research.analysts)) {
+    const byRole = new Map<AiResearchAnalystRole, AiResearchAnalyst>();
+    for (const fallbackAnalyst of base.research.analysts) {
+      byRole.set(fallbackAnalyst.analyst_role, fallbackAnalyst);
+    }
+    const parsed = response.research.analysts
+      .filter(isRecord)
+      .map((item) => {
+        const role = parseAnalystRole(item.analyst_role);
+        if (!role) return null;
+        const fallbackAnalyst = byRole.get(role);
+        if (!fallbackAnalyst) return null;
+        return normalizeAnalyst(item, fallbackAnalyst);
+      })
+      .filter((item): item is AiResearchAnalyst => item !== null);
+    if (parsed.length > 0) {
+      analysts = parsed;
+    }
+  }
+
+  return {
+    ...base,
+    run_id: asString(response.run_id) ?? base.run_id,
+    mode: response.mode === "mock" ? "mock" : base.mode,
+    decision,
+    simulation: normalizeSimulation(response.simulation, base.simulation),
+    research: {
+      ...base.research,
+      analysts,
+      bull_case:
+        isRecord(response.research) && isRecord(response.research.bull_case)
+          ? {
+              status:
+                response.research.bull_case.status === "placeholder"
+                  ? "placeholder"
+                  : base.research.bull_case.status,
+              key_points:
+                asStringArray(response.research.bull_case.key_points) ??
+                base.research.bull_case.key_points,
+            }
+          : base.research.bull_case,
+      bear_case:
+        isRecord(response.research) && isRecord(response.research.bear_case)
+          ? {
+              status:
+                response.research.bear_case.status === "placeholder"
+                  ? "placeholder"
+                  : base.research.bear_case.status,
+              key_points:
+                asStringArray(response.research.bear_case.key_points) ??
+                base.research.bear_case.key_points,
+            }
+          : base.research.bear_case,
+      trader_proposal:
+        isRecord(response.research) && isRecord(response.research.trader_proposal)
+          ? {
+              proposed_action:
+                response.research.trader_proposal.proposed_action === "avoid"
+                  ? "avoid"
+                  : "hold",
+              confidence:
+                asNumber(response.research.trader_proposal.confidence) ??
+                base.research.trader_proposal.confidence,
+              summary:
+                asString(response.research.trader_proposal.summary) ??
+                base.research.trader_proposal.summary,
+            }
+          : base.research.trader_proposal,
+      risk_review:
+        isRecord(response.research) && isRecord(response.research.risk_review)
+          ? {
+              decision:
+                response.research.risk_review.decision === "needs_more_data"
+                  ? "needs_more_data"
+                  : base.research.risk_review.decision,
+              max_allocation:
+                asNumber(response.research.risk_review.max_allocation) ??
+                base.research.risk_review.max_allocation,
+              required_user_confirmation:
+                asBoolean(response.research.risk_review.required_user_confirmation) ??
+                base.research.risk_review.required_user_confirmation,
+              flags:
+                asStringArray(response.research.risk_review.flags) ??
+                base.research.risk_review.flags,
+            }
+          : base.research.risk_review,
+      portfolio_decision:
+        isRecord(response.research) && isRecord(response.research.portfolio_decision)
+          ? {
+              action:
+                response.research.portfolio_decision.action === "no_action"
+                  ? "no_action"
+                  : base.research.portfolio_decision.action,
+              confidence:
+                asNumber(response.research.portfolio_decision.confidence) ??
+                base.research.portfolio_decision.confidence,
+              rationale:
+                asString(response.research.portfolio_decision.rationale) ??
+                base.research.portfolio_decision.rationale,
+            }
+          : base.research.portfolio_decision,
+    },
+    data_gaps: asStringArray(response.data_gaps) ?? base.data_gaps,
+    warnings: asStringArray(response.warnings) ?? base.warnings,
+    disclaimer: asString(response.disclaimer) ?? base.disclaimer,
+    replay_fingerprint:
+      asString(response.replay_fingerprint) ?? base.replay_fingerprint,
+    broker_execution:
+      asBoolean(response.broker_execution) === false ? false : base.broker_execution,
+    simulation_only:
+      asBoolean(response.simulation_only) === true ? true : base.simulation_only,
+    not_investment_advice:
+      asBoolean(response.not_investment_advice) === true
+        ? true
+        : base.not_investment_advice,
+  };
+}
+
 export type AiResearchViewModel = {
   ticker: string;
   asOfDate: string;
@@ -700,8 +1040,10 @@ function mapTimeline(response: AiResearchMockResponse): Array<{ stage: string; s
   ];
 }
 
-export function mapAiResearchResponseToViewModel(response: AiResearchMockResponse): AiResearchViewModel {
-  const analystRows = response.research.analysts.map((analyst) => ({
+export function mapAiResearchResponseToViewModel(response: unknown): AiResearchViewModel {
+  const normalized = normalizeAiResearchResponse(response);
+
+  const analystRows = normalized.research.analysts.map((analyst) => ({
     analyst: analyst.display_name,
     stance: mapStanceLabel(analyst.stance),
     confidence: analyst.confidence,
@@ -717,20 +1059,20 @@ export function mapAiResearchResponseToViewModel(response: AiResearchMockRespons
   };
 
   return {
-    ticker: response.ticker,
-    asOfDate: response.as_of_date,
-    modeLabel: response.mode === "mock" ? "Mock" : response.mode,
+    ticker: normalized.ticker,
+    asOfDate: normalized.as_of_date,
+    modeLabel: normalized.mode === "mock" ? "Mock" : normalized.mode,
     summary: {
-      actionCandidate: mapActionLabel(response.decision.action),
-      confidence: response.decision.confidence.toFixed(2),
-      riskDecision: response.research.risk_review.decision === "needs_more_data" ? "需要更多資料" : "已完成",
+      actionCandidate: mapActionLabel(normalized.decision.action),
+      confidence: normalized.decision.confidence.toFixed(2),
+      riskDecision: normalized.research.risk_review.decision === "needs_more_data" ? "需要更多資料" : "已完成",
       portfolioAction:
-        response.research.portfolio_decision.action === "no_action"
+        normalized.research.portfolio_decision.action === "no_action"
           ? "不採取動作"
-          : response.research.portfolio_decision.action,
-      simulationStatus: response.simulation_only ? "僅紙上模擬" : "非模擬",
+          : normalized.research.portfolio_decision.action,
+      simulationStatus: normalized.simulation_only ? "僅紙上模擬" : "非模擬",
     },
-    timelineSteps: mapTimeline(response),
+    timelineSteps: mapTimeline(normalized),
     analystRows,
     confidenceChartData: analystRows.map((row) => ({
       name: row.analyst,
@@ -741,29 +1083,32 @@ export function mapAiResearchResponseToViewModel(response: AiResearchMockRespons
       { name: "佔位", value: coverage.placeholder, colorClass: "bg-slate-500" },
       { name: "缺資料", value: coverage.missing, colorClass: "bg-slate-300" },
     ],
-    bullCasePoints: response.research.bull_case.key_points,
-    bearCasePoints: response.research.bear_case.key_points,
+    bullCasePoints: normalized.research.bull_case.key_points,
+    bearCasePoints: normalized.research.bear_case.key_points,
     risk: {
-      decision: response.research.risk_review.decision === "needs_more_data" ? "需要更多資料" : "已完成",
-      maxAllocation: `${response.research.risk_review.max_allocation}%`,
-      requiredUserConfirmation: response.research.risk_review.required_user_confirmation ? "是" : "否",
-      flags: response.research.risk_review.flags,
+      decision: normalized.research.risk_review.decision === "needs_more_data" ? "需要更多資料" : "已完成",
+      maxAllocation: `${normalized.research.risk_review.max_allocation}%`,
+      requiredUserConfirmation: normalized.research.risk_review.required_user_confirmation ? "是" : "否",
+      flags: normalized.research.risk_review.flags,
     },
     order: {
-      status: response.simulation.order.status === "rejected" ? "拒絕 / 不採取動作" : response.simulation.order.status,
-      simulationOnly: String(response.simulation_only),
-      brokerExecution: String(response.broker_execution),
-      reason: response.simulation.order.reason,
+      status:
+        normalized.simulation.order.status === "rejected"
+          ? "拒絕 / 不採取動作"
+          : normalized.simulation.order.status,
+      simulationOnly: String(normalized.simulation_only),
+      brokerExecution: String(normalized.broker_execution),
+      reason: normalized.simulation.order.reason,
     },
-    dataGaps: response.data_gaps,
-    warnings: response.warnings,
-    disclaimer: response.disclaimer,
-    replayFingerprint: response.replay_fingerprint,
-    runId: response.run_id,
+    dataGaps: normalized.data_gaps,
+    warnings: normalized.warnings,
+    disclaimer: normalized.disclaimer,
+    replayFingerprint: normalized.replay_fingerprint,
+    runId: normalized.run_id,
     safetyFlags: {
-      brokerExecution: String(response.broker_execution),
-      simulationOnly: String(response.simulation_only),
-      notInvestmentAdvice: String(response.not_investment_advice),
+      brokerExecution: String(normalized.broker_execution),
+      simulationOnly: String(normalized.simulation_only),
+      notInvestmentAdvice: String(normalized.not_investment_advice),
     },
   };
 }
