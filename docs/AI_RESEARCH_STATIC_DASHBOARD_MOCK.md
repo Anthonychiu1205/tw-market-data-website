@@ -68,3 +68,10 @@
 - 修正 Research Flow Timeline 內部 overflow / scrollbar，改為可換行的 grid 佈局並移除橫向捲動依賴。
 - 優化 Analyst Overview 欄位換行與欄寬比例，降低中文內容截斷。
 - 仍為 static mock，無 API / billing / auth / credits / DB 整合。
+
+## Timeline Dot And Overflow Refinement
+
+- 移除研究流程節點標題前的小圓點，釋放節點文字空間並降低不必要換行。
+- 修正流程區塊文字換行與 overflow，避免節點狀態出現不自然斷行與內部 scrollbar。
+- 仍為 static mock。
+- 無 API / auth / billing / credits / DB 整合。

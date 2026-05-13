@@ -92,7 +92,7 @@ const coverageChartData = [
 const timelineSteps = [
   { stage: "市場資料", status: "mock-real" },
   { stage: "分析師", status: "部分完成" },
-  { stage: "多空研究", status: "placeholder" },
+  { stage: "多空研究", status: "佔位" },
   { stage: "交易提案", status: "保守" },
   { stage: "風控", status: "需更多資料" },
   { stage: "投組", status: "不採取動作" },
@@ -206,11 +206,10 @@ export function AiResearchStaticMockPage() {
             {timelineSteps.map((step, index) => (
               <div key={step.stage} className="min-w-0 rounded-lg bg-slate-50/80 px-3 py-2">
                 <div className="flex items-center gap-2">
-                  <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-slate-700" />
-                  <p className="min-w-0 break-words text-xs font-medium text-slate-900">{step.stage}</p>
+                  <p className="min-w-0 break-words text-sm font-medium leading-tight text-slate-900">{step.stage}</p>
                 </div>
-                <div className="mt-1 flex items-center gap-2 pl-4">
-                  <p className="min-w-0 break-words text-xs text-slate-500">{step.status}</p>
+                <div className="mt-1 flex items-center gap-2">
+                  <p className="min-w-0 break-words text-sm leading-tight text-slate-500">{step.status}</p>
                   {index < timelineSteps.length - 1 ? (
                     <span className="hidden text-[11px] text-slate-400 xl:inline">→</span>
                   ) : null}
