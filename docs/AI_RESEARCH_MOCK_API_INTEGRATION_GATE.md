@@ -189,3 +189,10 @@ W4-B 可選路徑：
 - 不提供投資建議。
 - 不修改 tw-ai。
 - 不修改 tw-feature-engine。
+
+## W4-C Progress Note
+
+- W4-C 已先完成 local response adapter interaction：
+  - dashboard 可用本地 deterministic mock response 進行 ticker/date 互動更新。
+- 此進展不代表已接 API。
+- 仍無 frontend fetch、無 internal API proxy、無 server action。

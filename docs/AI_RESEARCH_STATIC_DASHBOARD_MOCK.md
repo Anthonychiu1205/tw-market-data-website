@@ -86,3 +86,13 @@
 - 仍未接 API / proxy / server action。
 - 市場資料分析師顯示為 `mock-real`，其餘分析師維持 `placeholder` / `missing`。
 - 無 billing / auth / credits / DB 變更。
+
+## W4-C Interactive Static Mock Sprint
+
+- 本輪新增本地互動式 static mock：
+  - 可輸入股票代號與研究日期，點擊「執行研究」後更新畫面。
+- ticker/date controls 只會更新 local deterministic mock response。
+- 無 API call、無 proxy、無 server action。
+- Market Data Analyst 會依 ticker 顯示不同 mock-real 摘要；其餘分析師維持 placeholder/missing。
+- 仍維持 research-only / simulation-only / not investment advice 邊界。
+- 無 billing / auth / credits / DB 整合。

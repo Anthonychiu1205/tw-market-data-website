@@ -1,8 +1,11 @@
 "use client";
 
+import { useMemo, useState } from "react";
+
 import { buttonClass } from "@/src/components/ui/button";
 import {
   aiResearchMockResponse,
+  buildAiResearchMockResponse,
   mapAiResearchResponseToViewModel,
   type AiResearchViewModel,
 } from "@/src/components/dashboard/ai-research-mock-response";
@@ -22,7 +25,24 @@ function statusBadgeClass(status: AiResearchViewModel["analystRows"][number]["st
 }
 
 export function AiResearchStaticMockPage() {
-  const viewModel = mapAiResearchResponseToViewModel(aiResearchMockResponse);
+  const [tickerInput, setTickerInput] = useState(aiResearchMockResponse.ticker);
+  const [asOfDateInput, setAsOfDateInput] = useState(aiResearchMockResponse.as_of_date);
+  const [activeResponse, setActiveResponse] = useState(aiResearchMockResponse);
+
+  const viewModel = useMemo(
+    () => mapAiResearchResponseToViewModel(activeResponse),
+    [activeResponse],
+  );
+
+  function handleRunResearch() {
+    setActiveResponse(
+      buildAiResearchMockResponse({
+        ticker: tickerInput,
+        asOfDate: asOfDateInput,
+        includeSimulation: true,
+      }),
+    );
+  }
 
   return (
     <div className="space-y-4 pb-8">
@@ -53,16 +73,17 @@ export function AiResearchStaticMockPage() {
             <label className="space-y-1">
               <span className="text-xs text-slate-500">股票代碼</span>
               <input
-                defaultValue={viewModel.ticker}
-                readOnly
+                value={tickerInput}
+                onChange={(event) => setTickerInput(event.target.value)}
                 className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900"
               />
             </label>
             <label className="space-y-1">
               <span className="text-xs text-slate-500">資料日期</span>
               <input
-                defaultValue={viewModel.asOfDate}
-                readOnly
+                type="date"
+                value={asOfDateInput}
+                onChange={(event) => setAsOfDateInput(event.target.value)}
                 className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900"
               />
             </label>
@@ -74,12 +95,13 @@ export function AiResearchStaticMockPage() {
             </div>
             <div className="space-y-1">
               <span className="text-xs text-transparent">執行</span>
-              <button type="button" disabled className={buttonClass("primary", "h-10 w-full rounded-lg text-sm")}>
+              <button type="button" onClick={handleRunResearch} className={buttonClass("primary", "h-10 w-full rounded-lg text-sm")}>
                 執行研究
               </button>
             </div>
           </div>
         </div>
+        <p className="mt-2 text-xs text-slate-500">目前為本地 mock 模式，不會呼叫後端或扣除 credits。</p>
 
         <div className="mt-5 grid gap-4 border-t border-slate-200 pt-4 md:grid-cols-5">
           <div>
@@ -106,6 +128,14 @@ export function AiResearchStaticMockPage() {
         <p className="mt-3 text-xs text-slate-500">
           Replay fingerprint
           <span className="ml-2 font-mono text-slate-700">{viewModel.replayFingerprint}</span>
+        </p>
+        <p className="mt-1 text-xs text-slate-500">
+          Run ID
+          <span className="ml-2 font-mono text-slate-700">{viewModel.runId}</span>
+        </p>
+        <p className="mt-1 text-xs text-slate-500">
+          safety: broker_execution={viewModel.safetyFlags.brokerExecution} / simulation_only={viewModel.safetyFlags.simulationOnly} /
+          not_investment_advice={viewModel.safetyFlags.notInvestmentAdvice}
         </p>
       </section>
 
