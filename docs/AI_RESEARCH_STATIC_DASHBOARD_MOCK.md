@@ -61,3 +61,10 @@
 2. Integrate mock response path from internal AI Research API boundary.
 3. Add usage/credits dry-run display for AI Research runs.
 4. Keep simulation-only constraints until separate broker/live gates are approved.
+
+## Localization And Layout Update
+
+- 完成繁體中文 UI 文案調整，保留少量必要英文術語（如 AI Research、Pro+、Replay fingerprint）。
+- 修正 Research Flow Timeline 內部 overflow / scrollbar，改為可換行的 grid 佈局並移除橫向捲動依賴。
+- 優化 Analyst Overview 欄位換行與欄寬比例，降低中文內容截斷。
+- 仍為 static mock，無 API / billing / auth / credits / DB 整合。
