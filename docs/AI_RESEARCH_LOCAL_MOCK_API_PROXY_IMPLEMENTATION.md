@@ -72,3 +72,80 @@ proxy 會檢查 tw-ai 回應 safety flags：
 ## 7. Next Step
 
 - W4-F：local proxy + tw-ai FastAPI end-to-end smoke（本機同時啟動 tw-ai server）。
+
+## 8. W4-F Smoke Checklist
+
+### Step 1: Start tw-ai mock server (read-only repo)
+
+```bash
+cd /Volumes/DEV_USB/Projects/tw-ai-investment-research
+PYTHONPATH=src /tmp/tw-ai-ir-py311/bin/python -m uvicorn \
+  tw_ai_investment_research.api.research_firm_app:app \
+  --host 127.0.0.1 \
+  --port 8010
+```
+
+Direct smoke:
+
+```bash
+curl -s -X POST http://127.0.0.1:8010/v1/research/ticker \
+  -H "Content-Type: application/json" \
+  -d '{"ticker":"2330","as_of_date":"2026-05-13","mode":"mock","include_simulation":true}'
+```
+
+Expected safety flags:
+
+- `broker_execution=false`
+- `simulation_only=true`
+- `not_investment_advice=true`
+- `research.analysts[0].analyst_role=market_data`
+- `research.analysts[0].output_status=mock_real`
+
+### Step 2: Start website with proxy env flags
+
+```bash
+cd /Volumes/DEV_USB/Projects/tw-market-data-website
+AI_RESEARCH_MOCK_PROXY_ENABLED=true \
+AI_RESEARCH_MOCK_API_BASE_URL=http://127.0.0.1:8010 \
+NEXT_PUBLIC_AI_RESEARCH_MOCK_PROXY_ENABLED=true \
+npm run dev
+```
+
+### Step 3: Smoke internal proxy route
+
+```bash
+curl -s -X POST http://127.0.0.1:3001/api/ai-research/mock-ticker \
+  -H "Content-Type: application/json" \
+  -d '{"ticker":"2330","as_of_date":"2026-05-13","mode":"mock","include_simulation":true}'
+```
+
+Expected:
+
+- `ok=true`
+- `source="tw_ai_mock_proxy"`
+- `data.broker_execution=false`
+- `data.simulation_only=true`
+- `data.not_investment_advice=true`
+
+### Step 4: Fallback behavior check
+
+If proxy base URL is unreachable or proxy disabled, internal route should return:
+
+- `ok=false`
+- `fallback_required=true`
+- reason like `proxy_disabled` or `proxy_unavailable`
+- no stack trace / no secrets
+
+### Step 5: Dashboard access check
+
+- login success via `/api/auth/password-login`
+- authenticated `/dashboard/ai-research` returns `200`
+- route remains usable even when proxy falls back
+
+### W4-F Boundaries
+
+- no production use
+- no deployment
+- no push
+- no auth/billing/credits/DB logic changes
+- browser never calls tw-ai directly
