@@ -141,3 +141,11 @@ UI and API response should always include copy equivalent to:
 - no investment advice mode
 - no backend deployment
 - no tw-ai repository modification
+
+## W4-H Local Entitlement Mock UI Note
+
+- W4-H adds a local mock entitlement UI preview for Free / Developer / Pro / Team / Enterprise directly in `/dashboard/ai-research`.
+- This is local preview only and does not read real subscription state, session plan, or billing records.
+- Free is shown as blocked with upgrade guidance; Developer stays mock-preview-only; Pro/Team/Enterprise are shown as enabled tiers with descriptive capability copy.
+- No real quota enforcement or credits deduction is implemented in W4-H.
+- No production entitlement logic is changed in this phase.

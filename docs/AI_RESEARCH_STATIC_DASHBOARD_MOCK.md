@@ -120,3 +120,17 @@
 - fallback 不再以錯誤樣式呈現，而是平穩回退提示，維持 dashboard 專業感。
 - 不顯示 backend URL / secrets，不新增 debug 面板。
 - 仍為 local/dev mock 邊界，無 auth/credits/billing/DB 變更。
+
+## W4-H Entitlement Mock UI Gate
+
+- 新增本地 mock entitlement UI，可在頁面中切換方案預覽：
+  - Free
+  - Developer
+  - Pro
+  - Team
+  - Enterprise
+- entitlement 僅為前端本地常數，不讀取真 subscription / billing / auth plan。
+- Free 方案會停用「執行研究」按鈕並顯示升級提示。
+- Developer 方案顯示 preview-only 與非商業使用提示。
+- Pro / Team / Enterprise 顯示對應模式與配額文案（UI mock，無 quota enforcement）。
+- 仍為 local mock 邊界，無 auth/credits/billing/DB 變更。

@@ -4,6 +4,11 @@ import { useMemo, useState } from "react";
 
 import { buttonClass } from "@/src/components/ui/button";
 import {
+  getAiResearchEntitlement,
+  listAiResearchPlans,
+  type AiResearchPlan,
+} from "@/src/components/dashboard/ai-research-entitlements";
+import {
   aiResearchMockResponse,
   buildAiResearchMockResponse,
   mapAiResearchResponseToViewModel,
@@ -51,6 +56,7 @@ export function AiResearchStaticMockPage() {
   };
 
   const proxyFeatureEnabled = process.env.NEXT_PUBLIC_AI_RESEARCH_MOCK_PROXY_ENABLED === "true";
+  const [selectedPlan, setSelectedPlan] = useState<AiResearchPlan>("pro");
   const [tickerInput, setTickerInput] = useState(aiResearchMockResponse.ticker);
   const [asOfDateInput, setAsOfDateInput] = useState(aiResearchMockResponse.as_of_date);
   const [activeResponse, setActiveResponse] = useState(aiResearchMockResponse);
@@ -62,8 +68,19 @@ export function AiResearchStaticMockPage() {
     () => mapAiResearchResponseToViewModel(activeResponse),
     [activeResponse],
   );
+  const entitlement = useMemo(
+    () => getAiResearchEntitlement(selectedPlan),
+    [selectedPlan],
+  );
+  const canRunResearch = entitlement.canRunResearch;
+  const runButtonDisabled = isRunning || !canRunResearch;
 
   async function handleRunResearch() {
+    if (!canRunResearch) {
+      setRunState("idle");
+      return;
+    }
+
     const localFallback = buildAiResearchMockResponse({
       ticker: tickerInput,
       asOfDate: asOfDateInput,
@@ -181,10 +198,24 @@ export function AiResearchStaticMockPage() {
                 className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900"
               />
             </label>
+            <label className="space-y-1 sm:col-span-2">
+              <span className="text-xs text-slate-500">預覽方案（本地 mock）</span>
+              <select
+                value={selectedPlan}
+                onChange={(event) => setSelectedPlan(event.target.value as AiResearchPlan)}
+                className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900"
+              >
+                {listAiResearchPlans().map((plan) => (
+                  <option key={plan} value={plan}>
+                    {getAiResearchEntitlement(plan).displayName}
+                  </option>
+                ))}
+              </select>
+            </label>
             <div className="space-y-1">
               <span className="text-xs text-slate-500">模式</span>
               <div className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm leading-10 text-slate-700">
-                {viewModel.modeLabel}
+                {entitlement.modeLabel}
               </div>
             </div>
             <div className="space-y-1">
@@ -192,13 +223,19 @@ export function AiResearchStaticMockPage() {
               <button
                 type="button"
                 onClick={handleRunResearch}
-                disabled={isRunning}
+                disabled={runButtonDisabled}
                 className={buttonClass("primary", "h-10 w-full rounded-lg text-sm")}
               >
-                {isRunning ? "執行中..." : "執行研究"}
+                {isRunning ? "執行中..." : canRunResearch ? "執行研究" : "方案未開放"}
               </button>
             </div>
           </div>
+        </div>
+        <div className="mt-2 grid gap-2 text-xs text-slate-500 sm:grid-cols-2 lg:grid-cols-4">
+          <p>目前方案：{entitlement.displayName}</p>
+          <p>AI Research：{entitlement.statusLabel}</p>
+          <p>每月研究次數：{entitlement.quotaLabel}</p>
+          <p>模式：{entitlement.modeLabel}</p>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
           <span>資料來源狀態</span>
@@ -208,7 +245,11 @@ export function AiResearchStaticMockPage() {
           {runState === "running" ? <span className="text-slate-500">執行中...</span> : null}
           <span className="w-full sm:w-auto">{sourceStatusMap[dataSource].description}</span>
         </div>
-        <p className="mt-1 text-xs text-slate-500">目前為本地 mock 優先模式，不扣除 credits。</p>
+        <p className="mt-1 text-xs text-slate-500">{entitlement.helperCopy}</p>
+        {entitlement.upgradeCopy ? (
+          <p className="mt-1 text-xs text-slate-500">{entitlement.upgradeCopy}</p>
+        ) : null}
+        <p className="mt-1 text-xs text-slate-500">目前為本地 mock entitlement，不扣除 credits。</p>
 
         <div className="mt-5 grid gap-4 border-t border-slate-200 pt-4 md:grid-cols-5">
           <div>
@@ -269,7 +310,9 @@ export function AiResearchStaticMockPage() {
         <div className="border-t border-slate-200 px-6 py-5">
           <div className="mb-3 flex items-center justify-between gap-3">
             <h2 className="text-sm font-semibold tracking-wide text-slate-900">分析師總覽</h2>
-            <div className="text-xs text-slate-500">目前方案：Pro · 功能已啟用</div>
+            <div className="text-xs text-slate-500">
+              目前方案：{entitlement.displayName} · {entitlement.statusLabel}
+            </div>
           </div>
           <div>
             <table className="w-full table-fixed text-sm">
