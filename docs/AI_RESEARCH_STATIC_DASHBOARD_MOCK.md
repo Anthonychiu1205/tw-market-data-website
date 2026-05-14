@@ -109,3 +109,14 @@
 - `/dashboard/ai-research` 在 proxy flag 開啟時可嘗試呼叫 internal route。
 - proxy 不可用時自動回退本地 deterministic mock，不影響頁面可用性。
 - 仍不做 production proxy，不做 auth/billing/credits/DB 整合。
+
+## W4-G Proxy Mode UX Polish
+
+- 新增「資料來源狀態」小型 badge + 說明文字：
+  - 本地 mock
+  - tw-ai mock proxy
+  - proxy 不可用，已切回本地 mock
+- 按下「執行研究」時提供克制的執行中回饋（按鈕顯示 `執行中...`）。
+- fallback 不再以錯誤樣式呈現，而是平穩回退提示，維持 dashboard 專業感。
+- 不顯示 backend URL / secrets，不新增 debug 面板。
+- 仍為 local/dev mock 邊界，無 auth/credits/billing/DB 變更。

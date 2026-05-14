@@ -149,3 +149,14 @@ If proxy base URL is unreachable or proxy disabled, internal route should return
 - no push
 - no auth/billing/credits/DB logic changes
 - browser never calls tw-ai directly
+
+## 9. W4-G Proxy Mode UX Polish
+
+- dashboard 新增克制版「資料來源狀態」呈現，支援三種模式：
+  - `本地 mock`
+  - `tw-ai mock proxy`
+  - `proxy 不可用，已切回本地 mock`
+- 狀態區塊僅顯示必要文字與 badge，不顯示 backend URL / env / stack trace。
+- 「執行研究」按鈕在處理中會顯示 `執行中...` 並短暫 disabled。
+- proxy 成功或 fallback 後皆會更新來源狀態，避免誤解目前資料來源。
+- 本輪仍不代表 production integration，且無 auth/credits/billing/DB 變更。

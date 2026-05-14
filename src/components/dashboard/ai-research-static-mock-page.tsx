@@ -26,12 +26,37 @@ function statusBadgeClass(status: AiResearchViewModel["analystRows"][number]["st
 }
 
 export function AiResearchStaticMockPage() {
+  type DataSourceState = "local" | "proxy" | "fallback";
+  type RunState = "idle" | "running" | "success" | "fallback";
+
+  const sourceStatusMap: Record<
+    DataSourceState,
+    { label: string; description: string; badgeClass: string }
+  > = {
+    local: {
+      label: "本地 mock",
+      description: "使用瀏覽器內建 deterministic mock response，未呼叫後端。",
+      badgeClass: "border-slate-300 text-slate-700 bg-white",
+    },
+    proxy: {
+      label: "tw-ai mock proxy",
+      description: "透過本機 internal proxy 呼叫 tw-ai mock endpoint。",
+      badgeClass: "border-slate-300 text-slate-700 bg-slate-50",
+    },
+    fallback: {
+      label: "proxy 不可用，已切回本地 mock",
+      description: "後端 mock proxy 暫時不可用，頁面已使用本地 deterministic mock fallback。",
+      badgeClass: "border-slate-300 text-slate-700 bg-slate-50",
+    },
+  };
+
   const proxyFeatureEnabled = process.env.NEXT_PUBLIC_AI_RESEARCH_MOCK_PROXY_ENABLED === "true";
   const [tickerInput, setTickerInput] = useState(aiResearchMockResponse.ticker);
   const [asOfDateInput, setAsOfDateInput] = useState(aiResearchMockResponse.as_of_date);
   const [activeResponse, setActiveResponse] = useState(aiResearchMockResponse);
   const [isRunning, setIsRunning] = useState(false);
-  const [dataSourceLabel, setDataSourceLabel] = useState<"local" | "proxy" | "fallback">("local");
+  const [dataSource, setDataSource] = useState<DataSourceState>("local");
+  const [runState, setRunState] = useState<RunState>("idle");
 
   const viewModel = useMemo(
     () => mapAiResearchResponseToViewModel(activeResponse),
@@ -47,11 +72,13 @@ export function AiResearchStaticMockPage() {
 
     if (!proxyFeatureEnabled) {
       setActiveResponse(localFallback);
-      setDataSourceLabel("local");
+      setDataSource("local");
+      setRunState("success");
       return;
     }
 
     setIsRunning(true);
+    setRunState("running");
     try {
       const response = await fetch("/api/ai-research/mock-ticker", {
         method: "POST",
@@ -68,7 +95,8 @@ export function AiResearchStaticMockPage() {
 
       if (!response.ok) {
         setActiveResponse(localFallback);
-        setDataSourceLabel("fallback");
+        setDataSource("fallback");
+        setRunState("fallback");
         return;
       }
 
@@ -86,21 +114,25 @@ export function AiResearchStaticMockPage() {
             includeSimulation: true,
           }),
         );
-        setDataSourceLabel("proxy");
+        setDataSource("proxy");
+        setRunState("success");
         return;
       }
 
       if (payload.fallback_required) {
         setActiveResponse(localFallback);
-        setDataSourceLabel("fallback");
+        setDataSource("fallback");
+        setRunState("fallback");
         return;
       }
 
       setActiveResponse(localFallback);
-      setDataSourceLabel("fallback");
+      setDataSource("fallback");
+      setRunState("fallback");
     } catch {
       setActiveResponse(localFallback);
-      setDataSourceLabel("fallback");
+      setDataSource("fallback");
+      setRunState("fallback");
     } finally {
       setIsRunning(false);
     }
@@ -163,22 +195,20 @@ export function AiResearchStaticMockPage() {
                 disabled={isRunning}
                 className={buttonClass("primary", "h-10 w-full rounded-lg text-sm")}
               >
-                執行研究
+                {isRunning ? "執行中..." : "執行研究"}
               </button>
             </div>
           </div>
         </div>
-        <p className="mt-2 text-xs text-slate-500">
-          目前為本地 mock 優先模式，不扣除 credits。
-          <span className="ml-2">
-            資料來源：
-            {dataSourceLabel === "proxy"
-              ? "tw-ai mock proxy"
-                : dataSourceLabel === "fallback"
-                ? "proxy unavailable, using local mock"
-                : "本地 mock"}
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          <span>資料來源狀態</span>
+          <span className={`rounded-full border px-2 py-0.5 ${sourceStatusMap[dataSource].badgeClass}`}>
+            {sourceStatusMap[dataSource].label}
           </span>
-        </p>
+          {runState === "running" ? <span className="text-slate-500">執行中...</span> : null}
+          <span className="w-full sm:w-auto">{sourceStatusMap[dataSource].description}</span>
+        </div>
+        <p className="mt-1 text-xs text-slate-500">目前為本地 mock 優先模式，不扣除 credits。</p>
 
         <div className="mt-5 grid gap-4 border-t border-slate-200 pt-4 md:grid-cols-5">
           <div>
