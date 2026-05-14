@@ -149,3 +149,9 @@ UI and API response should always include copy equivalent to:
 - Free is shown as blocked with upgrade guidance; Developer stays mock-preview-only; Pro/Team/Enterprise are shown as enabled tiers with descriptive capability copy.
 - No real quota enforcement or credits deduction is implemented in W4-H.
 - No production entitlement logic is changed in this phase.
+
+## Pricing Table Deferred Note
+
+- Pricing table updates for AI Research are deferred in the current phase.
+- Current focus remains dashboard-side Pro+ feature validation and local integration behavior.
+- Any public pricing-table row updates for AI Research require a separate gate before implementation.
