@@ -30,6 +30,26 @@ function statusBadgeClass(status: AiResearchViewModel["analystRows"][number]["st
   return "bg-slate-100 text-slate-500";
 }
 
+function availabilityBadgeClass(tone: AiResearchViewModel["availabilitySummary"]["statusTone"]) {
+  if (tone === "ready") return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  if (tone === "fallback") return "border-amber-200 bg-amber-50 text-amber-700";
+  if (tone === "skip") return "border-slate-300 bg-slate-100 text-slate-700";
+  return "border-slate-300 bg-slate-50 text-slate-600";
+}
+
+function availabilityHint(summary: AiResearchViewModel["availabilitySummary"]) {
+  if (summary.readiness === "ready" && summary.agentAction === "proceed") {
+    return "近 6 個月 TWSE 價格資料可用，允許 Market Data Analyst 進入 mock-real。";
+  }
+  if (summary.readiness === "unavailable" || summary.agentAction === "skip") {
+    return "找不到此 ticker 的價格資料，Market Data Analyst 將標記為 missing。";
+  }
+  if (summary.readiness === "beta_limited") {
+    return "TPEx 歷史深度尚未完成，研究流程僅能保守回退。";
+  }
+  return "偵測到資料覆蓋限制，研究流程將保守降級並維持 no_action。";
+}
+
 export function AiResearchStaticMockPage() {
   type DataSourceState = "local" | "proxy" | "fallback";
   type RunState = "idle" | "running" | "success" | "fallback";
@@ -271,6 +291,28 @@ export function AiResearchStaticMockPage() {
           <div>
             <p className="text-xs text-slate-500">模擬狀態</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{viewModel.summary.simulationStatus}</p>
+          </div>
+        </div>
+        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-xs text-slate-500">資料覆蓋狀態</p>
+            <span
+              className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${availabilityBadgeClass(viewModel.availabilitySummary.statusTone)}`}
+            >
+              {viewModel.availabilitySummary.label}
+            </span>
+            <span className="text-xs text-slate-500">rows_in_range: {viewModel.availabilitySummary.rowsInRange}</span>
+          </div>
+          <p className="mt-1 text-xs text-slate-500">
+            coverage window: {viewModel.availabilitySummary.coverageWindow}
+          </p>
+          <p className="mt-1 text-xs text-slate-600">{availabilityHint(viewModel.availabilitySummary)}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {viewModel.availabilitySummary.qualityNotes.map((item) => (
+              <span key={item} className="rounded-full border border-slate-300 px-2 py-0.5 text-[11px] text-slate-600">
+                {item}
+              </span>
+            ))}
           </div>
         </div>
         <p className="mt-3 text-xs text-slate-500">

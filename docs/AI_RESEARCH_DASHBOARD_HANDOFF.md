@@ -127,6 +127,16 @@ Dashboard 來源狀態會顯示：
 
 目前不建議直接改 pricing table。
 
+### W4-J Progress Note
+
+- W4-J 已完成 availability summary display：
+  - dashboard 會顯示 `availability.market_price` 的 `readiness / agent_action` 與 coverage 指標。
+  - 可直接解釋為何結果為 fallback / skip / no_action。
+- 目前 availability 仍屬 mock/local integration 範圍：
+  - local deterministic mock
+  - tw-ai mock API proxy（dev-only）
+- 無 production integration、無 billing/auth/credits/DB 變更。
+
 ## 10. Explicit Non-Goals
 
 - no pricing table change

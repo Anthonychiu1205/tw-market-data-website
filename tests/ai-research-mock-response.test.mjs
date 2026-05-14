@@ -17,6 +17,10 @@ test('local mock response maps to view model', () => {
   assert.equal(view.ticker, '2330');
   assert.equal(view.analystRows[0].analyst, '市場資料分析師');
   assert.equal(view.analystRows[0].status, 'mock-real');
+  assert.equal(response.availability?.market_price?.readiness, 'ready');
+  assert.equal(response.availability?.market_price?.agent_action, 'proceed');
+  assert.equal(view.availabilitySummary.readiness, 'ready');
+  assert.equal(view.availabilitySummary.agentAction, 'proceed');
 });
 
 test('tw-ai-like response normalizes and keeps market_data mock_real', () => {
@@ -90,6 +94,27 @@ test('tw-ai-like response normalizes and keeps market_data mock_real', () => {
     broker_execution: false,
     simulation_only: true,
     not_investment_advice: true,
+    availability: {
+      market_price: {
+        ticker: '2454',
+        market: 'twse',
+        dataset: 'twse_daily_price',
+        requested_start_date: '2025-11-13',
+        requested_end_date: '2026-05-13',
+        available: true,
+        readiness: 'ready',
+        agent_action: 'proceed',
+        min_date: '2000-03-01',
+        max_date: '2026-05-13',
+        rows_in_range: 114,
+        ohlc_null_rows: 0,
+        volume_null_rows: 0,
+        duplicate_groups: 0,
+        freshness: 'current',
+        data_gaps: [],
+        warnings: [],
+      },
+    },
   };
 
   const normalized = normalizeAiResearchResponse(upstreamLike, {
@@ -102,6 +127,8 @@ test('tw-ai-like response normalizes and keeps market_data mock_real', () => {
   assert.equal(normalized.research.analysts[0].output_status, 'mock_real');
   const view = mapAiResearchResponseToViewModel(normalized);
   assert.equal(view.analystRows[0].status, 'mock-real');
+  assert.equal(view.availabilitySummary.readiness, 'ready');
+  assert.equal(view.availabilitySummary.agentAction, 'proceed');
 });
 
 test('invalid payload falls back to deterministic local mock response', () => {
@@ -114,4 +141,73 @@ test('invalid payload falls back to deterministic local mock response', () => {
   assert.equal(normalized.ticker, '2603');
   assert.equal(normalized.research.analysts[0].analyst_role, 'market_data');
   assert.equal(normalized.research.analysts[0].output_status, 'mock_real');
+  assert.equal(normalized.availability?.market_price?.readiness, 'partial');
+  assert.equal(normalized.availability?.market_price?.agent_action, 'fallback');
+});
+
+test('2317 maps to partial fallback availability', () => {
+  const response = buildAiResearchMockResponse({
+    ticker: '2317',
+    asOfDate: '2026-05-13',
+    includeSimulation: true,
+  });
+  assert.equal(response.availability?.market_price?.readiness, 'partial');
+  assert.equal(response.availability?.market_price?.agent_action, 'fallback');
+  assert.ok(response.availability?.market_price?.data_gaps.includes('ohlc_null_rows_in_requested_range'));
+});
+
+test('unknown maps to unavailable skip and conservative output', () => {
+  const response = buildAiResearchMockResponse({
+    ticker: 'UNKNOWN',
+    asOfDate: '2026-05-13',
+    includeSimulation: true,
+  });
+  assert.equal(response.availability?.market_price?.readiness, 'unavailable');
+  assert.equal(response.availability?.market_price?.agent_action, 'skip');
+  assert.equal(response.research.analysts[0].output_status, 'missing');
+  assert.equal(response.decision.action, 'no_action');
+});
+
+test('missing availability in upstream response does not crash view model', () => {
+  const normalized = normalizeAiResearchResponse(
+    {
+      run_id: 'x',
+      ticker: '2330',
+      as_of_date: '2026-05-13',
+      mode: 'mock',
+      decision: { action: 'no_action', confidence: 0.6, reason: 'r' },
+      simulation: {
+        order: { status: 'rejected', quantity: 0, reason: 'r', simulation_only: true, broker_execution: false },
+        fill: null,
+        position: { ticker: '2330', quantity: 0, average_price: 0, market_value: 0, unrealized_pnl: 0, status: 'flat' },
+      },
+      research: { analysts: [], bull_case: { status: 'placeholder', key_points: [] }, bear_case: { status: 'placeholder', key_points: [] }, trader_proposal: { proposed_action: 'hold', confidence: 0.2, summary: 's' }, risk_review: { decision: 'needs_more_data', max_allocation: 0, required_user_confirmation: true, flags: [] }, portfolio_decision: { action: 'no_action', confidence: 0, rationale: 'r' } },
+      data_gaps: [],
+      warnings: [],
+      disclaimer: 'd',
+      replay_fingerprint: 'rf',
+      broker_execution: false,
+      simulation_only: true,
+      not_investment_advice: true,
+    },
+    { ticker: '2330', asOfDate: '2026-05-13', includeSimulation: true },
+  );
+  const view = mapAiResearchResponseToViewModel(normalized);
+  assert.ok(view.availabilitySummary);
+  assert.equal(typeof view.availabilitySummary.readiness, 'string');
+});
+
+test('response has no timestamp-like keys and safety flags unchanged', () => {
+  const response = buildAiResearchMockResponse({
+    ticker: '2330',
+    asOfDate: '2026-05-13',
+    includeSimulation: true,
+  });
+  const rendered = JSON.stringify(response).toLowerCase();
+  for (const key of ['timestamp', 'created_at', 'updated_at', 'generated_at', 'current_time']) {
+    assert.equal(rendered.includes(key), false);
+  }
+  assert.equal(response.broker_execution, false);
+  assert.equal(response.simulation_only, true);
+  assert.equal(response.not_investment_advice, true);
 });

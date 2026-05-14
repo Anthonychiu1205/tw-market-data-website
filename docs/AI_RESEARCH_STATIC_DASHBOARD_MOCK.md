@@ -134,3 +134,18 @@
 - Developer 方案顯示 preview-only 與非商業使用提示。
 - Pro / Team / Enterprise 顯示對應模式與配額文案（UI mock，無 quota enforcement）。
 - 仍為 local mock 邊界，無 auth/credits/billing/DB 變更。
+
+## W4-J Availability Summary Display
+
+- dashboard 已可顯示 `availability.market_price` 摘要（資料覆蓋狀態）。
+- 可在畫面上看到：
+  - `readiness / agent_action`
+  - `rows_in_range`
+  - coverage window
+  - OHLC / volume / duplicate 指標
+  - data_gaps / warnings 摘要
+- availability 值可來自：
+  - local deterministic mock response
+  - tw-ai mock API proxy response（若已啟用 proxy）
+- 此狀態用於說明資料覆蓋與 fallback 原因，不構成投資建議。
+- 仍無 production integration，且無 billing/auth/credits/DB 變更。

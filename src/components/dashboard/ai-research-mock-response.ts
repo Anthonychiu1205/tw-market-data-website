@@ -40,6 +40,7 @@ export type AiResearchAnalyst = {
   metadata: {
     deterministic: boolean;
     adapter: string;
+    [key: string]: string | number | boolean;
   };
 };
 
@@ -100,6 +101,28 @@ export type AiResearchMockResponse = {
       rationale: string;
     };
   };
+  availability?: {
+    market_price?: {
+      ticker: string;
+      market: string;
+      dataset: string;
+      requested_start_date?: string;
+      requested_end_date?: string;
+      available: boolean;
+      readiness: "ready" | "partial" | "beta_limited" | "unavailable";
+      agent_action: "proceed" | "fallback" | "skip" | "needs_more_data";
+      min_date?: string;
+      max_date?: string;
+      rows_in_range: number;
+      ohlc_null_rows: number;
+      volume_null_rows: number;
+      duplicate_groups: number;
+      freshness: string;
+      data_gaps: string[];
+      warnings: string[];
+      metadata?: Record<string, string | number | boolean | null>;
+    };
+  };
   data_gaps: string[];
   warnings: string[];
   disclaimer: string;
@@ -122,6 +145,8 @@ type MarketProfile = {
   extraWarnings?: string[];
   extraDataGaps?: string[];
 };
+
+type AiResearchAvailability = NonNullable<AiResearchMockResponse["availability"]>["market_price"];
 
 const MARKET_PROFILE_BY_TICKER: Record<string, MarketProfile> = {
   "1101": {
@@ -209,6 +234,31 @@ function normalizeAsOfDate(asOfDate: string): string {
   return "2026-05-13";
 }
 
+function normalizeTickerForAvailability(ticker: string): {
+  symbol: string;
+  market: "twse" | "tpex";
+} {
+  const normalized = normalizeTicker(ticker);
+  if (normalized.startsWith("TPEX:")) {
+    const symbol = normalized.split(":", 2)[1] ?? "";
+    return { symbol: symbol || "6488", market: "tpex" };
+  }
+  if (normalized.startsWith("TWSE:")) {
+    const symbol = normalized.split(":", 2)[1] ?? "";
+    return { symbol: symbol || "2330", market: "twse" };
+  }
+  return { symbol: normalized, market: "twse" };
+}
+
+function shiftDate(asOfDate: string, days: number): string {
+  const d = new Date(`${asOfDate}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function toSeed(ticker: string, asOfDate: string): number {
   const raw = `${ticker}|${asOfDate}`;
   let seed = 0;
@@ -257,7 +307,130 @@ function dedupe(values: string[]): string[] {
   return output;
 }
 
-function buildMarketDataAnalyst(ticker: string, asOfDate: string): AiResearchAnalyst {
+function buildMarketPriceAvailability(ticker: string, asOfDate: string): AiResearchAvailability {
+  const normalized = normalizeTickerForAvailability(ticker);
+  const requestedStartDate = shiftDate(asOfDate, -182);
+  const requestedEndDate = asOfDate;
+
+  if (normalized.market === "tpex") {
+    return {
+      ticker: normalized.symbol,
+      market: "tpex",
+      dataset: "tpex_daily_price",
+      requested_start_date: requestedStartDate,
+      requested_end_date: requestedEndDate,
+      available: true,
+      readiness: "beta_limited",
+      agent_action: "fallback",
+      min_date: requestedEndDate,
+      max_date: requestedEndDate,
+      rows_in_range: 1,
+      ohlc_null_rows: 0,
+      volume_null_rows: 0,
+      duplicate_groups: 0,
+      freshness: "current",
+      data_gaps: ["tpex_historical_depth_deferred"],
+      warnings: ["tpex_latest_day_limited_for_historical_requests"],
+      metadata: { source: "deterministic_local_availability_fixture" },
+    };
+  }
+
+  if (normalized.symbol === "UNKNOWN") {
+    return {
+      ticker: normalized.symbol,
+      market: "twse",
+      dataset: "twse_daily_price",
+      requested_start_date: requestedStartDate,
+      requested_end_date: requestedEndDate,
+      available: false,
+      readiness: "unavailable",
+      agent_action: "skip",
+      min_date: undefined,
+      max_date: undefined,
+      rows_in_range: 0,
+      ohlc_null_rows: 0,
+      volume_null_rows: 0,
+      duplicate_groups: 0,
+      freshness: "unknown",
+      data_gaps: ["ticker_not_found_in_market_price_dataset"],
+      warnings: [],
+      metadata: { source: "deterministic_local_availability_fixture" },
+    };
+  }
+
+  if (normalized.symbol === "2317") {
+    return {
+      ticker: normalized.symbol,
+      market: "twse",
+      dataset: "twse_daily_price",
+      requested_start_date: requestedStartDate,
+      requested_end_date: requestedEndDate,
+      available: true,
+      readiness: "partial",
+      agent_action: "fallback",
+      min_date: "2000-03-01",
+      max_date: requestedEndDate,
+      rows_in_range: 114,
+      ohlc_null_rows: 1,
+      volume_null_rows: 0,
+      duplicate_groups: 0,
+      freshness: "current",
+      data_gaps: ["ohlc_null_rows_in_requested_range"],
+      warnings: [],
+      metadata: { source: "deterministic_local_availability_fixture" },
+    };
+  }
+
+  if (["2330", "2454", "2308", "3008", "3030", "1101", "2882"].includes(normalized.symbol)) {
+    return {
+      ticker: normalized.symbol,
+      market: "twse",
+      dataset: "twse_daily_price",
+      requested_start_date: requestedStartDate,
+      requested_end_date: requestedEndDate,
+      available: true,
+      readiness: "ready",
+      agent_action: "proceed",
+      min_date: "2000-03-01",
+      max_date: requestedEndDate,
+      rows_in_range: 114,
+      ohlc_null_rows: 0,
+      volume_null_rows: 0,
+      duplicate_groups: 0,
+      freshness: "current",
+      data_gaps: [],
+      warnings: [],
+      metadata: { source: "deterministic_local_availability_fixture" },
+    };
+  }
+
+  return {
+    ticker: normalized.symbol,
+    market: "twse",
+    dataset: "twse_daily_price",
+    requested_start_date: requestedStartDate,
+    requested_end_date: requestedEndDate,
+    available: true,
+    readiness: "partial",
+    agent_action: "fallback",
+    min_date: "2000-03-01",
+    max_date: requestedEndDate,
+    rows_in_range: 60,
+    ohlc_null_rows: 0,
+    volume_null_rows: 0,
+    duplicate_groups: 0,
+    freshness: "current",
+    data_gaps: ["market_price_fixture_coverage_limited_for_ticker"],
+    warnings: ["deterministic local availability fixture used"],
+    metadata: { source: "deterministic_local_availability_fixture" },
+  };
+}
+
+function buildMarketDataAnalyst(
+  ticker: string,
+  asOfDate: string,
+  availability: AiResearchAvailability,
+): AiResearchAnalyst {
   const profile = MARKET_PROFILE_BY_TICKER[ticker];
   const fallbackProfile: MarketProfile = {
     confidence: 0.5,
@@ -268,42 +441,64 @@ function buildMarketDataAnalyst(ticker: string, asOfDate: string): AiResearchAna
   const resolved = profile ?? fallbackProfile;
   const price = buildDeterministicPrice(ticker, asOfDate);
 
+  const isUnavailable =
+    availability.readiness === "unavailable" || availability.agent_action === "skip";
+  const isFallback =
+    availability.readiness === "partial" ||
+    availability.readiness === "beta_limited" ||
+    availability.agent_action === "fallback" ||
+    availability.agent_action === "needs_more_data";
+
+  const confidence = isUnavailable
+    ? 0
+    : isFallback
+      ? Number(Math.max(0, resolved.confidence - 0.2).toFixed(2))
+      : resolved.confidence;
+
   return {
     analyst_role: "market_data",
     display_name: "市場資料分析師",
-    output_status: "mock_real",
-    stance: "neutral",
+    output_status: isUnavailable ? "missing" : "mock_real",
+    stance: isUnavailable ? "unavailable" : "neutral",
     score: 0,
-    confidence: resolved.confidence,
-    summary: "市場資料已可用，但尚未啟用完整趨勢模型，因此維持中性判讀。",
-    key_points: [
-      "TWSE 日線價格 fixture 可用",
-      `收盤價 ${price.close.toLocaleString("en-US")} 可用`,
-      `成交量 ${price.volume.toLocaleString("en-US")} 可用`,
-      `產業範圍：${resolved.sectorHint}`,
-      resolved.profileNote,
-    ],
-    evidence: [
-      {
-        dataset: "twse_daily_price",
-        field: "price.close",
-        value: price.close,
-        interpretation: "收盤價由 deterministic local fixture 提供，僅供 mock 研究流程使用。",
-      },
-      {
-        dataset: "twse_daily_price",
-        field: "price.volume",
-        value: price.volume,
-        interpretation: "成交量由 deterministic local fixture 提供，僅供 mock 研究流程使用。",
-      },
-    ],
+    confidence,
+    summary: isUnavailable
+      ? "市場價格資料不可用，已回退為缺資料輸出。"
+      : "市場資料已可用，但尚未啟用完整趨勢模型，因此維持中性判讀。",
+    key_points: isUnavailable
+      ? ["availability preflight indicates unavailable/skip"]
+      : [
+          "TWSE 日線價格 fixture 可用",
+          `收盤價 ${price.close.toLocaleString("en-US")} 可用`,
+          `成交量 ${price.volume.toLocaleString("en-US")} 可用`,
+          `產業範圍：${resolved.sectorHint}`,
+          resolved.profileNote,
+        ],
+    evidence: isUnavailable
+      ? []
+      : [
+          {
+            dataset: "twse_daily_price",
+            field: "price.close",
+            value: price.close,
+            interpretation: "收盤價由 deterministic local fixture 提供，僅供 mock 研究流程使用。",
+          },
+          {
+            dataset: "twse_daily_price",
+            field: "price.volume",
+            value: price.volume,
+            interpretation: "成交量由 deterministic local fixture 提供，僅供 mock 研究流程使用。",
+          },
+        ],
     data_gaps: dedupe([
       "live read 尚未接入",
       "fixture-only payload excludes technical, fundamentals, and news datasets",
+      ...availability.data_gaps,
       ...(resolved.extraDataGaps ?? []),
     ]),
     warnings: dedupe([
       "fixture data is deterministic mock input, not live market data",
+      ...availability.warnings,
       ...(resolved.extraWarnings ?? []),
     ]),
     provenance: {
@@ -318,6 +513,15 @@ function buildMarketDataAnalyst(ticker: string, asOfDate: string): AiResearchAna
     metadata: {
       deterministic: true,
       adapter: "market_data_analyst",
+      availability_readiness: availability.readiness,
+      availability_agent_action: availability.agent_action,
+      availability_rows_in_range: availability.rows_in_range,
+      availability_ohlc_null_rows: availability.ohlc_null_rows,
+      availability_volume_null_rows: availability.volume_null_rows,
+      availability_duplicate_groups: availability.duplicate_groups,
+      availability_freshness: availability.freshness,
+      availability_market: availability.market,
+      availability_dataset: availability.dataset,
     },
   };
 }
@@ -510,24 +714,34 @@ function buildNonMarketAnalysts(): AiResearchAnalyst[] {
 }
 
 export function buildAiResearchMockResponse(input: BuildAiResearchMockInput): AiResearchMockResponse {
-  const ticker = normalizeTicker(input.ticker);
+  const normalizedTicker = normalizeTickerForAvailability(input.ticker);
+  const ticker = normalizedTicker.symbol;
   const asOfDate = normalizeAsOfDate(input.asOfDate);
   const includeSimulation = input.includeSimulation ?? true;
-  const marketAnalyst = buildMarketDataAnalyst(ticker, asOfDate);
+  const availability = buildMarketPriceAvailability(input.ticker, asOfDate);
+  const marketAnalyst = buildMarketDataAnalyst(ticker, asOfDate, availability);
   const replayFingerprint = buildReplayFingerprint(ticker, asOfDate);
   const runId = buildRunId(ticker, asOfDate);
   const profile = MARKET_PROFILE_BY_TICKER[ticker];
 
   const warnings = dedupe([
     ...BASELINE_WARNINGS,
+    ...availability.warnings,
     ...(profile?.extraWarnings ?? []),
   ]);
   const dataGaps = dedupe([
     ...BASELINE_DATA_GAPS,
+    ...availability.data_gaps,
     ...(profile?.extraDataGaps ?? []),
   ]);
 
   const decisionConfidence = Number((0.52 + marketAnalyst.confidence * 0.14).toFixed(2));
+  const decisionReason =
+    availability.readiness === "unavailable" || availability.agent_action === "skip"
+      ? "找不到此 ticker 的市場價格資料，研究流程已保守降級。"
+      : availability.readiness === "partial" || availability.readiness === "beta_limited"
+        ? "市場資料存在覆蓋限制，研究流程已保守降級並維持不採取動作。"
+        : "市場資料可用，但其餘關鍵分析節點仍有資料缺口，暫不採取動作。";
 
   return {
     run_id: runId,
@@ -537,7 +751,7 @@ export function buildAiResearchMockResponse(input: BuildAiResearchMockInput): Ai
     decision: {
       action: "no_action",
       confidence: decisionConfidence,
-      reason: "市場資料可用，但其餘關鍵分析節點仍有資料缺口，暫不採取動作。",
+      reason: decisionReason,
     },
     simulation: {
       order: {
@@ -600,6 +814,9 @@ export function buildAiResearchMockResponse(input: BuildAiResearchMockInput): Ai
         confidence: 0,
         rationale: "風控審查尚未通過，投組不採取動作。",
       },
+    },
+    availability: {
+      market_price: availability,
     },
     data_gaps: dataGaps,
     warnings,
@@ -674,6 +891,73 @@ function parseStance(value: unknown): AiResearchAnalystStance | null {
     return stance;
   }
   return null;
+}
+
+function parseAvailabilityReadiness(
+  value: unknown,
+): AiResearchAvailability["readiness"] | null {
+  const readiness = asString(value);
+  if (
+    readiness === "ready" ||
+    readiness === "partial" ||
+    readiness === "beta_limited" ||
+    readiness === "unavailable"
+  ) {
+    return readiness;
+  }
+  return null;
+}
+
+function parseAvailabilityAgentAction(
+  value: unknown,
+): AiResearchAvailability["agent_action"] | null {
+  const action = asString(value);
+  if (
+    action === "proceed" ||
+    action === "fallback" ||
+    action === "skip" ||
+    action === "needs_more_data"
+  ) {
+    return action;
+  }
+  return null;
+}
+
+function normalizeAvailability(
+  raw: unknown,
+  fallback: AiResearchAvailability,
+): AiResearchAvailability {
+  if (!isRecord(raw)) {
+    return fallback;
+  }
+  return {
+    ticker: asString(raw.ticker) ?? fallback.ticker,
+    market: asString(raw.market) ?? fallback.market,
+    dataset: asString(raw.dataset) ?? fallback.dataset,
+    requested_start_date:
+      asString(raw.requested_start_date) ?? fallback.requested_start_date,
+    requested_end_date:
+      asString(raw.requested_end_date) ?? fallback.requested_end_date,
+    available: asBoolean(raw.available) ?? fallback.available,
+    readiness:
+      parseAvailabilityReadiness(raw.readiness) ?? fallback.readiness,
+    agent_action:
+      parseAvailabilityAgentAction(raw.agent_action) ?? fallback.agent_action,
+    min_date: asString(raw.min_date) ?? fallback.min_date,
+    max_date: asString(raw.max_date) ?? fallback.max_date,
+    rows_in_range: asNumber(raw.rows_in_range) ?? fallback.rows_in_range,
+    ohlc_null_rows: asNumber(raw.ohlc_null_rows) ?? fallback.ohlc_null_rows,
+    volume_null_rows:
+      asNumber(raw.volume_null_rows) ?? fallback.volume_null_rows,
+    duplicate_groups:
+      asNumber(raw.duplicate_groups) ?? fallback.duplicate_groups,
+    freshness: asString(raw.freshness) ?? fallback.freshness,
+    data_gaps: asStringArray(raw.data_gaps) ?? fallback.data_gaps,
+    warnings: asStringArray(raw.warnings) ?? fallback.warnings,
+    metadata: isRecord(raw.metadata)
+      ? (raw.metadata as Record<string, string | number | boolean | null>)
+      : fallback.metadata,
+  };
 }
 
 function normalizeAnalyst(
@@ -839,6 +1123,16 @@ export function normalizeAiResearchResponse(
       }
     : base.decision;
 
+  const availability =
+    isRecord(response.availability) && isRecord(response.availability.market_price)
+      ? {
+          market_price: normalizeAvailability(
+            response.availability.market_price,
+            base.availability?.market_price ?? buildMarketPriceAvailability(ticker, asOfDate),
+          ),
+        }
+      : base.availability;
+
   let analysts = base.research.analysts;
   if (isRecord(response.research) && Array.isArray(response.research.analysts)) {
     const byRole = new Map<AiResearchAnalystRole, AiResearchAnalyst>();
@@ -942,6 +1236,7 @@ export function normalizeAiResearchResponse(
             }
           : base.research.portfolio_decision,
     },
+    availability,
     data_gaps: asStringArray(response.data_gaps) ?? base.data_gaps,
     warnings: asStringArray(response.warnings) ?? base.warnings,
     disclaimer: asString(response.disclaimer) ?? base.disclaimer,
@@ -968,6 +1263,15 @@ export type AiResearchViewModel = {
     riskDecision: string;
     portfolioAction: string;
     simulationStatus: string;
+  };
+  availabilitySummary: {
+    label: string;
+    readiness: string;
+    agentAction: string;
+    statusTone: "ready" | "fallback" | "skip" | "neutral";
+    rowsInRange: string;
+    coverageWindow: string;
+    qualityNotes: string[];
   };
   timelineSteps: Array<{ stage: string; status: string }>;
   analystRows: Array<{
@@ -1023,6 +1327,27 @@ function mapStatusLabel(status: AiResearchAnalystStatus): "mock-real" | "placeho
   return status;
 }
 
+function formatAvailabilityLabel(readiness: string, action: string): string {
+  return `${readiness} / ${action}`;
+}
+
+function toAvailabilityTone(
+  readiness: AiResearchAvailability["readiness"],
+  action: AiResearchAvailability["agent_action"],
+): "ready" | "fallback" | "skip" | "neutral" {
+  if (readiness === "ready" && action === "proceed") return "ready";
+  if (readiness === "unavailable" || action === "skip") return "skip";
+  if (
+    readiness === "partial" ||
+    readiness === "beta_limited" ||
+    action === "fallback" ||
+    action === "needs_more_data"
+  ) {
+    return "fallback";
+  }
+  return "neutral";
+}
+
 function mapTimeline(response: AiResearchMockResponse): Array<{ stage: string; status: string }> {
   const marketData = response.research.analysts.find((item) => item.analyst_role === "market_data");
   const analystStatus = response.research.analysts.some((item) => item.output_status === "mock_real")
@@ -1042,6 +1367,20 @@ function mapTimeline(response: AiResearchMockResponse): Array<{ stage: string; s
 
 export function mapAiResearchResponseToViewModel(response: unknown): AiResearchViewModel {
   const normalized = normalizeAiResearchResponse(response);
+  const marketAvailability =
+    normalized.availability?.market_price ?? buildMarketPriceAvailability(normalized.ticker, normalized.as_of_date);
+  const availabilityTone = toAvailabilityTone(
+    marketAvailability.readiness,
+    marketAvailability.agent_action,
+  );
+  const qualityNotes = dedupe([
+    `OHLC 缺口：${marketAvailability.ohlc_null_rows}`,
+    `成交量缺口：${marketAvailability.volume_null_rows}`,
+    `重複筆數群組：${marketAvailability.duplicate_groups}`,
+    `freshness：${marketAvailability.freshness}`,
+    ...marketAvailability.data_gaps.slice(0, 2),
+    ...marketAvailability.warnings.slice(0, 1),
+  ]);
 
   const analystRows = normalized.research.analysts.map((analyst) => ({
     analyst: analyst.display_name,
@@ -1071,6 +1410,18 @@ export function mapAiResearchResponseToViewModel(response: unknown): AiResearchV
           ? "不採取動作"
           : normalized.research.portfolio_decision.action,
       simulationStatus: normalized.simulation_only ? "僅紙上模擬" : "非模擬",
+    },
+    availabilitySummary: {
+      label: formatAvailabilityLabel(
+        marketAvailability.readiness,
+        marketAvailability.agent_action,
+      ),
+      readiness: marketAvailability.readiness,
+      agentAction: marketAvailability.agent_action,
+      statusTone: availabilityTone,
+      rowsInRange: String(marketAvailability.rows_in_range),
+      coverageWindow: `${marketAvailability.requested_start_date ?? "n/a"} → ${marketAvailability.requested_end_date ?? "n/a"}`,
+      qualityNotes,
     },
     timelineSteps: mapTimeline(normalized),
     analystRows,

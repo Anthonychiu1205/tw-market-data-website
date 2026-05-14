@@ -160,3 +160,16 @@ If proxy base URL is unreachable or proxy disabled, internal route should return
 - 「執行研究」按鈕在處理中會顯示 `執行中...` 並短暫 disabled。
 - proxy 成功或 fallback 後皆會更新來源狀態，避免誤解目前資料來源。
 - 本輪仍不代表 production integration，且無 auth/credits/billing/DB 變更。
+
+## 10. W4-J Availability Summary Display
+
+- dashboard 新增 market price availability 摘要顯示，對齊 tw-ai `availability.market_price`。
+- 顯示重點：
+  - `readiness / agent_action`
+  - `rows_in_range`
+  - `ohlc_null_rows` / `volume_null_rows` / `duplicate_groups`
+  - `freshness`
+  - `data_gaps` / `warnings`
+- local mock 與 proxy 回應都可映射同一組 availability UI。
+- 不顯示 backend URL / secrets。
+- 仍為 local/mock 整合，不代表 production API integration。
