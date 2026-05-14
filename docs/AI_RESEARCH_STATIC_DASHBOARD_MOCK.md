@@ -149,3 +149,12 @@
   - tw-ai mock API proxy response（若已啟用 proxy）
 - 此狀態用於說明資料覆蓋與 fallback 原因，不構成投資建議。
 - 仍無 production integration，且無 billing/auth/credits/DB 變更。
+
+## W4-K Technical Analyst Mock-Real Display
+
+- dashboard 現在會渲染 `technical` analyst（若回應包含）並顯示 `mock-real` 狀態。
+- local deterministic mock response 針對核心 ticker（如 `2330/2454/2308/3008/3030`）提供 technical mock-real 輸出。
+- `2317` 走較保守 technical fallback 內容；`UNKNOWN` 為 missing/unavailable；`TPEX:*` 會帶 `tpex_historical_depth_deferred` 缺口。
+- `availability.market_price` 與 technical row 會一起呈現，方便解釋 fallback/no_action。
+- technical 輸出仍為 deterministic fixture/mock，不代表 production 技術訊號。
+- 無 production integration，且無 billing/auth/credits/DB 變更。

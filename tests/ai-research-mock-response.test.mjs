@@ -17,6 +17,9 @@ test('local mock response maps to view model', () => {
   assert.equal(view.ticker, '2330');
   assert.equal(view.analystRows[0].analyst, '市場資料分析師');
   assert.equal(view.analystRows[0].status, 'mock-real');
+  assert.equal(view.analystRows[1].analyst, '技術面分析師');
+  assert.equal(view.analystRows[1].status, 'mock-real');
+  assert.ok(view.analystRows[1].confidence > 0);
   assert.equal(response.availability?.market_price?.readiness, 'ready');
   assert.equal(response.availability?.market_price?.agent_action, 'proceed');
   assert.equal(view.availabilitySummary.readiness, 'ready');
@@ -80,6 +83,32 @@ test('tw-ai-like response normalizes and keeps market_data mock_real', () => {
             adapter: 'market_data_analyst',
           },
         },
+        {
+          analyst_role: 'technical',
+          display_name: '技術面分析師',
+          output_status: 'mock_real',
+          stance: 'bullish',
+          score: 20,
+          confidence: 0.62,
+          summary: '技術指標偏向正向，但仍為保守 mock 判讀。',
+          key_points: ['MA20 / MA60 fixture available'],
+          evidence: [{ dataset: 'technical_indicators', field: 'technical.ma_trend', value: '102/96', interpretation: 'fixture' }],
+          data_gaps: [],
+          warnings: [],
+          provenance: {
+            source_system: 'technical_fixture',
+            source_dataset: 'technical_indicators',
+            data_origin: 'deterministic_local_fixture',
+            data_status: 'mock_real',
+            live_provider_used: false,
+            llm_used: false,
+            broker_execution: false,
+          },
+          metadata: {
+            deterministic: true,
+            adapter: 'technical_analyst',
+          },
+        },
       ],
       bull_case: { status: 'placeholder', key_points: ['a'] },
       bear_case: { status: 'placeholder', key_points: ['b'] },
@@ -125,8 +154,13 @@ test('tw-ai-like response normalizes and keeps market_data mock_real', () => {
 
   assert.equal(normalized.research.analysts[0].analyst_role, 'market_data');
   assert.equal(normalized.research.analysts[0].output_status, 'mock_real');
+  assert.equal(normalized.research.analysts[1].analyst_role, 'technical');
+  assert.equal(normalized.research.analysts[1].output_status, 'mock_real');
+  assert.equal(normalized.research.analysts[1].stance, 'bullish');
   const view = mapAiResearchResponseToViewModel(normalized);
   assert.equal(view.analystRows[0].status, 'mock-real');
+  assert.equal(view.analystRows[1].status, 'mock-real');
+  assert.equal(view.analystRows[1].stance, '謹慎偏正向');
   assert.equal(view.availabilitySummary.readiness, 'ready');
   assert.equal(view.availabilitySummary.agentAction, 'proceed');
 });
@@ -154,6 +188,10 @@ test('2317 maps to partial fallback availability', () => {
   assert.equal(response.availability?.market_price?.readiness, 'partial');
   assert.equal(response.availability?.market_price?.agent_action, 'fallback');
   assert.ok(response.availability?.market_price?.data_gaps.includes('ohlc_null_rows_in_requested_range'));
+  const technical = response.research.analysts.find((item) => item.analyst_role === 'technical');
+  assert.ok(technical);
+  assert.ok(technical.confidence < 0.55);
+  assert.ok(technical.data_gaps.includes('ohlc_null_rows_in_requested_range'));
 });
 
 test('unknown maps to unavailable skip and conservative output', () => {
@@ -165,7 +203,28 @@ test('unknown maps to unavailable skip and conservative output', () => {
   assert.equal(response.availability?.market_price?.readiness, 'unavailable');
   assert.equal(response.availability?.market_price?.agent_action, 'skip');
   assert.equal(response.research.analysts[0].output_status, 'missing');
+  const technical = response.research.analysts.find((item) => item.analyst_role === 'technical');
+  assert.ok(technical);
+  assert.equal(technical.output_status, 'missing');
+  assert.equal(technical.stance, 'unavailable');
+  assert.equal(technical.confidence, 0);
   assert.equal(response.decision.action, 'no_action');
+});
+
+test('tpex-like ticker keeps technical conservative with tpex limitation gap', () => {
+  const response = buildAiResearchMockResponse({
+    ticker: 'TPEX:6488',
+    asOfDate: '2026-05-13',
+    includeSimulation: true,
+  });
+  const technical = response.research.analysts.find((item) => item.analyst_role === 'technical');
+  assert.ok(technical);
+  assert.ok(
+    technical.data_gaps.includes('tpex_historical_depth_deferred'),
+  );
+  assert.ok(
+    technical.output_status === 'mock_real' || technical.output_status === 'missing' || technical.output_status === 'placeholder',
+  );
 });
 
 test('missing availability in upstream response does not crash view model', () => {
@@ -210,4 +269,7 @@ test('response has no timestamp-like keys and safety flags unchanged', () => {
   assert.equal(response.broker_execution, false);
   assert.equal(response.simulation_only, true);
   assert.equal(response.not_investment_advice, true);
+  for (const forbidden of ['target_price', 'guaranteed_return', 'investment recommendation']) {
+    assert.equal(rendered.includes(forbidden), false);
+  }
 });

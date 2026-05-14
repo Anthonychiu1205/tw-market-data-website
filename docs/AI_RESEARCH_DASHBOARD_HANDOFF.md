@@ -137,6 +137,18 @@ Dashboard 來源狀態會顯示：
   - tw-ai mock API proxy（dev-only）
 - 無 production integration、無 billing/auth/credits/DB 變更。
 
+### W4-K Progress Note
+
+- W4-K 已完成 Technical Analyst dashboard rendering：
+  - `research.analysts` 中 `technical` 不再固定 placeholder，可顯示 mock-real。
+  - local deterministic mock 與 tw-ai proxy response 都可映射同一 technical row。
+- ticker 行為摘要：
+  - `2330/2454/2308/3008/3030`：technical 通常為 mock-real
+  - `2317`：較保守 fallback / lower confidence
+  - `UNKNOWN`：technical missing / unavailable
+  - `TPEX:*`：保留 `tpex_historical_depth_deferred` 缺口
+- technical 僅屬 deterministic fixture/mock，不代表 production 技術訊號。
+
 ## 10. Explicit Non-Goals
 
 - no pricing table change

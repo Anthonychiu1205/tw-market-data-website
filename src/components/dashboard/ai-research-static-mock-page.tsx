@@ -327,6 +327,9 @@ export function AiResearchStaticMockPage() {
           safety: broker_execution={viewModel.safetyFlags.brokerExecution} / simulation_only={viewModel.safetyFlags.simulationOnly} /
           not_investment_advice={viewModel.safetyFlags.notInvestmentAdvice}
         </p>
+        <p className="mt-1 text-xs text-slate-500">
+          技術面目前為 deterministic fixture，僅供 mock 研究流程展示，不代表完整實盤技術分析。
+        </p>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white">

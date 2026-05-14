@@ -173,3 +173,14 @@ If proxy base URL is unreachable or proxy disabled, internal route should return
 - local mock 與 proxy 回應都可映射同一組 availability UI。
 - 不顯示 backend URL / secrets。
 - 仍為 local/mock 整合，不代表 production API integration。
+
+## 11. W4-K Technical Analyst Display Compatibility
+
+- dashboard local mock 與 proxy 回應都已支援 `technical` analyst 渲染。
+- 當 tw-ai mock API 回傳 `research.analysts` 的 technical 輸出時，前端會直接顯示其：
+  - `output_status`
+  - `stance`
+  - `confidence`
+  - `key_points` / `data_gaps`
+- 若 proxy fallback 到本地 mock，technical row 仍由 deterministic fixture 提供，不會破版。
+- 仍不顯示 backend URL / secrets，且不代表 production integration。

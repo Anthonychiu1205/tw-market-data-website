@@ -9,7 +9,12 @@ export type AiResearchAnalystRole =
   | "macro_sector";
 
 export type AiResearchAnalystStatus = "mock_real" | "placeholder" | "missing";
-export type AiResearchAnalystStance = "neutral" | "mixed" | "unavailable";
+export type AiResearchAnalystStance =
+  | "neutral"
+  | "mixed"
+  | "bullish"
+  | "bearish"
+  | "unavailable";
 
 export type AiResearchAnalyst = {
   analyst_role: AiResearchAnalystRole;
@@ -526,34 +531,166 @@ function buildMarketDataAnalyst(
   };
 }
 
-function buildNonMarketAnalysts(): AiResearchAnalyst[] {
-  return [
-    {
+function buildTechnicalAnalyst(
+  ticker: string,
+  asOfDate: string,
+  availability: AiResearchAvailability,
+): AiResearchAnalyst {
+  const unavailable =
+    availability.readiness === "unavailable" || availability.agent_action === "skip";
+  const isFallback =
+    availability.readiness === "partial" ||
+    availability.readiness === "beta_limited" ||
+    availability.agent_action === "fallback" ||
+    availability.agent_action === "needs_more_data";
+
+  if (unavailable) {
+    return {
       analyst_role: "technical",
       display_name: "技術面分析師",
-      output_status: "placeholder",
-      stance: "mixed",
+      output_status: "missing",
+      stance: "unavailable",
       score: 0,
       confidence: 0,
-      summary: "技術指標尚未接入，暫以佔位輸出。",
-      key_points: ["—"],
+      summary: "市場價格覆蓋不足，技術面分析已保守跳過。",
+      key_points: ["availability preflight indicates unavailable/skip"],
       evidence: [],
-      data_gaps: ["技術指標尚未接入"],
-      warnings: [],
+      data_gaps: dedupe([
+        "technical_indicator_payload_required",
+        ...availability.data_gaps,
+      ]),
+      warnings: dedupe([...availability.warnings]),
       provenance: {
-        source_system: "placeholder",
-        source_dataset: "not_connected",
-        data_origin: "placeholder",
-        data_status: "placeholder",
+        source_system: "technical_fixture",
+        source_dataset: "technical_indicators",
+        data_origin: "deterministic_local_fixture",
+        data_status: "missing",
         live_provider_used: false,
         llm_used: false,
         broker_execution: false,
       },
       metadata: {
         deterministic: true,
-        adapter: "placeholder",
+        adapter: "technical_analyst",
       },
+    };
+  }
+
+  const tickerSeed = toSeed(ticker, asOfDate);
+  const ma20 = Number((100 + (tickerSeed % 8)).toFixed(2));
+  const ma60 = Number((95 + (tickerSeed % 6)).toFixed(2));
+  const rsi14 = Number((48 + (tickerSeed % 20)).toFixed(2));
+  const macd = Number((0.7 + (tickerSeed % 7) * 0.05).toFixed(2));
+  const macdSignal = Number((0.6 + (tickerSeed % 6) * 0.05).toFixed(2));
+  const macdHistogram = Number((macd - macdSignal).toFixed(2));
+  const volumeAvg20 = 10_500_000 + (tickerSeed % 9) * 240_000;
+
+  let stance: AiResearchAnalystStance = "mixed";
+  let score = 0;
+  let confidence = 0.58;
+  let summary = "技術指標方向不一致，維持保守混合判讀。";
+
+  const alignedBullish = ma20 > ma60 && macd > macdSignal && rsi14 >= 40 && rsi14 <= 70;
+  const alignedBearish = ma20 < ma60 && macd < macdSignal;
+
+  if (alignedBullish) {
+    stance = "bullish";
+    score = 20;
+    confidence = 0.62;
+    summary = "技術指標偏向正向，但仍僅為保守 mock 技術觀察。";
+  } else if (alignedBearish) {
+    stance = "bearish";
+    score = -20;
+    confidence = 0.57;
+    summary = "技術指標偏向弱勢，但仍僅為保守 mock 技術觀察。";
+  }
+
+  if (ticker === "2317") {
+    stance = "mixed";
+    score = 0;
+    confidence = 0.4;
+    summary = "市場資料覆蓋為 partial/fallback，技術面分析已保守降級。";
+  }
+
+  if (isFallback) {
+    confidence = Number(Math.max(0, confidence - 0.18).toFixed(2));
+    if (availability.readiness === "beta_limited") {
+      summary = "TPEx 覆蓋為 beta_limited，技術面分析僅保守回退。";
+    }
+  }
+
+  const warnings = dedupe([
+    ...(rsi14 > 70 ? ["rsi_overbought"] : []),
+    ...(rsi14 < 30 ? ["rsi_oversold"] : []),
+    ...availability.warnings,
+  ]);
+
+  const dataGaps = dedupe([
+    ...(ticker === "2317" ? ["ohlc_null_rows_in_requested_range"] : []),
+    ...(availability.readiness === "beta_limited" ? ["tpex_historical_depth_deferred"] : []),
+    ...availability.data_gaps,
+  ]);
+
+  return {
+    analyst_role: "technical",
+    display_name: "技術面分析師",
+    output_status: "mock_real",
+    stance,
+    score,
+    confidence,
+    summary,
+    key_points: [
+      `MA20 ${ma20} / MA60 ${ma60}`,
+      `RSI(14) ${rsi14}`,
+      `MACD ${macd} / Signal ${macdSignal}`,
+      `20 日均量 ${volumeAvg20.toLocaleString("en-US")}`,
+    ],
+    evidence: [
+      {
+        dataset: "technical_indicators",
+        field: "technical.ma_trend",
+        value: `${ma20}/${ma60}`,
+        interpretation: `evidence_id=technical:${ticker}:${asOfDate}:ma_trend`,
+      },
+      {
+        dataset: "technical_indicators",
+        field: "technical.rsi_14",
+        value: rsi14,
+        interpretation: `evidence_id=technical:${ticker}:${asOfDate}:rsi_14`,
+      },
+      {
+        dataset: "technical_indicators",
+        field: "technical.macd",
+        value: macdHistogram,
+        interpretation: `evidence_id=technical:${ticker}:${asOfDate}:macd`,
+      },
+    ],
+    data_gaps: dataGaps,
+    warnings,
+    provenance: {
+      source_system: "technical_fixture",
+      source_dataset: "technical_indicators",
+      data_origin: "deterministic_local_fixture",
+      data_status: "mock_real",
+      live_provider_used: false,
+      llm_used: false,
+      broker_execution: false,
     },
+    metadata: {
+      deterministic: true,
+      adapter: "technical_analyst",
+      indicator_set_version: "technical_v1",
+      availability_readiness: availability.readiness,
+      availability_agent_action: availability.agent_action,
+    },
+  };
+}
+
+function buildNonMarketAnalysts(
+  technicalAnalyst: AiResearchAnalyst,
+): AiResearchAnalyst[] {
+  return [
+    technicalAnalyst,
     {
       analyst_role: "monthly_revenue",
       display_name: "月營收分析師",
@@ -720,6 +857,7 @@ export function buildAiResearchMockResponse(input: BuildAiResearchMockInput): Ai
   const includeSimulation = input.includeSimulation ?? true;
   const availability = buildMarketPriceAvailability(input.ticker, asOfDate);
   const marketAnalyst = buildMarketDataAnalyst(ticker, asOfDate, availability);
+  const technicalAnalyst = buildTechnicalAnalyst(ticker, asOfDate, availability);
   const replayFingerprint = buildReplayFingerprint(ticker, asOfDate);
   const runId = buildRunId(ticker, asOfDate);
   const profile = MARKET_PROFILE_BY_TICKER[ticker];
@@ -774,7 +912,7 @@ export function buildAiResearchMockResponse(input: BuildAiResearchMockInput): Ai
       },
     },
     research: {
-      analysts: [marketAnalyst, ...buildNonMarketAnalysts()],
+      analysts: [marketAnalyst, ...buildNonMarketAnalysts(technicalAnalyst)],
       bull_case: {
         status: "placeholder",
         key_points: [
@@ -887,7 +1025,13 @@ function parseOutputStatus(value: unknown): AiResearchAnalystStatus | null {
 
 function parseStance(value: unknown): AiResearchAnalystStance | null {
   const stance = asString(value);
-  if (stance === "neutral" || stance === "mixed" || stance === "unavailable") {
+  if (
+    stance === "neutral" ||
+    stance === "mixed" ||
+    stance === "bullish" ||
+    stance === "bearish" ||
+    stance === "unavailable"
+  ) {
     return stance;
   }
   return null;
@@ -1313,6 +1457,8 @@ export type AiResearchViewModel = {
 function mapStanceLabel(stance: AiResearchAnalystStance): string {
   if (stance === "neutral") return "中性";
   if (stance === "mixed") return "分歧";
+  if (stance === "bullish") return "謹慎偏正向";
+  if (stance === "bearish") return "謹慎偏負向";
   return "尚無資料";
 }
 
