@@ -1,6 +1,5 @@
 export type DashboardSection =
   | "overview"
-  | "ai-research"
   | "billing"
   | "usage"
   | "keys"
@@ -50,14 +49,6 @@ export const dashboardNav: DashboardNavItem[] = [
     href: "/dashboard?section=overview",
     section: "overview",
     activeMode: "section",
-  },
-  {
-    type: "item",
-    id: "ai-research",
-    label: "AI Research",
-    icon: "usage",
-    href: "/dashboard/ai-research",
-    activeMode: "path",
   },
   {
     type: "group",
@@ -139,7 +130,6 @@ export const dashboardNav: DashboardNavItem[] = [
 export function toDashboardSection(value?: string): DashboardSection {
 const allowed: DashboardSection[] = [
     "overview",
-    "ai-research",
     "billing",
     "usage",
     "keys",

@@ -22,7 +22,7 @@ type DashboardSidebarProps = {
 };
 
 const SIDEBAR_NAV_GROUPS: string[][] = [
-  ["overview", "ai-research", "billing"],
+  ["overview", "billing"],
   ["usage", "settings"],
   ["docs", "tools"],
   ["support", "upgrade"],
