@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { usePathname } from "next/navigation";
 
 import {
@@ -22,7 +22,19 @@ function useTrackPageViews() {
 export function AnalyticsControls() {
   useTrackPageViews();
 
-  const [consent, setConsent] = useState<boolean | null>(() => getAnalyticsConsentValue());
+  const storedConsent = useSyncExternalStore(
+    (onStoreChange) => {
+      if (typeof window === "undefined") return () => {};
+      const handler = () => onStoreChange();
+      window.addEventListener("storage", handler);
+      return () => window.removeEventListener("storage", handler);
+    },
+    () => getAnalyticsConsentValue(),
+    () => null,
+  );
+  const [localConsent, setLocalConsent] = useState<boolean | null>(null);
+  const consent = localConsent ?? storedConsent;
+
   const shouldShowBanner = consent === null;
 
   if (!shouldShowBanner) return null;
@@ -41,7 +53,7 @@ export function AnalyticsControls() {
           type="button"
           onClick={() => {
             setAnalyticsConsent(false);
-            setConsent(false);
+            setLocalConsent(false);
           }}
           className="h-8 min-w-[88px] rounded-md border border-slate-200 px-3 text-xs text-slate-600 transition hover:bg-slate-100"
         >
@@ -51,7 +63,7 @@ export function AnalyticsControls() {
           type="button"
           onClick={() => {
             setAnalyticsConsent(true);
-            setConsent(true);
+            setLocalConsent(true);
             if (hasAnalyticsConsent()) {
               void trackPage(window.location.pathname);
             }
