@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { cn } from "@/src/lib/cn";
@@ -5,32 +6,41 @@ import type { BlogPost } from "@/src/content/blog-posts";
 
 type BlogCardProps = {
   post: BlogPost;
-  variant?: "default" | "featured";
   className?: string;
 };
 
-export function BlogCard({ post, variant = "default", className }: BlogCardProps) {
-  if (variant === "featured") {
-    return (
-      <article className={cn("rounded-xl border border-slate-200 bg-white px-5 py-6 sm:px-7", className)}>
-        <h3 className="text-2xl font-semibold tracking-tight text-slate-900">
-          <Link href={`/blog/${post.slug}`} className="hover:underline hover:underline-offset-4">
-            {post.seoTitle}
-          </Link>
-        </h3>
-        <p className="mt-3 text-base leading-8 text-slate-600">{post.description}</p>
-      </article>
-    );
-  }
-
+export function BlogCard({ post, className }: BlogCardProps) {
   return (
-    <article className={cn("py-6", className)}>
-      <h3 className="text-xl font-semibold tracking-tight text-slate-900">
-        <Link href={`/blog/${post.slug}`} className="hover:underline hover:underline-offset-4">
-          {post.title}
-        </Link>
-      </h3>
-      <p className="mt-2 text-sm leading-7 text-slate-600">{post.description}</p>
-    </article>
+    <Link
+      href={`/blog/${post.slug}`}
+      className={cn(
+        "group block h-full cursor-pointer rounded-2xl bg-transparent p-3 transition-colors duration-150 hover:bg-slate-200/70",
+        className,
+      )}
+    >
+      <article className="flex h-full flex-col">
+        <div className="relative aspect-[16/9] overflow-hidden rounded-xl bg-transparent">
+          <Image
+            src={post.coverImage}
+            alt={post.coverAlt}
+            fill
+            className="h-full w-full object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </div>
+
+        <div className="flex min-h-[170px] flex-1 flex-col px-1 pb-1 pt-4">
+          <h3 className="min-h-[3.1rem] text-lg font-semibold leading-snug text-slate-950">
+            <span className="line-clamp-2">{post.title}</span>
+          </h3>
+
+          <p className="mt-3 line-clamp-2 min-h-[2.9rem] text-sm leading-6 text-slate-600">{post.excerpt}</p>
+
+          <div className="mt-6 text-sm text-slate-500">
+            <time dateTime={post.publishedAt}>{post.publishedAt}</time>
+          </div>
+        </div>
+      </article>
+    </Link>
   );
 }

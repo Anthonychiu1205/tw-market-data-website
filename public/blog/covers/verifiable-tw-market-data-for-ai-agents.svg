@@ -1,0 +1,72 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Verifiable TW Market Data for AI Agents</title>
+  <desc id="desc">Abstract low-saturation illustration of market data nodes, candles, API routes, and database graph for TW Market Data blog cover.</desc>
+  <defs>
+    <linearGradient id="bg" x1="120" y1="80" x2="1480" y2="820" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EEF2F7"/>
+      <stop offset="1" stop-color="#F8FAFC"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#64748B" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#334155" stop-opacity="0.55"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+
+  <g opacity="0.35" stroke="#CBD5E1" stroke-width="1">
+    <path d="M140 170H1460"/>
+    <path d="M140 250H1460"/>
+    <path d="M140 330H1460"/>
+    <path d="M140 410H1460"/>
+    <path d="M140 490H1460"/>
+    <path d="M140 570H1460"/>
+    <path d="M140 650H1460"/>
+    <path d="M140 730H1460"/>
+    <path d="M220 120V780"/>
+    <path d="M360 120V780"/>
+    <path d="M500 120V780"/>
+    <path d="M640 120V780"/>
+    <path d="M780 120V780"/>
+    <path d="M920 120V780"/>
+    <path d="M1060 120V780"/>
+    <path d="M1200 120V780"/>
+    <path d="M1340 120V780"/>
+  </g>
+
+  <g stroke="url(#line)" stroke-width="3" stroke-linecap="round">
+    <path d="M190 610L340 520L460 560L590 460L720 500L860 430L1000 470L1140 390L1300 430L1410 360"/>
+    <path d="M190 680L320 660L470 620L620 640L760 590L900 610L1060 550L1220 570L1410 520" opacity="0.6"/>
+  </g>
+
+  <g fill="#334155" fill-opacity="0.9">
+    <rect x="272" y="520" width="14" height="62" rx="3"/>
+    <rect x="432" y="560" width="14" height="48" rx="3"/>
+    <rect x="582" y="458" width="14" height="80" rx="3"/>
+    <rect x="752" y="502" width="14" height="66" rx="3"/>
+    <rect x="922" y="430" width="14" height="74" rx="3"/>
+    <rect x="1082" y="392" width="14" height="90" rx="3"/>
+    <rect x="1272" y="432" width="14" height="64" rx="3"/>
+  </g>
+
+  <g stroke="#475569" stroke-width="2" fill="#FFFFFF">
+    <circle cx="260" cy="250" r="20"/>
+    <circle cx="460" cy="220" r="20"/>
+    <circle cx="700" cy="250" r="20"/>
+    <circle cx="930" cy="220" r="20"/>
+    <circle cx="1170" cy="250" r="20"/>
+    <circle cx="1380" cy="220" r="20"/>
+  </g>
+
+  <g stroke="#64748B" stroke-width="2" stroke-dasharray="5 6" opacity="0.75">
+    <path d="M280 250H440"/>
+    <path d="M480 220H680"/>
+    <path d="M720 250H910"/>
+    <path d="M950 220H1150"/>
+    <path d="M1190 250H1360"/>
+  </g>
+
+  <g fill="#0F172A">
+    <rect x="250" y="715" width="430" height="70" rx="14" fill="#FFFFFF" fill-opacity="0.88"/>
+    <text x="284" y="758" font-family="'Segoe UI', 'Noto Sans TC', sans-serif" font-size="30" font-weight="600">TW Market Data / API</text>
+  </g>
+</svg>

@@ -26,9 +26,7 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
   const post = getBlogPostBySlug(slug);
 
   if (!post) {
-    return {
-      title: "文章不存在",
-    };
+    return { title: "文章不存在" };
   }
 
   const canonicalPath = `/blog/${post.slug}`;
@@ -50,13 +48,13 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
       modifiedTime: post.updatedAt,
       authors: [post.author],
       tags: post.tags,
-      images: [toAbsoluteUrl(siteConfig.ogImagePath)],
+      images: [toAbsoluteUrl(post.coverImage)],
     },
     twitter: {
       card: "summary_large_image",
       title: post.seoTitle,
       description: post.description,
-      images: [toAbsoluteUrl(siteConfig.ogImagePath)],
+      images: [toAbsoluteUrl(post.coverImage)],
     },
   };
 }
@@ -96,6 +94,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     url: articleUrl,
     articleSection: post.category,
     keywords: post.keywords.join(", "),
+    image: toAbsoluteUrl(post.coverImage),
   };
 
   const breadcrumbLd = {
@@ -123,26 +122,10 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     ],
   };
 
-  const faqLd = post.faq.length
-    ? {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        mainEntity: post.faq.map((item) => ({
-          "@type": "Question",
-          name: item.question,
-          acceptedAnswer: {
-            "@type": "Answer",
-            text: item.answer,
-          },
-        })),
-      }
-    : null;
-
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      {faqLd ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} /> : null}
       <BlogArticle post={post} />
     </>
   );
