@@ -151,7 +151,9 @@ type MarketProfile = {
   extraDataGaps?: string[];
 };
 
-type AiResearchAvailability = NonNullable<AiResearchMockResponse["availability"]>["market_price"];
+type AiResearchAvailability = NonNullable<
+  NonNullable<AiResearchMockResponse["availability"]>["market_price"]
+>;
 
 const MARKET_PROFILE_BY_TICKER: Record<string, MarketProfile> = {
   "1101": {
@@ -434,8 +436,23 @@ function buildMarketPriceAvailability(ticker: string, asOfDate: string): AiResea
 function buildMarketDataAnalyst(
   ticker: string,
   asOfDate: string,
-  availability: AiResearchAvailability,
+  availability: AiResearchAvailability | undefined,
 ): AiResearchAnalyst {
+  const resolvedAvailability: AiResearchAvailability = availability ?? {
+    ticker,
+    market: "twse",
+    dataset: "twse_daily_price",
+    available: false,
+    readiness: "unavailable",
+    agent_action: "skip",
+    rows_in_range: 0,
+    ohlc_null_rows: 0,
+    volume_null_rows: 0,
+    duplicate_groups: 0,
+    freshness: "unknown",
+    data_gaps: ["availability_missing_in_fixture"],
+    warnings: ["availability summary missing; defaulted to unavailable/skip"],
+  };
   const profile = MARKET_PROFILE_BY_TICKER[ticker];
   const fallbackProfile: MarketProfile = {
     confidence: 0.5,
@@ -447,12 +464,13 @@ function buildMarketDataAnalyst(
   const price = buildDeterministicPrice(ticker, asOfDate);
 
   const isUnavailable =
-    availability.readiness === "unavailable" || availability.agent_action === "skip";
+    resolvedAvailability.readiness === "unavailable" ||
+    resolvedAvailability.agent_action === "skip";
   const isFallback =
-    availability.readiness === "partial" ||
-    availability.readiness === "beta_limited" ||
-    availability.agent_action === "fallback" ||
-    availability.agent_action === "needs_more_data";
+    resolvedAvailability.readiness === "partial" ||
+    resolvedAvailability.readiness === "beta_limited" ||
+    resolvedAvailability.agent_action === "fallback" ||
+    resolvedAvailability.agent_action === "needs_more_data";
 
   const confidence = isUnavailable
     ? 0
@@ -498,12 +516,12 @@ function buildMarketDataAnalyst(
     data_gaps: dedupe([
       "live read 尚未接入",
       "fixture-only payload excludes technical, fundamentals, and news datasets",
-      ...availability.data_gaps,
+      ...resolvedAvailability.data_gaps,
       ...(resolved.extraDataGaps ?? []),
     ]),
     warnings: dedupe([
       "fixture data is deterministic mock input, not live market data",
-      ...availability.warnings,
+      ...resolvedAvailability.warnings,
       ...(resolved.extraWarnings ?? []),
     ]),
     provenance: {
@@ -518,15 +536,15 @@ function buildMarketDataAnalyst(
     metadata: {
       deterministic: true,
       adapter: "market_data_analyst",
-      availability_readiness: availability.readiness,
-      availability_agent_action: availability.agent_action,
-      availability_rows_in_range: availability.rows_in_range,
-      availability_ohlc_null_rows: availability.ohlc_null_rows,
-      availability_volume_null_rows: availability.volume_null_rows,
-      availability_duplicate_groups: availability.duplicate_groups,
-      availability_freshness: availability.freshness,
-      availability_market: availability.market,
-      availability_dataset: availability.dataset,
+      availability_readiness: resolvedAvailability.readiness,
+      availability_agent_action: resolvedAvailability.agent_action,
+      availability_rows_in_range: resolvedAvailability.rows_in_range,
+      availability_ohlc_null_rows: resolvedAvailability.ohlc_null_rows,
+      availability_volume_null_rows: resolvedAvailability.volume_null_rows,
+      availability_duplicate_groups: resolvedAvailability.duplicate_groups,
+      availability_freshness: resolvedAvailability.freshness,
+      availability_market: resolvedAvailability.market,
+      availability_dataset: resolvedAvailability.dataset,
     },
   };
 }
@@ -534,15 +552,31 @@ function buildMarketDataAnalyst(
 function buildTechnicalAnalyst(
   ticker: string,
   asOfDate: string,
-  availability: AiResearchAvailability,
+  availability: AiResearchAvailability | undefined,
 ): AiResearchAnalyst {
+  const resolvedAvailability: AiResearchAvailability = availability ?? {
+    ticker,
+    market: "twse",
+    dataset: "twse_daily_price",
+    available: false,
+    readiness: "unavailable",
+    agent_action: "skip",
+    rows_in_range: 0,
+    ohlc_null_rows: 0,
+    volume_null_rows: 0,
+    duplicate_groups: 0,
+    freshness: "unknown",
+    data_gaps: ["availability_missing_in_fixture"],
+    warnings: ["availability summary missing; defaulted to unavailable/skip"],
+  };
   const unavailable =
-    availability.readiness === "unavailable" || availability.agent_action === "skip";
+    resolvedAvailability.readiness === "unavailable" ||
+    resolvedAvailability.agent_action === "skip";
   const isFallback =
-    availability.readiness === "partial" ||
-    availability.readiness === "beta_limited" ||
-    availability.agent_action === "fallback" ||
-    availability.agent_action === "needs_more_data";
+    resolvedAvailability.readiness === "partial" ||
+    resolvedAvailability.readiness === "beta_limited" ||
+    resolvedAvailability.agent_action === "fallback" ||
+    resolvedAvailability.agent_action === "needs_more_data";
 
   if (unavailable) {
     return {
@@ -557,9 +591,9 @@ function buildTechnicalAnalyst(
       evidence: [],
       data_gaps: dedupe([
         "technical_indicator_payload_required",
-        ...availability.data_gaps,
+        ...resolvedAvailability.data_gaps,
       ]),
-      warnings: dedupe([...availability.warnings]),
+      warnings: dedupe([...resolvedAvailability.warnings]),
       provenance: {
         source_system: "technical_fixture",
         source_dataset: "technical_indicators",
@@ -614,7 +648,7 @@ function buildTechnicalAnalyst(
 
   if (isFallback) {
     confidence = Number(Math.max(0, confidence - 0.18).toFixed(2));
-    if (availability.readiness === "beta_limited") {
+    if (resolvedAvailability.readiness === "beta_limited") {
       summary = "TPEx 覆蓋為 beta_limited，技術面分析僅保守回退。";
     }
   }
@@ -622,13 +656,15 @@ function buildTechnicalAnalyst(
   const warnings = dedupe([
     ...(rsi14 > 70 ? ["rsi_overbought"] : []),
     ...(rsi14 < 30 ? ["rsi_oversold"] : []),
-    ...availability.warnings,
+    ...resolvedAvailability.warnings,
   ]);
 
   const dataGaps = dedupe([
     ...(ticker === "2317" ? ["ohlc_null_rows_in_requested_range"] : []),
-    ...(availability.readiness === "beta_limited" ? ["tpex_historical_depth_deferred"] : []),
-    ...availability.data_gaps,
+    ...(resolvedAvailability.readiness === "beta_limited"
+      ? ["tpex_historical_depth_deferred"]
+      : []),
+    ...resolvedAvailability.data_gaps,
   ]);
 
   return {
@@ -680,8 +716,8 @@ function buildTechnicalAnalyst(
       deterministic: true,
       adapter: "technical_analyst",
       indicator_set_version: "technical_v1",
-      availability_readiness: availability.readiness,
-      availability_agent_action: availability.agent_action,
+      availability_readiness: resolvedAvailability.readiness,
+      availability_agent_action: resolvedAvailability.agent_action,
     },
   };
 }
