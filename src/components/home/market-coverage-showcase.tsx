@@ -38,7 +38,7 @@ export function MarketCoverageShowcase() {
                 agent 可在單一資料層完成分析與篩選，並支援完整財報分析（損益表 + 現金流量表）。
               </p>
               <div className="mt-6">
-                <Link href="/datasets" className={buttonClass("secondary")}>
+                <Link href="/datasets" className={buttonClass("primary")}>
                   探索資料集
                 </Link>
               </div>
