@@ -12,12 +12,14 @@ import { buttonClass } from "../ui/button";
 
 const navItems = [
   { href: "/product", label: "產品功能", withArrow: true, isMega: true },
+  { href: "/datasets", label: "探索資料集" },
   { href: "/pricing", label: "方案價格" },
   { href: "/docs", label: "文件" },
   { href: "/blog", label: "觀點文章" },
 ];
 
 const mobileNavItems = [
+  { href: "/datasets", label: "探索資料集" },
   { href: "/pricing", label: "方案價格" },
   { href: "/docs", label: "文件" },
   { href: "/blog", label: "觀點文章" },
