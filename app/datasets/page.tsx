@@ -1,88 +1,98 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { DatasetFamilyTabs } from "@/src/components/datasets/dataset-family-tabs";
 import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 
 const datasetFamilies = [
   {
-    title: "市場價格",
+    id: "market-prices",
+    label: "市場價格",
     description: "追蹤上市櫃股票每日價格、成交量與技術分析基礎資料。",
+    datasets: [
+      {
+        name: "TWSE 日線價格",
+        description: "上市股票每日價格與成交資料，是價格分析、回測與技術指標的基礎。",
+        href: "/docs/api/market-prices/twse-daily-price",
+      },
+      {
+        name: "TPEx 日線價格",
+        description: "上櫃股票每日價格與成交資料，用於觀察中小型股與櫃買市場變化。",
+        href: "/docs/introduction",
+      },
+      {
+        name: "技術指標",
+        description: "由價格與成交量衍生的研究指標，可用於趨勢、動能與風險分析。",
+        href: "/docs/introduction",
+      },
+    ],
   },
   {
-    title: "財報與基本面",
+    id: "fundamentals",
+    label: "財報與基本面",
     description: "追蹤月營收、損益表、資產負債表與公司營運體質。",
+    datasets: [
+      {
+        name: "月營收",
+        description: "公司每月公告的營業收入資料，可用於追蹤成長趨勢與營運變化。",
+        href: "/docs/api/financial-growth/monthly-revenue",
+      },
+      {
+        name: "損益表",
+        description: "公司季度營收、毛利、營業利益、淨利與 EPS，是獲利能力分析核心。",
+        href: "/docs/api/financial-growth/income-statement",
+      },
+      {
+        name: "資產負債表",
+        description: "公司資產、負債與股東權益資料，用於判斷財務體質與風險承受力。",
+        href: "/docs/api/financial-growth/balance-sheet",
+      },
+      {
+        name: "現金流量表",
+        description: "追蹤公司營業、投資與籌資現金流，用於觀察獲利品質與現金創造能力。",
+        href: "/docs/introduction",
+      },
+      {
+        name: "估值資料",
+        description: "整理本益比、股價淨值比、殖利率等資料，用於衡量價格與基本面的關係。",
+        href: "/docs/api/financial-growth/valuation-data",
+      },
+      {
+        name: "公司基本資料",
+        description: "整理股票代號、公司名稱、產業分類與上市櫃資訊，是資料串接與分組研究基礎。",
+        href: "/docs/api/company/issuer-profile",
+      },
+    ],
   },
   {
-    title: "籌碼與交易",
+    id: "trading-flow",
+    label: "籌碼與交易",
     description: "觀察三大法人、融資融券與市場資金流向。",
+    datasets: [
+      {
+        name: "三大法人買賣超",
+        description: "整理外資、投信、自營商每日買賣超，用於觀察台股籌碼與資金流向。",
+        href: "/docs/api/capital-flow/institutional-flow",
+      },
+      {
+        name: "融資融券",
+        description: "整理信用交易資料，用於觀察市場槓桿、散戶情緒與短線風險。",
+        href: "/docs/api/capital-flow/margin-short",
+      },
+    ],
   },
   {
-    title: "事件與研究",
+    id: "events-research",
+    label: "事件與研究",
     description: "整理公司事件、公告 metadata 與 AI research-ready evidence。",
-  },
-] as const;
-
-const coreDatasets = [
-  {
-    name: "TWSE 日線價格",
-    description: "上市股票每日價格與成交資料，是價格分析、回測與技術指標的基礎。",
-    href: "/docs/api/market-prices/twse-daily-price",
-  },
-  {
-    name: "TPEx 日線價格",
-    description: "上櫃股票每日價格與成交資料，用於觀察中小型股與櫃買市場變化。",
-    href: "/docs/introduction",
-  },
-  {
-    name: "技術指標",
-    description: "由價格與成交量衍生的研究指標，可用於趨勢、動能與風險分析。",
-    href: "/docs/introduction",
-  },
-  {
-    name: "月營收",
-    description: "公司每月公告的營業收入資料，可用於追蹤成長趨勢與營運變化。",
-    href: "/docs/api/financial-growth/monthly-revenue",
-  },
-  {
-    name: "損益表",
-    description: "公司季度營收、毛利、營業利益、淨利與 EPS，是獲利能力分析核心。",
-    href: "/docs/api/financial-growth/income-statement",
-  },
-  {
-    name: "資產負債表",
-    description: "公司資產、負債與股東權益資料，用於判斷財務體質與風險承受力。",
-    href: "/docs/api/financial-growth/balance-sheet",
-  },
-  {
-    name: "現金流量表",
-    description: "追蹤公司營業、投資與籌資現金流，用於觀察獲利品質與現金創造能力。",
-    href: "/docs/introduction",
-  },
-  {
-    name: "三大法人買賣超",
-    description: "整理外資、投信、自營商每日買賣超，用於觀察台股籌碼與資金流向。",
-    href: "/docs/api/capital-flow/institutional-flow",
-  },
-  {
-    name: "融資融券",
-    description: "整理信用交易資料，用於觀察市場槓桿、散戶情緒與短線風險。",
-    href: "/docs/api/capital-flow/margin-short",
-  },
-  {
-    name: "估值資料",
-    description: "整理本益比、股價淨值比、殖利率等資料，用於衡量價格與基本面的關係。",
-    href: "/docs/api/financial-growth/valuation-data",
-  },
-  {
-    name: "公司基本資料",
-    description: "整理股票代號、公司名稱、產業分類與上市櫃資訊，是資料串接與分組研究基礎。",
-    href: "/docs/api/company/issuer-profile",
-  },
-  {
-    name: "事件與公告 metadata",
-    description: "整理公司公告、注意股、處置股與事件分類 metadata，支援事件研究與風險監控。",
-    href: "/docs/api/company-events/events-calendar",
+    datasets: [
+      {
+        name: "事件與公告 metadata",
+        description: "整理公司公告、注意股、處置股與事件分類 metadata，支援事件研究與風險監控。",
+        href: "/docs/api/company-events/events-calendar",
+      },
+    ],
   },
 ] as const;
 
@@ -146,39 +156,7 @@ export default function DatasetsPage() {
           </div>
         </section>
 
-        <section>
-          <h2 className="text-2xl font-semibold tracking-tight text-slate-950">資料集家族摘要</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {datasetFamilies.map((family) => (
-              <article key={family.title} className="rounded-xl border border-slate-200 bg-white p-4">
-                <h3 className="text-base font-semibold text-slate-900">{family.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{family.description}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-          <h2 className="text-2xl font-semibold tracking-tight text-slate-950">核心資料集列表</h2>
-          <div className="mt-5 divide-y divide-slate-200">
-            {coreDatasets.map((dataset) => (
-              <article key={dataset.name} className="grid gap-3 py-4 sm:grid-cols-[1fr_auto] sm:items-center">
-                <div>
-                  <h3 className="text-sm font-semibold text-slate-900 sm:text-base">{dataset.name}</h3>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">{dataset.description}</p>
-                </div>
-                <div className="sm:pl-6">
-                  <Link
-                    href={dataset.href}
-                    className="inline-block text-xs font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
-                  >
-                    查看文件
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
+        <DatasetFamilyTabs families={datasetFamilies} />
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
           <h2 className="text-2xl font-semibold tracking-tight text-slate-950">股票分析如何使用這些資料</h2>
