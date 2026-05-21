@@ -38,7 +38,7 @@ export function DatasetFamilyTabs({ families }: DatasetFamilyTabsProps) {
       <h2 className="text-2xl font-semibold tracking-tight text-slate-950">資料集目錄</h2>
 
       <div
-        className="mt-5 flex gap-2 overflow-x-auto pb-1"
+        className="mt-5 flex items-end gap-1 overflow-x-auto pb-0"
         role="tablist"
         aria-label="資料集家族"
       >
@@ -55,11 +55,11 @@ export function DatasetFamilyTabs({ families }: DatasetFamilyTabsProps) {
               id={`dataset-tab-${family.id}`}
               onClick={() => setActiveFamilyId(family.id)}
               className={cn(
-                "shrink-0 rounded-t-xl border border-slate-200 px-4 py-2 text-sm font-medium transition duration-200 ease-out",
+                "relative shrink-0 rounded-t-xl border px-4 py-2 text-sm font-medium transition duration-200 ease-out",
                 "motion-reduce:transition-none",
                 isActive
-                  ? "-mb-px bg-white text-slate-950"
-                  : "bg-slate-50 text-slate-600 hover:-translate-y-0.5 hover:bg-slate-100 hover:text-slate-900",
+                  ? "z-10 -mb-px border-slate-200 border-b-white bg-white text-slate-950"
+                  : "z-0 border-slate-200 bg-slate-50 text-slate-600 hover:-translate-y-0.5 hover:bg-slate-100 hover:text-slate-900",
               )}
             >
               {family.label}
@@ -72,7 +72,7 @@ export function DatasetFamilyTabs({ families }: DatasetFamilyTabsProps) {
         id={`dataset-panel-${activeFamily.id}`}
         role="tabpanel"
         aria-labelledby={`dataset-tab-${activeFamily.id}`}
-        className="rounded-b-2xl rounded-tr-2xl border border-slate-200 border-t-slate-200 bg-white p-5 sm:p-6"
+        className="-mt-px rounded-b-2xl rounded-tr-2xl border border-slate-200 bg-white p-5 sm:p-6"
       >
         <h3 className="text-lg font-semibold text-slate-950">{activeFamily.label}</h3>
         <p className="mt-2 text-sm leading-6 text-slate-600">{activeFamily.description}</p>
