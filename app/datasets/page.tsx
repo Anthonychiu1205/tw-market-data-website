@@ -170,11 +170,6 @@ export default function DatasetsPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-          <p className="text-sm leading-7 text-slate-600">
-            資料集會依 coverage、freshness 與 source policy 逐步標示狀態；正式 API 文件會提供欄位、參數與回應格式。
-          </p>
-        </section>
       </div>
     </Container>
   );
