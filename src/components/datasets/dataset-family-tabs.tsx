@@ -59,7 +59,7 @@ export function DatasetFamilyTabs({ families }: DatasetFamilyTabsProps) {
                 "motion-reduce:transition-none",
                 isActive
                   ? "z-10 -mb-px border-slate-200 border-b-white bg-white text-slate-950"
-                  : "z-0 border-slate-200 bg-slate-50 text-slate-600 hover:-translate-y-0.5 hover:bg-slate-100 hover:text-slate-900",
+                  : "z-0 border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900",
               )}
             >
               {family.label}
