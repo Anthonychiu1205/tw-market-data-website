@@ -38,7 +38,7 @@ export function DatasetFamilyTabs({ families }: DatasetFamilyTabsProps) {
       <h2 className="text-2xl font-semibold tracking-tight text-slate-950">資料集目錄</h2>
 
       <div
-        className="mt-5 flex items-end gap-1 overflow-x-auto pb-0"
+        className="mt-5 flex items-end gap-1 overflow-x-auto overflow-y-hidden pb-0"
         role="tablist"
         aria-label="資料集家族"
       >
