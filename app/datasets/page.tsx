@@ -8,41 +8,127 @@ const datasetFamilies = [
   {
     title: "市場價格",
     description:
-      "提供台股日線與衍生指標查詢，適合行情監控、回測前置資料整理與研究流程接入。",
+      "提供台股日線與衍生指標資料，作為價格研究與策略流程的基礎輸入。",
     items: [
-      { name: "TWSE 日線價格", status: "Production-ready", href: "/docs/api/market-prices/twse-daily-price" },
-      { name: "TPEx 日線價格", status: "Coverage limited by source rollout", href: "/docs/introduction" },
-      { name: "技術指標", status: "Derived dataset", href: "/docs/introduction" },
+      {
+        name: "TWSE 日線價格",
+        status: "Production-ready",
+        href: "/docs/api/market-prices/twse-daily-price",
+        intro: "提供上市股票每日開盤、最高、最低、收盤、成交量與成交金額。",
+        useCase: "可用於價格走勢、報酬率、波動率、回測與技術指標計算。",
+        importance: "日線價格是股票研究的基礎資料，用來判斷趨勢、風險與市場定價變化。",
+      },
+      {
+        name: "TPEx 日線價格",
+        status: "Coverage limited by source rollout",
+        href: "/docs/introduction",
+        intro: "提供上櫃股票每日價格與成交資訊。",
+        useCase: "可用於觀察中小型股、櫃買市場與不同板塊的價格變化。",
+        importance: "上櫃股票常包含成長型與中小型公司，對完整台股研究不可缺少。",
+      },
+      {
+        name: "技術指標",
+        status: "Derived dataset",
+        href: "/docs/introduction",
+        intro: "由價格與成交量資料衍生出均線、報酬率、波動率等指標。",
+        useCase: "可用於趨勢判斷、動能分析、回測條件與風險監控。",
+        importance: "技術指標可補充基本面分析，協助觀察市場情緒與價格行為。",
+      },
     ],
   },
   {
     title: "財報與基本面",
     description:
-      "涵蓋月營收與核心財報欄位，支援季度追蹤、成長分析與研究上下文建立。",
+      "涵蓋月營收、財報三表與估值欄位，支援企業體質與獲利能力分析。",
     items: [
-      { name: "月營收", status: "Available", href: "/docs/api/financial-growth/monthly-revenue" },
-      { name: "損益表", status: "Available", href: "/docs/api/financial-growth/income-statement" },
-      { name: "資產負債表", status: "Available", href: "/docs/api/financial-growth/balance-sheet" },
-      { name: "現金流量表", status: "Deferred (source contract under review)", href: "/docs/introduction" },
+      {
+        name: "月營收",
+        status: "Available",
+        href: "/docs/api/financial-growth/monthly-revenue",
+        intro: "整理公司每月公告的營業收入資料。",
+        useCase: "可用於追蹤營收年增率、月增率與成長趨勢。",
+        importance: "月營收是台股最即時的基本面資料之一，能提前反映營運變化。",
+      },
+      {
+        name: "損益表",
+        status: "Available",
+        href: "/docs/api/financial-growth/income-statement",
+        intro: "提供季度營收、成本、毛利、營業利益、稅後淨利與 EPS 等資訊。",
+        useCase: "可用於分析獲利能力、毛利率、營業利益率與盈餘變化。",
+        importance: "損益表能判斷公司是否真正創造獲利，是基本面研究核心。",
+      },
+      {
+        name: "資產負債表",
+        status: "Available",
+        href: "/docs/api/financial-growth/balance-sheet",
+        intro: "整理公司資產、負債與股東權益等財務結構資料。",
+        useCase: "可用於觀察負債比、資本結構、現金水位與財務穩定性。",
+        importance: "資產負債表有助判斷公司體質與抗風險能力。",
+      },
+      {
+        name: "現金流量表",
+        status: "Deferred (source contract under review)",
+        href: "/docs/introduction",
+        intro: "追蹤公司營業、投資與籌資活動產生的現金流。",
+        useCase: "可用於判斷獲利品質、資本支出與現金創造能力。",
+        importance:
+          "此資料集將作為財務品質分析的重要模組，實際 coverage 會依資料狀態逐步開放。",
+      },
+      {
+        name: "估值資料",
+        status: "Available",
+        href: "/docs/api/financial-growth/valuation-data",
+        intro: "整理本益比、股價淨值比、殖利率等估值指標。",
+        useCase: "可用於比較公司價格與基本面之間的相對關係。",
+        importance: "估值資料能協助判斷股價是否已反映成長預期。",
+      },
     ],
   },
   {
     title: "籌碼資料",
     description:
-      "聚焦法人與資金面資料，讓策略流程可把價格與資金流向一起看。",
+      "聚焦法人與信用交易資料，補足價格與財報以外的資金面觀察。",
     items: [
-      { name: "法人買賣超", status: "Backfill in progress", href: "/docs/api/capital-flow/institutional-flow" },
-      { name: "融資融券", status: "Planned / next", href: "/docs/introduction" },
+      {
+        name: "三大法人買賣超",
+        status: "Backfill in progress",
+        href: "/docs/api/capital-flow/institutional-flow",
+        intro: "整理外資、投信、自營商每日買賣超資料。",
+        useCase: "可用於追蹤法人資金流向、籌碼集中度與短中期市場偏好。",
+        importance: "法人買賣超是台股籌碼分析的重要資料，可補充價格與基本面訊號。",
+      },
+      {
+        name: "融資融券",
+        status: "Planned / next",
+        href: "/docs/api/capital-flow/margin-short",
+        intro: "整理融資、融券與信用交易相關資料。",
+        useCase: "可用於觀察散戶槓桿、信用餘額變化與市場風險情緒。",
+        importance: "融資融券可反映市場過熱或偏空情緒，對風險控管與短線分析有幫助。",
+      },
     ],
   },
   {
     title: "公司、分類與事件",
     description:
-      "從公司主檔、分類結構到事件 metadata，讓資料查詢與 downstream mapping 更穩定。",
+      "提供公司主檔、分類與事件 metadata，作為跨資料集串接與研究流程的骨幹。",
     items: [
-      { name: "Issuer Profile", status: "Available", href: "/docs/api/company/issuer-profile" },
-      { name: "Sector / Theme taxonomy", status: "Beta / planned expansion", href: "/docs/introduction" },
-      { name: "News Intelligence", status: "Metadata-first, source approval gated", href: "/docs/introduction" },
+      {
+        name: "公司基本資料 / 發行人資料",
+        status: "Available",
+        href: "/docs/api/company/issuer-profile",
+        intro: "整理股票代號、公司名稱、產業分類與上市櫃資訊。",
+        useCase: "可用於資料關聯、篩選、分組與產業比較。",
+        importance: "公司基本資料是各資料表串接與分類研究的基礎。",
+      },
+      {
+        name: "市場事件 / News Intelligence metadata",
+        status: "Metadata-first, source approval gated",
+        href: "/docs/api/company-events/events-calendar",
+        intro: "整理公司公告、注意股、處置股、重大訊息與事件分類等 metadata。",
+        useCase: "可用於追蹤公司事件、監控風險訊號與建立事件研究流程。",
+        importance:
+          "事件資料可補充價格與財報以外的即時資訊，並以 metadata-first 模式逐步擴充。",
+      },
     ],
   },
 ] as const;
@@ -123,15 +209,15 @@ export default function DatasetsPage() {
                 <ul className="mt-4 space-y-3">
                   {family.items.map((item) => (
                     <li key={item.name} className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-sm font-medium text-slate-900">{item.name}</p>
-                        <span className="rounded-full border border-slate-300 px-2.5 py-1 text-xs text-slate-600">
-                          {item.status}
-                        </span>
+                      <p className="text-sm font-semibold text-slate-900">{item.name}</p>
+                      <div className="mt-2 space-y-2 text-sm leading-6 text-slate-600">
+                        <p><span className="font-medium text-slate-800">簡介：</span>{item.intro}</p>
+                        <p><span className="font-medium text-slate-800">用途：</span>{item.useCase}</p>
+                        <p><span className="font-medium text-slate-800">為什麼重要：</span>{item.importance}</p>
                       </div>
                       <Link
                         href={item.href}
-                        className="mt-2 inline-block text-xs font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
+                        className="mt-3 inline-block text-xs font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
                       >
                         查看文件
                       </Link>
