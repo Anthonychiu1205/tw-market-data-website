@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { ApiSidePanel } from "@/src/components/docs/api-side-panel";
+import { CodeBlock } from "@/src/components/docs/code-block";
 import { DocsLandingContent } from "@/src/components/docs/docs-landing-content";
 import { DocsPageShell } from "@/src/components/docs/docs-page-shell";
 import { QuickStartContent } from "@/src/components/docs/quick-start-content";
@@ -177,9 +178,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
                 </p>
               ))}
               {successStatusExample?.body ? (
-                <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-                  <code>{successStatusExample.body}</code>
-                </pre>
+                <CodeBlock code={successStatusExample.body} language="json" copyButtonVariant="icon" />
               ) : null}
             </section>
 
@@ -313,9 +312,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
                 </li>
               ))}
             </ol>
-            <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-              <code>{api.exampleRequestCurl}</code>
-            </pre>
+            <CodeBlock code={api.exampleRequestCurl} language="curl" copyButtonVariant="icon" />
             <div className="overflow-hidden rounded-lg border border-slate-200">
               <table className="min-w-full text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
@@ -348,9 +345,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               </p>
             ))}
             {successStatusExample?.body ? (
-              <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-                <code>{successStatusExample.body}</code>
-              </pre>
+              <CodeBlock code={successStatusExample.body} language="json" copyButtonVariant="icon" />
             ) : null}
           </section>
 
@@ -619,12 +614,12 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
             {(section.codeBlocks ?? []).length ? (
               <div className="space-y-3">
                 {(section.codeBlocks ?? []).map((codeBlock, blockIndex) => (
-                  <pre
+                  <CodeBlock
                     key={`${sectionId}-${codeBlock.language ?? "text"}-${blockIndex}`}
-                    className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700"
-                  >
-                    <code>{codeBlock.code}</code>
-                  </pre>
+                    code={codeBlock.code}
+                    language={codeBlock.language}
+                    copyButtonVariant="icon"
+                  />
                 ))}
               </div>
             ) : null}

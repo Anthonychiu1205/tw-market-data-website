@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { AnimatedCodeBlock } from "@/src/components/docs/animated-code-block";
+import { CodeBlock } from "@/src/components/docs/code-block";
 import { SectionHeading } from "@/src/components/docs/section-heading";
 
 const firstRequestTabs = [
@@ -233,21 +234,15 @@ export function QuickStartContent() {
         </p>
         <div className="space-y-2">
           <p className="text-sm font-medium text-slate-800">Python SDK</p>
-          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-            <code>{sdkPythonExample}</code>
-          </pre>
+          <CodeBlock code={sdkPythonExample} language="python" copyButtonVariant="icon" />
         </div>
         <div className="space-y-2">
           <p className="text-sm font-medium text-slate-800">JavaScript / TypeScript SDK</p>
-          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-            <code>{sdkTypeScriptExample}</code>
-          </pre>
+          <CodeBlock code={sdkTypeScriptExample} language="typescript" copyButtonVariant="icon" />
         </div>
         <div className="space-y-2">
           <p className="text-sm font-medium text-slate-800">錯誤處理範例</p>
-          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-            <code>{sdkErrorHandlingExample}</code>
-          </pre>
+          <CodeBlock code={sdkErrorHandlingExample} language="python" copyButtonVariant="icon" />
         </div>
       </section>
 
@@ -275,15 +270,11 @@ export function QuickStartContent() {
         </ul>
         <div className="space-y-2">
           <p className="text-sm font-medium text-slate-800">MCP skeleton example</p>
-          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-            <code>{mcpSkeletonExample}</code>
-          </pre>
+          <CodeBlock code={mcpSkeletonExample} language="json" copyButtonVariant="icon" />
         </div>
         <div className="space-y-2">
           <p className="text-sm font-medium text-slate-800">Agent workflow example</p>
-          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-            <code>{agentWorkflowExample}</code>
-          </pre>
+          <CodeBlock code={agentWorkflowExample} language="python" copyButtonVariant="icon" />
         </div>
         <p className="text-xs text-slate-500">
           此區塊為 preview，僅供 local/dev 驗證，未發布為正式套件或託管 MCP service，且不依賴 LLM API key。
@@ -315,8 +306,7 @@ export function QuickStartContent() {
         <AnimatedCodeBlock tabs={[...firstRequestTabs]} className="mt-2" />
         <div className="space-y-2">
           <p className="text-sm font-medium text-slate-800">Response example</p>
-          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-            <code>{`{
+          <CodeBlock code={`{
   "dataset": "twse_daily_price",
   "rows": [
     {
@@ -330,8 +320,7 @@ export function QuickStartContent() {
     }
   ],
   "count": 1
-}`}</code>
-          </pre>
+}`} language="json" copyButtonVariant="icon" />
           <p className="text-sm leading-7 text-slate-600">
             回應通常包含 dataset、rows 與 count。不同 dataset 會有不同欄位，但 response pattern 會盡量保持一致。
           </p>
@@ -348,11 +337,9 @@ export function QuickStartContent() {
             請使用 Dashboard 建立的 customer API key 放在 <code className="rounded bg-white px-1 py-0.5 text-xs">X-API-Key</code>。
             Gateway 與 backend 溝通使用的是網站伺服器端 internal token（例如 BACKEND_API_TOKEN），與 customer key 不同。
           </p>
-          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-white p-4 text-xs leading-6 text-slate-700">
-            <code>{`curl \\
+          <CodeBlock code={`curl \\
   -H "X-API-Key: twmd_live_xxx" \\
-  "https://twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=5"`}</code>
-          </pre>
+  "https://twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=5"`} language="curl" copyButtonVariant="icon" className="bg-white" />
           <p className="text-xs text-slate-500">
             dry-run 回應 headers 會包含 X-TWMD-Plan、X-TWMD-Credits-Cost、X-TWMD-Dry-Run=true 與 X-Request-Id。
           </p>
@@ -363,15 +350,13 @@ export function QuickStartContent() {
 
         <div className="space-y-2">
           <p className="text-sm font-medium text-slate-800">常見錯誤格式</p>
-          <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-            <code>{`{
+          <CodeBlock code={`{
   "error": {
     "code": "invalid_api_key",
     "message": "Invalid API key."
   },
   "requestId": "..."
-}`}</code>
-          </pre>
+}`} language="json" copyButtonVariant="icon" />
           <p className="text-xs text-slate-500">
             常見 code：`401 invalid_api_key`、`403 plan_not_entitled`、`402 insufficient_credits`、`404 dataset_not_found`、`502 upstream_error`、`504 upstream_timeout`。
           </p>
@@ -388,9 +373,7 @@ export function QuickStartContent() {
             <p className="text-sm text-slate-700">
               Endpoint：<code className="rounded bg-slate-100 px-1 py-0.5 text-xs">GET /v2/datasets/monthly-revenue</code>
             </p>
-            <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-              <code>{monthlyRevenuePython}</code>
-            </pre>
+            <CodeBlock code={monthlyRevenuePython} language="python" copyButtonVariant="icon" />
           </article>
 
           <article className="space-y-2">
@@ -398,9 +381,7 @@ export function QuickStartContent() {
             <p className="text-sm text-slate-700">
               Endpoint：<code className="rounded bg-slate-100 px-1 py-0.5 text-xs">GET /v2/datasets/issuer-profile</code>
             </p>
-            <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-              <code>{issuerProfilePython}</code>
-            </pre>
+            <CodeBlock code={issuerProfilePython} language="python" copyButtonVariant="icon" />
           </article>
 
           <article className="space-y-2">
@@ -408,9 +389,7 @@ export function QuickStartContent() {
             <p className="text-sm text-slate-700">
               Endpoint：<code className="rounded bg-slate-100 px-1 py-0.5 text-xs">GET /v2/datasets/technical-indicators</code>
             </p>
-            <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-              <code>{technicalIndicatorsPython}</code>
-            </pre>
+            <CodeBlock code={technicalIndicatorsPython} language="python" copyButtonVariant="icon" />
           </article>
 
           <article className="space-y-2">
@@ -418,9 +397,7 @@ export function QuickStartContent() {
             <p className="text-sm text-slate-700">
               Endpoint：<code className="rounded bg-slate-100 px-1 py-0.5 text-xs">POST /v2/datasets/screener</code>
             </p>
-            <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs leading-6 text-slate-700">
-              <code>{screenerPython}</code>
-            </pre>
+            <CodeBlock code={screenerPython} language="python" copyButtonVariant="icon" />
           </article>
         </div>
       </section>
