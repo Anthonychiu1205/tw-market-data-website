@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import { CodeBlock } from "@/src/components/docs/code-block";
 import { SectionHeading } from "@/src/components/docs/section-heading";
 
 type DemoRow = {
@@ -164,9 +165,7 @@ export function TwseDailyPriceLiveDemo() {
       ) : null}
 
       {raw ? (
-        <pre className="whitespace-pre-wrap break-words rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-6 text-slate-700">
-          {JSON.stringify(raw, null, 2)}
-        </pre>
+        <CodeBlock code={JSON.stringify(raw, null, 2)} language="json" copyButtonVariant="icon" />
       ) : null}
     </section>
   );
