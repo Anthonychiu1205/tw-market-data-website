@@ -18,7 +18,7 @@ export function DocsLandingContent() {
         <SectionHeading id="docs-portals">文件入口</SectionHeading>
         <p className="text-sm leading-7 text-slate-600">你可以從左側導覽進入資料集文件，也可以先從 Quick Start 建立第一個 request。</p>
         <p className="text-sm leading-7 text-slate-600">
-          若要讓 agent 或工具讀取文件，後續可提供 llms.txt、OpenAPI spec 與 MCP tools 作為入口。
+          若要讓 agent 或工具讀取文件，TW Market Data 已提供 llms.txt、llms-full.txt 與 /openapi.json 作為 machine-readable 入口；MCP tools 目前維持 preview / planned，不假設為正式交易或投資建議系統。
         </p>
         <p className="text-sm leading-7 text-slate-600">目前文件優先描述 available-now 與 normalized dataset；preview 資料會獨立標示。</p>
       </section>
