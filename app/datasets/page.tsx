@@ -139,8 +139,32 @@ export const metadata: Metadata = {
 };
 
 export default function DatasetsPage() {
+  const datasetItemListLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "TW Market Data 核心資料集目錄",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "TWSE 日線價格", url: "https://twmarketdata.com/docs/api/market-prices/twse-daily-price" },
+      { "@type": "ListItem", position: 2, name: "TPEx 日線價格", url: "https://twmarketdata.com/docs/introduction" },
+      { "@type": "ListItem", position: 3, name: "技術指標", url: "https://twmarketdata.com/docs/introduction" },
+      { "@type": "ListItem", position: 4, name: "月營收", url: "https://twmarketdata.com/docs/api/financial-growth/monthly-revenue" },
+      { "@type": "ListItem", position: 5, name: "損益表", url: "https://twmarketdata.com/docs/api/financial-growth/income-statement" },
+      { "@type": "ListItem", position: 6, name: "資產負債表", url: "https://twmarketdata.com/docs/api/financial-growth/balance-sheet" },
+      { "@type": "ListItem", position: 7, name: "現金流量表", url: "https://twmarketdata.com/docs/introduction" },
+      { "@type": "ListItem", position: 8, name: "三大法人買賣超", url: "https://twmarketdata.com/docs/api/capital-flow/institutional-flow" },
+      { "@type": "ListItem", position: 9, name: "融資融券", url: "https://twmarketdata.com/docs/api/capital-flow/margin-short" },
+      { "@type": "ListItem", position: 10, name: "估值資料", url: "https://twmarketdata.com/docs/api/financial-growth/valuation-data" },
+      { "@type": "ListItem", position: 11, name: "公司基本資料", url: "https://twmarketdata.com/docs/api/company/issuer-profile" },
+      { "@type": "ListItem", position: 12, name: "事件與公告 metadata", url: "https://twmarketdata.com/docs/api/company-events/events-calendar" },
+    ],
+  };
+
   return (
     <Container className="py-12 sm:py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetItemListLd) }}
+      />
       <div className="mx-auto max-w-6xl space-y-12">
         <section className="rounded-2xl border border-slate-200 bg-white p-7 sm:p-10">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Datasets</p>

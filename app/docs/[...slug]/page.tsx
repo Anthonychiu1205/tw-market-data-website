@@ -226,6 +226,15 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
                 </ul>
               </section>
             ) : null}
+
+            <section className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+              <p className="text-sm text-slate-700">
+                此 API 屬於 TW Market Data 資料集目錄。{" "}
+                <Link href="/datasets" className="font-medium text-slate-900 underline underline-offset-4 hover:text-slate-700">
+                  查看資料集總覽
+                </Link>
+              </p>
+            </section>
           </div>
         </DocsPageShell>
       );
@@ -390,6 +399,15 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
                 <li key={item}>{item}</li>
               ))}
             </ul>
+          </section>
+
+          <section className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+            <p className="text-sm text-slate-700">
+              此 API 屬於 TW Market Data 資料集目錄。{" "}
+              <Link href="/datasets" className="font-medium text-slate-900 underline underline-offset-4 hover:text-slate-700">
+                查看資料集總覽
+              </Link>
+            </p>
           </section>
         </div>
       </DocsPageShell>

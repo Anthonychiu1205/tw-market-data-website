@@ -22,6 +22,7 @@ function toEntry(
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: Array<{ path: string; changeFrequency: ChangeFrequency; priority: number }> = [
     { path: "/", changeFrequency: "weekly", priority: 1 },
+    { path: "/datasets", changeFrequency: "weekly", priority: 0.9 },
     { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
     { path: "/docs", changeFrequency: "weekly", priority: 0.9 },
     { path: "/blog", changeFrequency: "monthly", priority: 0.8 },
@@ -34,6 +35,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/docs/market-coverage", changeFrequency: "weekly", priority: 0.75 },
     { path: "/docs/tools-mcp", changeFrequency: "weekly", priority: 0.75 },
     { path: "/docs/openapi-spec", changeFrequency: "weekly", priority: 0.75 },
+    { path: "/llms.txt", changeFrequency: "monthly", priority: 0.55 },
+    { path: "/llms-full.txt", changeFrequency: "monthly", priority: 0.5 },
   ];
 
   const docsRoutes = docsPages

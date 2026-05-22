@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { PricingShell } from "@/src/components/pricing/pricing-shell";
+import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 
@@ -54,6 +56,14 @@ export default function PricingPage() {
       <Container className="space-y-10 py-12">
         <section className="border-b border-slate-200 pb-8">
           <h1 className="text-4xl font-semibold tracking-tight text-slate-900">方案價格</h1>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href="/datasets" className={buttonClass("secondary")}>
+              先查看可用資料集
+            </Link>
+            <Link href="/docs/introduction" className={buttonClass("secondary")}>
+              查看 API 文件
+            </Link>
+          </div>
         </section>
         <PricingShell />
       </Container>
