@@ -671,11 +671,11 @@ const baseDocsPages: DocsPageEntry[] = [
   {
     slug: ["data-access"],
     href: "/docs/data-access",
-    navLabel: "市場覆蓋範圍",
+    navLabel: "Coverage / Freshness",
     category: "overview",
     icon: "database",
-    title: "市場覆蓋範圍",
-    subtitle: "涵蓋台灣上市、上櫃市場的核心行情、財務、籌碼、事件與分類資料。",
+    title: "Coverage / Freshness",
+    subtitle: "說明各資料家族的覆蓋範圍、更新節奏與 data_gaps 判讀方式。",
     tier: "complete",
     sections: [
       {
@@ -683,56 +683,83 @@ const baseDocsPages: DocsPageEntry[] = [
         label: "文件入口",
         paragraphs: [
           "你可以從左側導覽查看所有資料集文件，也可以先從 Quick Start 建立第一個 request。",
-          "若要讓 agent 或內部工具讀取文件，後續可透過 OpenAPI spec、llms.txt 或 MCP tools 作為入口。",
+          "若要讓 agent 或內部工具讀取文件，TW Market Data 已提供 /openapi.json、/llms.txt、/llms-full.txt 作為 machine-readable 入口；MCP 仍為 preview/planned。",
         ],
       },
       {
         id: "coverage-overview",
-        label: "覆蓋範圍總覽",
+        label: "Coverage 是什麼",
+        paragraphs: [
+          "Coverage 指的是資料集在 ticker、日期、財報期間或事件類型上的可用範圍。Coverage 會隨資料來源揭露節奏與產品化進度持續更新，不應假設所有資料集都已完整覆蓋。",
+          "建議把 coverage 視為可觀測狀態，而不是固定常數。實際可用範圍應以 API 回應與 docs 說明為準。",
+        ],
+        bullets: [
+          "TWSE 日線價格：核心資料集，持續維護 coverage 與資料品質。",
+          "月營收、損益表、資產負債表：依公司公告與季度申報節奏更新。",
+          "三大法人買賣超：coverage 持續補齊中，請搭配 data_gaps 判讀。",
+          "技術指標：由價格資料衍生，覆蓋範圍依底層價格資料可用性而定。",
+          "現金流量表、News Intelligence 等主題：請依 docs 上的 available/preview/deferred 狀態判讀，不假設已完整上線。",
+        ],
+      },
+      {
+        id: "freshness-definition",
+        label: "Freshness 是什麼",
+        paragraphs: [
+          "Freshness 指的是某筆資料最近一次可用更新時間。不同資料集更新頻率不同，例如日線價格、月營收、季報與事件資料的揭露節奏並不相同。",
+          "在跨資料集查詢時，請同時檢查 freshness 與資料時間欄位，避免把不同更新節奏的資料視為同一時間點。",
+        ],
+      },
+      {
+        id: "data-gaps-interpretation",
+        label: "Data gaps 如何判讀",
+        paragraphs: [
+          "data_gaps 表示資料缺口或來源限制，是研究流程中應保留的訊號。請不要把缺口直接當成 0 或自動補值。",
+          "建議在 pipeline 中將 data_gaps、source_role、lineage 一起保存，以便後續審計與回溯。",
+        ],
+        bullets: [
+          "先檢查資料是否存在，再處理數值分析與策略邏輯。",
+          "缺口若來自官方來源延遲，應標記為 unavailable/pending，而非填入假值。",
+          "跨資料集整合時，優先以交集日期做分析，並記錄被排除的缺口範圍。",
+        ],
+      },
+      {
+        id: "status-categories",
+        label: "Dataset status categories",
+        paragraphs: [
+          "平台目前使用下列狀態語意，協助你在系統內區分可用程度與風險邊界。",
+        ],
+        bullets: [
+          "available：已進入主要公開能力，仍需依方案權限存取。",
+          "preview：可供測試或限定場景使用，欄位與 coverage 可能調整。",
+          "coverage-limited：已提供查詢，但覆蓋範圍仍在補齊。",
+          "deferred / not-yet-available：尚未納入正式對外能力。",
+        ],
+      },
+      {
+        id: "family-status-notes",
+        label: "資料家族狀態說明",
         paragraphs: [],
         bullets: [
-          "TWSE listed equities：上市股票日線價格與市場資料。",
-          "TPEx listed equities：上櫃股票日線價格與市場資料。",
-          "MOPS fundamentals：月營收與財報三表。",
-          "Valuation / technical / factor layer：估值、技術指標、因子與策略查詢層。",
-          "Company & events：公司基本資料、公告、事件、公司行動、股利。",
-          "目前 public sellable boundary 以 26 個 available-now dataset 為核心。",
-          "實際可用範圍依帳號方案與 API key 權限決定。",
+          "Market prices：TWSE/TPEx 日線為核心入口；技術指標為衍生層。",
+          "Fundamentals：月營收與財報三表依官方揭露節奏更新。",
+          "Capital flow：institutional-flow 仍在持續 productization rollout。",
+          "News Intelligence：metadata-first，非完整新聞全文商用再散佈服務。",
+          "Cash flow / 其他延伸主題：以 docs 狀態說明為準，不預設為 fully production-ready。",
         ],
       },
       {
-        id: "core-strength",
-        label: "核心優勢",
+        id: "how-to-read-in-api",
+        label: "如何在 API / Docs 判讀 coverage 與 freshness",
         paragraphs: [
-          "TW Market Data 的重點不是提供所有市場所有資料，而是把台股常用研究資料整理成穩定、可查詢、可追溯的 API。",
-          "主要優先順序是 official/public-first、schema consistency、agent-ready response。",
-        ],
-      },
-      {
-        id: "discover-coverage",
-        label: "如何發現可用股票與資料集",
-        paragraphs: [
-          "你可以先用公司基本資料建立標的清單，再用分類與欄位清單縮小查詢範圍。",
-          "若要讓 agent 自動探索可用能力，後續可結合 OpenAPI spec 與 MCP tools。",
-          "常用入口：",
+          "查看 response 中的 freshness、source_role、lineage、data_gaps 欄位，再搭配對應 endpoint 的 docs 說明與參數限制。",
+          "建議同時參考資料集介紹頁（/datasets）與單一資料集頁（例如 /datasets/twse-daily-price、/datasets/institutional-flow）。",
         ],
         bullets: [
-          "GET /v2/datasets/issuer-profile",
-          "GET /v2/datasets/theme-taxonomy",
-          "GET /v2/datasets/index-classification",
-          "GET /v2/query/fields",
-        ],
-      },
-      {
-        id: "limitations",
-        label: "目前限制",
-        paragraphs: [],
-        bullets: [
-          "不是 full public GA；採 controlled rollout。",
-          "部分資料集為 preview 或 not-yet-available。",
-          "部分延伸資料主題尚未納入公開主功能，後續會依 controlled rollout 另行公告。",
-          "若官方來源延遲或暫停，平台會保留最後 snapshot 或標記資料新鮮度。",
-          "配額、rate limit 與 dataset access 依方案不同。",
+          "/docs/data-provenance",
+          "/datasets",
+          "/datasets/twse-daily-price",
+          "/datasets/monthly-revenue",
+          "/datasets/institutional-flow",
         ],
       },
       {
@@ -747,11 +774,11 @@ const baseDocsPages: DocsPageEntry[] = [
   {
     slug: ["source-policy"],
     href: "/docs/source-policy",
-    navLabel: "來源政策",
+    navLabel: "Data Provenance",
     category: "overview",
     icon: "shield",
-    title: "來源政策",
-    subtitle: "以官方來源為核心的台股資料體系，提供完整可追溯（provenance）的資料鏈路。",
+    title: "Data Provenance / Source Policy",
+    subtitle: "說明台股資料來源政策、official/public-first 原則與 lineage 可追溯機制。",
     tier: "complete",
     sections: [
       {
@@ -760,7 +787,7 @@ const baseDocsPages: DocsPageEntry[] = [
         paragraphs: [
           "本平台以交易所與官方揭露系統為主要資料來源，包含 TWSE、TPEx 與公開資訊觀測站（MOPS）。所有資料皆由系統直接擷取、解析與結構化處理，建立從原始揭露到 API 回傳的完整資料路徑。",
           "對於市場行情等即時資料，平台會採用經過驗證的資料來源，並明確標示來源角色（source_role），確保使用者清楚了解資料來源與信任層級。",
-          "本頁說明各類資料的來源與處理方式，以及資料如何從原始來源進入 API。",
+          "本頁說明各類資料的來源與處理方式，以及資料如何從原始來源進入 API。資料產品優先追求可驗證性與可追溯性，而非未經驗證的資料擴張。",
         ],
       },
       {
@@ -789,6 +816,19 @@ const baseDocsPages: DocsPageEntry[] = [
           "canonical：官方來源或最接近原始來源的資料，優先使用",
           "fallback：當 canonical 不可用時的替代來源",
           "helper：輔助性資料，用於補充或提升可用性，不作為唯一依據",
+        ],
+      },
+      {
+        id: "raw-to-normalized-to-api",
+        label: "Raw → Normalized → API response",
+        paragraphs: [
+          "資料流程通常包含：原始來源擷取、欄位正規化、契約驗證、資料缺口標記與 API 回傳封裝。",
+          "這個流程可降低多來源欄位語意不一致的風險，並讓開發者在 response 中使用一致的欄位與判讀規則。",
+        ],
+        bullets: [
+          "Raw layer：官方公開揭露內容與原始欄位。",
+          "Normalized layer：欄位命名與型別對齊、日期與單位統一。",
+          "API layer：對外回傳可查詢資料，並附帶 source_role / lineage / freshness / data_gaps。",
         ],
       },
       {
@@ -861,6 +901,27 @@ const baseDocsPages: DocsPageEntry[] = [
         ],
       },
       {
+        id: "derived-dataset-notes",
+        label: "Derived datasets 如何標示",
+        paragraphs: [
+          "部分資料為 derived layer（例如技術指標、部分策略資料）。這類資料會保留來源脈絡，並區分是否由官方資料直接推導。",
+          "derived 資料不代表較低可信度，但需要更清楚的公式、欄位定義與資料前提，才能避免誤用。",
+        ],
+      },
+      {
+        id: "data-gaps-limitations",
+        label: "Data gaps 與限制",
+        paragraphs: [
+          "資料缺口是正常且需要揭露的資訊，不應以隱式補值掩蓋。當官方來源延遲、欄位暫缺或契約變動時，系統會優先保留缺口訊號。",
+          "對於 coverage 未完整的資料集（例如部分 institutional flow 補齊中），請在研究流程中顯式處理缺值與可用範圍。",
+        ],
+        bullets: [
+          "不假設所有資料集在所有日期都完整。",
+          "不把 data_gaps 自動轉為 0 或成功值。",
+          "不把 preview/deferred 主題視為 production-ready。",
+        ],
+      },
+      {
         id: "provenance-guarantees",
         label: "來源保證（Provenance Guarantees）",
         paragraphs: ["平台對資料來源提供以下保證：", "本來源政策確保資料在研究、分析與交易場景中具備可驗證性與一致性。"],
@@ -870,6 +931,14 @@ const baseDocsPages: DocsPageEntry[] = [
           "明確來源角色：所有資料標示 canonical / fallback / helper",
           "可量測延遲：ingestion 與更新時間可被追蹤",
           "單一責任：資料處理由平台負責，問題可定位與修正",
+        ],
+      },
+      {
+        id: "compliance-notes",
+        label: "使用與合規聲明",
+        paragraphs: [
+          "本文件用於說明資料來源與產品邊界，不構成投資建議或交易指令。",
+          "News Intelligence 目前以 metadata-first 為主，不應視為可任意再散佈的完整新聞全文資料庫。",
         ],
       },
     ],
