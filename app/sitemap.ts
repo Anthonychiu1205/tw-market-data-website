@@ -35,6 +35,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/docs/market-coverage", changeFrequency: "weekly", priority: 0.75 },
     { path: "/docs/tools-mcp", changeFrequency: "weekly", priority: 0.75 },
     { path: "/docs/openapi-spec", changeFrequency: "weekly", priority: 0.75 },
+    { path: "/openapi.json", changeFrequency: "weekly", priority: 0.7 },
     { path: "/llms.txt", changeFrequency: "monthly", priority: 0.55 },
     { path: "/llms-full.txt", changeFrequency: "monthly", priority: 0.5 },
   ];

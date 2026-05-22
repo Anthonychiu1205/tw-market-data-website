@@ -28,6 +28,7 @@ AI agent notes:
 - no trading action guidance is provided.
 
 OpenAPI:
+- https://twmarketdata.com/openapi.json
 - /docs/openapi-spec
 
 MCP:

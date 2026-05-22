@@ -1,0 +1,343 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TW Market Data API",
+    "description": "台股資料 API，為 AI agent、量化研究與金融產品開發設計。此文件提供 machine-readable 的公開資料端點摘要，詳細欄位請以對應 docs endpoint 頁面為準。",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://twmarketdata.com"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/v2/datasets/twse-daily-price": {
+      "get": {
+        "summary": "TWSE 日線價格 / TWSE daily prices",
+        "description": "上市股票日線價格與成交資訊。",
+        "parameters": [
+          {"$ref": "#/components/parameters/Symbol"},
+          {"$ref": "#/components/parameters/StartDate"},
+          {"$ref": "#/components/parameters/EndDate"},
+          {"$ref": "#/components/parameters/Limit"}
+        ],
+        "responses": {
+          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
+          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+        },
+        "x-data-status": "production",
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+      }
+    },
+    "/v2/datasets/tpex-daily-price": {
+      "get": {
+        "summary": "TPEx 日線價格 / TPEx daily prices",
+        "description": "上櫃股票日線價格與成交資訊。",
+        "parameters": [
+          {"$ref": "#/components/parameters/Symbol"},
+          {"$ref": "#/components/parameters/StartDate"},
+          {"$ref": "#/components/parameters/EndDate"},
+          {"$ref": "#/components/parameters/Limit"}
+        ],
+        "responses": {
+          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
+          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+        },
+        "x-data-status": "production",
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+      }
+    },
+    "/v2/datasets/monthly-revenue": {
+      "get": {
+        "summary": "月營收 / Monthly revenue",
+        "description": "公司月營收與成長觀察資料。",
+        "parameters": [
+          {"$ref": "#/components/parameters/Symbol"},
+          {"$ref": "#/components/parameters/StartDate"},
+          {"$ref": "#/components/parameters/EndDate"},
+          {"$ref": "#/components/parameters/Limit"}
+        ],
+        "responses": {
+          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
+          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+        },
+        "x-data-status": "production",
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+      }
+    },
+    "/v2/datasets/income-statement": {
+      "get": {
+        "summary": "損益表 / Income statement",
+        "description": "公司損益表欄位查詢。",
+        "parameters": [
+          {"$ref": "#/components/parameters/Symbol"},
+          {"$ref": "#/components/parameters/StartDate"},
+          {"$ref": "#/components/parameters/EndDate"},
+          {"$ref": "#/components/parameters/Limit"}
+        ],
+        "responses": {
+          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
+          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+        },
+        "x-data-status": "production",
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+      }
+    },
+    "/v2/datasets/balance-sheet": {
+      "get": {
+        "summary": "資產負債表 / Balance sheet",
+        "description": "公司資產負債欄位查詢。",
+        "parameters": [
+          {"$ref": "#/components/parameters/Symbol"},
+          {"$ref": "#/components/parameters/StartDate"},
+          {"$ref": "#/components/parameters/EndDate"},
+          {"$ref": "#/components/parameters/Limit"}
+        ],
+        "responses": {
+          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
+          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+        },
+        "x-data-status": "production",
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+      }
+    },
+    "/v2/datasets/institutional-flow": {
+      "get": {
+        "summary": "三大法人買賣超 / Institutional flow",
+        "description": "外資、投信、自營商等法人買賣超資料。",
+        "parameters": [
+          {"$ref": "#/components/parameters/Symbol"},
+          {"$ref": "#/components/parameters/StartDate"},
+          {"$ref": "#/components/parameters/EndDate"},
+          {"$ref": "#/components/parameters/Limit"}
+        ],
+        "responses": {
+          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
+          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+        },
+        "x-data-status": "production",
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+      }
+    },
+    "/v2/datasets/technical-indicators": {
+      "get": {
+        "summary": "技術指標 / Technical indicators",
+        "description": "由價格資料衍生的技術分析指標。",
+        "parameters": [
+          {"$ref": "#/components/parameters/Symbol"},
+          {"$ref": "#/components/parameters/StartDate"},
+          {"$ref": "#/components/parameters/EndDate"},
+          {"$ref": "#/components/parameters/Limit"}
+        ],
+        "responses": {
+          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
+          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+        },
+        "x-data-status": "production",
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+      }
+    },
+    "/v2/datasets/valuation-data": {
+      "get": {
+        "summary": "估值資料 / Valuation data",
+        "description": "本益比、股價淨值比、殖利率等估值欄位。",
+        "parameters": [
+          {"$ref": "#/components/parameters/Symbol"},
+          {"$ref": "#/components/parameters/StartDate"},
+          {"$ref": "#/components/parameters/EndDate"},
+          {"$ref": "#/components/parameters/Limit"}
+        ],
+        "responses": {
+          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
+          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+        },
+        "x-data-status": "production",
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+      }
+    },
+    "/v2/datasets/issuer-profile": {
+      "get": {
+        "summary": "公司基本資料 / Issuer profile",
+        "description": "公司識別、上市櫃別與產業分類等基本資訊。",
+        "parameters": [
+          {"$ref": "#/components/parameters/Symbol"},
+          {"$ref": "#/components/parameters/Limit"}
+        ],
+        "responses": {
+          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
+          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
+          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+        },
+        "x-data-status": "production",
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "Symbol": {
+        "name": "symbol",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        },
+        "description": "股票代號，例如 2330。"
+      },
+      "StartDate": {
+        "name": "start_date",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "查詢起始日期（YYYY-MM-DD）。"
+      },
+      "EndDate": {
+        "name": "end_date",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "查詢結束日期（YYYY-MM-DD）。"
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        },
+        "description": "回傳筆數上限。"
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "Use X-API-Key header with your dashboard-issued API key."
+      }
+    },
+    "schemas": {
+      "DatasetResponseEnvelope": {
+        "type": "object",
+        "description": "Common response envelope. Detailed dataset-specific row fields are documented in each endpoint docs page.",
+        "properties": {
+          "dataset": {
+            "type": "string"
+          },
+          "source_role": {
+            "type": "string"
+          },
+          "freshness": {
+            "type": "string"
+          },
+          "lineage": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "data_gaps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataGap"
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        },
+        "additionalProperties": true
+      },
+      "DataGap": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "next_cursor": {
+            "type": ["string", "null"]
+          }
+        },
+        "additionalProperties": true
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": ["code", "message"],
+            "additionalProperties": true
+          }
+        },
+        "required": ["error"]
+      }
+    }
+  }
+}

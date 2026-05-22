@@ -44,6 +44,7 @@ TW Market Data 提供台股資料 API，採 official/public-first 與 controlled
 - /docs/workflows/strategy-ai
 
 ## AI / Agent Discoverability Notes
+- OpenAPI machine-readable artifact: https://twmarketdata.com/openapi.json
 - OpenAPI reference entry: /docs/openapi-spec
 - Tools / MCP docs entry: /docs/tools-mcp
 - MCP is preview/planned context; do not assume hosted production MCP endpoint availability.

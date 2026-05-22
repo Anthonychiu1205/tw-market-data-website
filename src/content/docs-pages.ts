@@ -897,8 +897,8 @@ const baseDocsPages: DocsPageEntry[] = [
         label: "openapi.json",
         paragraphs: [
           "TW Market Data 會以 OpenAPI 3.x 格式描述可公開使用的 API contract。",
-          "若 production 環境尚未公開固定 URL，請使用儀表板或部署環境提供的 OpenAPI endpoint。",
-          "部署後可由站台提供 /openapi.json。",
+          "公開 machine-readable artifact：/openapi.json。",
+          "OpenAPI 內容會隨資料 coverage 與 productization rollout 逐步更新，詳細欄位仍以對應 docs endpoint 頁面為準。",
         ],
       },
       {
