@@ -23,6 +23,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: Array<{ path: string; changeFrequency: ChangeFrequency; priority: number }> = [
     { path: "/", changeFrequency: "weekly", priority: 1 },
     { path: "/datasets", changeFrequency: "weekly", priority: 0.9 },
+    { path: "/datasets/twse-daily-price", changeFrequency: "weekly", priority: 0.85 },
+    { path: "/datasets/monthly-revenue", changeFrequency: "weekly", priority: 0.85 },
+    { path: "/datasets/income-statement", changeFrequency: "weekly", priority: 0.85 },
+    { path: "/datasets/balance-sheet", changeFrequency: "weekly", priority: 0.85 },
+    { path: "/datasets/institutional-flow", changeFrequency: "weekly", priority: 0.85 },
     { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
     { path: "/docs", changeFrequency: "weekly", priority: 0.9 },
     { path: "/blog", changeFrequency: "monthly", priority: 0.8 },

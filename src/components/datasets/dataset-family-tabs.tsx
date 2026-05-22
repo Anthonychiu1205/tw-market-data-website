@@ -9,6 +9,7 @@ type DatasetItem = {
   name: string;
   description: string;
   href: string;
+  overviewHref?: string;
   note?: string;
 };
 
@@ -95,12 +96,22 @@ export function DatasetFamilyTabs({ families }: DatasetFamilyTabsProps) {
                 {dataset.note ? <p className="mt-1 text-xs text-slate-500">{dataset.note}</p> : null}
               </div>
               <div className="sm:pl-6">
-                <Link
-                  href={dataset.href}
-                  className="inline-block text-xs font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
-                >
-                  查看文件
-                </Link>
+                <div className="flex items-center gap-3">
+                  {dataset.overviewHref ? (
+                    <Link
+                      href={dataset.overviewHref}
+                      className="inline-block text-xs font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
+                    >
+                      資料集介紹
+                    </Link>
+                  ) : null}
+                  <Link
+                    href={dataset.href}
+                    className="inline-block text-xs font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
+                  >
+                    API 文件
+                  </Link>
+                </div>
               </div>
             </article>
           ))}

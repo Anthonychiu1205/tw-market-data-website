@@ -8,6 +8,11 @@ Documentation:
 - /docs/introduction
 - /docs/quick-start
 - /datasets
+- /datasets/twse-daily-price
+- /datasets/monthly-revenue
+- /datasets/income-statement
+- /datasets/balance-sheet
+- /datasets/institutional-flow
 - /pricing
 
 Authentication:

@@ -6,6 +6,11 @@ TW Market Data 提供台股資料 API，採 official/public-first 與 controlled
 - https://twmarketdata.com/docs/introduction
 - https://twmarketdata.com/docs/quick-start
 - https://twmarketdata.com/datasets
+- https://twmarketdata.com/datasets/twse-daily-price
+- https://twmarketdata.com/datasets/monthly-revenue
+- https://twmarketdata.com/datasets/income-statement
+- https://twmarketdata.com/datasets/balance-sheet
+- https://twmarketdata.com/datasets/institutional-flow
 - https://twmarketdata.com/pricing
 
 ## Source, Coverage, Freshness
