@@ -8204,8 +8204,27 @@ const workflowPageCatalog: Array<{
     slug: "company-fundamentals",
     navLabel: "查看公司基本面",
     title: "查看公司基本面",
-    subtitle: "使用 Python 查詢台股月營收、財報三表、估值資料與公司基本資料。",
+    subtitle: "從月營收、損益表、資產負債表與估值資料建立可驗證的台股基本面研究流程。",
     sections: [
+      {
+        id: "who-this-guide-is-for",
+        label: "這篇適合誰",
+        paragraphs: [
+          "這篇適合要建立台股基本面 API workflow 的開發者、研究員與 AI agent 整合者。",
+          "若你希望從台股資料 API 快速建立可重跑、可驗證的研究流程，可先從本頁開始。",
+        ],
+      },
+      {
+        id: "fundamental-research-map",
+        label: "基本面研究會用到哪些資料",
+        paragraphs: [
+          "常見的基本面資料包含月營收、損益表、資產負債表、現金流量表與估值資料。建議用統一的 ticker、日期與資料來源規則，避免 cross-dataset 對齊錯誤。",
+        ],
+        bullets: [
+          "資料集介紹：/datasets/monthly-revenue、/datasets/income-statement、/datasets/balance-sheet、/datasets",
+          "API 文件：/docs/api/financial-growth/monthly-revenue、/docs/api/financial-growth/income-statement、/docs/api/financial-growth/balance-sheet、/docs/api/financial-growth/valuation-data",
+        ],
+      },
       {
         id: "prerequisites",
         label: "Prerequisites",
@@ -8424,6 +8443,9 @@ print(valuation_data)`,
       {
         id: "fundamentals-summary",
         label: "組合成基本面摘要",
+        paragraphs: [
+          "實務上建議先看月營收變化，再看損益表與資產負債表，最後用估值資料補上價格與基本面的相對關係。",
+        ],
         codeBlocks: [
           {
             language: "python",
@@ -8446,6 +8468,14 @@ print(summary)`,
         ],
       },
       {
+        id: "coverage-freshness-notes",
+        label: "資料缺口與 freshness 注意事項",
+        paragraphs: [
+          "不同資料集的更新節奏與揭露時點不同。使用前請先確認各 API 回傳的時間欄位、資料範圍與 data_gaps 欄位。",
+          "TW Market Data 會保留來源角色與資料缺口資訊，請不要假設任一資料集在所有日期與所有標的都完整覆蓋。",
+        ],
+      },
+      {
         id: "next-steps",
         label: "Next Steps",
         paragraphs: ["完成基本面摘要後，可延伸到："],
@@ -8453,6 +8483,9 @@ print(summary)`,
           "/docs/api/market-prices/twse-daily-price",
           "/docs/api/query-tools/query-api",
           "/docs/workflows/market-status",
+          "/datasets/monthly-revenue",
+          "/datasets/income-statement",
+          "/datasets/balance-sheet",
         ],
       },
     ],
@@ -8461,8 +8494,16 @@ print(summary)`,
     slug: "capital-flow",
     navLabel: "看籌碼",
     title: "看籌碼",
-    subtitle: "使用 Python 查詢三大法人、融資融券與公司事件，建立台股籌碼觀察流程。",
+    subtitle: "使用三大法人與融資融券資料，建立可驗證的台股籌碼觀察流程。",
     sections: [
+      {
+        id: "who-this-guide-is-for",
+        label: "這篇適合誰",
+        paragraphs: [
+          "這篇適合要追蹤外資、投信、自營商與信用交易變化的研究者與開發者。",
+          "若你想把籌碼面接入策略或 AI agent 研究流程，可從本頁的最小查詢流程開始。",
+        ],
+      },
       { id: "prerequisites", label: "Prerequisites", paragraphs: ["Python 3.9+、requests、X-API-Key、symbol（例如 2330）。"] },
       {
         id: "authentication",
@@ -8491,6 +8532,9 @@ def get_dataset(path, params):
       {
         id: "institutional-flow",
         label: "查詢三大法人買賣",
+        paragraphs: [
+          "三大法人買賣超可用於觀察資金流向與籌碼變化。資料單位以 shares 為主，實際欄位請以 API 文件回應為準。",
+        ],
         codeBlocks: [
           {
             language: "python",
@@ -8507,6 +8551,7 @@ def get_dataset(path, params):
       {
         id: "margin-short",
         label: "查詢融資融券",
+        paragraphs: ["融資融券可補充信用交易與市場槓桿情緒，適合與法人流向一起判讀。"],
         codeBlocks: [
           {
             language: "python",
@@ -8579,6 +8624,17 @@ print(result)`,
         ],
       },
       {
+        id: "coverage-caveat",
+        label: "coverage 注意事項",
+        paragraphs: [
+          "institutional-flow 資料集 coverage 仍在持續補齊中。請在 workflow 內保留 data_gaps 與缺值處理，不要直接把缺口當成 0。",
+        ],
+        bullets: [
+          "資料集介紹：/datasets/institutional-flow、/datasets",
+          "API 文件：/docs/api/capital-flow/institutional-flow、/docs/api/capital-flow/margin-short",
+        ],
+      },
+      {
         id: "next-steps",
         label: "Next Steps",
         paragraphs: ["完成籌碼與事件整合後，可延伸到："],
@@ -8586,6 +8642,7 @@ print(result)`,
           "/docs/api/market-prices/twse-daily-price",
           "/docs/api/market-prices/technical-indicators",
           "/docs/workflows/market-status",
+          "/datasets/institutional-flow",
         ],
       },
     ],
@@ -8594,8 +8651,15 @@ print(result)`,
     slug: "market-status",
     navLabel: "看市場狀態",
     title: "取得台股價格與市場狀態",
-    subtitle: "使用 Python 查詢 TWSE / TPEx 日線價格、市場指數、技術指標與市場廣度。",
+    subtitle: "以台股價格、成交量、技術指標與市場廣度建立可重跑的市場狀態觀測流程。",
     sections: [
+      {
+        id: "who-this-guide-is-for",
+        label: "這篇適合誰",
+        paragraphs: [
+          "這篇適合需要每日追蹤台股市場狀態、建立篩選流程或監控流程的開發者與研究團隊。",
+        ],
+      },
       { id: "prerequisites", label: "Prerequisites", paragraphs: ["Python 3.9+、requests、X-API-Key、symbol（例如 2330）。"] },
       {
         id: "authentication",
@@ -8702,7 +8766,10 @@ def get_dataset(path, params):
       {
         id: "market-summary",
         label: "組合成市場狀態摘要",
-        paragraphs: ["市場狀態資料依 snapshot / ingestion cadence 更新，建議與交易日資料一起判讀。"],
+        paragraphs: [
+          "市場狀態資料依 snapshot / ingestion cadence 更新，建議與交易日資料一起判讀。",
+          "若 workflow 需要橫跨多資料集，請同步檢查 freshness 與 data_gaps，避免把不同更新時間的資料視為同一個時間點。",
+        ],
         codeBlocks: [
           {
             language: "python",
@@ -8716,6 +8783,14 @@ def get_dataset(path, params):
 
 print(summary)`,
           },
+        ],
+      },
+      {
+        id: "dataset-links",
+        label: "資料集與文件入口",
+        bullets: [
+          "資料集介紹：/datasets/twse-daily-price、/datasets",
+          "API 文件：/docs/api/market-prices/twse-daily-price、/docs/api/market-prices/technical-indicators",
         ],
       },
       {
@@ -8734,9 +8809,16 @@ print(summary)`,
     slug: "fast-data-access",
     navLabel: "快速查資料",
     title: "快速查資料",
-    subtitle: "先搜尋再查詢，再用 Explainability 驗證來源與公式。",
+    subtitle: "用一致的查詢步驟，快速定位台股資料 API 並驗證資料來源與欄位意義。",
     sections: [
-      { id: "problem", label: "這個 workflow 解決什麼問題", paragraphs: ["把查資料流程從『找不到資料』變成『可快速定位、可驗證、可落地』。"] },
+      {
+        id: "problem",
+        label: "這個 workflow 解決什麼問題",
+        paragraphs: [
+          "把查資料流程從『找不到資料』變成『可快速定位、可驗證、可落地』。",
+          "這篇可作為 developer quickstart：先決定 ticker，再挑 dataset，再檢查 query parameters 與 response/data_gaps。",
+        ],
+      },
       { id: "datasets", label: "用到哪些 API / dataset", paragraphs: [], bullets: ["/v2/search", "/v2/query", "explainability layer"] },
       {
         id: "minimal-flow",
@@ -8745,28 +8827,75 @@ print(summary)`,
         bullets: ["用 Search API 先找標的與主題", "用 Query API 取回指定欄位", "用 Explainability 檢查來源角色與計算邏輯"],
       },
       { id: "order", label: "建議先後順序", paragraphs: ["先定位（search）再提取（query）最後驗證（explainability）。"] },
-      { id: "next", label: "可延伸搭配頁面", paragraphs: ["/docs/api/query-tools/search-api、/docs/api/query-tools/query-api、/docs/api/query-tools/explainability"] },
+      {
+        id: "quick-query-notes",
+        label: "快速查詢重點",
+        bullets: [
+          "先確認 symbol 與市場別，避免 ticker 對不到資料集。",
+          "比對 start_date/end_date 或 limit 參數，避免誤判資料缺漏。",
+          "若回傳包含 data_gaps，請保留並進入後續分析流程，不要直接忽略。",
+        ],
+      },
+      {
+        id: "next",
+        label: "可延伸搭配頁面",
+        paragraphs: [
+          "/docs/introduction、/docs/api/query-tools/search-api、/docs/api/query-tools/query-api、/docs/api/query-tools/explainability",
+          "/datasets、/openapi.json、/llms.txt",
+        ],
+      },
     ],
   },
   {
     slug: "strategy-ai",
     navLabel: "做策略 / AI",
     title: "做策略 / AI",
-    subtitle: "以 features、factor_data、time_alignment 建立策略與 agent 可用資料流。",
+    subtitle: "以結構化 market data 建立策略與 AI agent 研究流程，並保留資料缺口與可追溯證據。",
     sections: [
-      { id: "problem", label: "這個 workflow 解決什麼問題", paragraphs: ["把策略研究與 AI workflow 的資料準備流程標準化，降低特徵口徑不一致風險。"] },
+      {
+        id: "problem",
+        label: "這個 workflow 解決什麼問題",
+        paragraphs: [
+          "把策略研究與 AI workflow 的資料準備流程標準化，降低特徵口徑不一致風險。",
+          "AI agent 應優先讀取 structured data、lineage 與 data_gaps，而不是只依賴單一自然語言摘要。",
+        ],
+      },
       { id: "datasets", label: "用到哪些 API / dataset", paragraphs: [], bullets: ["features", "factor_data", "time_alignment"] },
       {
         id: "minimal-flow",
         label: "最小使用流程",
         paragraphs: [],
-        bullets: ["用 features 做快速訊號判讀", "用 factor_data 建立結構化因子集", "用 time_alignment 對齊決策時間點與資料時間"],
+        bullets: [
+          "先用價格資料建立時間軸與交易日基準",
+          "再接月營收與財報資料補上基本面脈絡",
+          "接著加入 institutional-flow 與其他交易面資料",
+          "最後保留 data_gaps / confidence / source attribution 供 agent 判讀",
+        ],
       },
       { id: "order", label: "建議先後順序", paragraphs: ["先判讀、再建模、最後對齊；可降低回測與即時執行偏差。"] },
       {
+        id: "ai-discoverability-entrypoints",
+        label: "AI / Agent 可讀入口",
+        paragraphs: [
+          "若要讓 agent 程式化讀取文件與資料面，請優先使用 /llms.txt、/llms-full.txt 與 /openapi.json。",
+          "MCP tools 目前為 preview / planned，不應假設為已上線的正式交易或投資建議系統。",
+        ],
+      },
+      {
+        id: "risk-and-disclaimer",
+        label: "研究流程聲明",
+        bullets: [
+          "本 workflow 僅用於資料研究、策略分析與系統整合，不構成投資建議。",
+          "請避免輸出 buy/sell/hold 或 target price 類型的交易行動指令。",
+        ],
+      },
+      {
         id: "next",
         label: "可延伸搭配頁面",
-        paragraphs: ["/docs/api/query-tools/query-api、/docs/api/query-tools/explainability、/docs/workflows/fast-data-access"],
+        paragraphs: [
+          "/docs/api/query-tools/query-api、/docs/api/query-tools/explainability、/docs/workflows/fast-data-access",
+          "/datasets、/datasets/twse-daily-price、/datasets/institutional-flow、/llms.txt、/llms-full.txt、/openapi.json",
+        ],
       },
     ],
   },
