@@ -14,6 +14,7 @@ type CodeBlockProps = {
   filename?: string;
   header?: ReactNode;
   className?: string;
+  contentClassName?: string;
   copyButtonVariant?: CopyButtonVariant;
 };
 
@@ -159,7 +160,7 @@ function CopyControl({ code, variant = "icon" }: { code: string; variant?: CopyB
   );
 }
 
-export function CodeBlock({ code, language, filename, header, className, copyButtonVariant = "icon" }: CodeBlockProps) {
+export function CodeBlock({ code, language, filename, header, className, contentClassName, copyButtonVariant = "icon" }: CodeBlockProps) {
   const normalizedLanguage = normalizeLanguage(language);
   const highlighted = useMemo(() => renderHighlightedCode(code, normalizedLanguage), [code, normalizedLanguage]);
 
@@ -177,7 +178,7 @@ export function CodeBlock({ code, language, filename, header, className, copyBut
           <CopyControl code={code} variant={copyButtonVariant} />
         </div>
       )}
-      <pre className="overflow-x-auto px-4 pb-4 pt-2 text-xs leading-6">
+      <pre className={cn("overflow-x-auto px-4 pb-4 pt-2 text-xs leading-6", contentClassName)}>
         <code className="font-mono">{highlighted}</code>
       </pre>
     </div>

@@ -59,6 +59,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   const [apiKey, setApiKey] = useState("");
   const [activeStatus, setActiveStatus] = useState<ApiStatusExample["status"]>(api.sidePanel.statusExamples[0]?.status ?? "200");
   const [queryValues, setQueryValues] = useState<ParamState>({});
+  const [runNotice, setRunNotice] = useState("");
 
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -76,7 +77,22 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
     setQueryValues(initialValues);
     setActiveStatus(api.sidePanel.statusExamples[0]?.status ?? "200");
     setApiKey("");
+    setRunNotice("");
     setIsOpen(true);
+  }
+
+  function handleRunPreview() {
+    const hasMissingRequired = (api.queryParameters ?? []).some((parameter) => parameter.required && !queryValues[parameter.name]?.trim());
+
+    if (hasMissingRequired) {
+      const has400 = api.sidePanel.statusExamples.some((example) => example.status === "400");
+      if (has400) setActiveStatus("400");
+      setRunNotice("缺少必填參數，已切換到 400 範例。");
+      return;
+    }
+
+    setActiveStatus("200");
+    setRunNotice("已更新請求範例。");
   }
 
   useEffect(() => {
@@ -161,52 +177,65 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
       {isOpen ? (
         <div className="fixed inset-0 z-50">
           <div aria-hidden="true" className="fixed inset-0 bg-slate-900/35 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
-          <div className="fixed inset-0 flex items-center justify-center p-3 md:p-6">
+          <div className="fixed inset-0 flex items-center justify-center p-3 md:p-8">
             <div
               ref={dialogRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby="api-playground-title"
               aria-describedby="api-playground-description"
-              className="relative flex h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+              className="relative flex h-[min(760px,calc(100vh-64px))] w-full max-w-[1200px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
-              <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3 md:px-6">
-                <div className="min-w-0 space-y-1">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="rounded border border-slate-300 bg-slate-50 px-2 py-0.5 font-semibold text-slate-800">{api.method}</span>
-                    <code className="truncate font-mono text-slate-700">{api.endpoint}</code>
+              <div className="border-b border-slate-200 px-4 py-3 md:px-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="rounded border border-slate-300 bg-slate-50 px-2 py-0.5 font-semibold text-slate-800">{api.method}</span>
+                      <code className="truncate font-mono text-slate-700">{api.endpoint}</code>
+                    </div>
+                    <p id="api-playground-title" className="truncate text-sm font-semibold text-slate-900">
+                      {endpointTitle}
+                    </p>
                   </div>
-                  <p id="api-playground-title" className="truncate text-sm font-semibold text-slate-900">
-                    {endpointTitle}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleRunPreview}
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white transition hover:bg-slate-700"
+                    >
+                      Run
+                      <Play className="h-3.5 w-3.5" />
+                    </button>
+                    <button
+                      ref={closeButtonRef}
+                      type="button"
+                      onClick={() => setIsOpen(false)}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
+                      aria-label="關閉"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
-                <button
-                  ref={closeButtonRef}
-                  type="button"
-                  onClick={() => setIsOpen(false)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
-                  aria-label="關閉"
-                >
-                  <X className="h-4 w-4" />
-                </button>
+                {runNotice ? <p className="pt-1 text-[11px] text-slate-500">{runNotice}</p> : null}
               </div>
 
-              <div className="grid flex-1 grid-cols-1 overflow-y-auto md:grid-cols-2">
-                <div className="space-y-6 border-b border-slate-200 p-4 md:border-b-0 md:border-r md:p-6">
-                  <section className="space-y-2">
+              <div className="grid flex-1 min-h-0 grid-cols-1 md:grid-cols-2">
+                <div className="flex min-h-0 flex-col gap-4 border-b border-slate-200 p-4 md:border-b-0 md:border-r md:p-5">
+                  <section className="space-y-1">
                     <h3 id="api-playground-description" className="text-sm font-semibold text-slate-900">
                       試跑 API 請求
                     </h3>
-                    <p className="text-xs leading-6 text-slate-600">
-                      填入參數後，產生對應的 cURL 與回應範例。實際可用資料依方案、coverage 與 freshness 狀態為準。
+                    <p className="text-xs leading-5 text-slate-600">
+                      填入參數，產生 cURL 與回應範例。實際資料依 coverage 與 freshness 為準。
                     </p>
                   </section>
 
-                  <section className="space-y-3">
-                    <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">授權</h4>
-                    <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
-                      <div className="flex items-center gap-2 text-xs">
+                  <section className="space-y-2">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">授權</h4>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50 p-2.5">
+                      <div className="mb-2 flex items-center gap-2 text-xs">
                         <span className="font-mono text-slate-700">X-API-Key</span>
                         <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">必填</span>
                         <span className="text-slate-500">string</span>
@@ -216,20 +245,27 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                         value={apiKey}
                         onChange={(event) => setApiKey(event.target.value)}
                         placeholder="輸入 X-API-Key"
-                        className="h-9 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-800 outline-none ring-slate-300 placeholder:text-slate-400 focus:ring-2"
+                        className="h-8 w-full rounded-md border border-slate-300 bg-white px-2.5 text-xs text-slate-800 outline-none ring-slate-300 placeholder:text-slate-400 focus:ring-2"
                         autoComplete="off"
                       />
-                      <p className="text-[11px] leading-5 text-slate-500">API key 僅用於產生本次請求範例；本頁不會儲存或記錄。</p>
+                      <p className="pt-1 text-[10px] leading-4 text-slate-500">API key 僅用於本次預覽，本頁不會儲存或記錄。</p>
                     </div>
                   </section>
 
-                  <section className="space-y-3">
-                    <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">查詢參數</h4>
-                    <div className="space-y-2">
+                  <section className="flex min-h-0 flex-1 flex-col gap-2">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">查詢參數</h4>
+                    <div className="min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-white">
+                      <div className="sticky top-0 z-10 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-2 border-b border-slate-200 bg-slate-50 px-2.5 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                        <span>參數</span>
+                        <span>值</span>
+                      </div>
+                      <div className="divide-y divide-slate-200">
                       {(api.queryParameters ?? []).map((parameter) => (
-                        <div key={parameter.name} className="rounded-lg border border-slate-200 bg-white p-3">
-                          <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
-                            <span className="font-mono font-semibold text-slate-700">{parameter.name}</span>
+                        <div key={parameter.name} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-2 px-2.5 py-2.5">
+                          <div className="min-w-0 space-y-1">
+                            <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                              <span className="truncate font-mono font-semibold text-slate-700">{parameter.name}</span>
+                              <span className="text-[10px] text-slate-500">{parameter.type}</span>
                             <span
                               className={cn(
                                 "rounded px-1.5 py-0.5 text-[10px] font-medium",
@@ -238,7 +274,8 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                             >
                               {parameter.required ? "必填" : "選填"}
                             </span>
-                            <span className="text-slate-500">{parameter.type}</span>
+                          </div>
+                            <p className="line-clamp-1 text-[10px] leading-4 text-slate-500">{parameter.description}</p>
                           </div>
                           <input
                             type={getLanguageFromType(parameter.type) === "number" ? "number" : "text"}
@@ -249,25 +286,20 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                                 [parameter.name]: event.target.value,
                               }))
                             }
-                            className="h-9 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-800 outline-none ring-slate-300 placeholder:text-slate-400 focus:ring-2"
-                            placeholder={`輸入 ${parameter.name}`}
+                            className="h-8 w-full self-start rounded-md border border-slate-300 bg-white px-2.5 text-xs text-slate-800 outline-none ring-slate-300 placeholder:text-slate-400 focus:ring-2"
+                            placeholder={parameter.name}
                           />
-                          <p className="mt-2 text-[11px] leading-5 text-slate-500">{parameter.description}</p>
                         </div>
                       ))}
+                      </div>
                     </div>
                   </section>
                 </div>
 
-                <div className="space-y-6 p-4 md:p-6">
-                  <section className="space-y-2">
-                    <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">請求範例</h4>
-                    <CodeBlock code={generatedCurl} language="curl" copyButtonVariant="icon" />
-                  </section>
-
-                  <section className="space-y-2">
+                <div className="flex min-h-0 flex-col gap-4 p-4 md:p-5">
+                  <section className="flex min-h-0 flex-1 flex-col gap-2">
                     <div className="flex items-center justify-between gap-3">
-                      <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500">回應範例</h4>
+                      <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">回應範例</h4>
                       <div className="flex flex-wrap gap-1">
                         {api.sidePanel.statusExamples.map((example) => (
                           <button
@@ -275,7 +307,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                             type="button"
                             onClick={() => setActiveStatus(example.status)}
                             className={cn(
-                              "rounded-md px-2 py-1 text-xs font-medium transition",
+                              "rounded-full px-2 py-1 text-[11px] font-medium transition",
                               activeStatus === example.status ? "bg-slate-200 text-slate-900" : "text-slate-500 hover:text-slate-700",
                             )}
                           >
@@ -284,8 +316,24 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                         ))}
                       </div>
                     </div>
-                    {activeExample ? <p className="text-xs leading-6 text-slate-600">{activeExample.description}</p> : null}
-                    <CodeBlock code={activeExample?.body ?? "{}"} language="json" copyButtonVariant="icon" />
+                    {activeExample ? <p className="line-clamp-1 text-[11px] leading-5 text-slate-600">{activeExample.description}</p> : null}
+                    <CodeBlock
+                      code={activeExample?.body ?? "{}"}
+                      language="json"
+                      copyButtonVariant="icon"
+                      className="min-h-0 flex-1"
+                      contentClassName="max-h-[260px] overflow-auto"
+                    />
+                  </section>
+
+                  <section className="space-y-2">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">請求範例</h4>
+                    <CodeBlock
+                      code={generatedCurl}
+                      language="curl"
+                      copyButtonVariant="icon"
+                      contentClassName="max-h-[170px] overflow-auto"
+                    />
                   </section>
                 </div>
               </div>
