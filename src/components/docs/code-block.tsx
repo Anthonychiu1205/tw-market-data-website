@@ -48,11 +48,11 @@ function tokenizeJsonLine(line: string): Token[] {
 
     const token = match[0];
     let className = "text-slate-600";
-    if (/^\".*\":$/.test(token)) className = "text-amber-700";
-    else if (/^\"/.test(token)) className = "text-emerald-700";
-    else if (/^(true|false)$/.test(token)) className = "text-blue-700";
+    if (/^\".*\":$/.test(token)) className = "text-amber-600";
+    else if (/^\"/.test(token)) className = "text-teal-700";
+    else if (/^(true|false)$/.test(token)) className = "text-indigo-600";
     else if (/^null$/.test(token)) className = "text-slate-500";
-    else className = "text-violet-700";
+    else className = "text-sky-700";
 
     tokens.push({ text: token, className });
     lastIndex = tokenRegex.lastIndex;
@@ -74,14 +74,14 @@ function tokenizeCodeLine(line: string, language: CodeBlockLanguage): Token[] {
   const chunks = body.split(/(\s+|[(){}\[\],.:=<>+\-*/])/g).filter((chunk) => chunk.length > 0);
   const tokens: Token[] = chunks.map((chunk) => {
     if (/^\s+$/.test(chunk)) return { text: chunk, className: "text-slate-700" };
-    if (/^(['"`]).*\1$/.test(chunk)) return { text: chunk, className: "text-emerald-700" };
-    if (NUMBER_PATTERN.test(chunk)) return { text: chunk, className: "text-violet-700" };
+    if (/^(['"`]).*\1$/.test(chunk)) return { text: chunk, className: "text-teal-700" };
+    if (NUMBER_PATTERN.test(chunk)) return { text: chunk, className: "text-sky-700" };
 
     const keywordRegex =
       language === "python" ? PYTHON_KEYWORDS : language === "bash" || language === "curl" ? SHELL_KEYWORDS : JS_KEYWORDS;
 
-    if (keywordRegex.test(chunk)) return { text: chunk, className: "text-blue-700" };
-    if (chunk.startsWith("$") && (language === "bash" || language === "curl")) return { text: chunk, className: "text-rose-700" };
+    if (keywordRegex.test(chunk)) return { text: chunk, className: "text-slate-800" };
+    if (chunk.startsWith("$") && (language === "bash" || language === "curl")) return { text: chunk, className: "text-amber-700" };
     return { text: chunk, className: "text-slate-700" };
   });
 
