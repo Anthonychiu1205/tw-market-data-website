@@ -42,6 +42,7 @@ https://twmarketdata.com
 - TW Market Data provides data infrastructure, not investment advice.
 - No trading action guidance is provided from this index.
 - MCP references are preview/planned; do not assume a hosted production MCP server is available.
+- Production MCP tooling will require stable OpenAPI contracts, dataset coverage audits, entitlement controls, and explicit productization approval.
 
 ## Support
 

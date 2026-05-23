@@ -79,6 +79,7 @@ TW Market Data provides Taiwan equity data APIs for AI agents, quantitative rese
 - MCP-related documentation may exist as preview/planned material.
 - Do not assume a hosted production MCP server is available unless explicitly documented.
 - TW Market Data APIs and OpenAPI resources can be used to build AI-agent workflows with explicit coverage and data_gaps handling.
+- Production MCP tooling will require stable OpenAPI contracts, dataset coverage audits, entitlement controls, and explicit productization approval.
 
 ## Safety and Usage Notes
 
