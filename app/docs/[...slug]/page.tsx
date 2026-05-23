@@ -94,7 +94,6 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
         { id: "response-shape", label: "Response Shape" },
         { id: "field-reference", label: "Field 說明" },
         { id: "usage-notes", label: "Usage Notes / 使用建議" },
-        ...(api.planRequirement ? [{ id: "plan-requirement", label: api.planRequirement.title ?? "Plan Requirement" }] : []),
       ]).map(({ id, label }) => ({ id, label }));
 
       return (
@@ -215,17 +214,6 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               </ul>
             </section>
 
-            {api.planRequirement ? (
-              <section className="space-y-3">
-                <SectionHeading id="plan-requirement">{api.planRequirement.title ?? "Plan Requirement"}</SectionHeading>
-                <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
-                  {(api.planRequirement.bullets ?? []).map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-
             <section className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
               <p className="text-sm text-slate-700">
                 此 API 屬於 TW Market Data 資料集目錄。{" "}
@@ -241,7 +229,6 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
     const tocSections = normalizeDocsSections([
       { id: "overview", label: "Overview" },
-      ...(api.planRequirement ? [{ id: "plan-requirement", label: api.planRequirement.title ?? "適用方案" }] : []),
       { id: "request", label: "Request" },
       { id: "response", label: "Response" },
       { id: "field-reference", label: "Field 說明" },
@@ -284,17 +271,6 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               </p>
             ))}
           </section>
-
-          {api.planRequirement ? (
-            <section className="space-y-3 border-b border-slate-200 pb-8">
-              <SectionHeading id="plan-requirement">{api.planRequirement.title ?? "適用方案"}</SectionHeading>
-              <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
-                {(api.planRequirement.bullets ?? []).map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
 
           <section className="space-y-3 border-b border-slate-200 pb-8">
             <SectionHeading id="request">Request</SectionHeading>
