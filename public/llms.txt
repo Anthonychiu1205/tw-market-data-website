@@ -23,10 +23,16 @@ https://twmarketdata.com
 ## Core Dataset Pages
 
 - TWSE daily price: https://twmarketdata.com/datasets/twse-daily-price
+- TPEx daily price: https://twmarketdata.com/datasets/tpex-daily-price
+- Technical indicators: https://twmarketdata.com/datasets/technical-indicators
 - Monthly revenue: https://twmarketdata.com/datasets/monthly-revenue
 - Income statement: https://twmarketdata.com/datasets/income-statement
 - Balance sheet: https://twmarketdata.com/datasets/balance-sheet
 - Institutional flow: https://twmarketdata.com/datasets/institutional-flow
+- Valuation data: https://twmarketdata.com/datasets/valuation-data
+- Issuer profile: https://twmarketdata.com/datasets/issuer-profile
+- Margin short: https://twmarketdata.com/datasets/margin-short
+- Company events: https://twmarketdata.com/datasets/company-events
 
 ## API Documentation Groups
 

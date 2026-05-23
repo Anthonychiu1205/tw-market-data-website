@@ -142,6 +142,192 @@ export const datasetSeoEntries: readonly DatasetSeoEntry[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "tpex-daily-price",
+    name: "TPEx 日線價格",
+    seoTitle: "TPEx 日線價格資料集 | TW Market Data",
+    seoDescription:
+      "TPEx 日線價格資料集提供上櫃股票每日開高低收與成交資訊，支援中小型股研究、回測與趨勢分析。",
+    shortDescription: "上櫃股票每日價格與成交資訊的結構化資料集。",
+    whatItIs:
+      "此資料集聚焦上櫃公司（TPEx）日線市場資料，包含價格與成交欄位，適合補齊台股中小型股研究的資料層。",
+    useCases: [
+      "觀察上櫃市場與中小型股價格趨勢",
+      "建立跨市場（TWSE/TPEx）日線回測資料",
+      "作為技術指標與風險監控的底層輸入",
+    ],
+    whyItMatters:
+      "若只看上市市場資料，容易忽略櫃買市場的重要訊號。TPEx 日線資料可補足台股研究的市場覆蓋廣度。",
+    coverageNote:
+      "覆蓋範圍會依官方來源揭露與產品化進度持續更新，請以 API 文件與 data_gaps 訊號判讀可用範圍。",
+    freshnessNote:
+      "資料以日線與結構化回應為主，更新節奏與延遲請依回應 metadata 與文件標示為準。",
+    sourcePolicyNote:
+      "遵循 official/public-first 原則，保留來源語義與 lineage，不以未驗證來源補齊缺口。",
+    docsHref: "/docs/api/market-prices/tpex-daily-price",
+    pricingHref: "/pricing",
+    keywords: ["TPEx 日線價格 API", "上櫃股票資料", "台股中小型股資料"],
+    jsonLdName: "TPEx 日線價格資料集",
+    jsonLdDescription: "台股上櫃股票日線價格與成交資料，支援市場研究與量化流程。",
+    sourceRole: "official_tpex_daily_price",
+    provider: "tpex",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "technical-indicators",
+    name: "技術指標",
+    seoTitle: "台股技術指標資料集 | TW Market Data",
+    seoDescription:
+      "台股技術指標資料集提供由價格與成交量衍生的均線、報酬率與波動率指標，支援趨勢與動能分析。",
+    shortDescription: "由價格與成交資料衍生的技術分析指標資料集。",
+    whatItIs:
+      "此資料集屬於 derived dataset，基於日線價格與成交量進行標準化計算，提供可直接用於研究流程的技術指標欄位。",
+    useCases: [
+      "建立趨勢、動能與風險監控規則",
+      "作為量化回測條件與策略篩選輸入",
+      "補充基本面研究中的市場行為訊號",
+    ],
+    whyItMatters:
+      "技術指標可把原始價格序列轉為可比較的研究特徵，協助系統更快發現趨勢與異常變化。",
+    coverageNote:
+      "此資料集依賴底層價格資料，coverage 會跟隨 TWSE/TPEx 價格資料可用範圍與計算條件變化。",
+    freshnessNote:
+      "更新節奏通常跟隨底層日線資料；請以回應 metadata、freshness 與 data_gaps 為準。",
+    sourcePolicyNote:
+      "技術指標為衍生層，不等同官方原始欄位；計算邏輯與來源脈絡需與文件一併判讀。",
+    docsHref: "/docs/api/market-prices/technical-indicators",
+    pricingHref: "/pricing",
+    keywords: ["台股技術指標 API", "均線資料", "動能指標", "量化回測指標"],
+    jsonLdName: "技術指標資料集",
+    jsonLdDescription: "由台股價格與成交量衍生的技術指標資料，支援趨勢與動能研究。",
+    sourceRole: "derived_technical_indicators",
+    provider: "twmd",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "valuation-data",
+    name: "估值資料",
+    seoTitle: "台股估值資料集 | TW Market Data",
+    seoDescription:
+      "台股估值資料集提供 PE、PB、dividend yield 等估值欄位，支援價格與基本面關聯分析。",
+    shortDescription: "本益比、股價淨值比與殖利率等估值欄位的結構化資料集。",
+    whatItIs:
+      "此資料集整理常用估值指標，協助研究流程比較公司價格與基本面之間的相對關係。",
+    useCases: [
+      "觀察 PE、PB、殖利率在不同期間的變化",
+      "建立同業估值比較與分位數分析",
+      "作為研究框架中的估值訊號輸入",
+    ],
+    whyItMatters:
+      "估值資料有助於理解市場定價與基本面變化的對應關係，但需搭配來源與coverage脈絡解讀。",
+    coverageNote:
+      "估值欄位會依 source proof、coverage 與產品化 rollout 逐步擴充，不應假設所有欄位在全期間皆完整。",
+    freshnessNote:
+      "更新節奏與可用性受底層價格/財報來源影響，請以回應中的 freshness 與 data_gaps 訊號判讀。",
+    sourcePolicyNote:
+      "本資料集優先提供可驗證欄位；未完成 source proof 的延伸欄位不會包裝為完整能力。",
+    docsHref: "/docs/api/financial-growth/valuation-data",
+    pricingHref: "/pricing",
+    keywords: ["台股估值資料 API", "本益比 API", "股價淨值比 API", "殖利率資料"],
+    jsonLdName: "估值資料集",
+    jsonLdDescription: "台股 PE、PB、殖利率等估值欄位資料，支援估值與研究流程分析。",
+    sourceRole: "official_valuation_data",
+    provider: "twse",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "issuer-profile",
+    name: "公司基本資料",
+    seoTitle: "公司基本資料集 | TW Market Data",
+    seoDescription:
+      "公司基本資料集提供股票代號、公司名稱、產業分類與上市櫃資訊，是資料串接與篩選研究的核心主檔。",
+    shortDescription: "股票代號與公司主檔欄位的結構化資料集。",
+    whatItIs:
+      "此資料集提供 issuer profile 主檔，用於統一公司識別、產業分類與市場屬性，支援跨資料集關聯。",
+    useCases: [
+      "資料表關聯與 ticker 對照",
+      "依產業/市場分類做篩選與分組",
+      "建立研究流程中的公司主檔維度",
+    ],
+    whyItMatters:
+      "公司基本資料是所有資料集串接的基礎，若主檔不一致，後續財報、價格與事件分析容易出現關聯錯誤。",
+    coverageNote:
+      "覆蓋範圍與欄位完整度會依官方公開資料與標準化進度維護，請以文件與回應欄位為準。",
+    freshnessNote:
+      "主檔更新節奏取決於官方異動揭露時間，實際更新狀態請以 freshness 與資料回應判讀。",
+    sourcePolicyNote:
+      "主檔欄位採 official/public-first 原則與可追溯 lineage，避免未驗證來源造成識別漂移。",
+    docsHref: "/docs/api/company/issuer-profile",
+    pricingHref: "/pricing",
+    keywords: ["公司基本資料 API", "issuer profile API", "股票代號公司名稱 API", "產業分類資料"],
+    jsonLdName: "公司基本資料集",
+    jsonLdDescription: "台股公司主檔資料，支援資料串接、分類與研究流程建模。",
+    sourceRole: "official_issuer_profile",
+    provider: "twse",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "margin-short",
+    name: "融資融券",
+    seoTitle: "台股融資融券資料集 | TW Market Data",
+    seoDescription:
+      "台股融資融券資料集整理信用交易欄位，可用於觀察市場槓桿、散戶情緒與短線風險。",
+    shortDescription: "信用交易與融資融券相關欄位的結構化資料集。",
+    whatItIs:
+      "此資料集提供融資、融券與信用交易面資訊，支援籌碼面與風險情緒觀察。",
+    useCases: [
+      "追蹤融資/融券餘額與變化",
+      "分析市場槓桿與風險偏好",
+      "搭配法人與價格資料建立籌碼研究框架",
+    ],
+    whyItMatters:
+      "融資融券是台股信用交易的重要訊號，可補充價格與法人資料，協助判讀市場風險熱度。",
+    coverageNote:
+      "coverage 會依資料 rollout 與 source policy 持續標示，不應假設全市場/全期間皆完整覆蓋。",
+    freshnessNote:
+      "更新時間與可用日期受來源供給節奏影響，請以回應中的 freshness 與 data_gaps 訊號為準。",
+    sourcePolicyNote:
+      "資料以官方/公開來源為優先，保留來源語義與缺口標記，不以推估值補齊。",
+    docsHref: "/docs/api/capital-flow/margin-short",
+    pricingHref: "/pricing",
+    keywords: ["台股融資融券 API", "信用交易資料", "融資餘額", "融券資料"],
+    jsonLdName: "融資融券資料集",
+    jsonLdDescription: "台股信用交易與融資融券資料，支援籌碼與風險情緒分析。",
+    sourceRole: "official_margin_short",
+    provider: "twse",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "company-events",
+    name: "公司事件與公告",
+    seoTitle: "台股公司事件與公告資料集 | TW Market Data",
+    seoDescription:
+      "公司事件與公告資料集整理事件日曆、結構化事件、公司行動與股利 metadata，支援風險監控與研究流程。",
+    shortDescription: "公司公告與事件 metadata 的結構化資料集。",
+    whatItIs:
+      "此資料集聚焦公司公告與事件 metadata，包含事件日曆、結構化事件、公司行動與股利等可查詢欄位。",
+    useCases: [
+      "追蹤公司事件與公告節奏",
+      "建立事件驅動研究與風險監控流程",
+      "搭配價格/基本面資料做事件前後比較",
+    ],
+    whyItMatters:
+      "事件資料可補充價格與財報的時間落差，幫助研究流程更早發現風險訊號與重要變化。",
+    coverageNote:
+      "此資料集以 metadata-first 與官方揭露為主，覆蓋範圍會依來源與產品化進度逐步擴充。",
+    freshnessNote:
+      "事件更新節奏依官方揭露時點與結構化流程而定，請以回應 freshness 與 data_gaps 訊號為準。",
+    sourcePolicyNote:
+      "本資料集不等同完整新聞全文資料庫，不提供未授權全文再散佈；重點在官方揭露與結構化事件 metadata。",
+    docsHref: "/docs/api/company-events/events-calendar",
+    pricingHref: "/pricing",
+    keywords: ["台股公司事件 API", "公司公告 metadata", "corporate actions", "台股事件資料"],
+    jsonLdName: "公司事件與公告資料集",
+    jsonLdDescription: "台股公司事件與公告 metadata，支援風險監控與事件研究流程。",
+    sourceRole: "official_company_events_metadata",
+    provider: "twse",
+    marketScope: "TWSE_TPEX",
+  },
+  {
     slug: "institutional-flow",
     name: "三大法人買賣超",
     seoTitle: "三大法人買賣超資料集 | TW Market Data",
