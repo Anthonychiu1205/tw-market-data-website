@@ -1,45 +1,49 @@
 # TW Market Data
 
-台股資料 API，為 AI agent、量化研究與金融產品開發設計。
+TW Market Data 是台股資料 API，為 AI agent、量化研究、自動化系統與金融產品開發設計。
 
-Base URL: https://twmarketdata.com
+## Base URL
 
-Documentation:
-- /docs/introduction
-- /docs/quick-start
-- /datasets
-- /datasets/twse-daily-price
-- /datasets/monthly-revenue
-- /datasets/income-statement
-- /datasets/balance-sheet
-- /datasets/institutional-flow
-- /pricing
+https://twmarketdata.com
 
-Authentication:
-- API key workflow via dashboard and documented API routes.
-- Access scope and limits depend on plan and rollout stage.
+## Authentication
 
-Key dataset groups:
-- Market Prices
-- Fundamentals
-- Institutional Flow
-- Technical Indicators
-- News Intelligence (metadata-first)
+- API access uses an API key workflow through the dashboard.
+- Access scope, rate limits and dataset availability depend on plan and rollout status.
+- Do not include secrets in prompts, logs or public client code.
 
-AI agent notes:
-- data_gaps are preserved in responses.
-- coverage and freshness should be checked before downstream use.
-- not investment advice.
-- no trading action guidance is provided.
+## Main Documentation
 
-OpenAPI:
-- https://twmarketdata.com/openapi.json
-- /docs/openapi-spec
+- Introduction: https://twmarketdata.com/docs/introduction
+- Dataset catalog: https://twmarketdata.com/datasets
+- Pricing: https://twmarketdata.com/pricing
+- OpenAPI: https://twmarketdata.com/openapi.json
+- Full LLM index: https://twmarketdata.com/llms-full.txt
 
-MCP:
-- Preview / planned references are documented in /docs/tools-mcp.
-- Hosted production MCP server is not announced in this file.
+## Core Dataset Pages
 
-Support:
-- /contact
-- avenra.platform@gmail.com
+- TWSE daily price: https://twmarketdata.com/datasets/twse-daily-price
+- Monthly revenue: https://twmarketdata.com/datasets/monthly-revenue
+- Income statement: https://twmarketdata.com/datasets/income-statement
+- Balance sheet: https://twmarketdata.com/datasets/balance-sheet
+- Institutional flow: https://twmarketdata.com/datasets/institutional-flow
+
+## API Documentation Groups
+
+- Market prices: https://twmarketdata.com/docs/api/market-prices/twse-daily-price
+- Fundamentals: https://twmarketdata.com/docs/api/financial-growth/monthly-revenue
+- Institutional flow: https://twmarketdata.com/docs/api/capital-flow/institutional-flow
+- Company profile: https://twmarketdata.com/docs/api/company/issuer-profile
+- OpenAPI reference: https://twmarketdata.com/docs/openapi-spec
+
+## AI Agent Notes
+
+- Preserve data_gaps, coverage and freshness context in downstream workflows.
+- TW Market Data provides data infrastructure, not investment advice.
+- No trading action guidance is provided from this index.
+- MCP references are preview/planned; do not assume a hosted production MCP server is available.
+
+## Support
+
+- Contact: https://twmarketdata.com/contact
+- Email: avenra.platform@gmail.com

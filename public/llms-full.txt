@@ -1,65 +1,96 @@
-# TW Market Data - LLM Full Index
+# TW Market Data - Full LLM Index
 
-TW Market Data 提供台股資料 API，採 official/public-first 與 controlled rollout。
+## Product Overview
+
+TW Market Data provides Taiwan equity data APIs for AI agents, quantitative research, analytics workflows and financial product development. The platform follows an official/public-first data policy and preserves coverage, freshness, lineage and data_gaps context where available.
 
 ## Primary Entrypoints
-- https://twmarketdata.com/docs/introduction
-- https://twmarketdata.com/docs/quick-start
-- https://twmarketdata.com/datasets
-- https://twmarketdata.com/datasets/twse-daily-price
-- https://twmarketdata.com/datasets/monthly-revenue
-- https://twmarketdata.com/datasets/income-statement
-- https://twmarketdata.com/datasets/balance-sheet
-- https://twmarketdata.com/datasets/institutional-flow
-- https://twmarketdata.com/pricing
 
-## Source, Coverage, Freshness
-- 請先檢查 docs 中的 source policy、coverage、freshness 與 data_gaps 說明。
-- /docs/data-provenance
-- /docs/market-coverage
+- Homepage: https://twmarketdata.com
+- Documentation: https://twmarketdata.com/docs/introduction
+- Dataset catalog: https://twmarketdata.com/datasets
+- Pricing: https://twmarketdata.com/pricing
+- OpenAPI JSON: https://twmarketdata.com/openapi.json
+- Short LLM index: https://twmarketdata.com/llms.txt
 
-## Core API Docs
+## Dataset Landing Pages
+
+- TWSE daily price: https://twmarketdata.com/datasets/twse-daily-price
+- Monthly revenue: https://twmarketdata.com/datasets/monthly-revenue
+- Income statement: https://twmarketdata.com/datasets/income-statement
+- Balance sheet: https://twmarketdata.com/datasets/balance-sheet
+- Institutional flow: https://twmarketdata.com/datasets/institutional-flow
+
+## API Documentation
+
 ### Market Prices
-- /docs/api/market-prices/twse-daily-price
-- /docs/api/market-prices/tpex-daily-price
-- /docs/api/market-prices/technical-indicators
+
+- TWSE daily price: https://twmarketdata.com/docs/api/market-prices/twse-daily-price
+- TPEx daily price: https://twmarketdata.com/docs/api/market-prices/tpex-daily-price
+- Technical indicators: https://twmarketdata.com/docs/api/market-prices/technical-indicators
 
 ### Fundamentals
-- /docs/api/financial-growth/monthly-revenue
-- /docs/api/financial-growth/income-statement
-- /docs/api/financial-growth/balance-sheet
-- /docs/api/financial-growth/cash-flow-statement
-- /docs/api/financial-growth/valuation-data
+
+- Monthly revenue: https://twmarketdata.com/docs/api/financial-growth/monthly-revenue
+- Income statement: https://twmarketdata.com/docs/api/financial-growth/income-statement
+- Balance sheet: https://twmarketdata.com/docs/api/financial-growth/balance-sheet
+- Cash flow statement: https://twmarketdata.com/docs/api/financial-growth/cash-flow-statement
+- Valuation data: https://twmarketdata.com/docs/api/financial-growth/valuation-data
 
 ### Capital Flow
-- /docs/api/capital-flow/institutional-flow
-- /docs/api/capital-flow/margin-short
 
-### Company / Events
-- /docs/api/company/issuer-profile
-- /docs/api/company-events/events-calendar
-- /docs/api/company-events/structured-events
-- /docs/api/company-events/corporate-actions
-- /docs/api/company-events/dividends
+- Institutional flow: https://twmarketdata.com/docs/api/capital-flow/institutional-flow
+- Margin short: https://twmarketdata.com/docs/api/capital-flow/margin-short
 
-## Guides / Workflow Search Entrypoints
-- /docs/workflows/fast-data-access
-- /docs/workflows/company-fundamentals
-- /docs/workflows/capital-flow
-- /docs/workflows/market-status
-- /docs/workflows/strategy-ai
+### Company and Events
 
-## AI / Agent Discoverability Notes
-- OpenAPI machine-readable artifact: https://twmarketdata.com/openapi.json
-- OpenAPI reference entry: /docs/openapi-spec
-- Tools / MCP docs entry: /docs/tools-mcp
-- MCP is preview/planned context; do not assume hosted production MCP endpoint availability.
+- Issuer profile: https://twmarketdata.com/docs/api/company/issuer-profile
+- Events calendar: https://twmarketdata.com/docs/api/company-events/events-calendar
+- Structured events: https://twmarketdata.com/docs/api/company-events/structured-events
+- Corporate actions: https://twmarketdata.com/docs/api/company-events/corporate-actions
+- Dividends: https://twmarketdata.com/docs/api/company-events/dividends
+
+## Guides and Workflows
+
+- Fast data access: https://twmarketdata.com/docs/workflows/fast-data-access
+- Company fundamentals: https://twmarketdata.com/docs/workflows/company-fundamentals
+- Capital flow: https://twmarketdata.com/docs/workflows/capital-flow
+- Market status: https://twmarketdata.com/docs/workflows/market-status
+- Strategy and AI: https://twmarketdata.com/docs/workflows/strategy-ai
+
+## Source, Coverage and Freshness
+
+- Data provenance: https://twmarketdata.com/docs/data-provenance
+- Market coverage: https://twmarketdata.com/docs/market-coverage
+- The platform uses official/public-first sources where possible.
+- Some datasets are production-ready, some are preview or coverage-limited, and some are deferred pending source proof.
+- Cash flow, valuation extensions, institutional flow and News Intelligence may carry coverage or rollout caveats depending on current product status.
+- Preserve data_gaps, source lineage and confidence context in downstream systems.
+
+## Machine-Readable Resources
+
+- OpenAPI JSON: https://twmarketdata.com/openapi.json
+- OpenAPI docs: https://twmarketdata.com/docs/openapi-spec
+- llms.txt: https://twmarketdata.com/llms.txt
+- llms-full.txt: https://twmarketdata.com/llms-full.txt
+
+## MCP / AI Agent Status
+
+- MCP-related documentation may exist as preview/planned material.
+- Do not assume a hosted production MCP server is available unless explicitly documented.
+- TW Market Data APIs and OpenAPI resources can be used to build AI-agent workflows with explicit coverage and data_gaps handling.
 
 ## Safety and Usage Notes
-- Responses may include gaps; keep data_gaps and confidence context in downstream systems.
-- Do not treat model outputs as investment advice.
-- Do not provide trading action guidance from this index alone.
 
-## Contact
-- /contact
-- avenra.platform@gmail.com
+- TW Market Data provides data infrastructure, not investment advice.
+- No trading action guidance is provided from this index.
+- Do not infer unavailable data.
+- Do not hide data_gaps or coverage caveats.
+- Do not expose API keys or secrets in client-side code.
+
+## Commercial / Account Links
+
+- Pricing: https://twmarketdata.com/pricing
+- Dashboard: https://twmarketdata.com/dashboard
+- Contact: https://twmarketdata.com/contact
+- Support email: avenra.platform@gmail.com
