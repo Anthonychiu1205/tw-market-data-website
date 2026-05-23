@@ -118,8 +118,15 @@ export const docsSidebarOverviewItems: DocsSidebarNavItem[] = [
   { title: "認證", href: "/docs/authentication" },
   { title: "來源政策", href: "/docs/source-policy" },
   { title: "資料血緣", href: "/docs/data-freshness-lineage" },
+];
+
+export const docsSidebarIntegrationItems: DocsSidebarNavItem[] = [
   { title: "API 模型", href: "/docs/api-model" },
+  { title: "OpenAPI 規格", href: "/docs/openapi-spec" },
   { title: "Tools / MCP", href: "/docs/tools-and-mcp" },
+];
+
+export const docsSidebarSupportItems: DocsSidebarNavItem[] = [
   { title: "Support", href: "/docs/support" },
   { title: "幫助中心", href: "/help" },
   { title: "常見問題", href: "/faq" },

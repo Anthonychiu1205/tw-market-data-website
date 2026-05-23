@@ -4,23 +4,35 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Activity,
+  BadgeCheck,
+  Banknote,
   Bot,
   Braces,
   Building2,
+  Cable,
   ChevronDown,
+  Code2,
+  HelpCircle,
   Eye,
   FileCheck,
+  FileCode2,
+  FileJson,
   FileSpreadsheet,
   GitBranch,
   Home,
+  LibraryBig,
+  ListChecks,
   LifeBuoy,
   Landmark,
   LineChart,
+  MessageCircle,
   Network,
   Rocket,
   Search,
-  SearchCode,
+  SearchCheck,
   ShieldCheck,
+  Waves,
+  Workflow,
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
@@ -32,8 +44,10 @@ import {
   docsSidebarApiGroups,
   docsSidebarAiAgentItems,
   docsSidebarGuideItems,
+  docsSidebarIntegrationItems,
   docsSidebarOverviewItems,
   docsSidebarSdkItems,
+  docsSidebarSupportItems,
 } from "@/src/content/docs-sidebar";
 import type { DocsSidebarNavGroup, DocsSidebarNavItem } from "@/src/content/docs-sidebar";
 import { cn } from "@/src/lib/cn";
@@ -115,7 +129,7 @@ function GroupIcon({ groupIcon, className }: { groupIcon: DocsSidebarNavGroup["g
     case "activity":
       return <Activity className={className} aria-hidden="true" />;
     case "search-code":
-      return <SearchCode className={className} aria-hidden="true" />;
+      return <Search className={className} aria-hidden="true" />;
     case "eye":
       return <Eye className={className} aria-hidden="true" />;
   }
@@ -133,12 +147,32 @@ function getOverviewItemIcon(href: string) {
       return FileCheck;
     case "/docs/data-freshness-lineage":
       return GitBranch;
+    default:
+      return Home;
+  }
+}
+
+function getIntegrationItemIcon(href: string) {
+  switch (href) {
     case "/docs/api-model":
       return Braces;
+    case "/docs/openapi-spec":
+      return FileJson;
     case "/docs/tools-and-mcp":
       return Wrench;
+    default:
+      return Braces;
+  }
+}
+
+function getSupportItemIcon(href: string) {
+  switch (href) {
     case "/docs/support":
       return LifeBuoy;
+    case "/help":
+      return HelpCircle;
+    case "/faq":
+      return MessageCircle;
     default:
       return Home;
   }
@@ -147,41 +181,43 @@ function getOverviewItemIcon(href: string) {
 function getGuideItemIcon(href: string) {
   switch (href) {
     case "/docs/workflows/company-fundamentals":
-      return Building2;
+      return LibraryBig;
     case "/docs/workflows/capital-flow":
-      return Landmark;
+      return Banknote;
     case "/docs/workflows/market-status":
-      return Activity;
+      return Waves;
     case "/docs/workflows/fast-data-access":
-      return Search;
+      return SearchCheck;
     case "/docs/workflows/strategy-ai":
       return Bot;
     default:
-      return Building2;
+      return LibraryBig;
   }
 }
 
 function getSdkItemIcon(href: string) {
   switch (href) {
+    case "/docs/sdk/release-status":
+      return BadgeCheck;
     case "/docs/sdk/python-sdk":
-      return Braces;
+      return FileCode2;
     case "/docs/sdk/javascript-sdk":
-      return Braces;
+      return Code2;
     default:
-      return Braces;
+      return BadgeCheck;
   }
 }
 
 function getAiAgentItemIcon(href: string) {
   switch (href) {
     case "/docs/ai-agents/mcp-server-preview":
-      return Wrench;
+      return Cable;
     case "/docs/ai-agents/tool-manifest":
-      return SearchCode;
+      return ListChecks;
     case "/docs/ai-agents/agent-workflow-examples":
-      return Bot;
+      return Workflow;
     default:
-      return Bot;
+      return Cable;
   }
 }
 
@@ -262,18 +298,22 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
     );
   }
 
-  function renderFlatSidebarItems(items: DocsSidebarNavItem[], section: "overview" | "guides" | "sdks" | "ai-agents") {
+  function renderFlatSidebarItems(items: DocsSidebarNavItem[], section: "overview" | "integrations" | "guides" | "sdks" | "ai-agents" | "support") {
     return (
       <div className="space-y-1">
         {items.map((item) => {
           const isActive = isItemActive(item);
           const Icon = section === "overview"
             ? getOverviewItemIcon(item.href)
+            : section === "integrations"
+              ? getIntegrationItemIcon(item.href)
             : section === "guides"
               ? getGuideItemIcon(item.href)
               : section === "sdks"
                 ? getSdkItemIcon(item.href)
-                : getAiAgentItemIcon(item.href);
+                : section === "ai-agents"
+                  ? getAiAgentItemIcon(item.href)
+                  : getSupportItemIcon(item.href);
           return (
             <Link
               key={item.href}
@@ -313,10 +353,13 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
           >
             <p className="text-xs font-semibold tracking-wide text-slate-500">文件總覽</p>
             <nav className="mt-3">
-              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">Overview</p>
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">OVERVIEW</p>
               {renderFlatSidebarItems(docsSidebarOverviewItems, "overview")}
 
-              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">APIs</p>
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">INTEGRATIONS</p>
+              {renderFlatSidebarItems(docsSidebarIntegrationItems, "integrations")}
+
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">APIS</p>
               <div className="space-y-4">
                 {docsSidebarApiGroups.map((group) => (
                   <div key={group.id}>
@@ -348,14 +391,17 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
                 ))}
               </div>
 
-              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">Guides</p>
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">GUIDES</p>
               {renderFlatSidebarItems(docsSidebarGuideItems, "guides")}
 
-              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">SDKs</p>
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">SDKS</p>
               {renderFlatSidebarItems(docsSidebarSdkItems, "sdks")}
 
-              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">AI Agents</p>
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">AI AGENTS</p>
               {renderFlatSidebarItems(docsSidebarAiAgentItems, "ai-agents")}
+
+              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">SUPPORT</p>
+              {renderFlatSidebarItems(docsSidebarSupportItems, "support")}
             </nav>
             <div className="h-28 shrink-0" aria-hidden="true" />
           </div>
