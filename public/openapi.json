@@ -19,22 +19,113 @@
     "/v2/datasets/twse-daily-price": {
       "get": {
         "summary": "TWSE 日線價格 / TWSE daily prices",
-        "description": "上市股票日線價格與成交資訊。",
+        "description": "上市股票日線價格資料。適用於走勢分析、回測與技術指標計算。資料為日線結構化資料，非即時行情保證。",
         "parameters": [
-          {"$ref": "#/components/parameters/Symbol"},
-          {"$ref": "#/components/parameters/StartDate"},
-          {"$ref": "#/components/parameters/EndDate"},
-          {"$ref": "#/components/parameters/Limit"}
+          {
+            "$ref": "#/components/parameters/TickerParam"
+          },
+          {
+            "$ref": "#/components/parameters/StartDateParam"
+          },
+          {
+            "$ref": "#/components/parameters/EndDateParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
         ],
         "responses": {
-          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
-          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/DatasetResponseEnvelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/TwseDailyPriceRow"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "TWSE daily price sample",
+                    "value": {
+                      "data": [
+                        {
+                          "ticker": "2330",
+                          "market": "TWSE",
+                          "date": "2026-04-18",
+                          "open": 806,
+                          "high": 815,
+                          "low": 804,
+                          "close": 812,
+                          "volume": 28519324,
+                          "provider": "twse",
+                          "source_role": "official_twse_daily_price"
+                        }
+                      ],
+                      "meta": {
+                        "dataset": "twse-daily-price",
+                        "ticker": "2330",
+                        "market": "TWSE",
+                        "date_from": "2026-04-01",
+                        "date_to": "2026-04-30",
+                        "freshness": "daily",
+                        "source_role": "official_twse_daily_price",
+                        "lineage": {
+                          "provider": "twse",
+                          "source_role": "official_twse_daily_price"
+                        }
+                      },
+                      "pagination": {
+                        "count": 1,
+                        "limit": 50,
+                        "next_cursor": null
+                      },
+                      "data_gaps": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         },
         "x-data-status": "production",
-        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats.",
+        "operationId": "getTwseDailyPrice",
+        "tags": [
+          "Market Prices"
+        ],
+        "externalDocs": {
+          "description": "對應 API 文件",
+          "url": "https://twmarketdata.com/docs/api/market-prices/twse-daily-price"
+        },
+        "x-source-policy": "official/public-first where possible",
+        "x-coverage-note": "Coverage follows disclosed official sources and productization progress.",
+        "x-data-gaps-policy": "Response may include data_gaps; do not silently impute missing values."
       }
     },
     "/v2/datasets/tpex-daily-price": {
@@ -42,17 +133,70 @@
         "summary": "TPEx 日線價格 / TPEx daily prices",
         "description": "上櫃股票日線價格與成交資訊。",
         "parameters": [
-          {"$ref": "#/components/parameters/Symbol"},
-          {"$ref": "#/components/parameters/StartDate"},
-          {"$ref": "#/components/parameters/EndDate"},
-          {"$ref": "#/components/parameters/Limit"}
+          {
+            "$ref": "#/components/parameters/Symbol"
+          },
+          {
+            "$ref": "#/components/parameters/StartDate"
+          },
+          {
+            "$ref": "#/components/parameters/EndDate"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
         ],
         "responses": {
-          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
-          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetResponseEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate Limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         },
         "x-data-status": "production",
         "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
@@ -61,85 +205,447 @@
     "/v2/datasets/monthly-revenue": {
       "get": {
         "summary": "月營收 / Monthly revenue",
-        "description": "公司月營收與成長觀察資料。",
+        "description": "公司每月營收資料。更新節奏依官方公告揭露時點，建議保留 freshness 與 data_gaps 進行判讀。",
         "parameters": [
-          {"$ref": "#/components/parameters/Symbol"},
-          {"$ref": "#/components/parameters/StartDate"},
-          {"$ref": "#/components/parameters/EndDate"},
-          {"$ref": "#/components/parameters/Limit"}
+          {
+            "$ref": "#/components/parameters/TickerParam"
+          },
+          {
+            "$ref": "#/components/parameters/StartDateParam"
+          },
+          {
+            "$ref": "#/components/parameters/EndDateParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
         ],
         "responses": {
-          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
-          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/DatasetResponseEnvelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/MonthlyRevenueRow"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Monthly revenue sample",
+                    "value": {
+                      "data": [
+                        {
+                          "ticker": "2330",
+                          "revenue_month": "2026-03",
+                          "revenue": 195200000000,
+                          "revenue_yoy": 0.148,
+                          "revenue_mom": 0.021,
+                          "provider": "twse",
+                          "source_role": "official_monthly_revenue"
+                        }
+                      ],
+                      "meta": {
+                        "dataset": "monthly-revenue",
+                        "ticker": "2330",
+                        "market": "TWSE",
+                        "date_from": "2026-01-01",
+                        "date_to": "2026-03-31",
+                        "freshness": "monthly",
+                        "source_role": "official_monthly_revenue",
+                        "lineage": {
+                          "provider": "twse",
+                          "source_role": "official_monthly_revenue"
+                        }
+                      },
+                      "pagination": {
+                        "count": 1,
+                        "limit": 50,
+                        "next_cursor": null
+                      },
+                      "data_gaps": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         },
         "x-data-status": "production",
-        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats.",
+        "operationId": "getMonthlyRevenue",
+        "tags": [
+          "Fundamentals"
+        ],
+        "externalDocs": {
+          "description": "對應 API 文件",
+          "url": "https://twmarketdata.com/docs/api/financial-growth/monthly-revenue"
+        },
+        "x-source-policy": "official/public-first where possible",
+        "x-coverage-note": "Coverage varies by issuer disclosure availability and rollout stage.",
+        "x-data-gaps-policy": "Response may include data_gaps; do not silently impute missing values."
       }
     },
     "/v2/datasets/income-statement": {
       "get": {
         "summary": "損益表 / Income statement",
-        "description": "公司損益表欄位查詢。",
+        "description": "公司損益表核心欄位。適合獲利能力、毛利結構與 EPS 趨勢分析。",
         "parameters": [
-          {"$ref": "#/components/parameters/Symbol"},
-          {"$ref": "#/components/parameters/StartDate"},
-          {"$ref": "#/components/parameters/EndDate"},
-          {"$ref": "#/components/parameters/Limit"}
+          {
+            "$ref": "#/components/parameters/TickerParam"
+          },
+          {
+            "$ref": "#/components/parameters/StartDateParam"
+          },
+          {
+            "$ref": "#/components/parameters/EndDateParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
         ],
         "responses": {
-          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
-          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/DatasetResponseEnvelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/IncomeStatementRow"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Income statement sample",
+                    "value": {
+                      "data": [
+                        {
+                          "ticker": "2330",
+                          "fiscal_period": "2025Q4",
+                          "revenue": 868461000000,
+                          "gross_profit": 472300000000,
+                          "operating_income": 389200000000,
+                          "net_income": 346783000000,
+                          "eps": 13.45,
+                          "provider": "twse",
+                          "source_role": "official_income_statement"
+                        }
+                      ],
+                      "meta": {
+                        "dataset": "income-statement",
+                        "ticker": "2330",
+                        "market": "TWSE",
+                        "freshness": "quarterly",
+                        "source_role": "official_income_statement",
+                        "lineage": {
+                          "provider": "twse",
+                          "source_role": "official_income_statement"
+                        }
+                      },
+                      "pagination": {
+                        "count": 1,
+                        "limit": 50,
+                        "next_cursor": null
+                      },
+                      "data_gaps": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         },
         "x-data-status": "production",
-        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats.",
+        "operationId": "getIncomeStatement",
+        "tags": [
+          "Fundamentals"
+        ],
+        "externalDocs": {
+          "description": "對應 API 文件",
+          "url": "https://twmarketdata.com/docs/api/financial-growth/income-statement"
+        },
+        "x-source-policy": "official/public-first where possible",
+        "x-coverage-note": "Quarterly coverage depends on filing availability and normalization status.",
+        "x-data-gaps-policy": "Response may include data_gaps; do not silently impute missing values."
       }
     },
     "/v2/datasets/balance-sheet": {
       "get": {
         "summary": "資產負債表 / Balance sheet",
-        "description": "公司資產負債欄位查詢。",
+        "description": "公司資產負債表核心欄位。適用於財務結構、槓桿與流動性評估。",
         "parameters": [
-          {"$ref": "#/components/parameters/Symbol"},
-          {"$ref": "#/components/parameters/StartDate"},
-          {"$ref": "#/components/parameters/EndDate"},
-          {"$ref": "#/components/parameters/Limit"}
+          {
+            "$ref": "#/components/parameters/TickerParam"
+          },
+          {
+            "$ref": "#/components/parameters/StartDateParam"
+          },
+          {
+            "$ref": "#/components/parameters/EndDateParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
         ],
         "responses": {
-          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
-          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/DatasetResponseEnvelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/BalanceSheetRow"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Balance sheet sample",
+                    "value": {
+                      "data": [
+                        {
+                          "ticker": "2330",
+                          "fiscal_period": "2025Q4",
+                          "total_assets": 5924000000000,
+                          "total_liabilities": 2573000000000,
+                          "equity": 3351000000000,
+                          "cash_and_cash_equivalents": 1522000000000,
+                          "provider": "twse",
+                          "source_role": "official_balance_sheet"
+                        }
+                      ],
+                      "meta": {
+                        "dataset": "balance-sheet",
+                        "ticker": "2330",
+                        "market": "TWSE",
+                        "freshness": "quarterly",
+                        "source_role": "official_balance_sheet",
+                        "lineage": {
+                          "provider": "twse",
+                          "source_role": "official_balance_sheet"
+                        }
+                      },
+                      "pagination": {
+                        "count": 1,
+                        "limit": 50,
+                        "next_cursor": null
+                      },
+                      "data_gaps": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         },
         "x-data-status": "production",
-        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats.",
+        "operationId": "getBalanceSheet",
+        "tags": [
+          "Fundamentals"
+        ],
+        "externalDocs": {
+          "description": "對應 API 文件",
+          "url": "https://twmarketdata.com/docs/api/financial-growth/balance-sheet"
+        },
+        "x-source-policy": "official/public-first where possible",
+        "x-coverage-note": "Quarterly coverage follows official filing cadence and normalization readiness.",
+        "x-data-gaps-policy": "Response may include data_gaps; do not silently impute missing values."
       }
     },
     "/v2/datasets/institutional-flow": {
       "get": {
         "summary": "三大法人買賣超 / Institutional flow",
-        "description": "外資、投信、自營商等法人買賣超資料。",
+        "description": "外資、投信、自營商買賣超資料。unit_semantics 以 shares 為主；coverage 仍在持續補齊中。",
         "parameters": [
-          {"$ref": "#/components/parameters/Symbol"},
-          {"$ref": "#/components/parameters/StartDate"},
-          {"$ref": "#/components/parameters/EndDate"},
-          {"$ref": "#/components/parameters/Limit"}
+          {
+            "$ref": "#/components/parameters/TickerParam"
+          },
+          {
+            "$ref": "#/components/parameters/StartDateParam"
+          },
+          {
+            "$ref": "#/components/parameters/EndDateParam"
+          },
+          {
+            "$ref": "#/components/parameters/LimitParam"
+          }
         ],
         "responses": {
-          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
-          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/DatasetResponseEnvelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/InstitutionalFlowRow"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Institutional flow sample",
+                    "value": {
+                      "data": [
+                        {
+                          "ticker": "2330",
+                          "market": "TWSE",
+                          "date": "2026-04-21",
+                          "foreign_net_buy": 12543000,
+                          "investment_trust_net_buy": -210000,
+                          "dealer_net_buy": 54000,
+                          "institutional_net_buy_total": 12387000,
+                          "unit_semantics": "shares",
+                          "provider": "twse",
+                          "source_role": "official_twse_t86"
+                        }
+                      ],
+                      "meta": {
+                        "dataset": "institutional-flow",
+                        "ticker": "2330",
+                        "market": "TWSE",
+                        "date_from": "2026-04-01",
+                        "date_to": "2026-04-30",
+                        "freshness": "daily",
+                        "source_role": "official_twse_t86",
+                        "lineage": {
+                          "provider": "twse",
+                          "source_role": "official_twse_t86",
+                          "unit_semantics": "shares"
+                        }
+                      },
+                      "pagination": {
+                        "count": 1,
+                        "limit": 50,
+                        "next_cursor": null
+                      },
+                      "data_gaps": [
+                        {
+                          "code": "coverage_in_progress",
+                          "message": "Coverage is still being expanded for some date ranges.",
+                          "severity": "warning",
+                          "scope": "dataset"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
         },
-        "x-data-status": "production",
-        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
+        "x-data-status": "coverage-limited",
+        "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats.",
+        "operationId": "getInstitutionalFlow",
+        "tags": [
+          "Capital Flow"
+        ],
+        "externalDocs": {
+          "description": "對應 API 文件",
+          "url": "https://twmarketdata.com/docs/api/capital-flow/institutional-flow"
+        },
+        "x-source-policy": "official/public-first where possible",
+        "x-coverage-note": "Coverage is expanding; do not assume full 3Y historical completeness.",
+        "x-data-gaps-policy": "Response may include data_gaps; do not silently impute missing values."
       }
     },
     "/v2/datasets/technical-indicators": {
@@ -147,17 +653,70 @@
         "summary": "技術指標 / Technical indicators",
         "description": "由價格資料衍生的技術分析指標。",
         "parameters": [
-          {"$ref": "#/components/parameters/Symbol"},
-          {"$ref": "#/components/parameters/StartDate"},
-          {"$ref": "#/components/parameters/EndDate"},
-          {"$ref": "#/components/parameters/Limit"}
+          {
+            "$ref": "#/components/parameters/Symbol"
+          },
+          {
+            "$ref": "#/components/parameters/StartDate"
+          },
+          {
+            "$ref": "#/components/parameters/EndDate"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
         ],
         "responses": {
-          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
-          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetResponseEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate Limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         },
         "x-data-status": "production",
         "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
@@ -168,17 +727,70 @@
         "summary": "估值資料 / Valuation data",
         "description": "本益比、股價淨值比、殖利率等估值欄位。",
         "parameters": [
-          {"$ref": "#/components/parameters/Symbol"},
-          {"$ref": "#/components/parameters/StartDate"},
-          {"$ref": "#/components/parameters/EndDate"},
-          {"$ref": "#/components/parameters/Limit"}
+          {
+            "$ref": "#/components/parameters/Symbol"
+          },
+          {
+            "$ref": "#/components/parameters/StartDate"
+          },
+          {
+            "$ref": "#/components/parameters/EndDate"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
         ],
         "responses": {
-          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
-          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetResponseEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate Limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         },
         "x-data-status": "production",
         "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
@@ -189,15 +801,64 @@
         "summary": "公司基本資料 / Issuer profile",
         "description": "公司識別、上市櫃別與產業分類等基本資訊。",
         "parameters": [
-          {"$ref": "#/components/parameters/Symbol"},
-          {"$ref": "#/components/parameters/Limit"}
+          {
+            "$ref": "#/components/parameters/Symbol"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          }
         ],
         "responses": {
-          "200": {"description": "OK", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetResponseEnvelope"}}}},
-          "400": {"description": "Bad Request", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "401": {"description": "Unauthorized", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "429": {"description": "Rate Limited", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}},
-          "500": {"description": "Internal Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}}
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetResponseEnvelope"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate Limited",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
         },
         "x-data-status": "production",
         "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats."
@@ -245,6 +906,46 @@
           "maximum": 500
         },
         "description": "回傳筆數上限。"
+      },
+      "TickerParam": {
+        "name": "symbol",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "股票代碼（對應 ticker），例如 2330。"
+      },
+      "StartDateParam": {
+        "name": "start_date",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "查詢起始日期（YYYY-MM-DD）。"
+      },
+      "EndDateParam": {
+        "name": "end_date",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date"
+        },
+        "description": "查詢結束日期（YYYY-MM-DD）。"
+      },
+      "LimitParam": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "description": "回傳筆數上限。"
       }
     },
     "securitySchemes": {
@@ -258,35 +959,27 @@
     "schemas": {
       "DatasetResponseEnvelope": {
         "type": "object",
-        "description": "Common response envelope. Detailed dataset-specific row fields are documented in each endpoint docs page.",
+        "required": [
+          "data"
+        ],
         "properties": {
-          "dataset": {
-            "type": "string"
-          },
-          "source_role": {
-            "type": "string"
-          },
-          "freshness": {
-            "type": "string"
-          },
-          "lineage": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "data_gaps": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DataGap"
-            }
-          },
-          "meta": {
-            "$ref": "#/components/schemas/PaginationMeta"
-          },
           "data": {
             "type": "array",
             "items": {
               "type": "object",
               "additionalProperties": true
+            }
+          },
+          "meta": {
+            "$ref": "#/components/schemas/DatasetMeta"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationMeta"
+          },
+          "data_gaps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataGap"
             }
           }
         },
@@ -300,6 +993,24 @@
           },
           "message": {
             "type": "string"
+          },
+          "severity": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "info",
+              "warning",
+              "error",
+              null
+            ]
+          },
+          "scope": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "additionalProperties": true
@@ -308,35 +1019,463 @@
         "type": "object",
         "properties": {
           "count": {
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "limit": {
-            "type": "integer"
+            "type": [
+              "integer",
+              "null"
+            ]
           },
           "next_cursor": {
-            "type": ["string", "null"]
+            "type": [
+              "string",
+              "null"
+            ]
           }
         },
         "additionalProperties": true
       },
       "ErrorResponse": {
         "type": "object",
+        "required": [
+          "error"
+        ],
         "properties": {
           "error": {
             "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
             "properties": {
               "code": {
                 "type": "string"
               },
               "message": {
                 "type": "string"
+              },
+              "request_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               }
             },
-            "required": ["code", "message"],
             "additionalProperties": true
           }
         },
-        "required": ["error"]
+        "additionalProperties": true
+      },
+      "SourceLineage": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_role": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unit_semantics": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": true
+      },
+      "DatasetMeta": {
+        "type": "object",
+        "properties": {
+          "dataset": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ticker": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "market": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "date_from": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "date_to": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "source_policy": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "freshness": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_role": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lineage": {
+            "$ref": "#/components/schemas/SourceLineage"
+          }
+        },
+        "additionalProperties": true
+      },
+      "TwseDailyPriceRow": {
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "type": "string"
+          },
+          "market": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "open": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "high": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "low": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "close": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "volume": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_role": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": true
+      },
+      "MonthlyRevenueRow": {
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "type": "string"
+          },
+          "revenue_month": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "revenue": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "revenue_yoy": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "revenue_mom": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_role": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": true
+      },
+      "IncomeStatementRow": {
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "type": "string"
+          },
+          "fiscal_period": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "revenue": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "gross_profit": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "operating_income": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "net_income": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "eps": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_role": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": true
+      },
+      "BalanceSheetRow": {
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "type": "string"
+          },
+          "fiscal_period": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "total_assets": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "total_liabilities": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "equity": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "cash_and_cash_equivalents": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_role": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": true
+      },
+      "InstitutionalFlowRow": {
+        "type": "object",
+        "properties": {
+          "ticker": {
+            "type": "string"
+          },
+          "market": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "foreign_net_buy": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "investment_trust_net_buy": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "dealer_net_buy": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "institutional_net_buy_total": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "unit_semantics": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Typically shares."
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_role": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid query parameters",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Missing or invalid API key",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Rate limit exceeded",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Unexpected server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
       }
     }
   }
