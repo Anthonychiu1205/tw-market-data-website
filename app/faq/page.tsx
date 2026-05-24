@@ -7,10 +7,10 @@ export const metadata: Metadata = {
   title: `${faqPageMeta.title} | TW Market Data`,
   description: faqPageMeta.subtitle,
   alternates: {
-    canonical: "/docs/help-center",
+    canonical: "/help-center",
   },
 };
 
 export default function FaqPage() {
-  redirect("/docs/help-center");
+  redirect("/help-center");
 }

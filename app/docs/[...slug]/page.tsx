@@ -24,7 +24,11 @@ const docsCanonicalAliases: Record<string, string> = {
   "/docs/data-access": "/docs/market-coverage",
   "/docs/tools-and-mcp": "/docs/tools-mcp",
   "/docs/api-model": "/docs/openapi-spec",
-  "/docs/faq": "/docs/help-center",
+  "/docs/faq": "/help-center",
+  "/docs/help-center": "/help-center",
+  "/docs/help-center/get-api-key": "/help-center/get-api-key",
+  "/docs/help-center/call-api": "/help-center/call-api",
+  "/docs/help-center/502-504-errors": "/help-center/502-504-errors",
 };
 
 function resolveDocsCanonical(href: string) {
@@ -556,59 +560,6 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               Next: 快速開始
             </Link>
           </nav>
-        </div>
-      </DocsPageShell>
-    );
-  }
-
-  if (page.slug.join("/") === "help-center") {
-    return (
-      <DocsPageShell page={pageForShell} pageLabel="Support">
-        <div className="space-y-8 py-8">
-          <section className="space-y-3 border-b border-slate-200 pb-8">
-            <SectionHeading id="help-center-intro">幫助中心</SectionHeading>
-            <p className="text-sm leading-7 text-slate-600">
-              查找 TW Market Data API 使用、API key、錯誤排查與資料狀態相關問題。若問題持續發生，請保留 requestId、endpoint、查詢參數與發生時間，方便支援團隊排查。
-            </p>
-          </section>
-
-          <section className="space-y-3 border-b border-slate-200 pb-8">
-            <SectionHeading id="help-center-quick-start">快速開始</SectionHeading>
-            <div className="space-y-2">
-              <Link
-                href="/docs/help-center/get-api-key"
-                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
-              >
-                <span>如何取得 API key？</span>
-                <span className="text-xs text-slate-500">/docs/help-center/get-api-key</span>
-              </Link>
-              <Link
-                href="/docs/help-center/call-api"
-                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
-              >
-                <span>如何呼叫 API？</span>
-                <span className="text-xs text-slate-500">/docs/help-center/call-api</span>
-              </Link>
-            </div>
-          </section>
-
-          <section className="space-y-3 border-b border-slate-200 pb-8">
-            <SectionHeading id="help-center-troubleshooting">錯誤排查</SectionHeading>
-            <div className="space-y-2">
-              <Link
-                href="/docs/help-center/502-504-errors"
-                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
-              >
-                <span>為什麼會出現 502 / 504？</span>
-                <span className="text-xs text-slate-500">/docs/help-center/502-504-errors</span>
-              </Link>
-            </div>
-          </section>
-
-          <section className="space-y-3">
-            <SectionHeading id="help-center-next">之後可補充</SectionHeading>
-            <p className="text-sm leading-7 text-slate-600">更多帳號、credits、data_gaps、OpenAPI / MCP 問題會逐步整理進幫助中心。</p>
-          </section>
         </div>
       </DocsPageShell>
     );

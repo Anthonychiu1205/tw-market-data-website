@@ -1,0 +1,172 @@
+import Link from "next/link";
+
+import type { HelpArticle } from "@/src/content/help-center-articles";
+import { helpCenterArticles, helpCenterCategories, helpCenterMeta } from "@/src/content/help-center-articles";
+
+type HelpCenterArticleShellProps = {
+  article: HelpArticle;
+};
+
+function titleToId(title: string) {
+  return title
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\p{L}\p{N}-]/gu, "");
+}
+
+export function HelpCenterIndex() {
+  return (
+    <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+      <section className="rounded-2xl border border-slate-200 bg-white px-6 py-8">
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{helpCenterMeta.title}</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
+          查找 API key、API 呼叫、錯誤排查與資料使用相關說明。若問題持續發生，請保留 requestId、endpoint、查詢參數與發生時間，方便支援團隊排查。
+        </p>
+      </section>
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-2">
+        {helpCenterCategories.map((category) => (
+          <article key={category.id} className="rounded-2xl border border-slate-200 bg-white px-5 py-4">
+            <h2 className="text-base font-semibold text-slate-900">{category.title}</h2>
+            <p className="mt-1 text-sm text-slate-600">{category.description}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white px-5 py-4">
+        <h2 className="text-base font-semibold text-slate-900">文章</h2>
+        <div className="mt-3 space-y-2">
+          {helpCenterArticles.map((article) => (
+            <Link
+              key={article.slug}
+              href={`/help-center/${article.slug}`}
+              className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
+            >
+              <span>{article.title}</span>
+              <span className="text-xs text-slate-500">{article.category}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-2xl border border-slate-200 bg-white px-5 py-4">
+        <h2 className="text-base font-semibold text-slate-900">仍需要協助？</h2>
+        <p className="mt-2 text-sm leading-7 text-slate-600">
+          若問題持續發生，請附上 requestId、endpoint、查詢參數與發生時間，寄至{" "}
+          <a href="mailto:avenra.platform@gmail.com" className="font-medium text-slate-900 underline underline-offset-4">
+            avenra.platform@gmail.com
+          </a>
+          。
+        </p>
+      </section>
+    </div>
+  );
+}
+
+export function HelpCenterArticleShell({ article }: HelpCenterArticleShellProps) {
+  const toc = article.sections.map((section) => ({ id: section.id || titleToId(section.heading), label: section.heading }));
+  const relatedArticles = article.related
+    .map((slug) => helpCenterArticles.find((entry) => entry.slug === slug))
+    .filter((entry): entry is HelpArticle => Boolean(entry));
+
+  return (
+    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mb-4 text-sm text-slate-500">
+        <Link href="/help-center" className="hover:text-slate-800">
+          幫助中心
+        </Link>{" "}
+        / <span className="text-slate-700">{article.title}</span>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)_220px]">
+        <aside className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+          <h2 className="text-sm font-semibold text-slate-900">分類與文章</h2>
+          <div className="mt-3 space-y-4">
+            {helpCenterCategories.map((category) => {
+              const inCategory = helpCenterArticles.filter((entry) => entry.category === category.title);
+              return (
+                <div key={category.id}>
+                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{category.title}</p>
+                  <ul className="mt-1 space-y-1">
+                    {inCategory.map((entry) => (
+                      <li key={entry.slug}>
+                        <Link
+                          href={`/help-center/${entry.slug}`}
+                          className={`block rounded px-2 py-1 text-sm ${
+                            entry.slug === article.slug ? "bg-slate-100 font-medium text-slate-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          }`}
+                        >
+                          {entry.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+        </aside>
+
+        <article className="rounded-2xl border border-slate-200 bg-white px-6 py-6">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{article.title}</h1>
+          <p className="mt-2 text-sm leading-7 text-slate-600">{article.description}</p>
+          {article.updatedAt ? <p className="mt-2 text-xs text-slate-500">更新時間：{article.updatedAt}</p> : null}
+
+          <div className="mt-6 space-y-8">
+            {article.sections.map((section) => (
+              <section key={section.id} id={section.id} className="space-y-3 border-b border-slate-200 pb-6 last:border-b-0 last:pb-0">
+                <h2 className="text-lg font-semibold text-slate-900">{section.heading}</h2>
+                {(section.paragraphs ?? []).map((paragraph) => (
+                  <p key={paragraph} className="text-sm leading-7 text-slate-700">
+                    {paragraph}
+                  </p>
+                ))}
+                {(section.steps ?? []).length ? (
+                  <ol className="list-decimal space-y-2 pl-5 text-sm leading-7 text-slate-700">
+                    {(section.steps ?? []).map((step) => (
+                      <li key={step}>{step}</li>
+                    ))}
+                  </ol>
+                ) : null}
+                {(section.notes ?? []).length ? (
+                  <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700">
+                    {(section.notes ?? []).map((note) => (
+                      <li key={note}>{note}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </section>
+            ))}
+          </div>
+        </article>
+
+        <aside className="space-y-4">
+          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+            <h2 className="text-sm font-semibold text-slate-900">本頁章節</h2>
+            <ul className="mt-2 space-y-1">
+              {toc.map((item) => (
+                <li key={item.id}>
+                  <a href={`#${item.id}`} className="text-sm text-slate-600 hover:text-slate-900">
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+            <h2 className="text-sm font-semibold text-slate-900">相關文章</h2>
+            <ul className="mt-2 space-y-2">
+              {relatedArticles.map((entry) => (
+                <li key={entry.slug}>
+                  <Link href={`/help-center/${entry.slug}`} className="text-sm text-slate-600 hover:text-slate-900">
+                    {entry.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}

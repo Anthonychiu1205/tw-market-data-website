@@ -121,7 +121,7 @@ export async function trackPage(pathname: string) {
     return;
   }
 
-  if (normalized === "/help" || normalized === "/faq") {
+  if (normalized === "/help" || normalized === "/help-center" || normalized.startsWith("/help-center/") || normalized === "/faq") {
     await trackEvent({
       event: "help_center_viewed",
       properties: { pathname: normalized },

@@ -8,7 +8,7 @@ const policyLinks = [
 ];
 
 const supportLinks = [
-  { href: "/help", label: "幫助中心" },
+  { href: "/help-center", label: "幫助中心" },
 ];
 
 type SiteFooterProps = {
