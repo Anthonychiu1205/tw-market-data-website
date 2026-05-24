@@ -221,7 +221,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                 {runNotice ? <p className="pt-1 text-[11px] text-slate-500">{runNotice}</p> : null}
               </div>
 
-              <div className="grid flex-1 min-h-0 grid-cols-1 md:grid-cols-[57%_43%]">
+              <div className="grid flex-1 min-h-0 grid-cols-1 md:grid-cols-[minmax(0,1.45fr)_minmax(360px,0.95fr)]">
                 <div className="flex min-h-0 flex-col gap-3 border-b border-slate-200 p-4 md:border-b-0 md:border-r md:p-5">
                   <section className="space-y-1">
                     <h3 id="api-playground-description" className="text-sm font-semibold text-slate-900">
@@ -235,7 +235,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                   <section className="space-y-1.5">
                     <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">授權</h4>
                     <div className="rounded-lg border border-slate-200 bg-white p-2">
-                      <div className="mb-1.5 grid grid-cols-[208px_minmax(0,1fr)] items-center gap-2">
+                      <div className="mb-1.5 grid grid-cols-[232px_minmax(0,1fr)] items-center gap-2">
                         <div className="flex items-center gap-1.5 text-xs">
                           <span className="font-mono text-slate-700">X-API-Key</span>
                           <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">必填</span>
@@ -254,16 +254,16 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                     </div>
                   </section>
 
-                  <section className="flex min-h-0 flex-col gap-1.5">
+                  <section className="space-y-1.5">
                     <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">查詢參數</h4>
-                    <div className="overflow-y-auto rounded-lg border border-slate-200 bg-white">
-                      <div className="sticky top-0 z-10 grid grid-cols-[208px_minmax(0,1fr)] gap-2 border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                    <div className="max-h-[312px] overflow-y-auto rounded-lg border border-slate-200 bg-white">
+                      <div className="sticky top-0 z-10 grid grid-cols-[232px_minmax(0,1fr)] gap-2 border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         <span>參數</span>
                         <span>值</span>
                       </div>
                       <div className="divide-y divide-slate-200">
                       {(api.queryParameters ?? []).map((parameter) => (
-                        <div key={parameter.name} className="grid grid-cols-[208px_minmax(0,1fr)] items-center gap-2 px-3 py-2">
+                        <div key={parameter.name} className="grid grid-cols-[232px_minmax(0,1fr)] items-center gap-2 px-3 py-2">
                           <div className="min-w-0 space-y-1">
                             <div className="flex flex-wrap items-center gap-1.5 text-xs">
                               <span className="truncate font-mono font-semibold text-slate-700">{parameter.name}</span>
