@@ -3,7 +3,7 @@
 import { Play, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { CodeBlock } from "@/src/components/docs/code-block";
+import { CodeBlock, type CodeBlockLanguage } from "@/src/components/docs/code-block";
 import type { ApiReferenceContent, ApiStatusExample } from "@/src/content/docs-pages";
 import { cn } from "@/src/lib/cn";
 
@@ -13,6 +13,32 @@ type ApiRunPlaygroundProps = {
 };
 
 type ParamState = Record<string, string>;
+type RequestLanguage = "curl" | "python" | "javascript" | "php" | "go" | "java" | "ruby";
+
+type RequestLanguageOption = {
+  id: RequestLanguage;
+  label: string;
+  tag: string;
+};
+
+const REQUEST_LANGUAGE_OPTIONS: RequestLanguageOption[] = [
+  { id: "curl", label: "cURL", tag: "CLI" },
+  { id: "python", label: "Python", tag: "PY" },
+  { id: "javascript", label: "JavaScript", tag: "JS" },
+  { id: "php", label: "PHP", tag: "PHP" },
+  { id: "go", label: "Go", tag: "GO" },
+  { id: "java", label: "Java", tag: "JVM" },
+  { id: "ruby", label: "Ruby", tag: "RB" },
+];
+
+const RESPONSE_STATUS_ORDER = ["200", "400", "401", "403", "404"] as const;
+const STATUS_LABEL: Record<(typeof RESPONSE_STATUS_ORDER)[number], string> = {
+  "200": "200 - OK",
+  "400": "400 - Bad Request",
+  "401": "401 - Unauthorized",
+  "403": "403 - Forbidden",
+  "404": "404 - Not Found",
+};
 
 function pickBaseUrlFromCurl(exampleCurl: string): string {
   const match = exampleCurl.match(/https?:\/\/[^\s"']+/);
@@ -44,35 +70,195 @@ function getLanguageFromType(type: string) {
   return "text";
 }
 
-function encodeQuery(params: ParamState, orderedKeys: string[]) {
-  const searchParams = new URLSearchParams();
-  for (const key of orderedKeys) {
-    const value = params[key];
-    if (!value?.trim()) continue;
-    searchParams.set(key, value.trim());
-  }
-  return searchParams.toString();
+function collectQueryEntries(params: ParamState, orderedKeys: string[]) {
+  return orderedKeys
+    .map((key) => [key, params[key]?.trim() ?? ""] as const)
+    .filter(([, value]) => value.length > 0);
 }
 
-function pickCompactOperationalHints(api: ApiReferenceContent) {
-  const hints = [...(api.notes ?? []), ...(api.responseSummary ?? [])]
-    .filter((text) => /coverage|freshness|data_gaps|source|lineage|資料|缺口|來源|時效/i.test(text))
-    .map((text) => text.trim())
-    .filter(Boolean);
+function toObjectCode(entries: readonly (readonly [string, string])[], indent = "  ") {
+  if (entries.length === 0) return "{}";
+  return `\n${entries
+    .map(([name, value]) => `${indent}"${name}": "${value}"`)
+    .join(",\n")}\n`;
+}
 
-  if (hints.length > 0) return hints.slice(0, 3);
+function buildCurlSnippet(method: string, url: string, apiKey: string, entries: readonly (readonly [string, string])[]) {
+  const lines = [
+    `curl --request ${method} \\`,
+    `  --url \"${url}\" \\`,
+    `  --header \"X-API-Key: ${apiKey}\"`,
+  ];
+
+  if (entries.length > 0) {
+    lines.push("  --get \\");
+    for (const [name, value] of entries) {
+      lines.push(`  --data-urlencode \"${name}=${value}\" \\`);
+    }
+    lines[lines.length - 1] = lines[lines.length - 1].replace(/ \\$/, "");
+  }
+
+  return lines.join("\n");
+}
+
+function buildRequestSnippet(
+  language: RequestLanguage,
+  method: string,
+  url: string,
+  apiKey: string,
+  entries: readonly (readonly [string, string])[],
+) {
+  const objectLiteral = toObjectCode(entries);
+
+  if (language === "curl") {
+    return buildCurlSnippet(method, url, apiKey, entries);
+  }
+
+  if (language === "python") {
+    return [
+      "import requests",
+      "",
+      `url = \"${url}\"`,
+      `headers = {\"X-API-Key\": \"${apiKey}\"}`,
+      `params = ${objectLiteral === "{}" ? "{}" : `{${objectLiteral}}`}`,
+      "",
+      "response = requests.get(url, headers=headers, params=params)",
+      "data = response.json()",
+    ].join("\n");
+  }
+
+  if (language === "javascript") {
+    const setLines = entries.map(([name, value]) => `url.searchParams.set(\"${name}\", \"${value}\");`);
+    return [
+      `const url = new URL(\"${url}\");`,
+      ...(setLines.length ? [...setLines, ""] : []),
+      "const response = await fetch(url, {",
+      `  headers: { \"X-API-Key\": \"${apiKey}\" },`,
+      "});",
+      "const data = await response.json();",
+    ].join("\n");
+  }
+
+  if (language === "php") {
+    const query = entries.length ? `$params = [${entries.map(([name, value]) => `\"${name}\" => \"${value}\"`).join(", ")}];` : "$params = [];";
+    return [
+      "<?php",
+      `$url = \"${url}\";`,
+      query,
+      "$ch = curl_init($url . (!empty($params) ? '?' . http_build_query($params) : ''));",
+      `curl_setopt($ch, CURLOPT_HTTPHEADER, [\"X-API-Key: ${apiKey}\"]);`,
+      "curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);",
+      "$response = curl_exec($ch);",
+      "curl_close($ch);",
+    ].join("\n");
+  }
+
+  if (language === "go") {
+    const valueLines = entries.map(([name, value]) => `params.Set(\"${name}\", \"${value}\")`);
+    return [
+      'package main',
+      '',
+      'import (',
+      '  \"net/http\"',
+      '  \"net/url\"',
+      ')',
+      '',
+      `u, _ := url.Parse(\"${url}\")`,
+      'params := url.Values{}',
+      ...valueLines,
+      'u.RawQuery = params.Encode()',
+      `req, _ := http.NewRequest(\"${method}\", u.String(), nil)`,
+      `req.Header.Set(\"X-API-Key\", \"${apiKey}\")`,
+      'client := &http.Client{}',
+      'res, _ := client.Do(req)',
+      '_ = res',
+    ].join("\n");
+  }
+
+  if (language === "java") {
+    const setLines = entries.map(([name, value]) => `      .queryParam(\"${name}\", \"${value}\")`);
+    return [
+      'HttpRequest request = HttpRequest.newBuilder()',
+      `  .uri(URI.create(\"${url}\"))`,
+      ...setLines,
+      `  .header(\"X-API-Key\", \"${apiKey}\")`,
+      `  .method(\"${method}\", HttpRequest.BodyPublishers.noBody())`,
+      '  .build();',
+    ].join("\n");
+  }
 
   return [
-    "資料可用範圍依 coverage 與 freshness 狀態標示。",
-    "若存在資料缺口，回應可能包含 data_gaps 訊號。",
-    "來源欄位以 source_role / lineage 說明可追溯性。",
-  ];
+    "require 'net/http'",
+    "require 'uri'",
+    "",
+    `uri = URI(\"${url}\")`,
+    ...(entries.length
+      ? [
+          `params = { ${entries.map(([name, value]) => `${name}: \"${value}\"`).join(", ")} }`,
+          "uri.query = URI.encode_www_form(params)",
+        ]
+      : []),
+    "req = Net::HTTP::Get.new(uri)",
+    `req['X-API-Key'] = '${apiKey}'`,
+    "res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }",
+  ].join("\n");
+}
+
+function toCompactExampleJson(body: string, status: string) {
+  try {
+    const parsed = JSON.parse(body) as Record<string, unknown>;
+
+    if (status !== "200") {
+      return JSON.stringify(parsed, null, 2);
+    }
+
+    const rows = Array.isArray(parsed.rows) ? parsed.rows : Array.isArray(parsed.data) ? parsed.data : [];
+    const first = rows[0] && typeof rows[0] === "object" ? (rows[0] as Record<string, unknown>) : undefined;
+
+    if (!first) return JSON.stringify(parsed, null, 2);
+
+    const preferredKeys = ["symbol", "ticker", "trade_date", "date", "open", "high", "low", "close", "volume", "volume_shares"];
+    const compactRow: Record<string, unknown> = {};
+    for (const key of preferredKeys) {
+      if (key in first) compactRow[key] = first[key];
+    }
+    if (Object.keys(compactRow).length === 0) {
+      for (const key of Object.keys(first).slice(0, 8)) {
+        compactRow[key] = first[key];
+      }
+    }
+
+    const compact: Record<string, unknown> = {};
+    if (typeof parsed.dataset === "string") compact.dataset = parsed.dataset;
+    if (typeof parsed.count === "number") compact.count = parsed.count;
+    compact.rows = [compactRow];
+    if (parsed.meta && typeof parsed.meta === "object") compact.meta = parsed.meta;
+    if (Array.isArray(parsed.data_gaps)) compact.data_gaps = parsed.data_gaps;
+
+    return JSON.stringify(compact, null, 2);
+  } catch {
+    return body;
+  }
+}
+
+function fallbackStatusBody(status: string) {
+  return JSON.stringify(
+    {
+      error: {
+        code: `status_${status.toLowerCase()}`,
+        message: "此 endpoint 尚未提供對應狀態範例，請參考文件正文。",
+      },
+    },
+    null,
+    2,
+  );
 }
 
 export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [apiKey, setApiKey] = useState("");
-  const [activeStatus, setActiveStatus] = useState<ApiStatusExample["status"]>(api.sidePanel.statusExamples[0]?.status ?? "200");
+  const [requestLanguage, setRequestLanguage] = useState<RequestLanguage>("curl");
+  const [activeStatus, setActiveStatus] = useState<ApiStatusExample["status"]>("200");
   const [queryValues, setQueryValues] = useState<ParamState>({});
   const [runNotice, setRunNotice] = useState("");
 
@@ -90,8 +276,9 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
     }
 
     setQueryValues(initialValues);
-    setActiveStatus(api.sidePanel.statusExamples[0]?.status ?? "200");
+    setActiveStatus("200");
     setApiKey("");
+    setRequestLanguage("curl");
     setRunNotice("");
     setIsOpen(true);
   }
@@ -100,8 +287,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
     const hasMissingRequired = (api.queryParameters ?? []).some((parameter) => parameter.required && !queryValues[parameter.name]?.trim());
 
     if (hasMissingRequired) {
-      const has400 = api.sidePanel.statusExamples.some((example) => example.status === "400");
-      if (has400) setActiveStatus("400");
+      setActiveStatus("400");
       setRunNotice("缺少必填參數，已切換到 400 範例。");
       return;
     }
@@ -159,32 +345,82 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   }, [isOpen]);
 
   const queryKeys = useMemo(() => (api.queryParameters ?? []).map((parameter) => parameter.name), [api.queryParameters]);
+  const queryEntries = useMemo(() => collectQueryEntries(queryValues, queryKeys), [queryKeys, queryValues]);
+  const maskedKey = apiKey.trim() ? apiKey.trim() : "<api-key>";
 
-  const generatedCurl = useMemo(() => {
-    const query = encodeQuery(queryValues, queryKeys);
-    const maskedKey = apiKey.trim() ? apiKey.trim() : "<api-key>";
-    const lines = [
-      `curl --request ${api.method} \\`,
-      `  --url \"${baseUrl}${api.endpoint}\" \\`,
-      `  --header \"X-API-Key: ${maskedKey}\"`,
-    ];
-
-    if (query) {
-      lines.push("  --get \\");
-      for (const [name, value] of new URLSearchParams(query).entries()) {
-        lines.push(`  --data-urlencode \"${name}=${value}\" \\`);
-      }
-      lines[lines.length - 1] = lines[lines.length - 1].replace(/ \\\\$/, "");
-    }
-
-    return lines.join("\n");
-  }, [api.endpoint, api.method, apiKey, baseUrl, queryKeys, queryValues]);
-
-  const activeExample = useMemo(
-    () => api.sidePanel.statusExamples.find((example) => example.status === activeStatus) ?? api.sidePanel.statusExamples[0],
-    [activeStatus, api.sidePanel.statusExamples],
+  const requestExampleCode = useMemo(
+    () => buildRequestSnippet(requestLanguage, api.method, `${baseUrl}${api.endpoint}`, maskedKey, queryEntries),
+    [api.endpoint, api.method, baseUrl, maskedKey, queryEntries, requestLanguage],
   );
-  const operationalHints = useMemo(() => pickCompactOperationalHints(api), [api]);
+
+  const statusExampleMap = useMemo(() => {
+    const map = new Map<string, ApiStatusExample>();
+    for (const example of api.sidePanel.statusExamples) {
+      map.set(example.status, example);
+    }
+    return map;
+  }, [api.sidePanel.statusExamples]);
+
+  const activeExample = statusExampleMap.get(activeStatus);
+  const responseCode = useMemo(() => {
+    const raw = activeExample?.body ?? fallbackStatusBody(activeStatus);
+    return toCompactExampleJson(raw, activeStatus);
+  }, [activeExample?.body, activeStatus]);
+
+  const requestLanguageMeta = REQUEST_LANGUAGE_OPTIONS.find((item) => item.id === requestLanguage) ?? REQUEST_LANGUAGE_OPTIONS[0];
+
+  const requestHeader = (
+    <div className="flex w-full items-center justify-between gap-3">
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">請求範例</span>
+      </div>
+      <label className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
+        <span className="inline-flex h-5 min-w-7 items-center justify-center rounded bg-slate-100 px-1 text-[10px] font-semibold text-slate-600">
+          {requestLanguageMeta.tag}
+        </span>
+        <select
+          value={requestLanguage}
+          onChange={(event) => setRequestLanguage(event.target.value as RequestLanguage)}
+          className="h-6 bg-transparent text-[11px] font-medium text-slate-700 outline-none"
+          aria-label="請求範例語言"
+        >
+          {REQUEST_LANGUAGE_OPTIONS.map((option) => (
+            <option key={option.id} value={option.id}>{`${option.tag} · ${option.label}`}</option>
+          ))}
+        </select>
+      </label>
+    </div>
+  );
+
+  const responseHeader = (
+    <div className="flex w-full flex-wrap items-center justify-between gap-2">
+      <div className="flex items-center gap-2">
+        <span className={cn("inline-block h-2.5 w-2.5 rounded-full", activeStatus === "200" ? "bg-emerald-500/70" : "bg-amber-600/70")} />
+        <span className="text-[11px] font-semibold text-slate-700">{STATUS_LABEL[activeStatus as (typeof RESPONSE_STATUS_ORDER)[number]] ?? `${activeStatus} - Response`}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        {RESPONSE_STATUS_ORDER.map((status) => {
+          const exists = statusExampleMap.has(status);
+          return (
+            <button
+              key={status}
+              type="button"
+              onClick={() => setActiveStatus(status)}
+              className={cn(
+                "rounded-full border px-2 py-0.5 text-[10px] font-medium transition",
+                activeStatus === status ? "border-slate-300 bg-slate-200 text-slate-900" : "border-transparent text-slate-500 hover:border-slate-200 hover:text-slate-700",
+                !exists && "opacity-60",
+              )}
+            >
+              {status}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  const requestCodeLanguage: CodeBlockLanguage = requestLanguage === "curl" ? "curl" : requestLanguage === "javascript" ? "javascript" : requestLanguage === "python" ? "python" : "text";
 
   return (
     <>
@@ -246,48 +482,48 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
               </div>
 
               <div className="grid flex-1 min-h-0 grid-cols-1 md:grid-cols-[minmax(0,1.45fr)_minmax(360px,0.95fr)]">
-                <div className="flex min-h-0 flex-col gap-3 border-b border-slate-200 p-4 md:border-b-0 md:border-r md:p-5">
-                  <section className="space-y-1">
+                <div className="min-h-0 border-b border-slate-200 p-4 md:border-b-0 md:border-r md:p-5">
+                  <section className="space-y-1 border-b border-slate-200 pb-3">
                     <h3 id="api-playground-description" className="text-sm font-semibold text-slate-900">
                       試跑 API 請求
                     </h3>
-                    <p className="text-xs leading-5 text-slate-600">
-                      填入參數，產生 cURL 與回應範例。實際資料依 coverage 與 freshness 為準。
-                    </p>
+                    <p className="text-xs leading-5 text-slate-600">填入參數，產生請求範例與回應預覽。</p>
                   </section>
 
-                  <section className="space-y-1.5">
-                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">授權</h4>
-                    <div className="rounded-lg border border-slate-200 bg-white p-2">
-                      <div className="mb-1.5 grid grid-cols-[232px_minmax(0,1fr)] items-center gap-2">
-                        <div className="flex items-center gap-1.5 text-xs">
-                          <span className="font-mono text-slate-700">X-API-Key</span>
-                          <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">必填</span>
-                          <span className="text-[10px] text-slate-500">string</span>
+                  <section className="pt-2">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Authorization</h4>
+                    <div className="mt-1.5 border-b border-slate-200 pb-3">
+                      <div className="grid grid-cols-[minmax(260px,1.1fr)_minmax(0,1fr)] items-center gap-3">
+                        <div className="space-y-1.5">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="font-mono text-sm font-semibold text-slate-800">X-API-Key</span>
+                            <span className="text-xs text-slate-500">string</span>
+                            <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">必填</span>
+                          </div>
+                          <p className="text-[13px] leading-5 text-slate-600">API key 僅用於本次預覽，不會儲存。</p>
                         </div>
-                        <span className="text-[10px] text-slate-500">本頁不會儲存或記錄</span>
+                        <input
+                          type="password"
+                          value={apiKey}
+                          onChange={(event) => setApiKey(event.target.value)}
+                          placeholder="輸入 X-API-Key"
+                          className="h-9 w-full rounded-md border border-slate-300 bg-slate-50 px-3 text-xs text-slate-800 outline-none ring-slate-300 placeholder:text-slate-400 focus:bg-white focus:ring-2"
+                          autoComplete="off"
+                        />
                       </div>
-                      <input
-                        type="password"
-                        value={apiKey}
-                        onChange={(event) => setApiKey(event.target.value)}
-                        placeholder="輸入 X-API-Key"
-                        className="h-9 w-full rounded-md border border-slate-300 bg-slate-50 px-3 text-xs text-slate-800 outline-none ring-slate-300 placeholder:text-slate-400 focus:bg-white focus:ring-2"
-                        autoComplete="off"
-                      />
                     </div>
                   </section>
 
-                  <section className="space-y-1.5">
-                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">查詢參數</h4>
-                    <div className="max-h-[352px] overflow-y-auto rounded-lg border border-slate-200 bg-white">
-                      <div className="divide-y divide-slate-200">
-                        {(api.queryParameters ?? []).map((parameter) => (
-                          <div key={parameter.name} className="grid grid-cols-[minmax(260px,1.15fr)_minmax(0,1fr)] items-center gap-3 px-4 py-3">
-                            <div className="min-w-0 space-y-1.5">
+                  <section className="pt-3">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Query</h4>
+                    <div className="mt-1 max-h-[426px] overflow-y-auto">
+                      {(api.queryParameters ?? []).map((parameter) => (
+                        <div key={parameter.name} className="border-b border-slate-200 py-3">
+                          <div className="grid grid-cols-[minmax(260px,1.1fr)_minmax(0,1fr)] items-center gap-3">
+                            <div className="space-y-1.5 min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="truncate font-mono text-[13px] font-semibold text-slate-800">{parameter.name}</span>
-                                <span className="text-[11px] text-slate-500">{parameter.type}</span>
+                                <span className="truncate font-mono text-sm font-semibold text-slate-800">{parameter.name}</span>
+                                <span className="text-xs text-slate-500">{parameter.type}</span>
                                 <span
                                   className={cn(
                                     "rounded px-1.5 py-0.5 text-[10px] font-medium",
@@ -297,7 +533,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                                   {parameter.required ? "必填" : "選填"}
                                 </span>
                               </div>
-                              <p className="line-clamp-1 text-xs leading-5 text-slate-600">{parameter.description}</p>
+                              <p className="line-clamp-1 text-[13px] leading-5 text-slate-600">{parameter.description}</p>
                             </div>
                             <input
                               type={getLanguageFromType(parameter.type) === "number" ? "number" : "text"}
@@ -312,74 +548,32 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                               placeholder={parameter.name}
                             />
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                  </section>
-
-                  <section className="space-y-1.5">
-                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">資料狀態</h4>
-                    <div className="rounded-lg border border-slate-200 bg-slate-50/40 px-3.5 py-3">
-                      <ul className="space-y-2 text-xs leading-5 text-slate-600">
-                        {operationalHints.map((hint, index) => (
-                          <li key={`${hint}-${index}`} className="flex gap-1.5">
-                            <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
-                            <span className="line-clamp-2">{hint}</span>
-                          </li>
-                        ))}
-                        <li className="flex gap-1.5">
-                          <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
-                          <span>此區僅產生請求預覽，不會送出真實 API 請求。</span>
-                        </li>
-                      </ul>
+                        </div>
+                      ))}
                     </div>
                   </section>
                 </div>
 
                 <div className="flex min-h-0 flex-col gap-3 p-4 md:p-5">
-                  <section className="space-y-1.5">
-                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">請求範例</h4>
-                    <CodeBlock
-                      code={generatedCurl}
-                      language="curl"
-                      copyButtonVariant="icon"
-                      className="bg-white"
-                      wrapLines
-                      contentClassName="max-h-[156px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-[1.55]"
-                    />
-                  </section>
+                  <CodeBlock
+                    code={requestExampleCode}
+                    language={requestCodeLanguage}
+                    copyButtonVariant="icon"
+                    className="bg-white"
+                    wrapLines
+                    header={requestHeader}
+                    contentClassName="max-h-[160px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-[1.55]"
+                  />
 
-                  <section className="flex min-h-0 flex-col gap-1.5">
-                    <div className="flex items-center justify-between gap-3">
-                      <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">回應範例</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {api.sidePanel.statusExamples.map((example) => (
-                          <button
-                            key={example.status}
-                            type="button"
-                            onClick={() => setActiveStatus(example.status)}
-                            className={cn(
-                              "rounded-full border px-2 py-1 text-[11px] font-medium transition",
-                              activeStatus === example.status
-                                ? "border-slate-300 bg-slate-200 text-slate-900"
-                                : "border-transparent text-slate-500 hover:border-slate-200 hover:text-slate-700",
-                            )}
-                          >
-                            {example.status}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    {activeExample ? <p className="line-clamp-1 text-[11px] leading-5 text-slate-600">{activeExample.description}</p> : null}
-                    <CodeBlock
-                      code={activeExample?.body ?? "{}"}
-                      language="json"
-                      copyButtonVariant="icon"
-                      className="bg-white"
-                      wrapLines
-                      contentClassName="max-h-[332px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-[1.55]"
-                    />
-                  </section>
+                  <CodeBlock
+                    code={responseCode}
+                    language="json"
+                    copyButtonVariant="icon"
+                    className="bg-white"
+                    wrapLines
+                    header={responseHeader}
+                    contentClassName="max-h-[350px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-[1.55]"
+                  />
                 </div>
               </div>
             </div>
