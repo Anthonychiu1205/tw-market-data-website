@@ -280,51 +280,47 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
 
                   <section className="space-y-1.5">
                     <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">查詢參數</h4>
-                    <div className="max-h-[312px] overflow-y-auto rounded-lg border border-slate-200 bg-white">
-                      <div className="sticky top-0 z-10 grid grid-cols-[232px_minmax(0,1fr)] gap-2 border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                        <span>參數</span>
-                        <span>值</span>
-                      </div>
+                    <div className="max-h-[352px] overflow-y-auto rounded-lg border border-slate-200 bg-white">
                       <div className="divide-y divide-slate-200">
-                      {(api.queryParameters ?? []).map((parameter) => (
-                        <div key={parameter.name} className="grid grid-cols-[232px_minmax(0,1fr)] items-center gap-2 px-3 py-2">
-                          <div className="min-w-0 space-y-1">
-                            <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                              <span className="truncate font-mono font-semibold text-slate-700">{parameter.name}</span>
-                              <span className="text-[10px] text-slate-500">{parameter.type}</span>
-                            <span
-                              className={cn(
-                                "rounded px-1.5 py-0.5 text-[10px] font-medium",
-                                parameter.required ? "bg-rose-100 text-rose-700" : "bg-slate-100 text-slate-600",
-                              )}
-                            >
-                              {parameter.required ? "必填" : "選填"}
-                            </span>
+                        {(api.queryParameters ?? []).map((parameter) => (
+                          <div key={parameter.name} className="grid grid-cols-[minmax(260px,1.15fr)_minmax(0,1fr)] items-center gap-3 px-4 py-3">
+                            <div className="min-w-0 space-y-1.5">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="truncate font-mono text-[13px] font-semibold text-slate-800">{parameter.name}</span>
+                                <span className="text-[11px] text-slate-500">{parameter.type}</span>
+                                <span
+                                  className={cn(
+                                    "rounded px-1.5 py-0.5 text-[10px] font-medium",
+                                    parameter.required ? "bg-rose-100 text-rose-700" : "bg-slate-100 text-slate-600",
+                                  )}
+                                >
+                                  {parameter.required ? "必填" : "選填"}
+                                </span>
+                              </div>
+                              <p className="line-clamp-1 text-xs leading-5 text-slate-600">{parameter.description}</p>
+                            </div>
+                            <input
+                              type={getLanguageFromType(parameter.type) === "number" ? "number" : "text"}
+                              value={queryValues[parameter.name] ?? ""}
+                              onChange={(event) =>
+                                setQueryValues((prev) => ({
+                                  ...prev,
+                                  [parameter.name]: event.target.value,
+                                }))
+                              }
+                              className="h-9 w-full rounded-md border border-slate-300 bg-slate-50 px-3 text-xs text-slate-800 outline-none ring-slate-300 placeholder:text-slate-400 focus:bg-white focus:ring-2"
+                              placeholder={parameter.name}
+                            />
                           </div>
-                            <p className="line-clamp-1 text-[10px] leading-4 text-slate-500">{parameter.description}</p>
-                          </div>
-                          <input
-                            type={getLanguageFromType(parameter.type) === "number" ? "number" : "text"}
-                            value={queryValues[parameter.name] ?? ""}
-                            onChange={(event) =>
-                              setQueryValues((prev) => ({
-                                ...prev,
-                                [parameter.name]: event.target.value,
-                              }))
-                            }
-                            className="h-9 w-full rounded-md border border-slate-300 bg-slate-50 px-3 text-xs text-slate-800 outline-none ring-slate-300 placeholder:text-slate-400 focus:bg-white focus:ring-2"
-                            placeholder={parameter.name}
-                          />
-                        </div>
-                      ))}
+                        ))}
                       </div>
                     </div>
                   </section>
 
                   <section className="space-y-1.5">
                     <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">資料狀態</h4>
-                    <div className="rounded-lg border border-slate-200 bg-slate-50/40 px-3 py-2.5">
-                      <ul className="space-y-1.5 text-[11px] leading-5 text-slate-600">
+                    <div className="rounded-lg border border-slate-200 bg-slate-50/40 px-3.5 py-3">
+                      <ul className="space-y-2 text-xs leading-5 text-slate-600">
                         {operationalHints.map((hint, index) => (
                           <li key={`${hint}-${index}`} className="flex gap-1.5">
                             <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
@@ -349,7 +345,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                       copyButtonVariant="icon"
                       className="bg-white"
                       wrapLines
-                      contentClassName="max-h-[148px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-5"
+                      contentClassName="max-h-[156px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-[1.55]"
                     />
                   </section>
 
@@ -381,7 +377,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                       copyButtonVariant="icon"
                       className="bg-white"
                       wrapLines
-                      contentClassName="max-h-[320px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-5"
+                      contentClassName="max-h-[332px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-[1.55]"
                     />
                   </section>
                 </div>

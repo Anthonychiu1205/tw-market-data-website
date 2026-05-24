@@ -49,11 +49,11 @@ function tokenizeJsonLine(line: string): Token[] {
 
     const token = match[0];
     let className = "text-slate-600";
-    if (/^\".*\":$/.test(token)) className = "text-amber-700/70";
-    else if (/^\"/.test(token)) className = "text-teal-700/75";
-    else if (/^(true|false)$/.test(token)) className = "text-indigo-700/65";
-    else if (/^null$/.test(token)) className = "text-slate-500";
-    else className = "text-sky-700/65";
+    if (/^\".*\":$/.test(token)) className = "text-amber-800/55";
+    else if (/^\"/.test(token)) className = "text-teal-800/60";
+    else if (/^(true|false)$/.test(token)) className = "text-indigo-800/50";
+    else if (/^null$/.test(token)) className = "text-slate-600";
+    else className = "text-sky-800/55";
 
     tokens.push({ text: token, className });
     lastIndex = tokenRegex.lastIndex;
@@ -76,14 +76,14 @@ function tokenizeCodeLine(line: string, language: CodeBlockLanguage): Token[] {
   const tokens: Token[] = chunks.map((chunk) => {
     if (/^\s+$/.test(chunk)) return { text: chunk, className: "text-slate-700" };
     if (/^[(){}\[\],.:=<>+\-*/]$/.test(chunk)) return { text: chunk, className: "text-slate-400" };
-    if (/^(['"`]).*\1$/.test(chunk)) return { text: chunk, className: "text-teal-700/75" };
-    if (NUMBER_PATTERN.test(chunk)) return { text: chunk, className: "text-sky-700/65" };
+    if (/^(['"`]).*\1$/.test(chunk)) return { text: chunk, className: "text-teal-800/60" };
+    if (NUMBER_PATTERN.test(chunk)) return { text: chunk, className: "text-sky-800/55" };
 
     const keywordRegex =
       language === "python" ? PYTHON_KEYWORDS : language === "bash" || language === "curl" ? SHELL_KEYWORDS : JS_KEYWORDS;
 
-    if (keywordRegex.test(chunk)) return { text: chunk, className: "text-slate-800" };
-    if (chunk.startsWith("$") && (language === "bash" || language === "curl")) return { text: chunk, className: "text-amber-700/70" };
+    if (keywordRegex.test(chunk)) return { text: chunk, className: "text-slate-700" };
+    if (chunk.startsWith("$") && (language === "bash" || language === "curl")) return { text: chunk, className: "text-amber-800/55" };
     return { text: chunk, className: "text-slate-700" };
   });
 
