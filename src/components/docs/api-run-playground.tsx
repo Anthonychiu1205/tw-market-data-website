@@ -54,6 +54,21 @@ function encodeQuery(params: ParamState, orderedKeys: string[]) {
   return searchParams.toString();
 }
 
+function pickCompactOperationalHints(api: ApiReferenceContent) {
+  const hints = [...(api.notes ?? []), ...(api.responseSummary ?? [])]
+    .filter((text) => /coverage|freshness|data_gaps|source|lineage|資料|缺口|來源|時效/i.test(text))
+    .map((text) => text.trim())
+    .filter(Boolean);
+
+  if (hints.length > 0) return hints.slice(0, 3);
+
+  return [
+    "資料可用範圍依 coverage 與 freshness 狀態標示。",
+    "若存在資料缺口，回應可能包含 data_gaps 訊號。",
+    "來源欄位以 source_role / lineage 說明可追溯性。",
+  ];
+}
+
 export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [apiKey, setApiKey] = useState("");
@@ -147,20 +162,29 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
 
   const generatedCurl = useMemo(() => {
     const query = encodeQuery(queryValues, queryKeys);
-    const requestUrl = query ? `${baseUrl}${api.endpoint}?${query}` : `${baseUrl}${api.endpoint}`;
     const maskedKey = apiKey.trim() ? apiKey.trim() : "<api-key>";
-
-    return [
+    const lines = [
       `curl --request ${api.method} \\`,
-      `  --url \"${requestUrl}\" \\`,
+      `  --url \"${baseUrl}${api.endpoint}\" \\`,
       `  --header \"X-API-Key: ${maskedKey}\"`,
-    ].join("\n");
+    ];
+
+    if (query) {
+      lines.push("  --get \\");
+      for (const [name, value] of new URLSearchParams(query).entries()) {
+        lines.push(`  --data-urlencode \"${name}=${value}\" \\`);
+      }
+      lines[lines.length - 1] = lines[lines.length - 1].replace(/ \\\\$/, "");
+    }
+
+    return lines.join("\n");
   }, [api.endpoint, api.method, apiKey, baseUrl, queryKeys, queryValues]);
 
   const activeExample = useMemo(
     () => api.sidePanel.statusExamples.find((example) => example.status === activeStatus) ?? api.sidePanel.statusExamples[0],
     [activeStatus, api.sidePanel.statusExamples],
   );
+  const operationalHints = useMemo(() => pickCompactOperationalHints(api), [api]);
 
   return (
     <>
@@ -296,6 +320,24 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                       </div>
                     </div>
                   </section>
+
+                  <section className="space-y-1.5">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">資料狀態</h4>
+                    <div className="rounded-lg border border-slate-200 bg-slate-50/40 px-3 py-2.5">
+                      <ul className="space-y-1.5 text-[11px] leading-5 text-slate-600">
+                        {operationalHints.map((hint, index) => (
+                          <li key={`${hint}-${index}`} className="flex gap-1.5">
+                            <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+                            <span className="line-clamp-2">{hint}</span>
+                          </li>
+                        ))}
+                        <li className="flex gap-1.5">
+                          <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
+                          <span>此區僅產生請求預覽，不會送出真實 API 請求。</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </section>
                 </div>
 
                 <div className="flex min-h-0 flex-col gap-3 p-4 md:p-5">
@@ -306,7 +348,8 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                       language="curl"
                       copyButtonVariant="icon"
                       className="bg-white"
-                      contentClassName="max-h-[130px] overflow-auto px-3 pb-3 pt-1.5 text-[12px] leading-5"
+                      wrapLines
+                      contentClassName="max-h-[148px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-5"
                     />
                   </section>
 
@@ -337,7 +380,8 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                       language="json"
                       copyButtonVariant="icon"
                       className="bg-white"
-                      contentClassName="max-h-[300px] overflow-auto px-3 pb-3 pt-1.5 text-[12px] leading-5"
+                      wrapLines
+                      contentClassName="max-h-[320px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-5"
                     />
                   </section>
                 </div>
