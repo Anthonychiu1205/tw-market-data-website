@@ -378,7 +378,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
       <div className="flex items-center gap-2">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">請求範例</span>
       </div>
-      <div className="relative">
+      <div className="relative z-[90]">
         <button
           type="button"
           onClick={() => setIsLanguageMenuOpen((prev) => !prev)}
@@ -392,7 +392,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
           <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
         </button>
         {isLanguageMenuOpen ? (
-          <div className="absolute right-0 top-9 z-20 w-40 rounded-md border border-slate-200 bg-white p-1 shadow-lg">
+          <div className="absolute right-0 top-9 z-[100] w-40 rounded-xl border border-slate-200 bg-white p-1 shadow-xl">
             {REQUEST_LANGUAGE_OPTIONS.map((option) => {
               const OptionIcon = option.icon;
               return (
@@ -590,7 +590,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                     code={requestExampleCode}
                     language={requestCodeLanguage}
                     copyButtonVariant="icon"
-                    className="bg-white"
+                    className="relative z-20 !overflow-visible bg-white"
                     wrapLines
                     header={requestHeader}
                     contentClassName="max-h-[160px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-[1.55]"
