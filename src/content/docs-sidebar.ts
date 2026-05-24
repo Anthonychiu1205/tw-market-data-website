@@ -129,7 +129,6 @@ export const docsSidebarIntegrationItems: DocsSidebarNavItem[] = [
 export const docsSidebarSupportItems: DocsSidebarNavItem[] = [
   { title: "Support", href: "/docs/support" },
   { title: "幫助中心", href: "/help" },
-  { title: "常見問題", href: "/faq" },
 ];
 
 export const docsSidebarGuideItems: DocsSidebarNavItem[] = [

@@ -24,6 +24,8 @@ const docsCanonicalAliases: Record<string, string> = {
   "/docs/data-access": "/docs/market-coverage",
   "/docs/tools-and-mcp": "/docs/tools-mcp",
   "/docs/api-model": "/docs/openapi-spec",
+  "/docs/faq": "/help",
+  "/docs/help-center": "/help",
 };
 
 function resolveDocsCanonical(href: string) {
@@ -68,6 +70,12 @@ export async function generateMetadata({ params }: DocsDynamicPageProps): Promis
 
 export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) {
   const { slug } = await params;
+  const currentHref = `/docs/${slug.join("/")}`;
+  const canonicalAlias = docsCanonicalAliases[currentHref];
+  if (canonicalAlias && canonicalAlias !== currentHref) {
+    redirect(canonicalAlias);
+  }
+
   const page = getDocsPageBySlug(slug);
 
   if (!page) {
@@ -75,7 +83,6 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
   }
   const pageForShell = { ...page, apiReferenceFactory: undefined };
 
-  const currentHref = `/docs/${slug.join("/")}`;
   const groupTargetHref = resolveDocsGroupTargetHref(currentHref);
   if (groupTargetHref && groupTargetHref !== currentHref) {
     redirect(groupTargetHref);
