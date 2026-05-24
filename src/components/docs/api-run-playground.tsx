@@ -167,7 +167,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
       <button
         type="button"
         onClick={openPlayground}
-        className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white transition hover:bg-slate-700"
+        className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 text-xs font-semibold text-white transition hover:bg-slate-800"
         aria-label="Run"
       >
         Run
@@ -177,17 +177,17 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
       {isOpen ? (
         <div className="fixed inset-0 z-50">
           <div aria-hidden="true" className="fixed inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
-          <div className="fixed inset-0 flex items-center justify-center p-3 md:p-8">
+          <div className="fixed inset-0 flex items-center justify-center p-3 md:p-7">
             <div
               ref={dialogRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby="api-playground-title"
               aria-describedby="api-playground-description"
-              className="relative flex h-[min(760px,calc(100vh-64px))] w-full max-w-[1200px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+              className="relative flex h-[min(720px,calc(100vh-72px))] w-full max-w-[1160px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
-              <div className="border-b border-slate-200/90 bg-slate-50/50 px-4 py-3 md:px-5">
+              <div className="border-b border-slate-200/90 bg-slate-50/50 px-4 py-2.5 md:px-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 space-y-1">
                     <div className="flex items-center gap-2 text-sm">
@@ -202,7 +202,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                     <button
                       type="button"
                       onClick={handleRunPreview}
-                      className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 text-xs font-semibold text-white transition hover:bg-slate-800"
+                      className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 text-xs font-semibold text-white transition hover:bg-slate-800"
                     >
                       Run
                       <Play className="h-3.5 w-3.5" />
@@ -221,8 +221,8 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                 {runNotice ? <p className="pt-1 text-[11px] text-slate-500">{runNotice}</p> : null}
               </div>
 
-              <div className="grid flex-1 min-h-0 grid-cols-1 md:grid-cols-[48%_52%]">
-                <div className="flex min-h-0 flex-col gap-3.5 border-b border-slate-200 p-4 md:border-b-0 md:border-r md:p-5">
+              <div className="grid flex-1 min-h-0 grid-cols-1 md:grid-cols-[57%_43%]">
+                <div className="flex min-h-0 flex-col gap-3 border-b border-slate-200 p-4 md:border-b-0 md:border-r md:p-5">
                   <section className="space-y-1">
                     <h3 id="api-playground-description" className="text-sm font-semibold text-slate-900">
                       試跑 API 請求
@@ -232,10 +232,10 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                     </p>
                   </section>
 
-                  <section className="space-y-2">
+                  <section className="space-y-1.5">
                     <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">授權</h4>
-                    <div className="rounded-lg border border-slate-200 bg-white p-2.5">
-                      <div className="mb-2 grid grid-cols-[220px_minmax(0,1fr)] items-center gap-2">
+                    <div className="rounded-lg border border-slate-200 bg-white p-2">
+                      <div className="mb-1.5 grid grid-cols-[208px_minmax(0,1fr)] items-center gap-2">
                         <div className="flex items-center gap-1.5 text-xs">
                           <span className="font-mono text-slate-700">X-API-Key</span>
                           <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">必填</span>
@@ -254,16 +254,16 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                     </div>
                   </section>
 
-                  <section className="flex min-h-0 flex-1 flex-col gap-2">
+                  <section className="flex min-h-0 flex-col gap-1.5">
                     <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">查詢參數</h4>
-                    <div className="min-h-0 flex-1 overflow-y-auto rounded-lg border border-slate-200 bg-white">
-                      <div className="sticky top-0 z-10 grid grid-cols-[220px_minmax(0,1fr)] gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                    <div className="overflow-y-auto rounded-lg border border-slate-200 bg-white">
+                      <div className="sticky top-0 z-10 grid grid-cols-[208px_minmax(0,1fr)] gap-2 border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         <span>參數</span>
                         <span>值</span>
                       </div>
                       <div className="divide-y divide-slate-200">
                       {(api.queryParameters ?? []).map((parameter) => (
-                        <div key={parameter.name} className="grid grid-cols-[220px_minmax(0,1fr)] items-center gap-2 px-3 py-2.5">
+                        <div key={parameter.name} className="grid grid-cols-[208px_minmax(0,1fr)] items-center gap-2 px-3 py-2">
                           <div className="min-w-0 space-y-1">
                             <div className="flex flex-wrap items-center gap-1.5 text-xs">
                               <span className="truncate font-mono font-semibold text-slate-700">{parameter.name}</span>
@@ -298,8 +298,19 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                   </section>
                 </div>
 
-                <div className="flex min-h-0 flex-col gap-3.5 p-4 md:p-5">
-                  <section className="flex min-h-0 flex-1 flex-col gap-2">
+                <div className="flex min-h-0 flex-col gap-3 p-4 md:p-5">
+                  <section className="space-y-1.5">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">請求範例</h4>
+                    <CodeBlock
+                      code={generatedCurl}
+                      language="curl"
+                      copyButtonVariant="icon"
+                      className="bg-white"
+                      contentClassName="max-h-[130px] overflow-auto px-3 pb-3 pt-1.5 text-[12px] leading-5"
+                    />
+                  </section>
+
+                  <section className="flex min-h-0 flex-col gap-1.5">
                     <div className="flex items-center justify-between gap-3">
                       <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">回應範例</h4>
                       <div className="flex flex-wrap gap-1">
@@ -325,18 +336,8 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                       code={activeExample?.body ?? "{}"}
                       language="json"
                       copyButtonVariant="icon"
-                      className="min-h-0 flex-1"
-                      contentClassName="max-h-[250px] overflow-auto"
-                    />
-                  </section>
-
-                  <section className="space-y-2">
-                    <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">請求範例</h4>
-                    <CodeBlock
-                      code={generatedCurl}
-                      language="curl"
-                      copyButtonVariant="icon"
-                      contentClassName="max-h-[170px] overflow-auto"
+                      className="bg-white"
+                      contentClassName="max-h-[300px] overflow-auto px-3 pb-3 pt-1.5 text-[12px] leading-5"
                     />
                   </section>
                 </div>
