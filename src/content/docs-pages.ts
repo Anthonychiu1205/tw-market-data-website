@@ -9713,6 +9713,188 @@ TWMD_API_KEY=twmd_live_xxx python3 examples/agents/simple_research_agent.py`,
       },
     ],
   },
+  {
+    slug: ["help-center"],
+    href: "/docs/help-center",
+    navLabel: "幫助中心",
+    category: "support",
+    icon: "support",
+    title: "幫助中心",
+    subtitle: "查找 TW Market Data API 使用、API key、錯誤排查與資料狀態相關問題。",
+    tier: "complete",
+    sections: [
+      {
+        id: "intro",
+        label: "說明",
+        paragraphs: [
+          "查找 TW Market Data API 使用、API key、錯誤排查與資料狀態相關問題。",
+          "若問題持續發生，請保留 requestId、endpoint、查詢參數與發生時間，方便支援團隊排查。",
+        ],
+      },
+      {
+        id: "quick-start",
+        label: "快速開始",
+        bullets: [
+          "如何取得 API key？→ /docs/help-center/get-api-key",
+          "如何呼叫 API？→ /docs/help-center/call-api",
+        ],
+      },
+      {
+        id: "troubleshooting",
+        label: "錯誤排查",
+        bullets: ["為什麼會出現 502 / 504？→ /docs/help-center/502-504-errors"],
+      },
+      {
+        id: "next",
+        label: "之後可補充",
+        paragraphs: ["更多帳號、credits、data_gaps、OpenAPI / MCP 問題會逐步整理進幫助中心。"],
+      },
+    ],
+  },
+  {
+    slug: ["help-center", "get-api-key"],
+    href: "/docs/help-center/get-api-key",
+    navLabel: "如何取得 API key？",
+    category: "support",
+    icon: "support",
+    title: "如何取得 API key？",
+    subtitle: "從建立金鑰到安全保存，完整說明常見操作與風險防護。",
+    tier: "complete",
+    sections: [
+      {
+        id: "what-is-key",
+        label: "API key 是什麼",
+        paragraphs: [
+          "API key 是你呼叫 TW Market Data API 的授權憑證。每次請求都應在 header 帶上 `X-API-Key`，系統才會判斷權限與方案限制。",
+          "建議把 API key 視為密鑰資料，不要在公開程式碼、前端 bundle、截圖或客服對話中直接曝光。",
+        ],
+      },
+      {
+        id: "create-key-steps",
+        label: "建立 API key 步驟",
+        paragraphs: [
+          "先登入 dashboard，進入 API 金鑰管理區塊，建立一把新的 API key。",
+          "建立完成後通常只會顯示一次完整 key，請立即複製並存入安全的密鑰管理工具（例如受保護的環境變數或 secrets manager）。",
+          "若你的系統有 dev、staging、production 三種環境，建議分開建立金鑰，避免共用一把 key 造成追蹤困難。",
+        ],
+      },
+      {
+        id: "secure-usage",
+        label: "安全使用建議",
+        paragraphs: [
+          "不要把 key 寫在前端可見程式碼，也不要提交到 Git 倉庫。建議只在 server-side 或受保護的執行環境讀取。",
+          "若團隊多人協作，請使用權限可控的密鑰管理流程，不要透過聊天工具長期傳遞明文 key。",
+          "當你懷疑 key 外洩或遺失時，請先撤銷舊 key，再建立新 key 並更新所有服務設定，最後用最小查詢驗證新 key 是否可用。",
+        ],
+      },
+      {
+        id: "next-step",
+        label: "下一步",
+        bullets: [
+          "快速上手：/docs/quick-start",
+          "OpenAPI 規格：/docs/openapi-spec",
+          "API 文件入口：/docs/introduction",
+        ],
+      },
+    ],
+  },
+  {
+    slug: ["help-center", "call-api"],
+    href: "/docs/help-center/call-api",
+    navLabel: "如何呼叫 API？",
+    category: "support",
+    icon: "support",
+    title: "如何呼叫 API？",
+    subtitle: "從 endpoint、header、query parameter 到錯誤排查，逐步建立可重現的呼叫流程。",
+    tier: "complete",
+    sections: [
+      {
+        id: "request-basics",
+        label: "基本呼叫方式",
+        paragraphs: [
+          "TW Market Data 主要以 HTTPS GET 方式提供查詢，常見路徑格式為 `/v2/datasets/*`。",
+          "每次請求都要在 header 帶 `X-API-Key`；若缺少或不正確，通常會回傳 401。",
+          "建議先從單一 endpoint、單一標的、短日期區間開始，確認回應欄位後再擴大查詢範圍。",
+        ],
+      },
+      {
+        id: "query-strategy",
+        label: "查詢參數建議",
+        paragraphs: [
+          "先用小範圍參數測試，例如 `symbol` 搭配 `limit`，確認欄位語意後再加入 `start_date`、`end_date` 等條件。",
+          "如果一次查詢範圍太大，容易增加 timeout 或上游壓力，建議改成分批查詢並保留每批 requestId 方便追蹤。",
+          "若你要把結果接到資料管線，建議把 endpoint、完整參數、呼叫時間與 requestId 一起寫入日誌，方便重跑與稽核。",
+        ],
+      },
+      {
+        id: "error-checklist",
+        label: "常見錯誤快速檢查",
+        paragraphs: [
+          "收到 401 時，先檢查 key 是否正確、是否含多餘空白、是否已被撤銷，並確認使用的環境沒有混到舊金鑰。",
+          "收到 429 時，代表短時間請求過多或達到方案限制，建議實作退避重試、降低併發，並檢視目前方案的 rate limit 與 credits 使用情況。",
+          "收到 400 時，多半是參數格式錯誤或必填欄位缺失，請對照該 endpoint 文件逐一檢查參數名稱、型別與日期格式。",
+        ],
+      },
+      {
+        id: "next-step",
+        label: "延伸閱讀",
+        bullets: [
+          "快速開始：/docs/quick-start",
+          "API 主題文件：/docs/introduction",
+          "OpenAPI 規格：/docs/openapi-spec",
+        ],
+      },
+    ],
+  },
+  {
+    slug: ["help-center", "502-504-errors"],
+    href: "/docs/help-center/502-504-errors",
+    navLabel: "為什麼會出現 502 / 504？",
+    category: "support",
+    icon: "support",
+    title: "為什麼會出現 502 / 504？",
+    subtitle: "理解 502/504 的常見成因，並用可操作的流程縮短排查時間。",
+    tier: "complete",
+    sections: [
+      {
+        id: "what-502-504-means",
+        label: "502 / 504 代表什麼",
+        paragraphs: [
+          "502 / 504 通常代表上游服務暫時不可用、查詢逾時、或單次查詢範圍過大造成回應延遲。",
+          "這兩種錯誤不等於資料一定不存在，也不表示你的帳號一定失效；它們更常見於暫時性可恢復問題。",
+        ],
+      },
+      {
+        id: "first-response-steps",
+        label: "第一時間處理步驟",
+        paragraphs: [
+          "先縮小查詢範圍（例如縮短 date range、降低 limit、一次只查單一 symbol），再進行有限次重試。",
+          "重試時建議加入退避策略（例如 2~5 秒遞增等待），避免在上游不穩時瞬間放大流量。",
+          "若你在批次流程中遇到 502/504，建議把失敗區段切分重跑，避免整批任務因單筆逾時而中斷。",
+        ],
+      },
+      {
+        id: "what-to-record",
+        label: "回報前請先記錄",
+        bullets: [
+          "endpoint 路徑",
+          "symbol / ticker 與 date range",
+          "完整查詢參數",
+          "requestId",
+          "發生時間（含時區）",
+        ],
+      },
+      {
+        id: "when-to-contact-support",
+        label: "何時聯絡支援",
+        paragraphs: [
+          "若同一查詢在縮小範圍與退避重試後仍持續發生 502/504，請把上述資訊提供給支援團隊進行排查。",
+          "如果回應同時帶有 data_gaps，請保留原始回應內容與 requestId 一起回報，避免排查時遺失關鍵上下文。",
+          "建議不要把 502/504 直接當成資料缺失結論，而是先完成排查流程，再判斷是否為來源或服務層面的暫時問題。",
+        ],
+      },
+    ],
+  },
 ];
 
 const workflowPages: DocsPageEntry[] = workflowPageCatalog.map((workflow) => ({
