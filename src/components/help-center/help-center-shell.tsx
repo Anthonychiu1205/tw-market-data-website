@@ -7,13 +7,6 @@ type HelpCenterArticleShellProps = {
   article: HelpArticle;
 };
 
-function titleToId(title: string) {
-  return title
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^\p{L}\p{N}-]/gu, "");
-}
-
 export function HelpCenterIndex() {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -35,17 +28,26 @@ export function HelpCenterIndex() {
 
       <section className="mt-6 rounded-2xl border border-slate-200 bg-white px-5 py-4">
         <h2 className="text-base font-semibold text-slate-900">文章</h2>
-        <div className="mt-3 space-y-2">
-          {helpCenterArticles.map((article) => (
-            <Link
-              key={article.slug}
-              href={`/help-center/${article.slug}`}
-              className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
-            >
-              <span>{article.title}</span>
-              <span className="text-xs text-slate-500">{article.category}</span>
-            </Link>
-          ))}
+        <div className="mt-4 space-y-4">
+          {helpCenterCategories.map((category) => {
+            const articles = helpCenterArticles.filter((article) => article.category === category.title);
+            return (
+              <section key={category.id} className="space-y-2">
+                <h3 className="text-sm font-semibold text-slate-800">{category.title}</h3>
+                <div className="space-y-2">
+                  {articles.map((article) => (
+                    <Link
+                      key={article.slug}
+                      href={`/help-center/${article.slug}`}
+                      className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
+                    >
+                      <span>{article.title}</span>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
         </div>
       </section>
 
@@ -64,10 +66,10 @@ export function HelpCenterIndex() {
 }
 
 export function HelpCenterArticleShell({ article }: HelpCenterArticleShellProps) {
-  const toc = article.sections.map((section) => ({ id: section.id || titleToId(section.heading), label: section.heading }));
   const relatedArticles = article.related
     .map((slug) => helpCenterArticles.find((entry) => entry.slug === slug))
-    .filter((entry): entry is HelpArticle => Boolean(entry));
+    .filter((entry): entry is HelpArticle => Boolean(entry))
+    .slice(0, 3);
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
@@ -142,18 +144,6 @@ export function HelpCenterArticleShell({ article }: HelpCenterArticleShellProps)
 
         <aside className="space-y-4">
           <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-            <h2 className="text-sm font-semibold text-slate-900">本頁章節</h2>
-            <ul className="mt-2 space-y-1">
-              {toc.map((item) => (
-                <li key={item.id}>
-                  <a href={`#${item.id}`} className="text-sm text-slate-600 hover:text-slate-900">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
             <h2 className="text-sm font-semibold text-slate-900">相關文章</h2>
             <ul className="mt-2 space-y-2">
               {relatedArticles.map((entry) => (
@@ -164,6 +154,16 @@ export function HelpCenterArticleShell({ article }: HelpCenterArticleShellProps)
                 </li>
               ))}
             </ul>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+            <h2 className="text-sm font-semibold text-slate-900">需要協助？</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-600">請整理 requestId、endpoint、查詢參數與發生時間後，聯絡支援。</p>
+            <a
+              href="mailto:avenra.platform@gmail.com"
+              className="mt-2 inline-block text-sm font-medium text-slate-900 underline underline-offset-4 hover:text-slate-700"
+            >
+              avenra.platform@gmail.com
+            </a>
           </div>
         </aside>
       </div>
