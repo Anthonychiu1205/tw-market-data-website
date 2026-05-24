@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, X } from "lucide-react";
+import { Braces, Boxes, Check, ChevronDown, Code2, Coffee, FileCode2, Gem, Play, Terminal, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CodeBlock, type CodeBlockLanguage } from "@/src/components/docs/code-block";
@@ -18,17 +18,17 @@ type RequestLanguage = "curl" | "python" | "javascript" | "php" | "go" | "java" 
 type RequestLanguageOption = {
   id: RequestLanguage;
   label: string;
-  tag: string;
+  icon: typeof Terminal;
 };
 
 const REQUEST_LANGUAGE_OPTIONS: RequestLanguageOption[] = [
-  { id: "curl", label: "cURL", tag: "CLI" },
-  { id: "python", label: "Python", tag: "PY" },
-  { id: "javascript", label: "JavaScript", tag: "JS" },
-  { id: "php", label: "PHP", tag: "PHP" },
-  { id: "go", label: "Go", tag: "GO" },
-  { id: "java", label: "Java", tag: "JVM" },
-  { id: "ruby", label: "Ruby", tag: "RB" },
+  { id: "curl", label: "cURL", icon: Terminal },
+  { id: "python", label: "Python", icon: FileCode2 },
+  { id: "javascript", label: "JavaScript", icon: Code2 },
+  { id: "php", label: "PHP", icon: Braces },
+  { id: "go", label: "Go", icon: Boxes },
+  { id: "java", label: "Java", icon: Coffee },
+  { id: "ruby", label: "Ruby", icon: Gem },
 ];
 
 const RESPONSE_STATUS_ORDER = ["200", "400", "401", "403", "404"] as const;
@@ -258,6 +258,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   const [isOpen, setIsOpen] = useState(false);
   const [apiKey, setApiKey] = useState("");
   const [requestLanguage, setRequestLanguage] = useState<RequestLanguage>("curl");
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [activeStatus, setActiveStatus] = useState<ApiStatusExample["status"]>("200");
   const [queryValues, setQueryValues] = useState<ParamState>({});
   const [runNotice, setRunNotice] = useState("");
@@ -279,6 +280,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
     setActiveStatus("200");
     setApiKey("");
     setRequestLanguage("curl");
+    setIsLanguageMenuOpen(false);
     setRunNotice("");
     setIsOpen(true);
   }
@@ -305,6 +307,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        setIsLanguageMenuOpen(false);
         setIsOpen(false);
         return;
       }
@@ -368,27 +371,54 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   }, [activeExample?.body, activeStatus]);
 
   const requestLanguageMeta = REQUEST_LANGUAGE_OPTIONS.find((item) => item.id === requestLanguage) ?? REQUEST_LANGUAGE_OPTIONS[0];
+  const RequestLanguageIcon = requestLanguageMeta.icon;
 
   const requestHeader = (
     <div className="flex w-full items-center justify-between gap-3">
       <div className="flex items-center gap-2">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">請求範例</span>
       </div>
-      <label className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2 py-1">
-        <span className="inline-flex h-5 min-w-7 items-center justify-center rounded bg-slate-100 px-1 text-[10px] font-semibold text-slate-600">
-          {requestLanguageMeta.tag}
-        </span>
-        <select
-          value={requestLanguage}
-          onChange={(event) => setRequestLanguage(event.target.value as RequestLanguage)}
-          className="h-6 bg-transparent text-[11px] font-medium text-slate-700 outline-none"
-          aria-label="請求範例語言"
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsLanguageMenuOpen((prev) => !prev)}
+          className="inline-flex h-8 items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+          aria-haspopup="menu"
+          aria-expanded={isLanguageMenuOpen}
+          aria-label="選擇請求範例語言"
         >
-          {REQUEST_LANGUAGE_OPTIONS.map((option) => (
-            <option key={option.id} value={option.id}>{`${option.tag} · ${option.label}`}</option>
-          ))}
-        </select>
-      </label>
+          <RequestLanguageIcon className="h-3.5 w-3.5 text-slate-500" />
+          <span>{requestLanguageMeta.label}</span>
+          <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+        </button>
+        {isLanguageMenuOpen ? (
+          <div className="absolute right-0 top-9 z-20 w-40 rounded-md border border-slate-200 bg-white p-1 shadow-lg">
+            {REQUEST_LANGUAGE_OPTIONS.map((option) => {
+              const OptionIcon = option.icon;
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => {
+                    setRequestLanguage(option.id);
+                    setIsLanguageMenuOpen(false);
+                  }}
+                  className={cn(
+                    "flex w-full items-center justify-between rounded px-2 py-1.5 text-xs transition",
+                    option.id === requestLanguage ? "bg-slate-100 text-slate-900" : "text-slate-700 hover:bg-slate-50",
+                  )}
+                >
+                  <span className="flex items-center gap-2">
+                    <OptionIcon className="h-3.5 w-3.5 text-slate-500" />
+                    <span>{option.label}</span>
+                  </span>
+                  {option.id === requestLanguage ? <Check className="h-3.5 w-3.5 text-slate-500" /> : null}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 
@@ -416,6 +446,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
             </button>
           );
         })}
+        <span className="ml-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-500">Body</span>
       </div>
     </div>
   );
@@ -493,14 +524,14 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                   <section className="pt-2">
                     <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Authorization</h4>
                     <div className="mt-1.5 border-b border-slate-200 pb-3">
-                      <div className="grid grid-cols-[minmax(260px,1.1fr)_minmax(0,1fr)] items-center gap-3">
+                      <div className="grid grid-cols-1 items-center gap-2 md:grid-cols-[minmax(280px,1fr)_minmax(280px,340px)] md:gap-4">
                         <div className="space-y-1.5">
                           <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="font-mono text-sm font-semibold text-slate-800">X-API-Key</span>
+                            <span className="text-sm font-semibold text-slate-900">X-API-Key</span>
                             <span className="text-xs text-slate-500">string</span>
                             <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">必填</span>
                           </div>
-                          <p className="text-[13px] leading-5 text-slate-600">API key 僅用於本次預覽，不會儲存。</p>
+                          <p className="text-sm leading-5 text-slate-600">API key 僅用於本次預覽，不會儲存。</p>
                         </div>
                         <input
                           type="password"
@@ -518,11 +549,11 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                     <h4 className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Query</h4>
                     <div className="mt-1 max-h-[426px] overflow-y-auto">
                       {(api.queryParameters ?? []).map((parameter) => (
-                        <div key={parameter.name} className="border-b border-slate-200 py-3">
-                          <div className="grid grid-cols-[minmax(260px,1.1fr)_minmax(0,1fr)] items-center gap-3">
+                        <div key={parameter.name} className="border-b border-slate-200 py-3.5">
+                          <div className="grid grid-cols-1 items-center gap-2 md:grid-cols-[minmax(280px,1fr)_minmax(280px,340px)] md:gap-4">
                             <div className="space-y-1.5 min-w-0">
                               <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="truncate font-mono text-sm font-semibold text-slate-800">{parameter.name}</span>
+                                <span className="truncate text-sm font-semibold text-slate-900">{parameter.name}</span>
                                 <span className="text-xs text-slate-500">{parameter.type}</span>
                                 <span
                                   className={cn(
@@ -533,7 +564,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                                   {parameter.required ? "必填" : "選填"}
                                 </span>
                               </div>
-                              <p className="line-clamp-1 text-[13px] leading-5 text-slate-600">{parameter.description}</p>
+                              <p className="line-clamp-1 text-sm leading-5 text-slate-600">{parameter.description}</p>
                             </div>
                             <input
                               type={getLanguageFromType(parameter.type) === "number" ? "number" : "text"}
