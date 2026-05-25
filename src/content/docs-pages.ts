@@ -47,7 +47,7 @@ export type ApiResponseField = {
 };
 
 export type ApiStatusExample = {
-  status: "200" | "400" | "401" | "403" | "404";
+  status: "200" | "400" | "401" | "403" | "404" | "429" | "503";
   description: string;
   body: string;
 };
@@ -2480,6 +2480,14 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     topics: [
       { title: "公司新聞", href: "/docs/api/preview/company-news", topicId: "company_news", tableName: "company_news_items", endpoint: "/v2/datasets/company-news", source: "TWSE / TPEx / MOPS" },
       { title: "市場新聞", href: "/docs/api/preview/market-news", topicId: "market_news", tableName: "market_news_items", endpoint: "/v2/datasets/market-news", source: "TWSE / TPEx / MOPS" },
+      {
+        title: "MOPS 重大訊息事件（Private Beta）",
+        href: "/docs/api/preview/mops-material-events",
+        topicId: "mops_material_events",
+        tableName: "mops_*_v2",
+        endpoint: "/v2/datasets/news/mops-material-events",
+        source: "MOPS",
+      },
     ],
   },
 ];
@@ -7025,6 +7033,203 @@ function buildMarketNewsPreviewApiSections(): DocsContentSection[] {
   ];
 }
 
+function buildMopsMaterialEventsPreviewApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/news/mops-material-events";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+params = {
+    "company_code": "8937",
+    "date_from": "2026-05-24",
+    "date_to": "2026-05-24",
+    "limit": 50,
+    "source_mode": "production_db_read",
+    "include_detail_labels": "true",
+}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/news/mops-material-events",
+    headers=headers,
+    params=params,
+)
+print(response.json())`,
+    javascript: `const params = new URLSearchParams({
+  company_code: "8937",
+  date_from: "2026-05-24",
+  date_to: "2026-05-24",
+  limit: "50",
+  source_mode: "production_db_read",
+  include_detail_labels: "true",
+})
+
+const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/news/mops-material-events?" + params.toString(),
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/news/mops-material-events?company_code=8937&date_from=2026-05-24&date_to=2026-05-24&limit=50&source_mode=production_db_read&include_detail_labels=true" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+
+  const successBody = JSON.stringify(
+    {
+      data: [
+        {
+          news_item_id: "mops:8937:2026-05-24:07:00:03:1",
+          source_family: "mops_material_information",
+          source_endpoint: "https://mops.twse.com.tw/mops/web/t05sr01_1",
+          source_mode: "production_db_read",
+          company_code: "8937",
+          company_name: "合騏",
+          event_date: "2026-05-24",
+          event_time: "07:00:03",
+          seq_no: "1",
+          subject: "重大訊息範例（metadata-only）",
+          event_type: "material_information",
+          detail_available: false,
+          detail_labels_present: true,
+          full_body_stored: false,
+          raw_html_stored: false,
+          parser_status: "parsed",
+          confidence: 0.99,
+          data_gaps: {
+            missing_fields: [],
+          },
+          lineage: {
+            parser_version: "mops-v2",
+            trace_id: "mops_8937_20260524_1",
+          },
+          not_investment_advice: true,
+        },
+      ],
+      meta: {
+        row_count: 1,
+        production_ready: false,
+        source_mode: "production_db_read",
+        status: "private_beta_disabled_by_default",
+      },
+      source: {
+        name: "MOPS",
+        attribution_required: true,
+      },
+      not_investment_advice: true,
+    },
+    null,
+    2,
+  );
+
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "Preview / Private Beta",
+    endpoint,
+    method: "GET",
+    overview: [
+      "MOPS Material Events 提供公開資訊觀測站重大訊息的 metadata-only 事件資料，設計給事件情報流程與 API 工作流使用。",
+      "目前為 private beta 候選，且 backend route 預設 disabled；在 final gate 前不屬於 production-ready 公開能力。",
+    ],
+    requestDescription: [
+      "查詢必須為 bounded query，建議至少帶 company_code（或 ticker）與日期範圍。",
+      "預設 limit=50，硬上限 limit<=100；不接受 TPEx/OTC 範圍。",
+    ],
+    useCases: [
+      "重大訊息 metadata 索引與事件標記流程。",
+      "跨資料集事件對齊（company events / market context）。",
+      "保留 data_gaps / lineage 的審計與可追溯工作流。",
+    ],
+    gettingStarted: [
+      "先用單一 company_code + 單日區間驗證欄位。",
+      "確認 source_mode / data_gaps / lineage 後再擴大查詢。",
+      "請勿假設有全文內容，回應僅提供 metadata 與 detail labels。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "company_code", type: "string", required: false, description: "公司代碼。建議與日期範圍搭配，避免 unbounded query。" },
+      { name: "ticker", type: "string", required: false, description: "股票代碼，可替代 company_code。" },
+      { name: "date_from", type: "string", required: true, description: "查詢起始日期（YYYY-MM-DD），需與 date_to 成對出現。" },
+      { name: "date_to", type: "string", required: true, description: "查詢結束日期（YYYY-MM-DD），需與 date_from 成對出現。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數上限，預設 50，最大 100。" },
+      { name: "source_mode", type: "string", required: false, description: "資料模式，規劃對外回傳 production_db_read 標記。" },
+      { name: "include_detail_labels", type: "boolean", required: false, description: "是否包含 detail labels（不包含全文）。" },
+    ],
+    responseSummary: [
+      "回應為 metadata-only，不包含 full body、raw HTML、cookie/session/token。",
+      "`not_investment_advice=true`、`full_body_stored=false`、`raw_html_stored=false` 為固定安全語義。",
+      "在最終 enablement gate 完成前，`meta.production_ready` 必須維持 false。",
+    ],
+    responseFields: [
+      { path: "data[].news_item_id", type: "string", description: "事件唯一識別鍵。" },
+      { path: "data[].source_family", type: "string", description: "來源家族，固定 mops_material_information。" },
+      { path: "data[].source_endpoint", type: "string", description: "來源端點，用於 attribution。" },
+      { path: "data[].source_mode", type: "string", description: "來源模式，例如 production_db_read。" },
+      { path: "data[].company_code", type: "string", description: "公司代碼。" },
+      { path: "data[].company_name", type: "string|null", description: "公司名稱（若可得）。" },
+      { path: "data[].event_date", type: "string", description: "事件日期。" },
+      { path: "data[].event_time", type: "string", description: "事件時間。" },
+      { path: "data[].seq_no", type: "string", description: "重大訊息序號（non-empty）。" },
+      { path: "data[].subject", type: "string", description: "重大訊息標題/主旨（metadata）。" },
+      { path: "data[].event_type", type: "string", description: "事件型別，預設 material_information。" },
+      { path: "data[].detail_available", type: "boolean", description: "是否有可解析 detail metadata。" },
+      { path: "data[].detail_labels_present", type: "boolean", description: "是否有 detail labels。" },
+      { path: "data[].full_body_stored", type: "boolean", description: "固定 false，不提供全文儲存。" },
+      { path: "data[].raw_html_stored", type: "boolean", description: "固定 false，不提供 raw HTML 儲存。" },
+      { path: "data[].parser_status", type: "string", description: "解析狀態標記。" },
+      { path: "data[].confidence", type: "number", description: "欄位可信度分數。" },
+      { path: "data[].data_gaps", type: "object", description: "缺漏欄位與資料品質標記。" },
+      { path: "data[].lineage", type: "object", description: "資料血緣與 trace metadata。" },
+      { path: "data[].not_investment_advice", type: "boolean", description: "固定 true，非投資建議聲明。" },
+      { path: "meta.production_ready", type: "boolean", description: "在 route final gate 前固定 false。" },
+    ],
+    notes: [
+      "Private beta / disabled：此 endpoint 已 wired but disabled，不可視為 production-ready。",
+      "不提供：full body、raw HTML、cookies/session/token、買賣建議/目標價。",
+      "目前 scope 不含 TPEx；僅支援 MOPS material information metadata 流程。",
+      "來源引用請保留 source_family/source_endpoint 與 lineage。",
+    ],
+    planRequirement: {
+      title: "Plan & Entitlement（Docs-only）",
+      bullets: [
+        "目前屬 internal/private beta，尚未 public commercial availability。",
+        "未來啟用時需 API key + plan entitlement + rate limit gate。",
+        "此頁不設定 pricing、不變更 billing/runtime 行為。",
+      ],
+    },
+    errorCases: [
+      "200",
+      "400",
+      "401",
+      "403",
+      "429",
+      "503",
+    ],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "啟用後且條件合法時，回傳 metadata-only 事件資料。", body: successBody },
+        { status: "400", description: "查詢參數未 bounded、limit 超出範圍或缺少必要條件。", body: `{"detail":"validation_error","error_code":"unbounded_query_or_invalid_params"}` },
+        { status: "401", description: "缺少 API key 或驗證失敗。", body: `{"detail":"missing_or_invalid_api_key"}` },
+        { status: "403", description: "方案未授權或 dataset entitlement 不符合。", body: `{"detail":"plan_not_entitled"}` },
+        { status: "429", description: "超過 rate limit。", body: `{"detail":"rate_limited"}` },
+        { status: "503", description: "route disabled 或 emergency disabled。", body: `{"detail":"route_disabled","meta":{"production_ready":false}}` },
+      ],
+    },
+  };
+}
+
+function buildMopsMaterialEventsPreviewApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
 function buildChipFlowsApiReference(): ApiReferenceContent {
   const endpoint = "/v2/datasets/chip-flows";
   const codeExamples: ApiCodeExamples = {
@@ -10293,6 +10498,22 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
       };
     }
 
+    if (topic.topicId === "mops_material_events") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "MOPS Material Events（Private Beta）",
+        subtitle: "公開資訊觀測站重大訊息事件 metadata-only API（Private Beta，預設 disabled）。",
+        tier: "placeholder",
+        sections: buildMopsMaterialEventsPreviewApiSections(),
+        apiReferenceFactory: () => buildMopsMaterialEventsPreviewApiReference(),
+      };
+    }
+
     if (topic.topicId === "twse_daily_price") {
       return {
         slug: hrefToSlug(topic.href),
@@ -10572,6 +10793,7 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     items: [
       { title: "公司新聞", href: "/docs/api/preview/company-news", icon: "news", status: "preview" },
       { title: "市場新聞", href: "/docs/api/preview/market-news", icon: "news", status: "preview" },
+      { title: "MOPS 重大訊息事件（Private Beta）", href: "/docs/api/preview/mops-material-events", icon: "news", status: "preview" },
     ],
   },
 ];
