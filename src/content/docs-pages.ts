@@ -47,7 +47,7 @@ export type ApiResponseField = {
 };
 
 export type ApiStatusExample = {
-  status: "200" | "400" | "401" | "403" | "404";
+  status: "200" | "400" | "401" | "403" | "404" | "429" | "503";
   description: string;
   body: string;
 };
@@ -2422,7 +2422,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
       { title: "TWSE 日線價格", href: "/docs/api/market-prices/twse-daily-price", topicId: "twse_daily_price", tableName: "normalized_twse_daily_prices", endpoint: "/v2/datasets/twse-daily-price", source: "TWSE" },
       { title: "TPEx 日線價格", href: "/docs/api/market-prices/tpex-daily-price", topicId: "tpex_daily_price", tableName: "normalized_tpex_daily_prices", endpoint: "/v2/datasets/tpex-daily-price", source: "TPEx" },
       { title: "還原股價", href: "/docs/api/market-prices/adjusted-prices", topicId: "adjusted_prices", tableName: "adjusted_prices", endpoint: "/v2/datasets/adjusted-prices", source: "TWSE / TPEx" },
-      { title: "技術指標", href: "/docs/api/market-prices/technical-indicators", topicId: "technical_indicators", tableName: "technical_indicators", endpoint: "/v2/datasets/technical-indicators", source: "TWSE / TPEx" },
+      { title: "技術指標", href: "/docs/api/market-prices/technical-indicators", topicId: "technical_indicators", tableName: "technical_indicators", endpoint: "/v2/datasets/technical-indicators", source: "TWSE（Non-TPEx, Stage0 baseline）" },
       { title: "指數資料", href: "/docs/api/market-prices/index-data", topicId: "index_data", tableName: "index_data", endpoint: "/v2/datasets/index-data", source: "TWSE / TPEx" },
       { title: "市場廣度", href: "/docs/api/market-prices/market-breadth", topicId: "market_breadth", tableName: "market_breadth", endpoint: "/v2/datasets/market-breadth", source: "TWSE / TPEx" },
       { title: "利率", href: "/docs/api/market-prices/interest-rate", topicId: "interest_rate_snapshot", tableName: "interest_rate_snapshot", endpoint: "/v2/datasets/interest-rate-snapshot", source: "中央銀行 / 公開資料平台" },
@@ -2480,6 +2480,14 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     topics: [
       { title: "公司新聞", href: "/docs/api/preview/company-news", topicId: "company_news", tableName: "company_news_items", endpoint: "/v2/datasets/company-news", source: "TWSE / TPEx / MOPS" },
       { title: "市場新聞", href: "/docs/api/preview/market-news", topicId: "market_news", tableName: "market_news_items", endpoint: "/v2/datasets/market-news", source: "TWSE / TPEx / MOPS" },
+      {
+        title: "MOPS 重大訊息事件（Private Beta）",
+        href: "/docs/api/preview/mops-material-events",
+        topicId: "mops_material_events",
+        tableName: "mops_*_v2",
+        endpoint: "/v2/datasets/news/mops-material-events",
+        source: "MOPS",
+      },
     ],
   },
 ];
@@ -5139,20 +5147,24 @@ console.log(data)`,
       dataset: "technical_indicators",
       rows: [
         {
-          symbol: "2330",
-          date: "2026-04-22",
+          ticker: "2330",
+          market: "TWSE",
+          trade_date: "2026-04-22",
           close: 815,
+          volume: 18234000,
+          daily_return: 0.00492611,
           ma_5: 809.4,
           ma_20: 796.8,
           ma_60: 772.1,
-          rsi_14: 58.2,
-          macd: 8.4,
-          macd_signal: 7.1,
-          macd_hist: 1.3,
-          bollinger_upper: 824.5,
-          bollinger_middle: 796.8,
-          bollinger_lower: 769.1,
-          volume: 18234000,
+          volume_avg_20: 16852340.2,
+          return_5d: 0.01750000,
+          return_20d: 0.05130000,
+          volatility_20d: 0.01420000,
+          provider: "twse",
+          source_role: "derived_from_twse_price",
+          indicator_basis: "close",
+          feature_set: "stage0",
+          formula_version: "stage0_v1",
         },
       ],
       count: 1,
@@ -5167,52 +5179,68 @@ console.log(data)`,
     endpoint,
     method: "GET",
     overview: [
-      "技術指標 API 提供台股常用技術指標資料，適合用於趨勢追蹤、訊號判讀與量化策略研究。",
-      "資料由價格序列衍生，常與股價、事件與基本面資料搭配使用。",
+      "Technical Indicators 目前文件對齊的是 Technical Stage0 approved baseline。",
+      "此 baseline 為 TWSE only / Non-TPEx，範圍覆蓋至 2026-05-11，且不包含 Stage1 指標（RSI / MACD）。",
     ],
     requestDescription: ["使用此 endpoint 時，建議："],
     useCases: [
-      "追蹤移動平均、RSI、MACD 等指標變化。",
-      "建立策略進出場訊號或濾網條件。",
-      "搭配成交量與波動帶做風險與趨勢判讀。",
-      "在回測或研究流程中產生技術面特徵。",
+      "以 Stage0 欄位建立可重跑的日頻特徵流程。",
+      "搭配價格資料做報酬、趨勢與波動分析。",
+      "作為研究與回測前處理特徵層（非即時交易訊號）。",
     ],
     gettingStarted: [
-      "使用 symbol 指定標的，並搭配日期區間控制資料範圍。",
-      "若要快速檢視最近資料，可只帶 symbol 與 limit。",
-      "策略研究時建議與原始價格資料一起拉取，以便交叉驗證。",
-      "請保留 date 與 lineage 欄位，確保可追溯性。",
+      "建議以 ticker/symbol + 日期區間查詢，並保留 market 與 indicator_basis 以維持 key4 語意。",
+      "本頁欄位說明以 Stage0 production baseline 為準，不包含 Stage1（RSI / MACD）。",
+      "若你需要 lineage / data_gaps，請依目前路由實際回應欄位為準。",
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "symbol", type: "string", required: true, description: "股票代碼（內部對應 ticker）。" },
+      { name: "ticker / symbol", type: "string", required: true, description: "股票代碼（建議使用 ticker；若現有 SDK 使用 symbol，沿用現有命名）。" },
       { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
       { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "market", type: "string", required: false, description: "市場代碼（目前 Stage0 baseline 為 TWSE）。" },
+      { name: "indicator_basis", type: "string", required: false, description: "指標基礎（目前 baseline 為 close）。" },
+      { name: "provider", type: "string", required: false, description: "來源 provider（若現有路由支援，可作為輔助條件）。" },
+      { name: "source_role", type: "string", required: false, description: "來源角色（若現有路由支援，可作為輔助條件）。" },
       { name: "limit", type: "integer", required: false, description: "回傳筆數限制。" },
     ],
-    responseSummary: ["回應結構固定為 dataset、rows、count。"],
+    responseSummary: [
+      "回應結構固定為 dataset、rows、count。",
+      "Stage0 approved baseline coverage（TWSE only）",
+      "- Older: 2023-06-01..2024-03-31 = 176,750 rows",
+      "- Main baseline: 2024-04-01..2025-03-31 = 220,997 rows",
+      "- Newer recut: 2025-04-01..2026-05-11 = 217,890 rows",
+      "- Total: 615,637 rows",
+    ],
     responseFields: [
-      { path: "rows[].symbol", type: "string", description: "股票代碼。" },
-      { path: "rows[].date", type: "string", description: "資料日期（交易日語意）。" },
+      { path: "rows[].ticker", type: "string", description: "股票代碼。" },
+      { path: "rows[].market", type: "string", description: "市場代碼（目前 baseline 為 TWSE）。" },
+      { path: "rows[].trade_date", type: "string", description: "資料日期（交易日語意，Asia/Taipei）。" },
       { path: "rows[].close", type: "number", description: "收盤價。" },
+      { path: "rows[].volume", type: "number|null", description: "成交量。" },
+      { path: "rows[].daily_return", type: "number|null", description: "單日報酬率。" },
       { path: "rows[].ma_5", type: "number|null", description: "5 日均線。" },
       { path: "rows[].ma_20", type: "number|null", description: "20 日均線。" },
       { path: "rows[].ma_60", type: "number|null", description: "60 日均線。" },
-      { path: "rows[].rsi_14", type: "number|null", description: "14 日 RSI。" },
-      { path: "rows[].macd", type: "number|null", description: "MACD 主線。" },
-      { path: "rows[].macd_signal", type: "number|null", description: "MACD 訊號線。" },
-      { path: "rows[].macd_hist", type: "number|null", description: "MACD 柱狀值。" },
-      { path: "rows[].bollinger_upper", type: "number|null", description: "布林通道上軌。" },
-      { path: "rows[].bollinger_middle", type: "number|null", description: "布林通道中軌。" },
-      { path: "rows[].bollinger_lower", type: "number|null", description: "布林通道下軌。" },
-      { path: "rows[].volume", type: "number|null", description: "成交量。" },
+      { path: "rows[].volume_avg_20", type: "number|null", description: "20 日平均成交量。" },
+      { path: "rows[].return_5d", type: "number|null", description: "5 日報酬率。" },
+      { path: "rows[].return_20d", type: "number|null", description: "20 日報酬率。" },
+      { path: "rows[].volatility_20d", type: "number|null", description: "20 日波動度。" },
+      { path: "rows[].provider", type: "string", description: "資料 provider（baseline: twse）。" },
+      { path: "rows[].source_role", type: "string", description: "資料來源角色（baseline: derived_from_twse_price）。" },
+      { path: "rows[].indicator_basis", type: "string", description: "指標基礎（baseline: close）。" },
+      { path: "rows[].feature_set", type: "string", description: "特徵集合版本（baseline: stage0）。" },
+      { path: "rows[].formula_version", type: "string", description: "公式版本（baseline: stage0_v1）。" },
+      { path: "rows[].lineage", type: "object|null", description: "資料血緣（若當前路由有回傳）。" },
+      { path: "rows[].data_gaps", type: "object|null", description: "資料缺口描述（若當前路由有回傳）。" },
       { path: "count", type: "integer", description: "回傳資料筆數。" },
     ],
     notes: [
-      "技術指標會受 lookback 視窗影響，序列前段可能出現 null。",
-      "不同週期策略請統一使用相同欄位與計算窗口。",
-      "跨資料整合時，請以 Asia/Taipei 交易日語意（YYYY-MM-DD）對齊。",
-      "若需更完整驗證，建議同時查詢 TWSE/TPEx 日線價格資料。",
+      "Stage0 baseline 目前為 TWSE only / Non-TPEx，請勿將此頁解讀為 TPEx technical coverage。",
+      "Deferred：RSI / MACD / Stage1 advanced indicators 尚未納入目前 Stage0 production baseline。",
+      "Known gap：2026-05-12..2026-05-15（upstream price dependency gap），不計入目前 approved baseline coverage。",
+      "本資料為日頻衍生資料，不應宣稱 real-time。",
+      "技術欄位受 lookback 視窗影響，序列前段可能出現 null。",
     ],
     planRequirement: {
       title: "Plan Requirement",
@@ -6994,6 +7022,203 @@ console.log(data)`,
 }
 
 function buildMarketNewsPreviewApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildMopsMaterialEventsPreviewApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/news/mops-material-events";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+params = {
+    "company_code": "8937",
+    "date_from": "2026-05-24",
+    "date_to": "2026-05-24",
+    "limit": 50,
+    "source_mode": "production_db_read",
+    "include_detail_labels": "true",
+}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/news/mops-material-events",
+    headers=headers,
+    params=params,
+)
+print(response.json())`,
+    javascript: `const params = new URLSearchParams({
+  company_code: "8937",
+  date_from: "2026-05-24",
+  date_to: "2026-05-24",
+  limit: "50",
+  source_mode: "production_db_read",
+  include_detail_labels: "true",
+})
+
+const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/news/mops-material-events?" + params.toString(),
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/news/mops-material-events?company_code=8937&date_from=2026-05-24&date_to=2026-05-24&limit=50&source_mode=production_db_read&include_detail_labels=true" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+
+  const successBody = JSON.stringify(
+    {
+      data: [
+        {
+          news_item_id: "mops:8937:2026-05-24:07:00:03:1",
+          source_family: "mops_material_information",
+          source_endpoint: "https://mops.twse.com.tw/mops/web/t05sr01_1",
+          source_mode: "production_db_read",
+          company_code: "8937",
+          company_name: "合騏",
+          event_date: "2026-05-24",
+          event_time: "07:00:03",
+          seq_no: "1",
+          subject: "重大訊息範例（metadata-only）",
+          event_type: "material_information",
+          detail_available: false,
+          detail_labels_present: true,
+          full_body_stored: false,
+          raw_html_stored: false,
+          parser_status: "parsed",
+          confidence: 0.99,
+          data_gaps: {
+            missing_fields: [],
+          },
+          lineage: {
+            parser_version: "mops-v2",
+            trace_id: "mops_8937_20260524_1",
+          },
+          not_investment_advice: true,
+        },
+      ],
+      meta: {
+        row_count: 1,
+        production_ready: false,
+        source_mode: "production_db_read",
+        status: "private_beta_disabled_by_default",
+      },
+      source: {
+        name: "MOPS",
+        attribution_required: true,
+      },
+      not_investment_advice: true,
+    },
+    null,
+    2,
+  );
+
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "Preview / Private Beta",
+    endpoint,
+    method: "GET",
+    overview: [
+      "MOPS Material Events 提供公開資訊觀測站重大訊息的 metadata-only 事件資料，設計給事件情報流程與 API 工作流使用。",
+      "目前為 private beta 候選，且 backend route 預設 disabled；在 final gate 前不屬於 production-ready 公開能力。",
+    ],
+    requestDescription: [
+      "查詢必須為 bounded query，建議至少帶 company_code（或 ticker）與日期範圍。",
+      "預設 limit=50，硬上限 limit<=100；不接受 TPEx/OTC 範圍。",
+    ],
+    useCases: [
+      "重大訊息 metadata 索引與事件標記流程。",
+      "跨資料集事件對齊（company events / market context）。",
+      "保留 data_gaps / lineage 的審計與可追溯工作流。",
+    ],
+    gettingStarted: [
+      "先用單一 company_code + 單日區間驗證欄位。",
+      "確認 source_mode / data_gaps / lineage 後再擴大查詢。",
+      "請勿假設有全文內容，回應僅提供 metadata 與 detail labels。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "company_code", type: "string", required: false, description: "公司代碼。建議與日期範圍搭配，避免 unbounded query。" },
+      { name: "ticker", type: "string", required: false, description: "股票代碼，可替代 company_code。" },
+      { name: "date_from", type: "string", required: true, description: "查詢起始日期（YYYY-MM-DD），需與 date_to 成對出現。" },
+      { name: "date_to", type: "string", required: true, description: "查詢結束日期（YYYY-MM-DD），需與 date_from 成對出現。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數上限，預設 50，最大 100。" },
+      { name: "source_mode", type: "string", required: false, description: "資料模式，規劃對外回傳 production_db_read 標記。" },
+      { name: "include_detail_labels", type: "boolean", required: false, description: "是否包含 detail labels（不包含全文）。" },
+    ],
+    responseSummary: [
+      "回應為 metadata-only，不包含 full body、raw HTML、cookie/session/token。",
+      "`not_investment_advice=true`、`full_body_stored=false`、`raw_html_stored=false` 為固定安全語義。",
+      "在最終 enablement gate 完成前，`meta.production_ready` 必須維持 false。",
+    ],
+    responseFields: [
+      { path: "data[].news_item_id", type: "string", description: "事件唯一識別鍵。" },
+      { path: "data[].source_family", type: "string", description: "來源家族，固定 mops_material_information。" },
+      { path: "data[].source_endpoint", type: "string", description: "來源端點，用於 attribution。" },
+      { path: "data[].source_mode", type: "string", description: "來源模式，例如 production_db_read。" },
+      { path: "data[].company_code", type: "string", description: "公司代碼。" },
+      { path: "data[].company_name", type: "string|null", description: "公司名稱（若可得）。" },
+      { path: "data[].event_date", type: "string", description: "事件日期。" },
+      { path: "data[].event_time", type: "string", description: "事件時間。" },
+      { path: "data[].seq_no", type: "string", description: "重大訊息序號（non-empty）。" },
+      { path: "data[].subject", type: "string", description: "重大訊息標題/主旨（metadata）。" },
+      { path: "data[].event_type", type: "string", description: "事件型別，預設 material_information。" },
+      { path: "data[].detail_available", type: "boolean", description: "是否有可解析 detail metadata。" },
+      { path: "data[].detail_labels_present", type: "boolean", description: "是否有 detail labels。" },
+      { path: "data[].full_body_stored", type: "boolean", description: "固定 false，不提供全文儲存。" },
+      { path: "data[].raw_html_stored", type: "boolean", description: "固定 false，不提供 raw HTML 儲存。" },
+      { path: "data[].parser_status", type: "string", description: "解析狀態標記。" },
+      { path: "data[].confidence", type: "number", description: "欄位可信度分數。" },
+      { path: "data[].data_gaps", type: "object", description: "缺漏欄位與資料品質標記。" },
+      { path: "data[].lineage", type: "object", description: "資料血緣與 trace metadata。" },
+      { path: "data[].not_investment_advice", type: "boolean", description: "固定 true，非投資建議聲明。" },
+      { path: "meta.production_ready", type: "boolean", description: "在 route final gate 前固定 false。" },
+    ],
+    notes: [
+      "Private beta / disabled：此 endpoint 已 wired but disabled，不可視為 production-ready。",
+      "不提供：full body、raw HTML、cookies/session/token、買賣建議/目標價。",
+      "目前 scope 不含 TPEx；僅支援 MOPS material information metadata 流程。",
+      "來源引用請保留 source_family/source_endpoint 與 lineage。",
+    ],
+    planRequirement: {
+      title: "Plan & Entitlement（Docs-only）",
+      bullets: [
+        "目前屬 internal/private beta，尚未 public commercial availability。",
+        "未來啟用時需 API key + plan entitlement + rate limit gate。",
+        "此頁不設定 pricing、不變更 billing/runtime 行為。",
+      ],
+    },
+    errorCases: [
+      "200",
+      "400",
+      "401",
+      "403",
+      "429",
+      "503",
+    ],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "啟用後且條件合法時，回傳 metadata-only 事件資料。", body: successBody },
+        { status: "400", description: "查詢參數未 bounded、limit 超出範圍或缺少必要條件。", body: `{"detail":"validation_error","error_code":"unbounded_query_or_invalid_params"}` },
+        { status: "401", description: "缺少 API key 或驗證失敗。", body: `{"detail":"missing_or_invalid_api_key"}` },
+        { status: "403", description: "方案未授權或 dataset entitlement 不符合。", body: `{"detail":"plan_not_entitled"}` },
+        { status: "429", description: "超過 rate limit。", body: `{"detail":"rate_limited"}` },
+        { status: "503", description: "route disabled 或 emergency disabled。", body: `{"detail":"route_disabled","meta":{"production_ready":false}}` },
+      ],
+    },
+  };
+}
+
+function buildMopsMaterialEventsPreviewApiSections(): DocsContentSection[] {
   return [
     { id: "overview", label: "Overview", paragraphs: [] },
     { id: "request", label: "Request", paragraphs: [] },
@@ -10010,7 +10235,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         apiSection: group.id,
         icon: topic.icon ?? group.icon,
         title: "技術指標",
-        subtitle: "提供台股常用技術指標資料，適合用於趨勢追蹤、訊號判讀與量化策略研究。",
+        subtitle: "Technical Stage0 baseline（TWSE only / Non-TPEx），覆蓋至 2026-05-11；Stage1（RSI / MACD）尚未納入 production baseline。",
         tier: "complete",
         sections: buildTechnicalIndicatorsApiSections(),
         apiReferenceFactory: () => buildTechnicalIndicatorsApiReference(),
@@ -10270,6 +10495,22 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         tier: "complete",
         sections: buildMarketNewsPreviewApiSections(),
         apiReferenceFactory: () => buildMarketNewsPreviewApiReference(),
+      };
+    }
+
+    if (topic.topicId === "mops_material_events") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "MOPS Material Events（Private Beta）",
+        subtitle: "公開資訊觀測站重大訊息事件 metadata-only API（Private Beta，預設 disabled）。",
+        tier: "placeholder",
+        sections: buildMopsMaterialEventsPreviewApiSections(),
+        apiReferenceFactory: () => buildMopsMaterialEventsPreviewApiReference(),
       };
     }
 
@@ -10552,6 +10793,7 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     items: [
       { title: "公司新聞", href: "/docs/api/preview/company-news", icon: "news", status: "preview" },
       { title: "市場新聞", href: "/docs/api/preview/market-news", icon: "news", status: "preview" },
+      { title: "MOPS 重大訊息事件（Private Beta）", href: "/docs/api/preview/mops-material-events", icon: "news", status: "preview" },
     ],
   },
 ];

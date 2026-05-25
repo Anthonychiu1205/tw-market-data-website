@@ -108,6 +108,7 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
     items: [
       { title: "公司新聞", href: "/docs/api/preview/company-news" },
       { title: "市場新聞", href: "/docs/api/preview/market-news" },
+      { title: "MOPS 重大訊息事件（Private Beta）", href: "/docs/api/preview/mops-material-events" },
     ],
   },
 ];
