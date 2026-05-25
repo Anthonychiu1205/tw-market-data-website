@@ -7,7 +7,13 @@ export type HelpArticleSlug =
   | "data-gaps"
   | "credits"
   | "change-api-key"
-  | "contact-support";
+  | "contact-support"
+  | "query-twse-daily-price"
+  | "query-monthly-revenue"
+  | "no-data-returned"
+  | "wrong-parameters"
+  | "openapi-usage"
+  | "mcp-preview";
 
 export type HelpArticleSection = {
   id: string;
@@ -21,7 +27,7 @@ export type HelpArticle = {
   slug: HelpArticleSlug;
   title: string;
   description: string;
-  category: "快速開始" | "錯誤排查" | "資料與用量" | "帳號與安全" | "聯絡支援";
+  category: "快速開始" | "錯誤排查" | "資料與用量" | "帳號與安全" | "工具與 AI" | "聯絡支援";
   updatedAt?: string;
   sections: HelpArticleSection[];
   related: HelpArticleSlug[];
@@ -33,7 +39,7 @@ export const helpCenterMeta = {
 };
 
 export const helpCenterCategories: Array<{
-  id: "quick-start" | "troubleshooting" | "data-usage" | "security" | "contact";
+  id: "quick-start" | "troubleshooting" | "data-usage" | "security" | "tools-ai" | "contact";
   title: HelpArticle["category"];
   description: string;
 }> = [
@@ -56,6 +62,11 @@ export const helpCenterCategories: Array<{
     id: "security",
     title: "帳號與安全",
     description: "API key 外洩或更換時，如何安全處理。",
+  },
+  {
+    id: "tools-ai",
+    title: "工具與 AI",
+    description: "了解 OpenAPI 與 MCP preview 該怎麼用，避免誤解為正式交易工具。",
   },
   {
     id: "contact",
@@ -149,7 +160,7 @@ export const helpCenterArticles: HelpArticle[] = [
         notes: ["endpoint", "完整參數", "HTTP 狀態碼", "requestId", "發生時間（含時區）"],
       },
     ],
-    related: ["401-unauthorized", "429-rate-limit", "contact-support"],
+    related: ["wrong-parameters", "query-twse-daily-price", "contact-support"],
   },
   {
     slug: "502-504-errors",
@@ -350,7 +361,7 @@ export const helpCenterArticles: HelpArticle[] = [
         notes: ["/help-center/call-api", "/help-center/502-504-errors", "/help-center/contact-support"],
       },
     ],
-    related: ["call-api", "502-504-errors", "contact-support"],
+    related: ["no-data-returned", "query-monthly-revenue", "contact-support"],
   },
   {
     slug: "credits",
@@ -511,6 +522,313 @@ export const helpCenterArticles: HelpArticle[] = [
       },
     ],
     related: ["502-504-errors", "401-unauthorized", "429-rate-limit"],
+  },
+  {
+    slug: "query-twse-daily-price",
+    title: "如何查詢台股日線價格？",
+    description: "從股票代號、日期區間到資料檢查，用最實用的方式完成日線查詢。",
+    category: "快速開始",
+    updatedAt: "2026-05-25",
+    sections: [
+      {
+        id: "what-it-means",
+        heading: "日線價格是什麼",
+        paragraphs: [
+          "日線價格可以理解成「每天收盤後整理的一天資料」。它通常包含開盤、最高、最低、收盤和成交量。",
+          "這類資料適合看趨勢、比對不同日期表現，也常用在報表或策略測試前的資料準備。",
+        ],
+      },
+      {
+        id: "how-to-query",
+        heading: "建議查詢步驟",
+        steps: [
+          "先確認股票代號是否正確。",
+          "依標的選對市場資料集（TWSE 或 TPEx）。",
+          "先用小範圍查詢，例如幾天資料，不要一開始就查太長區間。",
+          "帶入 symbol、start_date、end_date、limit 後送出請求。",
+          "拿到結果後，確認欄位完整，並檢查有沒有 data_gaps 提示。",
+        ],
+      },
+      {
+        id: "common-problems",
+        heading: "常見查不到資料原因",
+        notes: [
+          "日期剛好是非交易日。",
+          "股票代號填錯，或用了不對的市場資料集。",
+          "資料尚未更新到你查的時段。",
+        ],
+      },
+      {
+        id: "support-prep",
+        heading: "如果還是不行，回報前請準備",
+        paragraphs: [
+          "請準備 requestId、endpoint、查詢參數和發生時間，再聯絡支援。",
+          "不需要提供完整 API key。",
+        ],
+      },
+      {
+        id: "next-step",
+        heading: "下一步",
+        notes: ["/docs/api/market-prices/twse-daily-price", "/docs/api/market-prices/tpex-daily-price", "/help-center/wrong-parameters"],
+      },
+    ],
+    related: ["wrong-parameters", "no-data-returned", "data-gaps"],
+  },
+  {
+    slug: "query-monthly-revenue",
+    title: "如何查詢月營收？",
+    description: "用簡單流程查公司每月營收，並避免把缺資料誤判成 0。",
+    category: "快速開始",
+    updatedAt: "2026-05-25",
+    sections: [
+      {
+        id: "what-it-means",
+        heading: "月營收資料是什麼",
+        paragraphs: [
+          "月營收是公司按月公布的營收數字，不是每天都會更新。",
+          "所以你查最新月份時，若公司還沒公告，結果可能暫時沒有資料。",
+        ],
+      },
+      {
+        id: "how-to-query",
+        heading: "建議查詢步驟",
+        steps: [
+          "先查單一公司，確認代號正確。",
+          "確認月份格式符合文件要求。",
+          "先看幾個月資料，確認欄位都能正常回傳。",
+          "若要比年增率或月增率，先檢查是否有缺口再做比較。",
+        ],
+      },
+      {
+        id: "common-problems",
+        heading: "常見問題",
+        notes: [
+          "最新月份尚未公告。",
+          "查詢月份格式不符合要求。",
+          "把缺資料誤當成 0，導致後續計算失真。",
+        ],
+      },
+      {
+        id: "support-prep",
+        heading: "如果結果看起來不合理",
+        paragraphs: [
+          "請保留 requestId、公司代號、查詢月份和錯誤狀態碼，再回報支援。",
+          "不要傳完整 API key。",
+        ],
+      },
+      {
+        id: "next-step",
+        heading: "下一步",
+        notes: ["/docs/api/financial-growth/monthly-revenue", "/help-center/data-gaps", "/help-center/no-data-returned"],
+      },
+    ],
+    related: ["no-data-returned", "data-gaps", "wrong-parameters"],
+  },
+  {
+    slug: "no-data-returned",
+    title: "為什麼查不到資料？",
+    description: "查不到資料不一定是系統壞掉，這篇幫你快速找出最常見原因。",
+    category: "錯誤排查",
+    updatedAt: "2026-05-25",
+    sections: [
+      {
+        id: "what-it-means",
+        heading: "先理解「查不到資料」",
+        paragraphs: [
+          "查不到資料不一定代表 API 故障。有時候是條件太嚴格，有時候是該期間本來就沒有資料。",
+          "先分清楚是「請求失敗」還是「請求成功但資料為空」，可以省下很多排查時間。",
+        ],
+      },
+      {
+        id: "common-reasons",
+        heading: "常見原因",
+        notes: [
+          "股票代號錯誤。",
+          "日期不是交易日或公司尚未公告。",
+          "該公司在該期間本來就沒有資料。",
+          "資料尚在更新中或 coverage 尚未補齊。",
+          "方案或權限限制。",
+        ],
+      },
+      {
+        id: "how-to-fix",
+        heading: "你可以怎麼做",
+        steps: [
+          "先縮小查詢範圍，用最小條件測一次。",
+          "用已知一定有資料的代號做對照測試。",
+          "查看回應中的 data_gaps 與 status code。",
+          "保留 requestId，方便後續比對。",
+        ],
+      },
+      {
+        id: "important-note",
+        heading: "不要自行補數字",
+        paragraphs: [
+          "若結果是空或有缺口，不要直接補 0 或猜測數值。",
+          "先確認資料條件與可用性，再決定是否要改查詢範圍或改資料來源。",
+        ],
+      },
+      {
+        id: "next-step",
+        heading: "下一步",
+        notes: ["/help-center/data-gaps", "/help-center/wrong-parameters", "/help-center/contact-support"],
+      },
+    ],
+    related: ["data-gaps", "wrong-parameters", "contact-support"],
+  },
+  {
+    slug: "wrong-parameters",
+    title: "參數填錯怎麼辦？",
+    description: "參數錯誤是最常見問題之一，這篇用最直覺的方式幫你快速修正。",
+    category: "錯誤排查",
+    updatedAt: "2026-05-25",
+    sections: [
+      {
+        id: "what-it-means",
+        heading: "參數是什麼",
+        paragraphs: [
+          "參數就是你送給 API 的查詢條件，例如股票代號、日期區間、筆數上限。",
+          "只要格式或欄位名稱不對，系統就可能回 400 或拿不到你預期資料。",
+        ],
+      },
+      {
+        id: "common-mistakes",
+        heading: "常見填錯方式",
+        notes: [
+          "symbol / ticker 用錯欄位名稱。",
+          "日期格式不是 YYYY-MM-DD。",
+          "start_date 晚於 end_date。",
+          "limit 設太大。",
+          "header 沒帶 API key。",
+        ],
+      },
+      {
+        id: "how-to-fix",
+        heading: "建議修正步驟",
+        steps: [
+          "先對照 API 文件的 Query Parameters。",
+          "先用最小必要參數測一次。",
+          "日期統一用 YYYY-MM-DD。",
+          "不要一開始就查太大範圍。",
+          "若回 400，先看錯誤訊息再修正。",
+        ],
+      },
+      {
+        id: "support-prep",
+        heading: "還是不行時要準備什麼",
+        paragraphs: [
+          "請附上 endpoint、參數、status code、requestId 和你已嘗試的修正方式。",
+          "不需要提供完整 API key。",
+        ],
+      },
+      {
+        id: "next-step",
+        heading: "下一步",
+        notes: ["/help-center/call-api", "/help-center/no-data-returned", "/docs/openapi-spec"],
+      },
+    ],
+    related: ["call-api", "401-unauthorized", "no-data-returned"],
+  },
+  {
+    slug: "openapi-usage",
+    title: "OpenAPI 規格可以怎麼用？",
+    description: "用白話理解 OpenAPI，幫你更快接 API、測試請求與檢查回傳格式。",
+    category: "工具與 AI",
+    updatedAt: "2026-05-25",
+    sections: [
+      {
+        id: "what-is-openapi",
+        heading: "OpenAPI 是什麼",
+        paragraphs: [
+          "OpenAPI 可以把它想成「給工具讀的 API 說明書」。",
+          "它會告訴你：有哪些路徑、要帶哪些參數、可能回哪些格式與狀態碼。",
+          "你不一定要手動讀完整檔案，很多工具可以直接匯入使用。",
+        ],
+      },
+      {
+        id: "common-uses",
+        heading: "常見用途",
+        notes: [
+          "匯入 Postman 或 Insomnia 來快速測試。",
+          "讓 AI 工具理解 API 可呼叫範圍。",
+          "產生 SDK 或型別定義，減少手寫錯誤。",
+          "檢查 request / response 是否符合預期。",
+        ],
+      },
+      {
+        id: "important-reminders",
+        heading: "使用時要注意",
+        paragraphs: [
+          "OpenAPI 是輔助文件，不是保證每個欄位在所有時間都一定有值。",
+          "實際可用資料仍會受 coverage、方案限制與更新時間影響。",
+          "OpenAPI 也不是用來提供買賣判斷的工具，請把它當成技術整合說明。",
+        ],
+      },
+      {
+        id: "support-prep",
+        heading: "如果匯入或解析有問題",
+        paragraphs: [
+          "請保留你使用的工具名稱、錯誤畫面、requestId（若有）與發生時間，再聯絡支援。",
+          "不需要提供完整 API key。",
+        ],
+      },
+      {
+        id: "next-step",
+        heading: "下一步",
+        notes: ["/docs/openapi-spec", "/help-center/call-api", "/help-center/mcp-preview"],
+      },
+    ],
+    related: ["call-api", "mcp-preview", "data-gaps"],
+  },
+  {
+    slug: "mcp-preview",
+    title: "MCP Server Preview 是什麼？",
+    description: "MCP preview 是讓 AI 工具接資料服務的試驗入口，目前不是正式 production 服務。",
+    category: "工具與 AI",
+    updatedAt: "2026-05-25",
+    sections: [
+      {
+        id: "what-is-mcp",
+        heading: "先用白話理解 MCP",
+        paragraphs: [
+          "MCP 是讓 AI 工具接外部資料服務的一種溝通方式，可以想成「工具對工具的標準接口」。",
+          "目前 TW Market Data 的 MCP 狀態是 preview / planned，不是正式 production-ready server。",
+        ],
+      },
+      {
+        id: "what-to-use-now",
+        heading: "現階段建議先用什麼",
+        steps: [
+          "先用 API 文件確認端點與參數。",
+          "用 OpenAPI 規格做工具整合與測試。",
+          "需要給 AI 閱讀時，可參考 llms.txt / llms-full.txt。",
+        ],
+      },
+      {
+        id: "what-is-needed-later",
+        heading: "正式化前還需要什麼",
+        notes: [
+          "穩定的 API contract（接口不再頻繁變動）。",
+          "完整的 coverage audit（資料覆蓋稽核）。",
+          "明確的權限與用量控制。",
+          "正式產品化批准流程。",
+        ],
+      },
+      {
+        id: "important-safety-note",
+        heading: "重要提醒",
+        paragraphs: [
+          "請不要把 preview MCP 當成可直接做交易或投資決策的正式系統。",
+          "即使是 AI 流程，也要保留 data_gaps 與 coverage 限制，避免模型誤判。",
+        ],
+      },
+      {
+        id: "next-step",
+        heading: "下一步",
+        notes: ["/help-center/openapi-usage", "/help-center/data-gaps", "/help-center/contact-support"],
+      },
+    ],
+    related: ["openapi-usage", "data-gaps", "contact-support"],
   },
 ];
 

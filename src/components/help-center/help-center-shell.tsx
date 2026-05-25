@@ -112,7 +112,6 @@ export function HelpCenterArticleShell({ article }: HelpCenterArticleShellProps)
         <article className="rounded-2xl border border-slate-200 bg-white px-6 py-6">
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{article.title}</h1>
           <p className="mt-2 text-sm leading-7 text-slate-600">{article.description}</p>
-          {article.updatedAt ? <p className="mt-2 text-xs text-slate-500">更新時間：{article.updatedAt}</p> : null}
 
           <div className="mt-6 space-y-8">
             {article.sections.map((section) => (
