@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { HelpArticle } from "@/src/content/help-center-articles";
 import { helpCenterArticles, helpCenterCategories, helpCenterMeta } from "@/src/content/help-center-articles";
+import { HelpCenterArticleNav, HelpCenterIndexPanels } from "@/src/components/help-center/help-center-nav-search";
 
 type HelpCenterArticleShellProps = {
   article: HelpArticle;
@@ -26,30 +27,7 @@ export function HelpCenterIndex() {
         ))}
       </section>
 
-      <section className="mt-6 rounded-2xl border border-slate-200 bg-white px-5 py-4">
-        <h2 className="text-base font-semibold text-slate-900">文章</h2>
-        <div className="mt-4 space-y-4">
-          {helpCenterCategories.map((category) => {
-            const articles = helpCenterArticles.filter((article) => article.category === category.title);
-            return (
-              <section key={category.id} className="space-y-2">
-                <h3 className="text-sm font-semibold text-slate-800">{category.title}</h3>
-                <div className="space-y-2">
-                  {articles.map((article) => (
-                    <Link
-                      key={article.slug}
-                      href={`/help-center/${article.slug}`}
-                      className="flex items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700 transition hover:border-slate-300 hover:text-slate-900"
-                    >
-                      <span>{article.title}</span>
-                    </Link>
-                  ))}
-                </div>
-              </section>
-            );
-          })}
-        </div>
-      </section>
+      <HelpCenterIndexPanels articles={helpCenterArticles} categories={helpCenterCategories} />
 
       <section className="mt-6 rounded-2xl border border-slate-200 bg-white px-5 py-4">
         <h2 className="text-base font-semibold text-slate-900">仍需要協助？</h2>
@@ -68,7 +46,8 @@ export function HelpCenterIndex() {
 export function HelpCenterArticleShell({ article }: HelpCenterArticleShellProps) {
   const relatedArticles = article.related
     .map((slug) => helpCenterArticles.find((entry) => entry.slug === slug))
-    .filter((entry): entry is HelpArticle => Boolean(entry))
+    .filter((entry): entry is HelpArticle => entry !== undefined)
+    .filter((entry) => entry.slug !== article.slug)
     .slice(0, 3);
 
   return (
@@ -81,33 +60,7 @@ export function HelpCenterArticleShell({ article }: HelpCenterArticleShellProps)
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)_220px]">
-        <aside className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
-          <h2 className="text-sm font-semibold text-slate-900">分類與文章</h2>
-          <div className="mt-3 space-y-4">
-            {helpCenterCategories.map((category) => {
-              const inCategory = helpCenterArticles.filter((entry) => entry.category === category.title);
-              return (
-                <div key={category.id}>
-                  <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{category.title}</p>
-                  <ul className="mt-1 space-y-1">
-                    {inCategory.map((entry) => (
-                      <li key={entry.slug}>
-                        <Link
-                          href={`/help-center/${entry.slug}`}
-                          className={`block rounded px-2 py-1 text-sm ${
-                            entry.slug === article.slug ? "bg-slate-100 font-medium text-slate-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                          }`}
-                        >
-                          {entry.title}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
-        </aside>
+        <HelpCenterArticleNav articles={helpCenterArticles} categories={helpCenterCategories} currentSlug={article.slug} />
 
         <article className="rounded-2xl border border-slate-200 bg-white px-6 py-6">
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{article.title}</h1>
@@ -147,7 +100,10 @@ export function HelpCenterArticleShell({ article }: HelpCenterArticleShellProps)
             <ul className="mt-2 space-y-2">
               {relatedArticles.map((entry) => (
                 <li key={entry.slug}>
-                  <Link href={`/help-center/${entry.slug}`} className="text-sm text-slate-600 hover:text-slate-900">
+                  <Link
+                    href={`/help-center/${entry.slug}`}
+                    className="block rounded-md border border-slate-200 px-2.5 py-2 text-sm text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                  >
                     {entry.title}
                   </Link>
                 </li>

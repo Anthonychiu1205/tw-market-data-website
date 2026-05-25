@@ -13,7 +13,12 @@ export type HelpArticleSlug =
   | "no-data-returned"
   | "wrong-parameters"
   | "openapi-usage"
-  | "mcp-preview";
+  | "mcp-preview"
+  | "billing-payment-review"
+  | "login-problems"
+  | "api-response-fields"
+  | "freshness"
+  | "report-data-issue";
 
 export type HelpArticleSection = {
   id: string;
@@ -46,22 +51,22 @@ export const helpCenterCategories: Array<{
   {
     id: "quick-start",
     title: "快速開始",
-    description: "先建立 API key，再用簡單查詢確認資料流程。",
-  },
-  {
-    id: "troubleshooting",
-    title: "錯誤排查",
-    description: "針對 401、429、502/504 建立可重現、可回報的處理步驟。",
-  },
-  {
-    id: "data-usage",
-    title: "資料與用量",
-    description: "看懂 data_gaps 與 credits，避免誤判資料與成本。",
+    description: "先完成 key、基本查詢與常用資料測試，快速建立第一條可用流程。",
   },
   {
     id: "security",
     title: "帳號與安全",
-    description: "API key 外洩或更換時，如何安全處理。",
+    description: "登入問題、key 管理與審核測試帳號如何安全處理。",
+  },
+  {
+    id: "troubleshooting",
+    title: "錯誤排查",
+    description: "針對 401、429、502/504 與常見參數錯誤建立可重現排查步驟。",
+  },
+  {
+    id: "data-usage",
+    title: "資料與用量",
+    description: "看懂資料欄位、更新節奏與使用量，避免把缺口誤判成錯誤。",
   },
   {
     id: "tools-ai",
@@ -829,6 +834,260 @@ export const helpCenterArticles: HelpArticle[] = [
       },
     ],
     related: ["openapi-usage", "data-gaps", "contact-support"],
+  },
+  {
+    slug: "billing-payment-review",
+    title: "付款或金流審核需要測試帳號怎麼辦？",
+    description: "整理審核常見需求，安全建立可測試帳號，不暴露管理權限與敏感資訊。",
+    category: "帳號與安全",
+    updatedAt: "2026-05-25",
+    sections: [
+      {
+        id: "why-needed",
+        heading: "為什麼會需要測試帳號",
+        paragraphs: [
+          "金流或平台審核時，對方常會要求實際走一次登入與付款流程，確認使用者真的能完成購買。",
+          "這種情況很常見，但重點是「可測試」不等於「給最高權限」。",
+        ],
+      },
+      {
+        id: "safe-account-setup",
+        heading: "建議的安全做法",
+        steps: [
+          "建立一般使用者權限帳號，避免提供管理員帳號。",
+          "確認該帳號可登入、看方案頁、走到付款流程。",
+          "不要開放後台管理、資料修改或系統設定權限。",
+          "審核完成後，停用或刪除測試帳號。",
+        ],
+      },
+      {
+        id: "what-not-to-share",
+        heading: "哪些資訊不能提供",
+        notes: [
+          "不要提供資料庫連線資訊。",
+          "不要提供 API secret、管理員密碼或後台超級權限。",
+          "不要傳送付款敏感資料原文。",
+        ],
+      },
+      {
+        id: "login-fail-check",
+        heading: "如果審核方登入失敗",
+        paragraphs: [
+          "先確認帳號建立在正式站使用的資料庫，並確認信箱驗證與密碼設定是否完成。",
+          "若仍失敗，請用你們內部流程重設密碼，再請對方重新測試一次。",
+        ],
+      },
+      {
+        id: "next-step",
+        heading: "下一步",
+        notes: ["/help-center/login-problems", "/help-center/get-api-key", "/help-center/contact-support"],
+      },
+    ],
+    related: ["login-problems", "get-api-key", "contact-support"],
+  },
+  {
+    slug: "login-problems",
+    title: "無法登入怎麼辦？",
+    description: "用簡單檢查步驟快速判斷登入問題，避免反覆卡在同一個錯誤。",
+    category: "帳號與安全",
+    updatedAt: "2026-05-25",
+    sections: [
+      {
+        id: "first-understanding",
+        heading: "先理解常見登入卡點",
+        paragraphs: [
+          "無法登入不一定代表系統壞掉，很多時候是登入方式、帳號來源或密碼流程不一致。",
+          "例如你原本用 Google 登入，改用密碼登入時就可能出現錯誤。",
+        ],
+      },
+      {
+        id: "common-causes",
+        heading: "常見原因",
+        notes: [
+          "密碼輸入錯誤或已重設但還在用舊密碼。",
+          "信箱尚未完成驗證。",
+          "Google 登入與密碼登入方式混用。",
+          "正式站與測試站的帳號資料不同步。",
+        ],
+      },
+      {
+        id: "step-by-step-fix",
+        heading: "建議排查步驟",
+        steps: [
+          "確認你目前所在網址是不是正式站。",
+          "使用你原本建立帳號時的登入方式。",
+          "若是密碼問題，先走重設密碼流程。",
+          "若是測試帳號，確認帳號存在於正式環境使用的資料庫。",
+        ],
+      },
+      {
+        id: "support-info",
+        heading: "聯絡支援前要準備什麼",
+        paragraphs: [
+          "請提供登入信箱、發生時間、錯誤畫面與你使用的登入方式（Google 或密碼）。",
+          "不要提供密碼全文，也不要提供任何後台敏感憑證。",
+        ],
+      },
+      {
+        id: "next-step",
+        heading: "下一步",
+        notes: ["/help-center/get-api-key", "/help-center/billing-payment-review", "/help-center/contact-support"],
+      },
+    ],
+    related: ["get-api-key", "billing-payment-review", "contact-support"],
+  },
+  {
+    slug: "api-response-fields",
+    title: "API 回傳欄位看不懂怎麼辦？",
+    description: "用白話拆解常見回傳欄位，幫你分清主資料、補充資訊與缺口提示。",
+    category: "資料與用量",
+    updatedAt: "2026-05-25",
+    sections: [
+      {
+        id: "field-overview",
+        heading: "先看欄位分工",
+        paragraphs: [
+          "API 回應通常可以分成幾塊：主資料、補充資訊、錯誤提示與追蹤資訊。",
+          "先弄懂每塊的用途，比硬背所有欄位名稱更有效。",
+        ],
+      },
+      {
+        id: "common-fields",
+        heading: "常見欄位白話解釋",
+        notes: [
+          "data：主要查詢結果。",
+          "meta：這次查詢的補充資訊，例如分頁或資料版本提示。",
+          "data_gaps：資料缺口或限制提醒，不代表系統壞掉。",
+          "requestId：本次請求編號，排查時很好用。",
+        ],
+      },
+      {
+        id: "how-to-read",
+        heading: "看不懂時怎麼做",
+        steps: [
+          "先回到該 endpoint 文件，對照欄位說明。",
+          "再看 OpenAPI 規格確認欄位型別與可能值。",
+          "遇到空值時，不要直接當成 0。",
+          "若有 data_gaps，請在報表或流程中保留這個提示。",
+        ],
+      },
+      {
+        id: "support-prep",
+        heading: "還是不確定時",
+        paragraphs: [
+          "請附上 endpoint、回應片段、requestId 與你看不懂的欄位名稱。",
+          "這樣支援團隊可以更快指出欄位用途，不需要你貼任何完整金鑰。",
+        ],
+      },
+      {
+        id: "next-step",
+        heading: "下一步",
+        notes: ["/help-center/data-gaps", "/help-center/openapi-usage", "/help-center/report-data-issue"],
+      },
+    ],
+    related: ["data-gaps", "openapi-usage", "report-data-issue"],
+  },
+  {
+    slug: "freshness",
+    title: "資料多久更新一次？",
+    description: "用白話說明不同資料的更新節奏，幫你判斷「還沒更新」與「真的異常」的差別。",
+    category: "資料與用量",
+    updatedAt: "2026-05-25",
+    sections: [
+      {
+        id: "update-rhythm",
+        heading: "更新節奏不是全部都一樣",
+        paragraphs: [
+          "不同資料種類的更新時間本來就不同，不是每個資料集都會即時更新。",
+          "先理解各資料的節奏，可以避免把正常延遲誤判成系統問題。",
+        ],
+      },
+      {
+        id: "common-cases",
+        heading: "常見更新情境",
+        notes: [
+          "日線價格：通常在交易日收盤後整理。",
+          "月營收：依公司公告時點更新。",
+          "財報：依季度申報與揭露節奏更新。",
+          "籌碼資料：依官方來源與補齊進度更新。",
+        ],
+      },
+      {
+        id: "if-latest-missing",
+        heading: "最新資料沒看到時先做什麼",
+        steps: [
+          "先確認該日期是不是交易日或公告日。",
+          "確認資料來源是否已正式發布。",
+          "檢查回應裡是否出現 data_gaps 提示。",
+          "必要時縮小查詢範圍再測一次。",
+        ],
+      },
+      {
+        id: "report-with-context",
+        heading: "要回報時請附上下文",
+        paragraphs: [
+          "若你懷疑更新異常，請附上 endpoint、symbol、日期範圍、requestId 與發生時間。",
+          "這些資訊會比單張截圖更能幫助排查。",
+        ],
+      },
+      {
+        id: "next-step",
+        heading: "下一步",
+        notes: ["/help-center/data-gaps", "/help-center/no-data-returned", "/help-center/report-data-issue"],
+      },
+    ],
+    related: ["data-gaps", "no-data-returned", "report-data-issue"],
+  },
+  {
+    slug: "report-data-issue",
+    title: "發現資料疑似有問題怎麼回報？",
+    description: "把回報資訊整理完整，能讓支援更快判斷是查詢問題、資料缺口還是來源延遲。",
+    category: "資料與用量",
+    updatedAt: "2026-05-25",
+    sections: [
+      {
+        id: "before-report",
+        heading: "回報前先做基本確認",
+        paragraphs: [
+          "先確認股票代號、日期範圍與 endpoint 是否正確，很多疑似錯誤其實是參數或範圍問題。",
+          "也請先看資料是否尚未公告，或回應裡是否已有 data_gaps 提示。",
+        ],
+      },
+      {
+        id: "what-to-prepare",
+        heading: "建議準備的資訊",
+        notes: [
+          "問題發生時間（含時區）。",
+          "endpoint 與查詢參數。",
+          "HTTP 狀態碼與 requestId。",
+          "你預期看到什麼、實際看到什麼。",
+          "可遮蔽後的回應片段或清楚截圖。",
+        ],
+      },
+      {
+        id: "what-not-to-share",
+        heading: "不需要提供的資料",
+        notes: [
+          "完整 API key。",
+          "密碼或付款敏感資料。",
+          "資料庫連線字串等系統機密。",
+        ],
+      },
+      {
+        id: "after-report",
+        heading: "回報後會怎麼排查",
+        paragraphs: [
+          "支援團隊會根據來源、coverage、freshness 與 data_gaps 一起判斷。",
+          "如果問題可重現，通常會請你補一小段最小可重現的請求範例。",
+        ],
+      },
+      {
+        id: "next-step",
+        heading: "下一步",
+        notes: ["/help-center/data-gaps", "/help-center/api-response-fields", "/help-center/contact-support"],
+      },
+    ],
+    related: ["data-gaps", "api-response-fields", "contact-support"],
   },
 ];
 
