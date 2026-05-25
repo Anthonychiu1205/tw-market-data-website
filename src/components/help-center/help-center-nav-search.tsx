@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, ChevronRight, Search } from "lucide-react";
+import { AlertTriangle, Bot, ChevronDown, ChevronRight, Database, LifeBuoy, Rocket, Search, ShieldCheck } from "lucide-react";
+import type { ComponentType } from "react";
 import { useMemo, useState } from "react";
 
 import type { HelpArticle } from "@/src/content/help-center-articles";
@@ -12,6 +13,15 @@ type HelpCategory = (typeof helpCenterCategories)[number];
 type GroupedCategory = {
   category: HelpCategory;
   articles: HelpArticle[];
+};
+
+const categoryIcons: Record<HelpCategory["id"], ComponentType<{ className?: string }>> = {
+  "quick-start": Rocket,
+  security: ShieldCheck,
+  troubleshooting: AlertTriangle,
+  "data-usage": Database,
+  "tools-ai": Bot,
+  contact: LifeBuoy,
 };
 
 function normalize(value: string) {
@@ -76,30 +86,34 @@ export function HelpCenterIndexPanels({ articles, categories }: IndexPanelsProps
         </label>
       </div>
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-4 rounded-xl border border-slate-200 bg-white">
         {groups.map(({ category, articles: groupedArticles }) => {
+          const Icon = categoryIcons[category.id];
           const isExpanded = Boolean(expanded[category.id]) || query.length > 0;
           return (
-            <section key={category.id} className="rounded-xl border border-slate-200">
+            <section key={category.id} className="border-b border-slate-200 last:border-b-0">
               <button
                 type="button"
                 onClick={() => toggle(category.id)}
-                className="flex w-full items-center justify-between px-3 py-2.5 text-left"
+                className="flex w-full items-center justify-between px-3 py-2.5 text-left transition-colors hover:bg-slate-50"
                 aria-expanded={isExpanded}
               >
-                <span className="text-sm font-semibold text-slate-800">{category.title}</span>
+                <span className="inline-flex items-center gap-2 text-sm font-medium text-slate-800">
+                  <Icon className="h-4 w-4 text-slate-500" />
+                  {category.title}
+                </span>
                 {isExpanded ? <ChevronDown className="h-4 w-4 text-slate-500" /> : <ChevronRight className="h-4 w-4 text-slate-500" />}
               </button>
               {isExpanded ? (
-                <div className="space-y-2 border-t border-slate-200 px-3 py-3">
+                <div className="space-y-1 border-t border-slate-200 px-3 py-2.5">
                   {groupedArticles.map((article) => (
                     <Link
                       key={article.slug}
                       href={`/help-center/${article.slug}`}
-                      className="block rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                      className="block rounded px-2 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
                     >
-                      <p className="font-medium">{article.title}</p>
-                      <p className="mt-1 text-xs text-slate-500">{article.description}</p>
+                      <p className="font-medium text-slate-700">{article.title}</p>
+                      <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">{article.description}</p>
                     </Link>
                   ))}
                 </div>
@@ -152,6 +166,8 @@ export function HelpCenterArticleNav({ articles, categories, currentSlug }: Arti
     setExpanded((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }));
   };
 
+  const isSearching = query.trim().length > 0;
+
   return (
     <aside className="rounded-2xl border border-slate-200 bg-white px-4 py-4">
       <h2 className="text-sm font-semibold text-slate-900">分類與文章</h2>
@@ -165,27 +181,33 @@ export function HelpCenterArticleNav({ articles, categories, currentSlug }: Arti
           className="h-9 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-700 outline-none transition-colors placeholder:text-slate-400 focus:border-slate-300"
         />
       </label>
-      <div className="mt-3 space-y-3">
+      <div className="mt-3 rounded-xl border border-slate-200 bg-white">
         {groups.map(({ category, articles: groupedArticles }) => {
-          const isExpanded = Boolean(expanded[category.id]) || category.id === activeCategoryId || query.length > 0;
+          const Icon = categoryIcons[category.id];
+          const isExpanded = Boolean(expanded[category.id]) || category.id === activeCategoryId || isSearching;
           return (
-            <section key={category.id} className="rounded-xl border border-slate-200">
+            <section key={category.id} className="border-b border-slate-200 last:border-b-0">
               <button
                 type="button"
                 onClick={() => toggle(category.id)}
-                className="flex w-full items-center justify-between px-3 py-2.5 text-left"
+                className={`flex w-full items-center justify-between px-3 py-2.5 text-left transition-colors hover:bg-slate-50 ${
+                  isExpanded ? "bg-slate-50/70" : ""
+                }`}
                 aria-expanded={isExpanded}
               >
-                <span className="text-xs font-semibold uppercase tracking-wide text-slate-600">{category.title}</span>
+                <span className="inline-flex items-center gap-2 text-sm font-medium text-slate-800">
+                  <Icon className="h-4 w-4 text-slate-500" />
+                  {category.title}
+                </span>
                 {isExpanded ? <ChevronDown className="h-4 w-4 text-slate-500" /> : <ChevronRight className="h-4 w-4 text-slate-500" />}
               </button>
               {isExpanded ? (
-                <ul className="space-y-1 border-t border-slate-200 px-2 py-2">
+                <ul className="space-y-1 border-t border-slate-200 px-3 py-2.5">
                   {groupedArticles.map((entry) => (
                     <li key={entry.slug}>
                       <Link
                         href={`/help-center/${entry.slug}`}
-                        className={`block rounded px-2 py-1.5 text-sm transition-colors ${
+                        className={`block rounded pl-5 pr-2 py-1.5 text-sm transition-colors ${
                           entry.slug === currentSlug
                             ? "bg-slate-100 font-medium text-slate-900"
                             : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"

@@ -18,15 +18,6 @@ export function HelpCenterIndex() {
         </p>
       </section>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-2">
-        {helpCenterCategories.map((category) => (
-          <article key={category.id} className="rounded-2xl border border-slate-200 bg-white px-5 py-4">
-            <h2 className="text-base font-semibold text-slate-900">{category.title}</h2>
-            <p className="mt-1 text-sm text-slate-600">{category.description}</p>
-          </article>
-        ))}
-      </section>
-
       <HelpCenterIndexPanels articles={helpCenterArticles} categories={helpCenterCategories} />
 
       <section className="mt-6 rounded-2xl border border-slate-200 bg-white px-5 py-4">
@@ -102,7 +93,7 @@ export function HelpCenterArticleShell({ article }: HelpCenterArticleShellProps)
                 <li key={entry.slug}>
                   <Link
                     href={`/help-center/${entry.slug}`}
-                    className="block rounded-md border border-slate-200 px-2.5 py-2 text-sm text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900"
+                    className="block rounded px-2 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
                   >
                     {entry.title}
                   </Link>
