@@ -11,7 +11,7 @@ const offersLd = {
   "@type": "Product",
   name: "TW Market Data",
   description:
-    "台股資料 API 方案，支援 TWSE / TPEx 日線價格、MOPS 財報與營收、台股技術指標、三大法人與融資融券資料。",
+    "TWSE-first verified Taiwan financial data API 方案，資料可用性依 dataset coverage 與方案權限揭露。",
   brand: {
     "@type": "Brand",
     name: "TW Market Data",
@@ -26,14 +26,14 @@ const offersLd = {
 export const metadata: Metadata = {
   title: "方案",
   description:
-    "台股資料 API 方案與能力比較，涵蓋台灣股票資料、月營收 API、台股財報 API、台股技術指標與三大法人、融資融券資料。",
+    "台股資料 API 方案與能力比較，採 TWSE-first verified baseline，並揭露資料 coverage 與限制。",
   alternates: {
     canonical: "/pricing",
   },
   openGraph: {
     title: "方案價格 | TW Market Data",
     description:
-      "比較台股 API 方案與配額，依需求使用 TWSE API、TPEx API、MOPS API 與量化查詢工具。",
+      "比較台股 API 方案與配額，依 dataset coverage 與資料狀態規劃使用範圍。",
     url: "/pricing",
     images: [getAbsoluteUrl(siteConfig.ogImagePath)],
   },

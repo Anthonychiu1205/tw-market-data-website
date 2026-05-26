@@ -78,7 +78,7 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     monthlyAmount: 6000,
     yearlyAmount: 72000,
     apiKeyLimit: 10,
-    datasetLimit: "available-now 全量資料集",
+    datasetLimit: "多數可用資料集（依 coverage 狀態）",
     isContactOnly: false,
   },
   enterprise: {
@@ -94,12 +94,12 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
 
 const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "displayName" | "monthlyAmount" | "yearlyAmount" | "isContactOnly" | "apiKeyLimit" | "datasetLimit">> = {
   enterprise: {
-    summary: "全量 available-now 能力與客製化方案。",
+    summary: "以已驗證資料集為核心，搭配客製化方案。",
     monthlyHint: "客製合約",
     yearlyHint: "客製合約",
     usageMultiplier: "Custom",
     highlights: [
-      { text: "available-now datasets 完整可用", icon: "database" },
+      { text: "verified datasets（依 coverage 狀態）", icon: "database" },
       { text: "API key / 配額 / RPM 可客製", icon: "key" },
       { text: "商業使用與進階權限", icon: "shield" },
       { text: "SLA 與專屬支援可談", icon: "headphones" },
@@ -111,12 +111,12 @@ const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "di
     href: "/contact",
   },
   team: {
-    summary: "全量資料與團隊級用量。",
+    summary: "團隊級用量與已驗證資料集。",
     monthlyHint: "月付方案",
     yearlyHint: "年付方案",
     usageMultiplier: "20x",
     highlights: [
-      { text: "available-now datasets 完整可用", icon: "database" },
+      { text: "verified datasets（依 coverage 狀態）", icon: "database" },
       { text: "API Keys 10", icon: "key" },
       { text: "RPM 600", icon: "gauge" },
       { text: "每日上限 20,000 credits / 每月 included 500,000 credits", icon: "activity" },
@@ -174,7 +174,7 @@ const FREE_PLAN_VIEW: PricingPlanView = {
   yearlyHint: "免費方案",
   usageMultiplier: "—",
   highlights: [
-    { text: "5 個資料集：twse_daily_price、tpex_daily_price、adjusted_prices、issuer_profile、monthly_revenue", icon: "database" },
+    { text: "5 個資料集：twse_daily_price、monthly_revenue、income_statement、balance_sheet、institutional_flow", icon: "database" },
     { text: "API Keys 1 把、RPM 10", icon: "key" },
     { text: "基本 usage 顯示", icon: "sparkles" },
   ],

@@ -93,9 +93,9 @@ const comparisonSections: ComparisonSection[] = [
           kind: "dataset-list",
           items: [
             "TWSE 日線價格",
-            "TPEx 日線價格",
-            "還原股價",
-            "公司基本資料",
+            "TPEx 日線價格（beta / historical deferred）",
+            "還原股價（deferred）",
+            "公司基本資料（coverage-limited）",
             "月營收",
             "估值資料",
             "技術指標",
@@ -125,9 +125,9 @@ const comparisonSections: ComparisonSection[] = [
           kind: "dataset-list",
           items: [
             "TWSE 日線價格",
-            "TPEx 日線價格",
-            "還原股價",
-            "公司基本資料",
+            "TPEx 日線價格（beta / historical deferred）",
+            "還原股價（deferred）",
+            "公司基本資料（coverage-limited）",
             "月營收",
             "估值資料",
             "技術指標",
@@ -156,9 +156,9 @@ const comparisonSections: ComparisonSection[] = [
           kind: "dataset-list",
           items: [
             "TWSE 日線價格",
-            "TPEx 日線價格",
-            "還原股價",
-            "公司基本資料",
+            "TPEx 日線價格（beta / historical deferred）",
+            "還原股價（deferred）",
+            "公司基本資料（coverage-limited）",
             "月營收",
             "估值資料",
             "技術指標",
@@ -181,9 +181,9 @@ const comparisonSections: ComparisonSection[] = [
           kind: "dataset-list",
           items: [
             "TWSE 日線價格",
-            "TPEx 日線價格",
-            "還原股價",
-            "公司基本資料",
+            "TPEx 日線價格（beta / historical deferred）",
+            "還原股價（deferred）",
+            "公司基本資料（coverage-limited）",
             "月營收",
             "估值資料",
             "技術指標",
@@ -196,9 +196,9 @@ const comparisonSections: ComparisonSection[] = [
           kind: "dataset-list",
           items: [
             "TWSE 日線價格",
-            "TPEx 日線價格",
-            "還原股價",
-            "公司基本資料",
+            "TPEx 日線價格（beta / historical deferred）",
+            "還原股價（deferred）",
+            "公司基本資料（coverage-limited）",
             "月營收",
           ],
         },
@@ -461,7 +461,7 @@ export function PricingShell() {
       <section className="space-y-4 border-t border-slate-200 pt-8">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Comparison Table</h2>
-          <p className="mt-2 text-sm text-slate-600">同版型比較價格、資料廣度、配額與使用層級差異。</p>
+          <p className="mt-2 text-sm text-slate-600">同版型比較價格、資料廣度、配額與使用層級差異。各資料集實際可用範圍請以 docs 的 coverage/status 註記為準。</p>
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
@@ -558,6 +558,9 @@ export function PricingShell() {
             </tbody>
           </table>
         </div>
+        <p className="text-xs text-slate-500">
+          註：TPEx 日線歷史深度目前仍為 deferred；adjusted prices、survivorship-safe universe、backtest-grade full-market baseline 皆不在目前可公開宣稱範圍。
+        </p>
       </section>
 
       <section className="space-y-4 border-t border-slate-200 pt-8">

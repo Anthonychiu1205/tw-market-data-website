@@ -9,7 +9,7 @@ const datasetFamilies = [
   {
     id: "market-prices",
     label: "市場價格",
-    description: "追蹤上市櫃股票每日價格、成交量與技術分析基礎資料。",
+    description: "以 TWSE 上市資料為核心，提供日線價格與衍生分析基礎資料。",
     datasets: [
       {
         name: "TWSE 日線價格",
@@ -19,12 +19,13 @@ const datasetFamilies = [
       },
       {
         name: "TPEx 日線價格",
-        description: "上櫃股票每日價格與成交資料，用於觀察中小型股與櫃買市場變化。",
+        description: "上櫃股票日線資料目前為 beta / limited，歷史深度覆蓋仍在 deferred 狀態。",
         href: "/docs/introduction",
+        note: "目前不宣稱 TPEx 歷史完整覆蓋。",
       },
       {
         name: "技術指標",
-        description: "由價格與成交量衍生的研究指標，可用於趨勢、動能與風險分析。",
+        description: "由價格與成交量衍生的研究指標；目前 baseline 以 TWSE 為主。",
         href: "/docs/introduction",
       },
     ],
@@ -64,7 +65,7 @@ const datasetFamilies = [
       },
       {
         name: "公司基本資料",
-        description: "整理股票代號、公司名稱、產業分類與上市櫃資訊，是資料串接與分組研究基礎。",
+        description: "整理股票代號、公司名稱與產業分類；若涉及 survivorship-safe / PIT 用途，請先確認資料狀態。",
         href: "/docs/api/company/issuer-profile",
       },
     ],
@@ -124,14 +125,14 @@ const analysisUsage = [
 export const metadata: Metadata = {
   title: "台股資料集總覽 | TW Market Data",
   description:
-    "台股資料集商業總覽：價格、財報、月營收與籌碼資料的 coverage、freshness 與 productization 狀態。",
+    "TWSE-first 資料集總覽：價格、財報、月營收與籌碼資料的 coverage、freshness 與 productization 狀態。",
   alternates: {
     canonical: "/datasets",
   },
   openGraph: {
     title: "台股資料集 | TW Market Data",
     description:
-      "探索 TW Market Data 的台股資料集，包含 TWSE 日線價格、月營收、財報、法人買賣超與資料 coverage / freshness 狀態。",
+      "探索 TW Market Data 的 TWSE-first 台股資料集，查看各資料集 coverage / freshness 與限制狀態。",
     url: "/datasets",
     siteName: "TW Market Data",
     type: "website",
@@ -140,7 +141,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "台股資料集 | TW Market Data",
     description:
-      "探索 TW Market Data 的台股資料集，包含 TWSE 日線價格、月營收、財報、法人買賣超與資料 coverage / freshness 狀態。",
+      "探索 TWSE-first 台股資料集，查看各資料集 coverage / freshness 與限制狀態。",
   },
 };
 
@@ -179,6 +180,7 @@ export default function DatasetsPage() {
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">
             從價格、財報、月營收到法人買賣超，TW Market Data 將台股資料整理成可追溯、可重跑、可接入 workflow 的 API 產品。
+            目前公開定位為 TWSE-first verified baseline；TPEx 歷史深度與 full-market claim 尚未開放。
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/docs/introduction" className={buttonClass("primary")}>查看 API 文件</Link>

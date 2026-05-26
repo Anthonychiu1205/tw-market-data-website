@@ -7,10 +7,10 @@ export function DocsLandingContent() {
     <div className="space-y-8 py-8">
       <section className="space-y-3 border-b border-slate-200 pb-8">
         <p className="text-sm leading-7 text-slate-600">
-          TW Market Data 提供標準化的台股資料 API，將 TWSE、TPEx 與 MOPS 等官方來源整理成一致、可查詢、可串接的資料格式。
+          TW Market Data 提供以 TWSE 上市資料為核心的台股資料 API，並將官方來源整理成一致、可查詢、可串接的資料格式。
         </p>
         <p className="text-sm leading-7 text-slate-600">
-          平台目前以 public sellable boundary 內的 26 個 dataset 為核心，涵蓋行情、財報、營收、估值、技術指標、籌碼資金、公司事件與分類資料。實際可用範圍與配額會依帳號方案與 API key 權限決定。
+          已驗證資料集會明確標示 coverage window、來源與限制。實際可用範圍與配額會依帳號方案與 API key 權限決定，請勿假設所有市場與所有期間都已完整覆蓋。
         </p>
       </section>
 
@@ -20,19 +20,22 @@ export function DocsLandingContent() {
         <p className="text-sm leading-7 text-slate-600">
           若要讓 agent 或工具讀取文件，TW Market Data 已提供 llms.txt、llms-full.txt 與 /openapi.json 作為 machine-readable 入口；MCP tools 目前維持 preview / planned，不假設為正式交易或投資建議系統。
         </p>
-        <p className="text-sm leading-7 text-slate-600">目前文件優先描述 available-now 與 normalized dataset；preview 資料會獨立標示。</p>
+        <p className="text-sm leading-7 text-slate-600">目前文件會標示 available / preview / deferred 狀態；TPEx 歷史覆蓋與 adjusted price 目前屬 deferred 或受限狀態。</p>
       </section>
 
       <section className="space-y-3 border-b border-slate-200 pb-8">
         <SectionHeading id="what-you-can-access">目前可存取的資料</SectionHeading>
         <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
-          <li>市場價格：TWSE / TPEx 日線價格、還原股價、市場指數、市場廣度與利率快照。</li>
+          <li>市場價格：TWSE 日線價格（已驗證可用）；TPEx 日線價格目前為 beta / limited，歷史深度 deferred。</li>
           <li>財務與成長：月營收、損益表、資產負債表、現金流量表、財務指標與估值資料。</li>
           <li>籌碼與資金：三大法人買賣、融資融券與資金面資料。</li>
-          <li>公司與事件：公司基本資料、公司公告、事件日曆、結構化事件、公司行動與股利。</li>
+          <li>公司與事件：公司公告、事件日曆與結構化事件；公司行動與股利請依頁面狀態判讀，不預設完整歷史可用。</li>
           <li>分類與結構：主題分類、指數分類與跨資料集對齊用的分類 mapping。</li>
           <li>策略與查詢：features、factor data、time alignment、screener、search API 與 query API。</li>
         </ul>
+        <p className="text-sm leading-7 text-slate-600">
+          不宣稱 full-market historical coverage、adjusted price 可用、survivorship-safe universe 或 backtest-grade 全市場 baseline。
+        </p>
       </section>
 
       <section className="space-y-3 border-b border-slate-200 pb-8">

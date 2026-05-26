@@ -27,7 +27,7 @@ export const HOME_SOURCE_OF_TRUTH_ITEMS = [
   {
     id: "twse_daily_price",
     title: "股價日線",
-    description: "TWSE / TPEx 日線價格、成交量與交易日資料",
+    description: "TWSE 日線價格與交易日資料（TPEx 歷史深度 deferred）",
     responseLabel: "twse_daily_price",
     status: "200 OK",
     responseTitle: "2330",
