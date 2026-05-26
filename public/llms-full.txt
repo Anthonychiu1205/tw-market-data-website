@@ -64,6 +64,9 @@ TW Market Data provides Taiwan equity data APIs for AI agents, quantitative rese
 - Market coverage: https://twmarketdata.com/docs/market-coverage
 - The platform uses official/public-first sources where possible.
 - Some datasets are production-ready, some are preview or coverage-limited, and some are deferred pending source proof.
+- Public launch positioning is TWSE-first verified baseline.
+- TPEx historical daily price coverage is deferred (latest/recent beta only where exposed).
+- Full-market daily price, adjusted price readiness, and survivorship-safe universe must not be claimed as currently available.
 - Cash flow, valuation extensions, institutional flow and News Intelligence may carry coverage or rollout caveats depending on current product status.
 - Preserve data_gaps, source lineage and confidence context in downstream systems.
 

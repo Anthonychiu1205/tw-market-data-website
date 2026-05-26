@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "文件入口 | TW Market Data",
-    description: "台股資料 API 文件入口，提供快速上手與完整 endpoint 文件。",
+    description: "台股資料 API 文件入口，提供快速上手與依資料集揭露的 coverage / limitation 說明。",
     url: "/docs",
     images: [getAbsoluteUrl(siteConfig.ogImagePath)],
   },

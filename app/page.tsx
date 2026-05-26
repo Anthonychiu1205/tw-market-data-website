@@ -21,13 +21,13 @@ const softwareApplicationLd = {
   operatingSystem: "Web",
   url: siteConfig.url,
   description:
-    "台股資料 API，涵蓋行情、財報、營收、籌碼、公司事件、分類與查詢工具，適合系統、量化研究與 AI agent workflow。",
+    "以 TWSE 上市資料為核心的台股資料 API，提供已驗證資料集並揭露 coverage 與限制，適合系統、量化研究與 AI agent workflow。",
 };
 
 export const metadata: Metadata = {
   title: "台股資料 API 基礎設施",
   description:
-    "台股資料 API，整合 TWSE、TPEx、MOPS 官方來源，提供台灣股票資料、月營收 API、台股財報 API、台股技術指標與三大法人、融資融券資料。",
+    "TWSE-first verified Taiwan financial data API，提供已驗證資料集並明確標示 coverage window、來源與限制。",
   alternates: {
     canonical: "/",
   },
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "台股資料 API 基礎設施 | TW Market Data",
     description:
-      "整合 TWSE API、TPEx API、MOPS API 的台股資料平台，支援量化研究與 AI agent workflow。",
+      "以 TWSE 上市資料為核心的台股資料平台，公開揭露資料 coverage 與限制，支援量化研究與 AI agent workflow。",
     images: [getAbsoluteUrl(siteConfig.ogImagePath)],
   },
 };
@@ -63,7 +63,7 @@ export default function HomePage() {
               </h1>
               <p className="mt-7 max-w-[700px] text-[19px] leading-9 text-slate-600">
                 為 AI agent、自動化流程與量化研究提供一致的台股資料 API。<br />
-                涵蓋行情、財報、營收、籌碼與事件資料，讓模型與系統使用同一份可信資料底座。
+                以 TWSE 上市資料為核心，已驗證資料集會清楚標示 coverage window、來源與限制。
               </p>
               <div className="mt-9 flex gap-4">
                 <Link href="/login" className={buttonClass("secondary")}>
@@ -95,10 +95,10 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 gap-y-8 md:grid-cols-4">
             {[
-              ["26", "個 available-now datasets", "涵蓋行情、財報、營收、籌碼、公司事件與分類資料"],
+              ["TWSE-first", "verified baseline", "以 TWSE 上市資料為核心，逐步擴充其他市場 coverage"],
               ["<100ms", "目標 API latency", "為 agent workflow 與自動化查詢設計的低延遲讀取體驗"],
-              ["3", "個官方核心來源", "TWSE、TPEx、MOPS official/public-first source policy"],
-              ["1", "套可信資料邊界", "以 available-now、preview、not-yet-available 明確分級"],
+              ["official/public-first", "來源政策", "TWSE、TPEx、MOPS 與官方公開來源優先，保留 lineage 與 data gaps"],
+              ["scoped claims", "公開宣告邊界", "不宣稱 full-market、adjusted price、survivorship-safe 或回測等級全市場基準"],
             ].map(([value, label, description], index) => (
               <div
                 key={`${value}-${label}`}

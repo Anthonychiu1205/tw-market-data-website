@@ -152,7 +152,7 @@ export function SourceOfTruthSection() {
         <div>
           <h2 className="text-3xl font-semibold tracking-tight text-slate-900">單一可信資料來源</h2>
           <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-            以下展示目前 public sellable boundary 的資料主題範例。現況已完成 26 個 sellable-now datasets 對齊；access 採 controlled rollout，billing 維持 preview semantics。
+            以下展示目前 public boundary 的資料主題範例。公開定位採 TWSE-first verified baseline；TPEx 歷史覆蓋、adjusted prices 與 survivorship-safe universe 仍屬 deferred / in-progress。
           </p>
         </div>
 
