@@ -2372,6 +2372,27 @@ const topicPlanVisibility: Partial<Record<string, { bullets: string[] }>> = {
       "Pro / Enterprise：完整可用（含商業使用）",
     ],
   },
+  dataset_factory_institutional_flow: {
+    bullets: [
+      "Invited / Preview：可用（受控驗證）",
+      "Developer：可用（文件預覽，非正式商售宣告）",
+      "Pro / Enterprise：維持 production_ready=false，待後續產品化核准",
+    ],
+  },
+  dataset_factory_technical_indicators: {
+    bullets: [
+      "Invited / Preview：可用（受控驗證）",
+      "Developer：可用（文件預覽，非正式商售宣告）",
+      "Pro / Enterprise：維持 production_ready=false，待後續產品化核准",
+    ],
+  },
+  dataset_factory_valuation_data: {
+    bullets: [
+      "Invited / Preview：可用（受控驗證）",
+      "Developer：可用（文件預覽，非正式商售宣告）",
+      "Pro / Enterprise：維持 production_ready=false，待後續產品化核准",
+    ],
+  },
 };
 
 const schemaReadyGroups: SchemaReadyGroup[] = [
@@ -2487,6 +2508,38 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
         tableName: "mops_*_v2",
         endpoint: "/v2/datasets/news/mops-material-events",
         source: "MOPS",
+      },
+    ],
+  },
+  {
+    id: "dataset-factory",
+    label: "Dataset Factory（Preview）",
+    href: "/docs/api/dataset-factory",
+    icon: "database",
+    topics: [
+      {
+        title: "Institutional Flow（Preview）",
+        href: "/docs/api/dataset-factory/institutional-flow",
+        topicId: "dataset_factory_institutional_flow",
+        tableName: "institutional_flow",
+        endpoint: "/v2/datasets/institutional-flow",
+        source: "TWSE / TPEx（contract-generated docs）",
+      },
+      {
+        title: "Technical Indicators（Preview）",
+        href: "/docs/api/dataset-factory/technical-indicators",
+        topicId: "dataset_factory_technical_indicators",
+        tableName: "technical_indicators",
+        endpoint: "/v2/datasets/technical-indicators",
+        source: "TWSE / TPEx（contract-generated docs）",
+      },
+      {
+        title: "Valuation Data（Preview）",
+        href: "/docs/api/dataset-factory/valuation-data",
+        topicId: "dataset_factory_valuation_data",
+        tableName: "valuation_data",
+        endpoint: "/v2/datasets/valuation-data",
+        source: "MOPS / TWSE / TPEx（contract-generated docs）",
       },
     ],
   },
@@ -9981,6 +10034,7 @@ const workflowPages: DocsPageEntry[] = workflowPageCatalog.map((workflow) => ({
 
 const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group) => {
   const isStrategyQuantGroup = group.id === "strategy-quant";
+  const isDatasetFactoryGroup = group.id === "dataset-factory";
   const groupPage: DocsPageEntry = {
     slug: hrefToSlug(group.href),
     href: group.href,
@@ -10018,6 +10072,41 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
             paragraphs: [
               "建議先從單一主題頁完成欄位與參數驗證，再串接跨主題策略流程。",
               "若需要整體流程示例，可搭配 Workflows / Use Cases 區塊。",
+            ],
+          },
+        ]
+      : isDatasetFactoryGroup
+      ? [
+          {
+            id: "group-overview",
+            label: "Preview 概覽",
+            paragraphs: [
+              "Dataset Factory 文件同步自 tw-feature-engine 的 registry/catalog contracts。",
+              "此區塊僅為 website docs preview，同步展示契約資訊，不代表 production route 已正式上線。",
+            ],
+            bullets: [
+              "release_label：private_beta_preview",
+              "production_ready：false（需原樣保留）",
+              "not_investment_advice：true",
+            ],
+          },
+          {
+            id: "sync-guardrails",
+            label: "同步守則",
+            paragraphs: ["網站文件必須保留來源契約語義，不得改寫為正式商售承諾。"],
+            bullets: [
+              "不可移除 data_gaps 與限制敘述",
+              "不可新增交易行動建議語句",
+              "不可聲稱覆蓋完整或時效保證",
+            ],
+          },
+          {
+            id: "source-of-truth",
+            label: "Source Of Truth",
+            paragraphs: [
+              "source_repo：tw-feature-engine",
+              "source_manifest：docs/generated/dataset_website_sync_manifest.json",
+              "llms surfaces：/llms.txt、/llms-full.txt",
             ],
           },
         ]
@@ -10541,6 +10630,139 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
       };
     }
 
+    if (topic.topicId === "dataset_factory_institutional_flow") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "Dataset Factory / Institutional Flow（Preview）",
+        subtitle: "Private beta preview 文件；內容來自 contract-generated docs，同步保留 data_gaps 與 non-production 語義。",
+        tier: "complete",
+        sections: [
+          {
+            id: "status",
+            label: "狀態與定位",
+            paragraphs: [
+              "dataset_id：institutional_flow",
+              "release_label：private_beta_preview",
+              "production_ready：false",
+              "not_investment_advice：true",
+            ],
+          },
+          {
+            id: "endpoint-shape",
+            label: "Endpoint 與欄位摘要",
+            bullets: [
+              "route_path：/v2/datasets/institutional-flow",
+              "schema sample：symbol、date、foreign_net_buy_sell、total_institutional_net_buy_sell",
+              "coverage metadata：coverage_start / coverage_end / row_count（來源契約值）",
+            ],
+          },
+          {
+            id: "limitations",
+            label: "限制與資料缺口",
+            paragraphs: ["本頁為文件預覽同步，不是產品上線宣告。"],
+            bullets: [
+              "data_gaps 必須可見（目前為 none_declared）",
+              "不得宣稱覆蓋完整或時效保證",
+              "不得新增投資建議語句",
+            ],
+          },
+        ],
+      };
+    }
+
+    if (topic.topicId === "dataset_factory_technical_indicators") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "Dataset Factory / Technical Indicators（Preview）",
+        subtitle: "Private beta preview 文件；來源為 contract-generated metadata，保留限制與 data_gaps。",
+        tier: "complete",
+        sections: [
+          {
+            id: "status",
+            label: "狀態與定位",
+            paragraphs: [
+              "dataset_id：technical_indicators",
+              "release_label：private_beta_preview",
+              "production_ready：false",
+              "not_investment_advice：true",
+            ],
+          },
+          {
+            id: "endpoint-shape",
+            label: "Endpoint 與欄位摘要",
+            bullets: [
+              "route_path：/v2/datasets/technical-indicators",
+              "schema sample：symbol、as_of_date、ma_20、rsi_14",
+              "coverage metadata：coverage_start / coverage_end / row_count（來源契約值）",
+            ],
+          },
+          {
+            id: "limitations",
+            label: "限制與資料缺口",
+            bullets: [
+              "data_gaps 必須可見（目前為 none_declared）",
+              "不得宣稱正式商售上線或完整覆蓋",
+              "僅可描述文件契約，不可推導未宣告能力",
+            ],
+          },
+        ],
+      };
+    }
+
+    if (topic.topicId === "dataset_factory_valuation_data") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "Dataset Factory / Valuation Data（Preview）",
+        subtitle: "Private beta preview 文件；同步自 registry/catalog contracts，維持 production_ready=false。",
+        tier: "complete",
+        sections: [
+          {
+            id: "status",
+            label: "狀態與定位",
+            paragraphs: [
+              "dataset_id：valuation_data",
+              "release_label：private_beta_preview",
+              "production_ready：false",
+              "not_investment_advice：true",
+            ],
+          },
+          {
+            id: "endpoint-shape",
+            label: "Endpoint 與欄位摘要",
+            bullets: [
+              "route_path：/v2/datasets/valuation-data",
+              "schema sample：symbol、as_of_date、pe_ratio、pb_ratio",
+              "coverage metadata：coverage_start / coverage_end / row_count（來源契約值）",
+            ],
+          },
+          {
+            id: "limitations",
+            label: "限制與資料缺口",
+            bullets: [
+              "資料僅作資料基礎設施用途，非投資建議",
+              "保留 data_gaps 透明揭露（目前為 none_declared）",
+              "不得宣稱時效保證或可交易指令",
+            ],
+          },
+        ],
+      };
+    }
+
     if (topic.topicId === "twse_daily_price") {
       return {
         slug: hrefToSlug(topic.href),
@@ -10821,6 +11043,10 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
       { title: "公司新聞", href: "/docs/api/preview/company-news", icon: "news", status: "preview" },
       { title: "市場新聞", href: "/docs/api/preview/market-news", icon: "news", status: "preview" },
       { title: "MOPS 重大訊息事件（Private Beta）", href: "/docs/api/preview/mops-material-events", icon: "news", status: "preview" },
+      { title: "Dataset Factory（Preview）", href: "/docs/api/dataset-factory", icon: "database", status: "preview" },
+      { title: "Institutional Flow（Preview）", href: "/docs/api/dataset-factory/institutional-flow", icon: "holdings", status: "preview" },
+      { title: "Technical Indicators（Preview）", href: "/docs/api/dataset-factory/technical-indicators", icon: "prices", status: "preview" },
+      { title: "Valuation Data（Preview）", href: "/docs/api/dataset-factory/valuation-data", icon: "metrics", status: "preview" },
     ],
   },
 ];

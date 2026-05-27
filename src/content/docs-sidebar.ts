@@ -109,6 +109,10 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
       { title: "公司新聞", href: "/docs/api/preview/company-news" },
       { title: "市場新聞", href: "/docs/api/preview/market-news" },
       { title: "MOPS 重大訊息事件（Private Beta）", href: "/docs/api/preview/mops-material-events" },
+      { title: "Dataset Factory（Preview）", href: "/docs/api/dataset-factory" },
+      { title: "Institutional Flow（Preview）", href: "/docs/api/dataset-factory/institutional-flow" },
+      { title: "Technical Indicators（Preview）", href: "/docs/api/dataset-factory/technical-indicators" },
+      { title: "Valuation Data（Preview）", href: "/docs/api/dataset-factory/valuation-data" },
     ],
   },
 ];

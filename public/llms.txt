@@ -44,6 +44,17 @@ https://twmarketdata.com
 - MCP references are preview/planned; do not assume a hosted production MCP server is available.
 - Production MCP tooling will require stable OpenAPI contracts, dataset coverage audits, entitlement controls, and explicit productization approval.
 
+## Dataset Factory Preview Docs
+
+- dataset_ids: institutional_flow, technical_indicators, valuation_data
+- Overview (preview): https://twmarketdata.com/docs/api/dataset-factory
+- Institutional Flow (preview): https://twmarketdata.com/docs/api/dataset-factory/institutional-flow
+- Technical Indicators (preview): https://twmarketdata.com/docs/api/dataset-factory/technical-indicators
+- Valuation Data (preview): https://twmarketdata.com/docs/api/dataset-factory/valuation-data
+- production_ready=false for all three Dataset Factory preview docs
+- Preserve data_gaps visibility and contract limitations
+- No trading-action guidance output
+
 ## Support
 
 - Contact: https://twmarketdata.com/contact
