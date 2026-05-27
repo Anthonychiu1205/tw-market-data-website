@@ -113,6 +113,9 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
       { title: "Institutional Flow（Preview）", href: "/docs/api/dataset-factory/institutional-flow" },
       { title: "Technical Indicators（Preview）", href: "/docs/api/dataset-factory/technical-indicators" },
       { title: "Valuation Data（Preview）", href: "/docs/api/dataset-factory/valuation-data" },
+      { title: "Income Statement（Preview）", href: "/docs/api/dataset-factory/income-statement" },
+      { title: "Balance Sheet（Preview）", href: "/docs/api/dataset-factory/balance-sheet" },
+      { title: "Cash Flow（Preview）", href: "/docs/api/dataset-factory/cash-flow" },
     ],
   },
 ];

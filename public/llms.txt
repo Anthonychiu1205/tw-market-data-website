@@ -46,12 +46,17 @@ https://twmarketdata.com
 
 ## Dataset Factory Preview Docs
 
-- dataset_ids: institutional_flow, technical_indicators, valuation_data
+- dataset_ids: balance_sheet, cash_flow, income_statement, institutional_flow, technical_indicators, valuation_data
 - Overview (preview): https://twmarketdata.com/docs/api/dataset-factory
 - Institutional Flow (preview): https://twmarketdata.com/docs/api/dataset-factory/institutional-flow
 - Technical Indicators (preview): https://twmarketdata.com/docs/api/dataset-factory/technical-indicators
 - Valuation Data (preview): https://twmarketdata.com/docs/api/dataset-factory/valuation-data
-- production_ready=false for all three Dataset Factory preview docs
+- Income Statement (preview): https://twmarketdata.com/docs/api/dataset-factory/income-statement
+- Balance Sheet (preview): https://twmarketdata.com/docs/api/dataset-factory/balance-sheet
+- Cash Flow (preview): https://twmarketdata.com/docs/api/dataset-factory/cash-flow
+- production_ready=false for all listed Dataset Factory preview docs
+- verified fundamentals window: 2023Q2..2026Q1 only
+- do not claim complete historical coverage outside verified window
 - Preserve data_gaps visibility and contract limitations
 - No trading-action guidance output
 

@@ -2393,6 +2393,27 @@ const topicPlanVisibility: Partial<Record<string, { bullets: string[] }>> = {
       "Pro / Enterprise：維持 production_ready=false，待後續產品化核准",
     ],
   },
+  dataset_factory_income_statement: {
+    bullets: [
+      "Invited / Preview：可用（受控驗證）",
+      "Developer：可用（文件預覽，非正式商售宣告）",
+      "Pro / Enterprise：維持 production_ready=false，待後續產品化核准",
+    ],
+  },
+  dataset_factory_balance_sheet: {
+    bullets: [
+      "Invited / Preview：可用（受控驗證）",
+      "Developer：可用（文件預覽，非正式商售宣告）",
+      "Pro / Enterprise：維持 production_ready=false，待後續產品化核准",
+    ],
+  },
+  dataset_factory_cash_flow: {
+    bullets: [
+      "Invited / Preview：可用（受控驗證）",
+      "Developer：可用（文件預覽，非正式商售宣告）",
+      "Pro / Enterprise：維持 production_ready=false，待後續產品化核准",
+    ],
+  },
 };
 
 const schemaReadyGroups: SchemaReadyGroup[] = [
@@ -2540,6 +2561,30 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
         tableName: "valuation_data",
         endpoint: "/v2/datasets/valuation-data",
         source: "MOPS / TWSE / TPEx（contract-generated docs）",
+      },
+      {
+        title: "Income Statement（Preview）",
+        href: "/docs/api/dataset-factory/income-statement",
+        topicId: "dataset_factory_income_statement",
+        tableName: "fundamental_income_statements",
+        endpoint: "/v2/datasets/income-statement",
+        source: "MOPS（contract-generated docs）",
+      },
+      {
+        title: "Balance Sheet（Preview）",
+        href: "/docs/api/dataset-factory/balance-sheet",
+        topicId: "dataset_factory_balance_sheet",
+        tableName: "fundamental_balance_sheets",
+        endpoint: "/v2/datasets/balance-sheet",
+        source: "MOPS（contract-generated docs）",
+      },
+      {
+        title: "Cash Flow（Preview）",
+        href: "/docs/api/dataset-factory/cash-flow",
+        topicId: "dataset_factory_cash_flow",
+        tableName: "fundamental_cash_flows",
+        endpoint: "/v2/datasets/cash-flow",
+        source: "MOPS（contract-generated docs）",
       },
     ],
   },
@@ -10763,6 +10808,147 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
       };
     }
 
+    if (topic.topicId === "dataset_factory_income_statement") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "Dataset Factory / Income Statement（Preview）",
+        subtitle: "Private beta preview 文件；同步自 contract-generated metadata，保留已驗證季度區間與資料缺口。",
+        tier: "complete",
+        sections: [
+          {
+            id: "status",
+            label: "狀態與定位",
+            paragraphs: [
+              "dataset_id：income_statement",
+              "release_label：private_beta",
+              "production_ready：false",
+              "not_investment_advice：true",
+            ],
+          },
+          {
+            id: "coverage",
+            label: "Coverage（已驗證視窗）",
+            bullets: [
+              "quarter_range：2023Q2..2026Q1",
+              "latest_quarter：2026Q1",
+              "row_count：12268",
+              "route_path：/v2/datasets/income-statement",
+            ],
+          },
+          {
+            id: "gaps",
+            label: "已知資料缺口",
+            paragraphs: ["data_gaps：explicitly visible in preview docs and llms outputs."],
+            bullets: [
+              "revenue sparse nulls：10",
+              "gross_profit sparse nulls：4",
+              "operating_income sparse nulls：3",
+              "coverage 僅限已驗證區間，不外推歷史完整性",
+            ],
+          },
+        ],
+      };
+    }
+
+    if (topic.topicId === "dataset_factory_balance_sheet") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "Dataset Factory / Balance Sheet（Preview）",
+        subtitle: "Private beta preview 文件；保留 allowlisted unresolved gap 與欄位缺值可見性。",
+        tier: "complete",
+        sections: [
+          {
+            id: "status",
+            label: "狀態與定位",
+            paragraphs: [
+              "dataset_id：balance_sheet",
+              "release_label：private_beta",
+              "production_ready：false",
+              "not_investment_advice：true",
+            ],
+          },
+          {
+            id: "coverage",
+            label: "Coverage（已驗證視窗）",
+            bullets: [
+              "quarter_range：2023Q2..2026Q1",
+              "latest_quarter：2026Q1",
+              "row_count：12689",
+              "route_path：/v2/datasets/balance-sheet",
+            ],
+          },
+          {
+            id: "gaps",
+            label: "已知資料缺口",
+            paragraphs: ["data_gaps：explicitly visible in preview docs and llms outputs."],
+            bullets: [
+              "2882/2025/Q1..Q4：unresolved allowlisted cross-source gap",
+              "total_assets / total_liabilities：sparse nulls",
+              "cash_and_cash_equivalents：mostly null by current contract",
+              "coverage 僅限已驗證區間，不外推歷史完整性",
+            ],
+          },
+        ],
+      };
+    }
+
+    if (topic.topicId === "dataset_factory_cash_flow") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "Dataset Factory / Cash Flow（Preview）",
+        subtitle: "Private beta preview 文件；同步 current contract data_gaps 與非 production 聲明。",
+        tier: "complete",
+        sections: [
+          {
+            id: "status",
+            label: "狀態與定位",
+            paragraphs: [
+              "dataset_id：cash_flow",
+              "release_label：private_beta",
+              "production_ready：false",
+              "not_investment_advice：true",
+            ],
+          },
+          {
+            id: "coverage",
+            label: "Coverage（已驗證視窗）",
+            bullets: [
+              "quarter_range：2023Q2..2026Q1",
+              "latest_quarter：2026Q1",
+              "row_count：12685",
+              "route_path：/v2/datasets/cash-flow",
+            ],
+          },
+          {
+            id: "gaps",
+            label: "已知資料缺口",
+            paragraphs: ["data_gaps：explicitly visible in preview docs and llms outputs."],
+            bullets: [
+              "free_cash_flow：deferred-null by current contract",
+              "financing_cash_flow：sparse nulls",
+              "net_cash_flow：column absent by current contract",
+              "coverage 僅限已驗證區間，不外推歷史完整性",
+            ],
+          },
+        ],
+      };
+    }
+
     if (topic.topicId === "twse_daily_price") {
       return {
         slug: hrefToSlug(topic.href),
@@ -11047,6 +11233,9 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
       { title: "Institutional Flow（Preview）", href: "/docs/api/dataset-factory/institutional-flow", icon: "holdings", status: "preview" },
       { title: "Technical Indicators（Preview）", href: "/docs/api/dataset-factory/technical-indicators", icon: "prices", status: "preview" },
       { title: "Valuation Data（Preview）", href: "/docs/api/dataset-factory/valuation-data", icon: "metrics", status: "preview" },
+      { title: "Income Statement（Preview）", href: "/docs/api/dataset-factory/income-statement", icon: "statements", status: "preview" },
+      { title: "Balance Sheet（Preview）", href: "/docs/api/dataset-factory/balance-sheet", icon: "statements", status: "preview" },
+      { title: "Cash Flow（Preview）", href: "/docs/api/dataset-factory/cash-flow", icon: "statements", status: "preview" },
     ],
   },
 ];

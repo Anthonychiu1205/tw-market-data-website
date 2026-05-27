@@ -52,14 +52,18 @@ TW Market Data provides Taiwan equity data APIs for AI agents, quantitative rese
 
 ### Dataset Factory (Preview / Private Beta Docs)
 
-- dataset_ids: institutional_flow, technical_indicators, valuation_data
+- dataset_ids: balance_sheet, cash_flow, income_statement, institutional_flow, technical_indicators, valuation_data
 - Overview: https://twmarketdata.com/docs/api/dataset-factory
 - Institutional Flow: https://twmarketdata.com/docs/api/dataset-factory/institutional-flow
 - Technical Indicators: https://twmarketdata.com/docs/api/dataset-factory/technical-indicators
 - Valuation Data: https://twmarketdata.com/docs/api/dataset-factory/valuation-data
+- Income Statement: https://twmarketdata.com/docs/api/dataset-factory/income-statement
+- Balance Sheet: https://twmarketdata.com/docs/api/dataset-factory/balance-sheet
+- Cash Flow: https://twmarketdata.com/docs/api/dataset-factory/cash-flow
 - All Dataset Factory docs in this section keep production_ready=false and not_investment_advice semantics.
 - Preserve data_gaps and limitations exactly as contract-derived metadata.
 - Do not infer missing coverage or freshness details.
+- fundamentals window is verified for 2023Q2..2026Q1 only; do not overclaim beyond that range.
 
 ## Guides and Workflows
 

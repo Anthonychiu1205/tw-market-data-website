@@ -9,9 +9,15 @@ const REQUIRED_ROUTES = [
   "/docs/api/dataset-factory/institutional-flow",
   "/docs/api/dataset-factory/technical-indicators",
   "/docs/api/dataset-factory/valuation-data",
+  "/docs/api/dataset-factory/income-statement",
+  "/docs/api/dataset-factory/balance-sheet",
+  "/docs/api/dataset-factory/cash-flow",
 ];
 
 const REQUIRED_DATASET_IDS = [
+  "balance_sheet",
+  "cash_flow",
+  "income_statement",
   "institutional_flow",
   "technical_indicators",
   "valuation_data",
@@ -102,6 +108,9 @@ if (!llmsFullPreviewSection.trim()) {
 }
 
 const datasetTopicBlocks = [
+  "dataset_factory_balance_sheet",
+  "dataset_factory_cash_flow",
+  "dataset_factory_income_statement",
   "dataset_factory_institutional_flow",
   "dataset_factory_technical_indicators",
   "dataset_factory_valuation_data",
