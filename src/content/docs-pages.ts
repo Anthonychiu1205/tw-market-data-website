@@ -11147,8 +11147,8 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     groupIcon: "line-chart",
     items: [
       { title: "TWSE 日線價格", href: "/docs/api/market-prices/twse-daily-price", icon: "prices", status: "production" },
-      { title: "TPEx 日線價格（Beta）", href: "/docs/api/market-prices/tpex-daily-price", icon: "prices", status: "preview" },
-      { title: "還原股價（Deferred）", href: "/docs/api/market-prices/adjusted-prices", icon: "prices", status: "preview" },
+      { title: "TPEx 日線價格", href: "/docs/api/market-prices/tpex-daily-price", icon: "prices", status: "preview" },
+      { title: "還原股價", href: "/docs/api/market-prices/adjusted-prices", icon: "prices", status: "preview" },
       { title: "技術指標", href: "/docs/api/market-prices/technical-indicators", icon: "prices", status: "normalized" },
       { title: "市場指數", href: "/docs/api/market-prices/index-data", icon: "prices", status: "normalized" },
       { title: "市場廣度", href: "/docs/api/market-prices/market-breadth", icon: "prices", status: "normalized" },
@@ -11161,11 +11161,10 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     groupIcon: "file-spreadsheet",
     items: [
       { title: "月營收", href: "/docs/api/financial-growth/monthly-revenue", icon: "metrics", status: "normalized" },
-      { title: "損益表", href: "/docs/api/financial-growth/income-statement", icon: "statements", status: "normalized" },
+      { title: "綜合損益表", href: "/docs/api/financial-growth/income-statement", icon: "statements", status: "normalized" },
       { title: "資產負債表", href: "/docs/api/financial-growth/balance-sheet", icon: "statements", status: "normalized" },
       { title: "現金流量表", href: "/docs/api/financial-growth/cash-flow-statement", icon: "statements", status: "normalized" },
-      { title: "財務指標", href: "/docs/api/financial-growth/financial-metrics", icon: "metrics", status: "normalized" },
-      { title: "估值資料", href: "/docs/api/financial-growth/valuation-data", icon: "metrics", status: "normalized" },
+      { title: "財務比率", href: "/docs/api/financial-growth/financial-metrics", icon: "metrics", status: "normalized" },
     ],
   },
   {
@@ -11173,8 +11172,10 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     label: "籌碼與資金",
     groupIcon: "landmark",
     items: [
-      { title: "三大法人", href: "/docs/api/capital-flow/institutional-flow", icon: "holdings", status: "normalized" },
+      { title: "三大法人買賣", href: "/docs/api/capital-flow/institutional-flow", icon: "holdings", status: "normalized" },
       { title: "融資融券", href: "/docs/api/capital-flow/margin-short", icon: "holdings", status: "normalized" },
+      { title: "外資持股", href: "/docs/api/institutional-holdings", icon: "holdings", status: "preview" },
+      { title: "借券資料", href: "/docs/api/capital-flow/margin-short", icon: "holdings", status: "normalized" },
     ],
   },
   {
@@ -11182,12 +11183,10 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     label: "公司與事件",
     groupIcon: "building-2",
     items: [
-      { title: "公司基本資料", href: "/docs/api/company/issuer-profile", icon: "building", status: "normalized" },
-      { title: "公司公告", href: "/docs/api/company-events/issuer-announcements", icon: "filings", status: "normalized" },
-      { title: "事件日曆", href: "/docs/api/company-events/events-calendar", icon: "guide", status: "normalized" },
-      { title: "結構化事件", href: "/docs/api/company-events/structured-events", icon: "guide", status: "normalized" },
-      { title: "公司行動", href: "/docs/api/company-events/corporate-actions", icon: "guide", status: "normalized" },
-      { title: "股利", href: "/docs/api/company-events/dividends", icon: "guide", status: "normalized" },
+      { title: "公司主檔 / Security Master", href: "/docs/api/company/issuer-profile", icon: "building", status: "normalized" },
+      { title: "重大訊息", href: "/docs/api/company-events/issuer-announcements", icon: "filings", status: "normalized" },
+      { title: "股利與公司行動", href: "/docs/api/company-events/corporate-actions", icon: "guide", status: "normalized" },
+      { title: "注意 / 處置", href: "/docs/api/preview/mops-material-events", icon: "news", status: "preview" },
     ],
   },
   {
@@ -11195,7 +11194,8 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     label: "分類與結構",
     groupIcon: "network",
     items: [
-      { title: "主題分類", href: "/docs/api/taxonomy/theme-taxonomy", icon: "segments", status: "normalized" },
+      { title: "產業分類", href: "/docs/api/taxonomy/theme-taxonomy", icon: "segments", status: "normalized" },
+      { title: "題材分類", href: "/docs/api/segments", icon: "segments", status: "normalized" },
       { title: "指數分類", href: "/docs/api/taxonomy/index-classification", icon: "segments", status: "normalized" },
     ],
   },
@@ -11204,10 +11204,9 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     label: "策略與量化",
     groupIcon: "activity",
     items: [
-      { title: "特徵資料", href: "/docs/api/strategy-quant/features", icon: "chart", status: "normalized" },
-      { title: "因子資料", href: "/docs/api/strategy-quant/factor-data", icon: "chart", status: "normalized" },
-      { title: "時間對齊", href: "/docs/api/strategy-quant/time-alignment", icon: "chart", status: "normalized" },
-      { title: "條件篩選", href: "/docs/api/strategy-quant/screener", icon: "chart", status: "normalized" },
+      { title: "特徵資料集", href: "/docs/api/strategy-quant/features", icon: "chart", status: "normalized" },
+      { title: "AI 研究訊號", href: "/docs/api/strategy-quant/factor-data", icon: "chart", status: "normalized" },
+      { title: "回測資料準備", href: "/docs/api/strategy-quant/time-alignment", icon: "chart", status: "normalized" },
     ],
   },
   {
@@ -11215,27 +11214,10 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     label: "查詢與工具",
     groupIcon: "search-code",
     items: [
-      { title: "搜尋 API", href: "/docs/api/query-tools/search-api", icon: "search", status: "normalized" },
-      { title: "查詢 API", href: "/docs/api/query-tools/query-api", icon: "braces", status: "normalized" },
-      { title: "查詢欄位", href: "/docs/api/query-tools/query-fields", icon: "braces", status: "normalized" },
-      { title: "查詢範例", href: "/docs/api/query-tools/query-examples", icon: "braces", status: "normalized" },
-    ],
-  },
-  {
-    id: "preview",
-    label: "預覽",
-    groupIcon: "eye",
-    items: [
-      { title: "公司新聞", href: "/docs/api/preview/company-news", icon: "news", status: "preview" },
-      { title: "市場新聞", href: "/docs/api/preview/market-news", icon: "news", status: "preview" },
-      { title: "MOPS 重大訊息事件（Private Beta）", href: "/docs/api/preview/mops-material-events", icon: "news", status: "preview" },
-      { title: "Dataset Factory（Preview）", href: "/docs/api/dataset-factory", icon: "database", status: "preview" },
-      { title: "Institutional Flow（Preview）", href: "/docs/api/dataset-factory/institutional-flow", icon: "holdings", status: "preview" },
-      { title: "Technical Indicators（Preview）", href: "/docs/api/dataset-factory/technical-indicators", icon: "prices", status: "preview" },
-      { title: "Valuation Data（Preview）", href: "/docs/api/dataset-factory/valuation-data", icon: "metrics", status: "preview" },
-      { title: "Income Statement（Preview）", href: "/docs/api/dataset-factory/income-statement", icon: "statements", status: "preview" },
-      { title: "Balance Sheet（Preview）", href: "/docs/api/dataset-factory/balance-sheet", icon: "statements", status: "preview" },
-      { title: "Cash Flow（Preview）", href: "/docs/api/dataset-factory/cash-flow", icon: "statements", status: "preview" },
+      { title: "Dataset Factory", href: "/docs/api/dataset-factory", icon: "database", status: "preview" },
+      { title: "Coverage Registry", href: "/docs/market-coverage", icon: "search", status: "production" },
+      { title: "Release Status", href: "/docs/sdk/release-status", icon: "braces", status: "production" },
+      { title: "Query Examples", href: "/docs/api/query-tools/query-examples", icon: "braces", status: "normalized" },
     ],
   },
 ];
@@ -11248,7 +11230,6 @@ export const docsSidebarOverviewItems: DocsSidebarNavItem[] = [
   { title: "資料血緣", href: "/docs/data-freshness-lineage", icon: "chart", status: "production" },
   { title: "API 模型", href: "/docs/api-model", icon: "braces", status: "production" },
   { title: "Tools / MCP", href: "/docs/tools-and-mcp", icon: "braces", status: "production" },
-  { title: "Support", href: "/docs/support", icon: "support", status: "production" },
 ];
 
 export const docsSidebarGuideItems: DocsSidebarNavItem[] = [
@@ -11269,6 +11250,10 @@ export const docsSidebarAiAgentItems: DocsSidebarNavItem[] = [
   { title: "MCP Server Preview", href: "/docs/ai-agents/mcp-server-preview", icon: "advanced", status: "preview" },
   { title: "Tool Manifest", href: "/docs/ai-agents/tool-manifest", icon: "advanced", status: "preview" },
   { title: "Agent Workflow Examples", href: "/docs/ai-agents/agent-workflow-examples", icon: "advanced", status: "preview" },
+];
+
+export const docsSidebarHelpItems: DocsSidebarNavItem[] = [
+  { title: "幫助中心", href: "/help-center", icon: "support", status: "production" },
 ];
 
 export const docsSidebarApiGroups: DocsSidebarNavGroup[] = docsSidebarNav;

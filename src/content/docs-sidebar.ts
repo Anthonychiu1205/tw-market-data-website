@@ -91,7 +91,7 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
   {
     id: "query-tools",
     label: "查詢與工具",
-    groupIcon: "book-open",
+    groupIcon: "search-code",
     items: [
       { title: "Dataset Factory", href: "/docs/api/dataset-factory" },
       { title: "Coverage Registry", href: "/docs/market-coverage" },
