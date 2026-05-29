@@ -14,7 +14,9 @@ type CodeBlockProps = {
   filename?: string;
   header?: ReactNode;
   className?: string;
+  contentClassName?: string;
   copyButtonVariant?: CopyButtonVariant;
+  wrapLines?: boolean;
 };
 
 type Token = {
@@ -91,14 +93,14 @@ function tokenizeCodeLine(line: string, language: CodeBlockLanguage): Token[] {
   return tokens;
 }
 
-function renderHighlightedCode(code: string, language: CodeBlockLanguage) {
+function renderHighlightedCode(code: string, language: CodeBlockLanguage, wrapLines = false) {
   const lines = code.split("\n");
 
   return lines.map((line, lineIndex) => {
     const tokens = language === "json" ? tokenizeJsonLine(line) : tokenizeCodeLine(line, language);
 
     return (
-      <span key={`line-${lineIndex}`} className="block whitespace-pre">
+      <span key={`line-${lineIndex}`} className={cn("block", wrapLines ? "whitespace-pre-wrap break-words [overflow-wrap:anywhere]" : "whitespace-pre")}>
         {tokens.length ? tokens.map((token, tokenIndex) => <span key={`${lineIndex}-${tokenIndex}`} className={token.className}>{token.text}</span>) : "\u00A0"}
       </span>
     );
@@ -159,9 +161,18 @@ function CopyControl({ code, variant = "icon" }: { code: string; variant?: CopyB
   );
 }
 
-export function CodeBlock({ code, language, filename, header, className, copyButtonVariant = "icon" }: CodeBlockProps) {
+export function CodeBlock({
+  code,
+  language,
+  filename,
+  header,
+  className,
+  contentClassName,
+  copyButtonVariant = "icon",
+  wrapLines = false,
+}: CodeBlockProps) {
   const normalizedLanguage = normalizeLanguage(language);
-  const highlighted = useMemo(() => renderHighlightedCode(code, normalizedLanguage), [code, normalizedLanguage]);
+  const highlighted = useMemo(() => renderHighlightedCode(code, normalizedLanguage, wrapLines), [code, normalizedLanguage, wrapLines]);
 
   return (
     <div className={cn("group overflow-hidden rounded-lg border border-slate-200 bg-slate-50", className)}>
@@ -177,7 +188,7 @@ export function CodeBlock({ code, language, filename, header, className, copyBut
           <CopyControl code={code} variant={copyButtonVariant} />
         </div>
       )}
-      <pre className="overflow-x-auto px-4 pb-4 pt-2 text-xs leading-6">
+      <pre className={cn(wrapLines ? "overflow-x-hidden" : "overflow-x-auto", "px-4 pb-4 pt-2 text-xs leading-6", contentClassName)}>
         <code className="font-mono">{highlighted}</code>
       </pre>
     </div>
