@@ -132,7 +132,7 @@ export const docsSidebarAiAgentItems: DocsSidebarNavItem[] = [
 ];
 
 export const docsSidebarHelpItems: DocsSidebarNavItem[] = [
-  { title: "幫助中心", href: "/help" },
+  { title: "幫助中心", href: "/help-center" },
 ];
 
 function getFirstLeafHref(item: DocsSidebarNavItem): string | null {

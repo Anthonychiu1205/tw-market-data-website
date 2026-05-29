@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { ApiRunPlayground } from "@/src/components/docs/api-run-playground";
 import { ApiSidePanel } from "@/src/components/docs/api-side-panel";
 import { CodeBlock } from "@/src/components/docs/code-block";
 import { DocsLandingContent } from "@/src/components/docs/docs-landing-content";
@@ -113,11 +114,12 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
         >
           <div className="space-y-8 py-8">
             <section className="space-y-4 border-b border-slate-200 pb-8">
-              <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+              <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
                 <div className="flex min-w-0 items-center gap-2 text-sm">
                   <span className="rounded border border-slate-300 bg-white px-2 py-0.5 font-semibold text-slate-800">{api.method}</span>
                   <code className="truncate font-mono text-slate-700">{api.endpoint}</code>
                 </div>
+                <ApiRunPlayground api={api} endpointTitle={page.title} />
               </div>
             </section>
 

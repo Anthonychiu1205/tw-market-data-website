@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+
+import { HelpCenterShell } from "@/src/components/help/help-center-shell";
 import { helpCenterPageMeta } from "@/src/content/help-center";
 
 export const metadata: Metadata = {
@@ -10,6 +11,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HelpCenterPage() {
-  redirect("/help-center");
+export default function HelpCenterStandalonePage() {
+  return <HelpCenterShell mode="help" />;
 }

@@ -322,7 +322,7 @@ export const helpCenterEntryCards = [
     id: "faq",
     title: "常見問題",
     description: "快速查看 API、登入、billing、security 常見問題。",
-    href: "/faq",
+    href: "/help-center#api-data",
     icon: CircleHelp,
   },
   {

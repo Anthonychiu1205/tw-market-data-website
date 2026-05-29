@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-
-import { HelpCenterShell } from "@/src/components/help/help-center-shell";
+import { redirect } from "next/navigation";
 import { faqPageMeta } from "@/src/content/help-center";
 
 export const metadata: Metadata = {
   title: `${faqPageMeta.title} | TW Market Data`,
   description: faqPageMeta.subtitle,
+  alternates: {
+    canonical: "/help-center",
+  },
 };
 
 export default function FaqPage() {
-  return <HelpCenterShell mode="faq" />;
+  redirect("/help-center#api-data");
 }
