@@ -8,7 +8,6 @@ export type DocsSidebarNavGroup = {
   id: string;
   label: string;
   groupIcon:
-    | "rocket"
     | "line-chart"
     | "file-spreadsheet"
     | "landmark"
@@ -16,7 +15,7 @@ export type DocsSidebarNavGroup = {
     | "network"
     | "activity"
     | "search-code"
-    | "eye";
+    | "book-open";
   items: DocsSidebarNavItem[];
 };
 
@@ -41,11 +40,10 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
     groupIcon: "file-spreadsheet",
     items: [
       { title: "月營收", href: "/docs/api/financial-growth/monthly-revenue" },
-      { title: "損益表", href: "/docs/api/financial-growth/income-statement" },
+      { title: "綜合損益表", href: "/docs/api/financial-growth/income-statement" },
       { title: "資產負債表", href: "/docs/api/financial-growth/balance-sheet" },
       { title: "現金流量表", href: "/docs/api/financial-growth/cash-flow-statement" },
-      { title: "財務指標", href: "/docs/api/financial-growth/financial-metrics" },
-      { title: "估值資料", href: "/docs/api/financial-growth/valuation-data" },
+      { title: "財務比率", href: "/docs/api/financial-growth/financial-metrics" },
     ],
   },
   {
@@ -53,8 +51,10 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
     label: "籌碼與資金",
     groupIcon: "landmark",
     items: [
-      { title: "三大法人", href: "/docs/api/capital-flow/institutional-flow" },
+      { title: "三大法人買賣", href: "/docs/api/capital-flow/institutional-flow" },
       { title: "融資融券", href: "/docs/api/capital-flow/margin-short" },
+      { title: "外資持股", href: "/docs/api/institutional-holdings" },
+      { title: "借券資料", href: "/docs/api/capital-flow/margin-short" },
     ],
   },
   {
@@ -62,12 +62,10 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
     label: "公司與事件",
     groupIcon: "building-2",
     items: [
-      { title: "公司基本資料", href: "/docs/api/company/issuer-profile" },
-      { title: "公司公告", href: "/docs/api/company-events/issuer-announcements" },
-      { title: "事件日曆", href: "/docs/api/company-events/events-calendar" },
-      { title: "結構化事件", href: "/docs/api/company-events/structured-events" },
-      { title: "公司行動", href: "/docs/api/company-events/corporate-actions" },
-      { title: "股利", href: "/docs/api/company-events/dividends" },
+      { title: "公司主檔 / Security Master", href: "/docs/api/company/issuer-profile" },
+      { title: "重大訊息", href: "/docs/api/company-events/issuer-announcements" },
+      { title: "股利與公司行動", href: "/docs/api/company-events/corporate-actions" },
+      { title: "注意 / 處置", href: "/docs/api/preview/mops-material-events" },
     ],
   },
   {
@@ -75,8 +73,9 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
     label: "分類與結構",
     groupIcon: "network",
     items: [
-      { title: "主題分類", href: "/docs/api/taxonomy/theme-taxonomy" },
-      { title: "指數分類", href: "/docs/api/taxonomy/index-classification" },
+      { title: "產業分類", href: "/docs/api/taxonomy/theme-taxonomy" },
+      { title: "題材分類", href: "/docs/api/segments" },
+      { title: "指數成分", href: "/docs/api/taxonomy/index-classification" },
     ],
   },
   {
@@ -84,38 +83,20 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
     label: "策略與量化",
     groupIcon: "activity",
     items: [
-      { title: "特徵資料", href: "/docs/api/strategy-quant/features" },
-      { title: "因子資料", href: "/docs/api/strategy-quant/factor-data" },
-      { title: "時間對齊", href: "/docs/api/strategy-quant/time-alignment" },
-      { title: "條件篩選", href: "/docs/api/strategy-quant/screener" },
+      { title: "特徵資料集", href: "/docs/api/strategy-quant/features" },
+      { title: "AI 研究訊號", href: "/docs/api/strategy-quant/factor-data" },
+      { title: "回測資料準備", href: "/docs/api/strategy-quant/time-alignment" },
     ],
   },
   {
     id: "query-tools",
     label: "查詢與工具",
-    groupIcon: "search-code",
+    groupIcon: "book-open",
     items: [
-      { title: "搜尋 API", href: "/docs/api/query-tools/search-api" },
-      { title: "查詢 API", href: "/docs/api/query-tools/query-api" },
-      { title: "查詢欄位", href: "/docs/api/query-tools/query-fields" },
-      { title: "查詢範例", href: "/docs/api/query-tools/query-examples" },
-    ],
-  },
-  {
-    id: "preview",
-    label: "預覽",
-    groupIcon: "eye",
-    items: [
-      { title: "公司新聞", href: "/docs/api/preview/company-news" },
-      { title: "市場新聞", href: "/docs/api/preview/market-news" },
-      { title: "MOPS 重大訊息事件（Private Beta）", href: "/docs/api/preview/mops-material-events" },
-      { title: "Dataset Factory（Preview）", href: "/docs/api/dataset-factory" },
-      { title: "Institutional Flow（Preview）", href: "/docs/api/dataset-factory/institutional-flow" },
-      { title: "Technical Indicators（Preview）", href: "/docs/api/dataset-factory/technical-indicators" },
-      { title: "Valuation Data（Preview）", href: "/docs/api/dataset-factory/valuation-data" },
-      { title: "Income Statement（Preview）", href: "/docs/api/dataset-factory/income-statement" },
-      { title: "Balance Sheet（Preview）", href: "/docs/api/dataset-factory/balance-sheet" },
-      { title: "Cash Flow（Preview）", href: "/docs/api/dataset-factory/cash-flow" },
+      { title: "Dataset Factory", href: "/docs/api/dataset-factory" },
+      { title: "Coverage Registry", href: "/docs/market-coverage" },
+      { title: "Release Status", href: "/docs/sdk/release-status" },
+      { title: "Query Examples", href: "/docs/api/query-tools/query-examples" },
     ],
   },
 ];
@@ -128,9 +109,6 @@ export const docsSidebarOverviewItems: DocsSidebarNavItem[] = [
   { title: "資料血緣", href: "/docs/data-freshness-lineage" },
   { title: "API 模型", href: "/docs/api-model" },
   { title: "Tools / MCP", href: "/docs/tools-and-mcp" },
-  { title: "Support", href: "/docs/support" },
-  { title: "幫助中心", href: "/help" },
-  { title: "常見問題", href: "/faq" },
 ];
 
 export const docsSidebarGuideItems: DocsSidebarNavItem[] = [
@@ -151,6 +129,10 @@ export const docsSidebarAiAgentItems: DocsSidebarNavItem[] = [
   { title: "MCP Server Preview", href: "/docs/ai-agents/mcp-server-preview" },
   { title: "Tool Manifest", href: "/docs/ai-agents/tool-manifest" },
   { title: "Agent Workflow Examples", href: "/docs/ai-agents/agent-workflow-examples" },
+];
+
+export const docsSidebarHelpItems: DocsSidebarNavItem[] = [
+  { title: "幫助中心", href: "/help" },
 ];
 
 function getFirstLeafHref(item: DocsSidebarNavItem): string | null {
