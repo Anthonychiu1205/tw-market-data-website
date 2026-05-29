@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   faqPageMeta,
@@ -32,15 +32,20 @@ function normalize(text: string) {
 
 export function HelpCenterShell({ mode }: HelpCenterShellProps) {
   const [query, setQuery] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("all");
+  const [activeSectionId, setActiveSectionId] = useState(helpCenterQuickLinks[0]?.href.replace("#", "") ?? "");
   const normalizedQuery = normalize(query);
   const isSearching = normalizedQuery.length > 0;
 
   const filteredCategories = useMemo(() => {
+    const baseCategories =
+      selectedCategoryId === "all" ? helpCategories : helpCategories.filter((category) => category.id === selectedCategoryId);
+
     if (!isSearching) {
-      return helpCategories;
+      return baseCategories;
     }
 
-    return helpCategories
+    return baseCategories
       .map((category) => ({
         ...category,
         topics: category.topics.filter((topic) => {
@@ -49,7 +54,7 @@ export function HelpCenterShell({ mode }: HelpCenterShellProps) {
         }),
       }))
       .filter((category) => category.topics.length > 0);
-  }, [isSearching, normalizedQuery]);
+  }, [isSearching, normalizedQuery, selectedCategoryId]);
 
   const searchResults = useMemo(() => {
     if (!isSearching) return [];
@@ -57,6 +62,43 @@ export function HelpCenterShell({ mode }: HelpCenterShellProps) {
   }, [isSearching, normalizedQuery]);
 
   const pageMeta = mode === "help" ? helpCenterPageMeta : faqPageMeta;
+
+  const visibleSectionIds = useMemo(() => new Set(filteredCategories.map((category) => category.id)), [filteredCategories]);
+  const activeDisplaySectionId = useMemo(() => {
+    if (filteredCategories.length === 0) return "";
+    if (visibleSectionIds.has(activeSectionId)) return activeSectionId;
+    return filteredCategories[0].id;
+  }, [activeSectionId, filteredCategories, visibleSectionIds]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (filteredCategories.length === 0) return;
+
+    const sectionIds = filteredCategories.map((category) => category.id);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible.length === 0) return;
+        const nextId = visible[0].target.getAttribute("id");
+        if (!nextId) return;
+        setActiveSectionId(nextId);
+      },
+      {
+        root: null,
+        rootMargin: "-20% 0px -65% 0px",
+        threshold: [0.1, 0.3, 0.6],
+      },
+    );
+
+    for (const id of sectionIds) {
+      const section = document.getElementById(id);
+      if (section) observer.observe(section);
+    }
+
+    return () => observer.disconnect();
+  }, [filteredCategories]);
 
   return (
     <div className="bg-slate-50">
@@ -101,13 +143,47 @@ export function HelpCenterShell({ mode }: HelpCenterShellProps) {
         </div>
 
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:px-6">
-          <h2 className="text-sm font-semibold text-slate-900">{helpFaqSectionTitle}</h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold text-slate-900">{helpFaqSectionTitle}</h2>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setSelectedCategoryId("all")}
+                className={`rounded-full border px-3 py-1.5 text-xs transition ${
+                  selectedCategoryId === "all"
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-900"
+                }`}
+              >
+                全部分類
+              </button>
+              {helpCategories.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  onClick={() => setSelectedCategoryId(category.id)}
+                  className={`rounded-full border px-3 py-1.5 text-xs transition ${
+                    selectedCategoryId === category.id
+                      ? "border-slate-900 bg-slate-900 text-white"
+                      : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-900"
+                  }`}
+                >
+                  {category.title}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
             {helpCenterQuickLinks.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="whitespace-nowrap rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-slate-900"
+                    onClick={() => setActiveSectionId(item.href.replace("#", ""))}
+                    className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs transition ${
+                  activeDisplaySectionId === item.href.replace("#", "")
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-900"
+                } ${visibleSectionIds.has(item.href.replace("#", "")) ? "" : "opacity-40"}`}
               >
                 {item.label}
               </a>
