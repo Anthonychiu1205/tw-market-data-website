@@ -1,6 +1,6 @@
 "use client";
 
-import { Braces, Boxes, Check, ChevronDown, Code2, Coffee, FileCode2, Gem, Play, Terminal, X } from "lucide-react";
+import { Braces, Boxes, Check, ChevronDown, Code2, Coffee, Copy, Download, FileCode2, Gem, Play, Terminal, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CodeBlock, type CodeBlockLanguage } from "@/src/components/docs/code-block";
@@ -19,6 +19,13 @@ type RequestLanguageOption = {
   id: RequestLanguage;
   label: string;
   icon: typeof Terminal;
+};
+
+type PreviewResult = {
+  status: ApiStatusExample["status"];
+  body: string;
+  querySignature: string;
+  generatedAt: string;
 };
 
 const REQUEST_LANGUAGE_OPTIONS: RequestLanguageOption[] = [
@@ -262,6 +269,8 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   const [activeStatus, setActiveStatus] = useState<ApiStatusExample["status"]>("200");
   const [queryValues, setQueryValues] = useState<ParamState>({});
   const [runNotice, setRunNotice] = useState("");
+  const [previewResult, setPreviewResult] = useState<PreviewResult | null>(null);
+  const [resultCopied, setResultCopied] = useState(false);
 
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -282,20 +291,9 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
     setRequestLanguage("curl");
     setIsLanguageMenuOpen(false);
     setRunNotice("");
+    setPreviewResult(null);
+    setResultCopied(false);
     setIsOpen(true);
-  }
-
-  function handleRunPreview() {
-    const hasMissingRequired = (api.queryParameters ?? []).some((parameter) => parameter.required && !queryValues[parameter.name]?.trim());
-
-    if (hasMissingRequired) {
-      setActiveStatus("400");
-      setRunNotice("缺少必填參數，已切換到 400 範例。");
-      return;
-    }
-
-    setActiveStatus("200");
-    setRunNotice("已更新請求範例。");
   }
 
   useEffect(() => {
@@ -349,6 +347,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
 
   const queryKeys = useMemo(() => (api.queryParameters ?? []).map((parameter) => parameter.name), [api.queryParameters]);
   const queryEntries = useMemo(() => collectQueryEntries(queryValues, queryKeys), [queryKeys, queryValues]);
+  const querySignature = useMemo(() => JSON.stringify(queryEntries), [queryEntries]);
   const maskedKey = apiKey.trim() ? apiKey.trim() : "<api-key>";
 
   const requestExampleCode = useMemo(
@@ -365,10 +364,56 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   }, [api.sidePanel.statusExamples]);
 
   const activeExample = statusExampleMap.get(activeStatus);
+  const previewIsStale = Boolean(previewResult && previewResult.querySignature !== querySignature);
   const responseCode = useMemo(() => {
     const raw = activeExample?.body ?? fallbackStatusBody(activeStatus);
     return toCompactExampleJson(raw, activeStatus);
   }, [activeExample?.body, activeStatus]);
+  const previewResultCode = useMemo(() => {
+    if (!previewResult) return "";
+    return previewResult.body;
+  }, [previewResult]);
+
+  function handleRunPreview() {
+    const hasMissingRequired = (api.queryParameters ?? []).some((parameter) => parameter.required && !queryValues[parameter.name]?.trim());
+    const nextStatus: ApiStatusExample["status"] = hasMissingRequired ? "400" : "200";
+    const sourceBody = statusExampleMap.get(nextStatus)?.body ?? fallbackStatusBody(nextStatus);
+    const normalizedBody = toCompactExampleJson(sourceBody, nextStatus);
+
+    setActiveStatus(nextStatus);
+    setPreviewResult({
+      status: nextStatus,
+      body: normalizedBody,
+      querySignature,
+      generatedAt: new Date().toISOString(),
+    });
+    setResultCopied(false);
+    setRunNotice(hasMissingRequired ? "缺少必填參數，已產生 400 預覽結果。" : "Preview result generated");
+  }
+
+  async function handleCopyResult() {
+    if (!previewResultCode) return;
+    try {
+      await navigator.clipboard.writeText(previewResultCode);
+      setResultCopied(true);
+      window.setTimeout(() => setResultCopied(false), 1500);
+    } catch {
+      setResultCopied(false);
+    }
+  }
+
+  function handleDownloadResult() {
+    if (!previewResultCode) return;
+    const blob = new Blob([previewResultCode], { type: "application/json" });
+    const link = document.createElement("a");
+    const status = previewResult?.status ?? "200";
+    link.href = URL.createObjectURL(blob);
+    link.download = `preview-result-${status}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  }
 
   const requestLanguageMeta = REQUEST_LANGUAGE_OPTIONS.find((item) => item.id === requestLanguage) ?? REQUEST_LANGUAGE_OPTIONS[0];
   const RequestLanguageIcon = requestLanguageMeta.icon;
@@ -426,7 +471,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
     <div className="flex w-full flex-wrap items-center justify-between gap-2">
       <div className="flex items-center gap-2">
         <span className={cn("inline-block h-2.5 w-2.5 rounded-full", activeStatus === "200" ? "bg-emerald-500/70" : "bg-amber-600/70")} />
-        <span className="text-[11px] font-semibold text-slate-700">{STATUS_LABEL[activeStatus as (typeof RESPONSE_STATUS_ORDER)[number]] ?? `${activeStatus} - Response`}</span>
+        <span className="text-[11px] font-semibold text-slate-700">Example / Sample response</span>
       </div>
       <div className="flex items-center gap-1">
         {RESPONSE_STATUS_ORDER.map((status) => {
@@ -446,7 +491,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
             </button>
           );
         })}
-        <span className="ml-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-500">Body</span>
+        <span className="ml-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-500">Sample</span>
       </div>
     </div>
   );
@@ -586,6 +631,64 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                 </div>
 
                 <div className="flex min-h-0 flex-col gap-3 p-4 md:p-5">
+                  {previewResult ? (
+                    <section className="rounded-lg border border-emerald-200 bg-emerald-50/70">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-200 px-3 py-2">
+                        <div className="flex items-center gap-2">
+                          <span className={cn("inline-block h-2.5 w-2.5 rounded-full", previewResult.status === "200" ? "bg-emerald-500" : "bg-amber-500")} />
+                          <span className="text-[11px] font-semibold text-emerald-900">
+                            {STATUS_LABEL[previewResult.status as (typeof RESPONSE_STATUS_ORDER)[number]] ?? `${previewResult.status} - Response`}
+                          </span>
+                          <span className="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+                            Preview result
+                          </span>
+                          {previewIsStale ? (
+                            <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                              stale
+                            </span>
+                          ) : null}
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+                            Body
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => void handleCopyResult()}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-emerald-200 bg-white text-emerald-700 transition hover:bg-emerald-100"
+                            aria-label={resultCopied ? "已複製結果" : "複製結果"}
+                            title={resultCopied ? "已複製" : "複製"}
+                          >
+                            {resultCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleDownloadResult}
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-emerald-200 bg-white text-emerald-700 transition hover:bg-emerald-100"
+                            aria-label="下載結果 JSON"
+                            title="下載"
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPreviewResult(null)}
+                            className="inline-flex h-7 items-center rounded-md border border-emerald-200 bg-white px-2 text-[10px] font-medium text-emerald-700 transition hover:bg-emerald-100"
+                          >
+                            Clear result
+                          </button>
+                        </div>
+                      </div>
+                      <pre className="max-h-[220px] overflow-auto px-3 pb-3 pt-2 text-[12px] leading-[1.55] text-emerald-950">
+                        <code className="font-mono whitespace-pre-wrap break-words">{previewResultCode}</code>
+                      </pre>
+                    </section>
+                  ) : (
+                    <section className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-3">
+                      <p className="text-xs text-slate-600">尚未執行。點擊 Run 後，會在此產生 Preview result（不會呼叫真實 API）。</p>
+                    </section>
+                  )}
+
                   <CodeBlock
                     code={requestExampleCode}
                     language={requestCodeLanguage}
