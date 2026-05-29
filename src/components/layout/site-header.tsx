@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useSession } from "next-auth/react";
 import { Menu, X } from "lucide-react";
 
 import { productMegaMenuColumns } from "../../content/mega-menu-links";
@@ -28,8 +27,6 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ onContactClick }: SiteHeaderProps) {
-  const { status } = useSession();
-  const isAuthenticated = status === "authenticated";
   const [isProductsMenuOpen, setIsProductsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const hasHydratedRef = useRef(false);
@@ -185,24 +182,11 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
               className={buttonClass("secondary")}
               onClick={onContactClick}
             >
-            聯繫我們
+            聯絡我們
             </button>
-            {isAuthenticated ? (
-              <>
-                <Link href="/dashboard" className={`${buttonClass("primary")} hidden md:inline-flex`}>
-                  儀表板
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/login" className={`${buttonClass("secondary")} hidden md:inline-flex`}>
-                  登入
-                </Link>
-                <Link href="/register" className={`${buttonClass("primary")} hidden md:inline-flex`}>
-                  註冊
-                </Link>
-              </>
-            )}
+            <Link href="/login" className={`${buttonClass("primary")} hidden md:inline-flex`}>
+              儀表板
+            </Link>
             <button
               type="button"
               aria-expanded={isMobileMenuOpen}
@@ -255,32 +239,23 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
             </nav>
 
             <div className="mt-5 space-y-2 border-t border-slate-200 pt-4">
-              {isAuthenticated ? (
-                <Link
-                  href="/dashboard"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`${buttonClass("primary")} w-full justify-center`}
-                >
-                  儀表板
-                </Link>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`${buttonClass("secondary")} w-full justify-center`}
-                  >
-                    登入
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`${buttonClass("primary")} w-full justify-center`}
-                  >
-                    註冊
-                  </Link>
-                </>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  onContactClick();
+                }}
+                className={`${buttonClass("secondary")} w-full justify-center`}
+              >
+                聯絡我們
+              </button>
+              <Link
+                href="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`${buttonClass("primary")} w-full justify-center`}
+              >
+                儀表板
+              </Link>
             </div>
           </div>
         </div>
