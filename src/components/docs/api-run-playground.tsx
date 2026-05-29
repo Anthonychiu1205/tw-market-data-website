@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CodeBlock, type CodeBlockLanguage } from "@/src/components/docs/code-block";
 import type { ApiReferenceContent, ApiStatusExample } from "@/src/content/docs-pages";
 import { cn } from "@/src/lib/cn";
+import { buildRunUrl, createLiveRunResult, maskApiKey, validateApiKey } from "@/src/lib/docs/run-playground";
 
 type ApiRunPlaygroundProps = {
   api: ApiReferenceContent;
@@ -21,11 +22,13 @@ type RequestLanguageOption = {
   icon: typeof Terminal;
 };
 
-type PreviewResult = {
-  status: ApiStatusExample["status"];
+type LiveResult = {
+  status: string;
   body: string;
   querySignature: string;
   generatedAt: string;
+  isLive: true;
+  usageCounted: boolean;
 };
 
 const REQUEST_LANGUAGE_OPTIONS: RequestLanguageOption[] = [
@@ -269,7 +272,8 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   const [activeStatus, setActiveStatus] = useState<ApiStatusExample["status"]>("200");
   const [queryValues, setQueryValues] = useState<ParamState>({});
   const [runNotice, setRunNotice] = useState("");
-  const [previewResult, setPreviewResult] = useState<PreviewResult | null>(null);
+  const [liveResult, setLiveResult] = useState<LiveResult | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
   const [resultCopied, setResultCopied] = useState(false);
 
   const dialogRef = useRef<HTMLDivElement | null>(null);
@@ -291,7 +295,8 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
     setRequestLanguage("curl");
     setIsLanguageMenuOpen(false);
     setRunNotice("");
-    setPreviewResult(null);
+    setLiveResult(null);
+    setIsRunning(false);
     setResultCopied(false);
     setIsOpen(true);
   }
@@ -348,7 +353,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   const queryKeys = useMemo(() => (api.queryParameters ?? []).map((parameter) => parameter.name), [api.queryParameters]);
   const queryEntries = useMemo(() => collectQueryEntries(queryValues, queryKeys), [queryKeys, queryValues]);
   const querySignature = useMemo(() => JSON.stringify(queryEntries), [queryEntries]);
-  const maskedKey = apiKey.trim() ? apiKey.trim() : "<api-key>";
+  const maskedKey = maskApiKey(apiKey);
 
   const requestExampleCode = useMemo(
     () => buildRequestSnippet(requestLanguage, api.method, `${baseUrl}${api.endpoint}`, maskedKey, queryEntries),
@@ -364,37 +369,90 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   }, [api.sidePanel.statusExamples]);
 
   const activeExample = statusExampleMap.get(activeStatus);
-  const previewIsStale = Boolean(previewResult && previewResult.querySignature !== querySignature);
+  const liveResultIsStale = Boolean(liveResult && liveResult.querySignature !== querySignature);
   const responseCode = useMemo(() => {
     const raw = activeExample?.body ?? fallbackStatusBody(activeStatus);
     return toCompactExampleJson(raw, activeStatus);
   }, [activeExample?.body, activeStatus]);
-  const previewResultCode = useMemo(() => {
-    if (!previewResult) return "";
-    return previewResult.body;
-  }, [previewResult]);
+  const liveResultCode = useMemo(() => {
+    if (!liveResult) return "";
+    return liveResult.body;
+  }, [liveResult]);
 
-  function handleRunPreview() {
+  async function handleRunLiveRequest() {
+    const keyValidation = validateApiKey(apiKey);
+    if (!keyValidation.ok) {
+      setRunNotice(keyValidation.reason === "missing" ? "請先輸入 API key。" : "請使用有效的 API key，勿使用 placeholder。");
+      return;
+    }
+
     const hasMissingRequired = (api.queryParameters ?? []).some((parameter) => parameter.required && !queryValues[parameter.name]?.trim());
-    const nextStatus: ApiStatusExample["status"] = hasMissingRequired ? "400" : "200";
-    const sourceBody = statusExampleMap.get(nextStatus)?.body ?? fallbackStatusBody(nextStatus);
-    const normalizedBody = toCompactExampleJson(sourceBody, nextStatus);
+    if (hasMissingRequired) {
+      setRunNotice("缺少必填參數，請補齊後再執行。");
+      return;
+    }
 
-    setActiveStatus(nextStatus);
-    setPreviewResult({
-      status: nextStatus,
-      body: normalizedBody,
-      querySignature,
-      generatedAt: new Date().toISOString(),
-    });
+    const runUrl = buildRunUrl(api.endpoint, queryEntries);
+    setIsRunning(true);
+    setRunNotice("正在呼叫真實 API...");
     setResultCopied(false);
-    setRunNotice(hasMissingRequired ? "缺少必填參數，已產生 400 預覽結果。" : "Preview result generated");
+
+    try {
+      const response = await fetch(runUrl, {
+        method: api.method,
+        headers: {
+          "X-API-Key": apiKey.trim(),
+        },
+        cache: "no-store",
+      });
+      const rawBody = await response.text();
+      const normalizedBody = toCompactExampleJson(rawBody || fallbackStatusBody(String(response.status)), String(response.status));
+      const statusCode = String(response.status) as ApiStatusExample["status"];
+
+      if (RESPONSE_STATUS_ORDER.includes(statusCode as (typeof RESPONSE_STATUS_ORDER)[number])) {
+        setActiveStatus(statusCode as ApiStatusExample["status"]);
+      }
+
+      setLiveResult({
+        ...createLiveRunResult(response.status, normalizedBody),
+        querySignature,
+        generatedAt: new Date().toISOString(),
+        isLive: true,
+      });
+
+      setRunNotice(
+        response.ok
+          ? "真實回應已更新。此請求會計入用量；儀表板可能有數秒快取延遲。"
+          : `請求失敗（${response.status}）。此請求仍可能計入用量，請以儀表板為準。`,
+      );
+    } catch {
+      setLiveResult({
+        status: "network_error",
+        body: JSON.stringify(
+          {
+            error: {
+              code: "network_error",
+              message: "無法連線到 API，請稍後再試。",
+            },
+          },
+          null,
+          2,
+        ),
+        querySignature,
+        generatedAt: new Date().toISOString(),
+        isLive: true,
+        usageCounted: false,
+      });
+      setRunNotice("請求失敗：無法連線到 API。");
+    } finally {
+      setIsRunning(false);
+    }
   }
 
   async function handleCopyResult() {
-    if (!previewResultCode) return;
+    if (!liveResultCode) return;
     try {
-      await navigator.clipboard.writeText(previewResultCode);
+      await navigator.clipboard.writeText(liveResultCode);
       setResultCopied(true);
       window.setTimeout(() => setResultCopied(false), 1500);
     } catch {
@@ -403,12 +461,12 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   }
 
   function handleDownloadResult() {
-    if (!previewResultCode) return;
-    const blob = new Blob([previewResultCode], { type: "application/json" });
+    if (!liveResultCode) return;
+    const blob = new Blob([liveResultCode], { type: "application/json" });
     const link = document.createElement("a");
-    const status = previewResult?.status ?? "200";
+    const status = liveResult?.status ?? "200";
     link.href = URL.createObjectURL(blob);
-    link.download = `preview-result-${status}.json`;
+    link.download = `live-result-${status}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -537,10 +595,11 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={handleRunPreview}
-                      className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 text-xs font-semibold text-white transition hover:bg-slate-800"
+                      onClick={() => void handleRunLiveRequest()}
+                      disabled={isRunning}
+                      className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 text-xs font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
                     >
-                      Run
+                      {isRunning ? "Running..." : "Run"}
                       <Play className="h-3.5 w-3.5" />
                     </button>
                     <button
@@ -563,7 +622,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                     <h3 id="api-playground-description" className="text-sm font-semibold text-slate-900">
                       試跑 API 請求
                     </h3>
-                    <p className="text-xs leading-5 text-slate-600">填入參數，產生請求範例與回應預覽。</p>
+                    <p className="text-xs leading-5 text-slate-600">填入參數後可呼叫真實 API，並在此查看即時回應。</p>
                   </section>
 
                   <section className="pt-2">
@@ -576,7 +635,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                             <span className="text-xs text-slate-500">string</span>
                             <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">必填</span>
                           </div>
-                          <p className="text-sm leading-5 text-slate-600">API key 僅用於本次預覽，不會儲存。</p>
+                          <p className="text-sm leading-5 text-slate-600">API key 僅保存在本頁狀態，不會儲存。送出 Run 會呼叫真實 API，並依你的方案計入用量。</p>
                         </div>
                         <input
                           type="password"
@@ -631,18 +690,21 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                 </div>
 
                 <div className="flex min-h-0 flex-col gap-3 p-4 md:p-5">
-                  {previewResult ? (
+                  {liveResult ? (
                     <section className="rounded-lg border border-emerald-200 bg-emerald-50/70">
                       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-200 px-3 py-2">
                         <div className="flex items-center gap-2">
-                          <span className={cn("inline-block h-2.5 w-2.5 rounded-full", previewResult.status === "200" ? "bg-emerald-500" : "bg-amber-500")} />
+                          <span className={cn("inline-block h-2.5 w-2.5 rounded-full", liveResult.status === "200" ? "bg-emerald-500" : "bg-amber-500")} />
                           <span className="text-[11px] font-semibold text-emerald-900">
-                            {STATUS_LABEL[previewResult.status as (typeof RESPONSE_STATUS_ORDER)[number]] ?? `${previewResult.status} - Response`}
+                            {STATUS_LABEL[liveResult.status as (typeof RESPONSE_STATUS_ORDER)[number]] ?? `${liveResult.status} - Response`}
                           </span>
                           <span className="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-[10px] font-medium text-emerald-700">
-                            Preview result
+                            Live response
                           </span>
-                          {previewIsStale ? (
+                          <span className="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+                            真實回應 · 已計入用量
+                          </span>
+                          {liveResultIsStale ? (
                             <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">
                               stale
                             </span>
@@ -672,7 +734,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                           </button>
                           <button
                             type="button"
-                            onClick={() => setPreviewResult(null)}
+                            onClick={() => setLiveResult(null)}
                             className="inline-flex h-7 items-center rounded-md border border-emerald-200 bg-white px-2 text-[10px] font-medium text-emerald-700 transition hover:bg-emerald-100"
                           >
                             Clear result
@@ -680,12 +742,12 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                         </div>
                       </div>
                       <pre className="max-h-[220px] overflow-auto px-3 pb-3 pt-2 text-[12px] leading-[1.55] text-emerald-950">
-                        <code className="font-mono whitespace-pre-wrap break-words">{previewResultCode}</code>
+                        <code className="font-mono whitespace-pre-wrap break-words">{liveResultCode}</code>
                       </pre>
                     </section>
                   ) : (
                     <section className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-3">
-                      <p className="text-xs text-slate-600">尚未執行。點擊 Run 後，會在此產生 Preview result（不會呼叫真實 API）。</p>
+                      <p className="text-xs text-slate-600">尚未執行。點擊 Run 後會呼叫真實 API，並在此顯示 Live response。</p>
                     </section>
                   )}
 
