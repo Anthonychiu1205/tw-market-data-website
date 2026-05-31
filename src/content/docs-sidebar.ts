@@ -29,6 +29,7 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
       { title: "TPEx 日線價格", href: "/docs/api/market-prices/tpex-daily-price" },
       { title: "還原股價", href: "/docs/api/market-prices/adjusted-prices" },
       { title: "技術指標", href: "/docs/api/market-prices/technical-indicators" },
+      { title: "市場指數 / Market Index", href: "/docs/api/market-prices/market-index" },
       { title: "市場指數", href: "/docs/api/market-prices/index-data" },
       { title: "市場廣度", href: "/docs/api/market-prices/market-breadth" },
       { title: "利率快照", href: "/docs/api/market-prices/interest-rate" },

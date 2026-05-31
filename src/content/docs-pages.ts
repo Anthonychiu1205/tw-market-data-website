@@ -2610,6 +2610,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
       { title: "TPEx 日線價格", href: "/docs/api/market-prices/tpex-daily-price", topicId: "tpex_daily_price", tableName: "normalized_tpex_daily_prices", endpoint: "/v2/datasets/tpex-daily-price", source: "TPEx" },
       { title: "還原股價", href: "/docs/api/market-prices/adjusted-prices", topicId: "adjusted_prices", tableName: "adjusted_prices", endpoint: "/v2/datasets/adjusted-prices", source: "TWSE / TPEx" },
       { title: "技術指標", href: "/docs/api/market-prices/technical-indicators", topicId: "technical_indicators", tableName: "technical_indicators", endpoint: "/v2/datasets/technical-indicators", source: "TWSE（Non-TPEx, Stage0 baseline）" },
+      { title: "市場指數 / Market Index", href: "/docs/api/market-prices/market-index", topicId: "market_index", tableName: "index_data_items", endpoint: "/v2/datasets/market-index", source: "TWSE official MI_INDEX / exact mapping" },
       { title: "指數資料", href: "/docs/api/market-prices/index-data", topicId: "index_data", tableName: "index_data", endpoint: "/v2/datasets/index-data", source: "TWSE / TPEx" },
       { title: "市場廣度", href: "/docs/api/market-prices/market-breadth", topicId: "market_breadth", tableName: "market_breadth", endpoint: "/v2/datasets/market-breadth", source: "TWSE / TPEx" },
       { title: "利率", href: "/docs/api/market-prices/interest-rate", topicId: "interest_rate_snapshot", tableName: "interest_rate_snapshot", endpoint: "/v2/datasets/interest-rate-snapshot", source: "中央銀行 / 公開資料平台" },
@@ -5958,6 +5959,160 @@ console.log(data)`,
 }
 
 function buildIndexDataApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildMarketIndexApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/market-index";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/market-index",
+    headers=headers,
+    params={
+        "index_code": "TWSE_TAIEX",
+        "market": "TWSE",
+        "start_date": "2026-05-22",
+        "end_date": "2026-05-28",
+        "limit": 5,
+        "latest": "false",
+        "include_data_gaps": "true"
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/market-index?index_code=TWSE_TAIEX&market=TWSE&start_date=2026-05-22&end_date=2026-05-28&limit=5&latest=false&include_data_gaps=true",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/market-index?index_code=TWSE_TAIEX&market=TWSE&start_date=2026-05-22&end_date=2026-05-28&limit=5&latest=false&include_data_gaps=true" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      dataset_id: "market-index",
+      row_count: 1,
+      items: [
+        {
+          index_identity: {
+            index_code: "TWSE_TAIEX",
+            index_name: "發行量加權股價指數",
+            index_version: "v1",
+            index_type: "price",
+          },
+          market_identity: {
+            market: "TWSE",
+            as_of_date: "2026-05-28",
+            provider: "twse_official",
+            source_role: "official_twse_mi_index",
+          },
+          index_level: { value: 21444.5 },
+          daily_change: { points: 40.0, return_pct: 0.2 },
+          turnover: { turnover_value: 1000000.0, volume_shares: 2000000.0 },
+          source_lineage: { source: "TWSE_MI_INDEX", identity_rule: "exact_index_name_match" },
+          data_gaps: [],
+          safe_usage_notes: [
+            "not_investment_advice",
+            "twse_taiex_index_only_scope",
+            "breadth_overview_sector_rows_are_held",
+          ],
+          available_tools_or_endpoints: {
+            dataset_endpoint: "/v2/datasets/market-index",
+            lookup_hint: "index_code=TWSE_TAIEX&market=TWSE",
+            scope_note: "taiex_index_only_read_model",
+          },
+        },
+      ],
+      held_policy: {
+        market_breadth_items: "held",
+        market_overview_snapshots: "held",
+        sector_or_unknown_index_rows: "held",
+      },
+    },
+    null,
+    2,
+  );
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "市場與價格",
+    endpoint,
+    method: "GET",
+    overview: [
+      "市場指數 / Market Index API 提供 TAIEX read-only 視圖，使用官方 TWSE MI_INDEX exact identity mapping。",
+      "目前為 private beta，僅開放 TWSE_TAIEX、TWSE、seed coverage 視窗。",
+    ],
+    useCases: [
+      "查詢 TAIEX 最近可用日期點位與單日變化。",
+      "在研究流程中對齊 index_identity / source_lineage / safe_usage_notes。",
+      "作為後續 index-only controlled scope 的查詢入口。",
+    ],
+    gettingStarted: [
+      "預設使用 index_code=TWSE_TAIEX 與 market=TWSE。",
+      "可使用 latest=true 取得單筆最新資料。",
+      "區間查詢可用 start_date/end_date 與 limit。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "index_code", type: "string", required: false, description: "預設 TWSE_TAIEX；目前僅支援此值。" },
+      { name: "market", type: "string", required: false, description: "預設 TWSE；目前僅支援 TWSE。" },
+      { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數限制（max 500）。" },
+      { name: "latest", type: "boolean|string", required: false, description: "true 時回傳單筆最新資料。" },
+      { name: "include_data_gaps", type: "boolean|string", required: false, description: "是否回傳 data_gaps（預設 true）。" },
+    ],
+    responseSummary: ["回應包含 index_identity、market_identity、index_level、daily_change、turnover、source_lineage、data_gaps 等 section。"],
+    responseFields: [
+      { path: "items[].index_identity", type: "object", description: "指數身分欄位（index_code/index_name/index_version/index_type）。" },
+      { path: "items[].market_identity", type: "object", description: "市場身分欄位（market/as_of_date/provider/source_role）。" },
+      { path: "items[].index_level", type: "object", description: "指數點位資訊。" },
+      { path: "items[].daily_change", type: "object", description: "單日點數變化與報酬率。" },
+      { path: "items[].turnover", type: "object", description: "成交金額與成交股數。" },
+      { path: "items[].source_lineage", type: "object", description: "來源與 identity mapping lineage。" },
+      { path: "items[].data_gaps", type: "array", description: "資料缺口描述（可為空陣列）。" },
+      { path: "items[].safe_usage_notes", type: "array", description: "安全使用備註（含 not_investment_advice）。" },
+      { path: "items[].available_tools_or_endpoints", type: "object", description: "可用工具與 endpoint 提示。" },
+    ],
+    notes: [
+      "MCP/tool plan：`market_index_lookup(index_code?, market?, latest?, start_date?, end_date?)`。",
+      "目前只支援 TWSE_TAIEX。",
+      "目前只支援 TWSE。",
+      "seed coverage only：2026-05-22 ~ 2026-05-28。",
+      "sector index rows held。",
+      "unknown index rows held。",
+      "market breadth not included。",
+      "market overview not included。",
+      "not full historical index coverage yet。",
+      "非投資建議。",
+    ],
+    planRequirement: { title: "Plan Requirement", bullets: ["Private Beta（受限）"] },
+    errorCases: ["200", "401", "404", "503"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳 market-index 範圍資料", body: successBody },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "404", description: "指定 index_code 查無資料", body: `{"status":"not_found","reason":"market_index_not_found"}` },
+        { status: "503", description: "資料表未就緒", body: `{"status":"unavailable","reason":"index_data_items_table_missing"}` },
+      ],
+    },
+  };
+}
+
+function buildMarketIndexApiSections(): DocsContentSection[] {
   return [
     { id: "overview", label: "Overview", paragraphs: [] },
     { id: "request", label: "Request", paragraphs: [] },
@@ -10564,6 +10719,22 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
       };
     }
 
+    if (topic.topicId === "market_index") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "市場指數 / Market Index",
+        subtitle: "TAIEX private beta read-only endpoint（TWSE_TAIEX exact mapping only）。",
+        tier: "complete",
+        sections: buildMarketIndexApiSections(),
+        apiReferenceFactory: () => buildMarketIndexApiReference(),
+      };
+    }
+
     if (topic.topicId === "market_breadth") {
       return {
         slug: hrefToSlug(topic.href),
@@ -11295,6 +11466,7 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
       { title: "TPEx 日線價格", href: "/docs/api/market-prices/tpex-daily-price", icon: "prices", status: "preview" },
       { title: "還原股價", href: "/docs/api/market-prices/adjusted-prices", icon: "prices", status: "preview" },
       { title: "技術指標", href: "/docs/api/market-prices/technical-indicators", icon: "prices", status: "normalized" },
+      { title: "市場指數 / Market Index", href: "/docs/api/market-prices/market-index", icon: "prices", status: "preview" },
       { title: "市場指數", href: "/docs/api/market-prices/index-data", icon: "prices", status: "normalized" },
       { title: "市場廣度", href: "/docs/api/market-prices/market-breadth", icon: "prices", status: "normalized" },
       { title: "利率快照", href: "/docs/api/market-prices/interest-rate", icon: "rates", status: "normalized" },
