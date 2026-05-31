@@ -95,16 +95,16 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 gap-y-8 md:grid-cols-4">
             {[
-              ["TWSE-first", "verified baseline", "以 TWSE 上市資料為核心，逐步擴充其他市場 coverage"],
-              ["<100ms", "目標 API latency", "為 agent workflow 與自動化查詢設計的低延遲讀取體驗"],
-              ["official/public-first", "來源政策", "TWSE、TPEx、MOPS 與官方公開來源優先，保留 lineage 與 data gaps"],
-              ["scoped claims", "公開宣告邊界", "不宣稱 full-market、adjusted price、survivorship-safe 或回測等級全市場基準"],
+              ["TWSE 優先", "已驗證基準", "以上市資料為核心，逐步擴充其他市場 coverage。"],
+              ["低延遲查詢", "面向 API 與 agent workflow", "以自動化查詢與研究流程為目標，持續優化讀取體驗。"],
+              ["官方來源優先", "保留 lineage 與 data gaps", "以 TWSE、TPEx、MOPS 與官方公開來源為優先，避免來源混雜。"],
+              ["邊界清楚", "不做過度宣稱", "不宣稱 full-market、adjusted price、survivorship-safe 或投資建議。"],
             ].map(([value, label, description], index) => (
               <div
                 key={`${value}-${label}`}
                 className={`md:border-l md:border-slate-200 md:pl-8 ${index === 0 ? "md:border-l-0 md:pl-0" : ""}`}
               >
-                <p className="text-4xl font-semibold leading-none tracking-tight text-slate-900 sm:text-[44px]">{value}</p>
+                <p className="text-3xl font-semibold leading-none tracking-tight text-slate-900 sm:text-4xl">{value}</p>
                 <p className="mt-2 text-base font-semibold text-slate-900">{label}</p>
                 <p className="mt-2 text-sm text-slate-600">{description}</p>
               </div>
