@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { getHomepageMarketSnapshot } from "@/src/lib/homepage/homepage-market-data";
 import { getMarketMarqueeSnapshotView } from "@/src/lib/market-marquee-snapshot";
 
 const MARKET_LABELS = ["加權指數", "櫃買指數", "台灣50", "電子類股", "金融保險"] as const;
@@ -11,14 +12,13 @@ function toneClass(trend: "up" | "down" | "neutral") {
 }
 
 export async function HeroMarketIntel() {
-  // Hero market cards follow the public snapshot. They update when
-  // data/market-marquee-snapshot.json is refreshed.
-  // Suggested refresh cadence: hourly during Taiwan market open window
-  // (Mon-Fri 09:00-13:30 Asia/Taipei).
-  const snapshot = await getMarketMarqueeSnapshotView();
-  const selectedRows = MARKET_LABELS.map((label) => snapshot.items.find((item) => item.name === label)).filter((item) => item !== undefined);
-  const marketRows = selectedRows.length > 0 ? selectedRows : snapshot.items.slice(0, 5);
-  const newsItems = snapshot.news.slice(0, 4);
+  const [marketSnapshot, newsSnapshot] = await Promise.all([
+    getHomepageMarketSnapshot(),
+    getMarketMarqueeSnapshotView(),
+  ]);
+  const selectedRows = MARKET_LABELS.map((label) => marketSnapshot.items.find((item) => item.name === label)).filter((item) => item !== undefined);
+  const marketRows = selectedRows.length > 0 ? selectedRows : marketSnapshot.items.slice(0, 5);
+  const newsItems = newsSnapshot.news.slice(0, 4);
 
   return (
     <div className="relative hidden lg:block">
@@ -30,6 +30,7 @@ export async function HeroMarketIntel() {
               查看全部資料 &gt;
             </Link>
           </div>
+          <p className="mt-2 text-xs text-slate-500">{marketSnapshot.statusLabel}</p>
 
           <div className="pt-2">
             {marketRows.map((item) => (

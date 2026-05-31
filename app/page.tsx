@@ -12,6 +12,7 @@ import { buttonClass } from "@/src/components/ui/button";
 import { SourceOfTruthSectionDeferred } from "@/src/components/home/source-of-truth-section-deferred";
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
+import { getHomepageCoverageMetrics } from "@/src/lib/homepage/homepage-market-data";
 
 const softwareApplicationLd = {
   "@context": "https://schema.org",
@@ -47,7 +48,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const coverageMetrics = await getHomepageCoverageMetrics();
+  const coverageByKey = Object.fromEntries(coverageMetrics.map((metric) => [metric.key, metric.value])) as Record<string, string>;
+
   return (
     <>
       <script
@@ -95,17 +99,18 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 gap-y-8 md:grid-cols-4">
             {[
-              ["TWSE 優先", "已驗證基準", "以上市資料為核心，逐步擴充其他市場 coverage。"],
-              ["低延遲查詢", "面向 API 與 agent workflow", "以自動化查詢與研究流程為目標，持續優化讀取體驗。"],
-              ["官方來源優先", "保留 lineage 與 data gaps", "以 TWSE、TPEx、MOPS 與官方公開來源為優先，避免來源混雜。"],
-              ["邊界清楚", "不做過度宣稱", "不宣稱 full-market、adjusted price、survivorship-safe 或投資建議。"],
-            ].map(([value, label, description], index) => (
+              ["TWSE 優先", "已驗證基準", "以上市資料為核心，逐步擴充其他市場 coverage。", coverageByKey.twse_first ?? "TWSE official-first"],
+              ["低延遲查詢", "面向 API 與 agent workflow", "以自動化查詢與研究流程為目標，持續優化讀取體驗。", coverageByKey.low_latency ?? "API-first workflow"],
+              ["官方來源優先", "保留 lineage 與 data gaps", "以 TWSE、TPEx、MOPS 與官方公開來源為優先，避免來源混雜。", coverageByKey.official_first ?? "official/public-first"],
+              ["邊界清楚", "不做過度宣稱", "不宣稱 full-market、adjusted price、survivorship-safe 或投資建議。", coverageByKey.clear_boundary ?? "scoped dataset claims"],
+            ].map(([value, label, description, metric], index) => (
               <div
                 key={`${value}-${label}`}
                 className={`md:border-l md:border-slate-200 md:pl-8 ${index === 0 ? "md:border-l-0 md:pl-0" : ""}`}
               >
                 <p className="text-3xl font-semibold leading-none tracking-tight text-slate-900 sm:text-4xl">{value}</p>
                 <p className="mt-2 text-base font-semibold text-slate-900">{label}</p>
+                <p className="mt-1 text-xs font-medium text-slate-500">{metric}</p>
                 <p className="mt-2 text-sm text-slate-600">{description}</p>
               </div>
             ))}
