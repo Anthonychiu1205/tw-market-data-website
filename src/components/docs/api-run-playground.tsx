@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CodeBlock, type CodeBlockLanguage } from "@/src/components/docs/code-block";
 import type { ApiReferenceContent, ApiStatusExample } from "@/src/content/docs-pages";
 import { cn } from "@/src/lib/cn";
-import { buildRunUrl, createLiveRunResult, maskApiKey, validateApiKey } from "@/src/lib/docs/run-playground";
+import { buildRunUrl, createLiveRunResult, validateApiKey } from "@/src/lib/docs/run-playground";
 
 type ApiRunPlaygroundProps = {
   api: ApiReferenceContent;
@@ -42,13 +42,6 @@ const REQUEST_LANGUAGE_OPTIONS: RequestLanguageOption[] = [
 ];
 
 const RESPONSE_STATUS_ORDER = ["200", "400", "401", "403", "404"] as const;
-const STATUS_LABEL: Record<(typeof RESPONSE_STATUS_ORDER)[number], string> = {
-  "200": "200 - OK",
-  "400": "400 - Bad Request",
-  "401": "401 - Unauthorized",
-  "403": "403 - Forbidden",
-  "404": "404 - Not Found",
-};
 
 function pickBaseUrlFromCurl(exampleCurl: string): string {
   const match = exampleCurl.match(/https?:\/\/[^\s"']+/);
@@ -93,11 +86,11 @@ function toObjectCode(entries: readonly (readonly [string, string])[], indent = 
     .join(",\n")}\n`;
 }
 
-function buildCurlSnippet(method: string, url: string, apiKey: string, entries: readonly (readonly [string, string])[]) {
+function buildCurlSnippet(method: string, url: string, entries: readonly (readonly [string, string])[]) {
   const lines = [
     `curl --request ${method} \\`,
-    `  --url \"${url}\" \\`,
-    `  --header \"X-API-Key: ${apiKey}\"`,
+    `  --url '${url}' \\`,
+    `  --header 'X-API-Key: $TWMD_API_KEY'`,
   ];
 
   if (entries.length > 0) {
@@ -115,13 +108,12 @@ function buildRequestSnippet(
   language: RequestLanguage,
   method: string,
   url: string,
-  apiKey: string,
   entries: readonly (readonly [string, string])[],
 ) {
   const objectLiteral = toObjectCode(entries);
 
   if (language === "curl") {
-    return buildCurlSnippet(method, url, apiKey, entries);
+    return buildCurlSnippet(method, url, entries);
   }
 
   if (language === "python") {
@@ -129,7 +121,7 @@ function buildRequestSnippet(
       "import requests",
       "",
       `url = \"${url}\"`,
-      `headers = {\"X-API-Key\": \"${apiKey}\"}`,
+      'headers = {"X-API-Key": "$TWMD_API_KEY"}',
       `params = ${objectLiteral === "{}" ? "{}" : `{${objectLiteral}}`}`,
       "",
       "response = requests.get(url, headers=headers, params=params)",
@@ -143,7 +135,7 @@ function buildRequestSnippet(
       `const url = new URL(\"${url}\");`,
       ...(setLines.length ? [...setLines, ""] : []),
       "const response = await fetch(url, {",
-      `  headers: { \"X-API-Key\": \"${apiKey}\" },`,
+      '  headers: { "X-API-Key": "$TWMD_API_KEY" },',
       "});",
       "const data = await response.json();",
     ].join("\n");
@@ -156,7 +148,7 @@ function buildRequestSnippet(
       `$url = \"${url}\";`,
       query,
       "$ch = curl_init($url . (!empty($params) ? '?' . http_build_query($params) : ''));",
-      `curl_setopt($ch, CURLOPT_HTTPHEADER, [\"X-API-Key: ${apiKey}\"]);`,
+      'curl_setopt($ch, CURLOPT_HTTPHEADER, ["X-API-Key: $TWMD_API_KEY"]);',
       "curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);",
       "$response = curl_exec($ch);",
       "curl_close($ch);",
@@ -178,7 +170,7 @@ function buildRequestSnippet(
       ...valueLines,
       'u.RawQuery = params.Encode()',
       `req, _ := http.NewRequest(\"${method}\", u.String(), nil)`,
-      `req.Header.Set(\"X-API-Key\", \"${apiKey}\")`,
+      'req.Header.Set("X-API-Key", "$TWMD_API_KEY")',
       'client := &http.Client{}',
       'res, _ := client.Do(req)',
       '_ = res',
@@ -191,7 +183,7 @@ function buildRequestSnippet(
       'HttpRequest request = HttpRequest.newBuilder()',
       `  .uri(URI.create(\"${url}\"))`,
       ...setLines,
-      `  .header(\"X-API-Key\", \"${apiKey}\")`,
+      '  .header("X-API-Key", "$TWMD_API_KEY")',
       `  .method(\"${method}\", HttpRequest.BodyPublishers.noBody())`,
       '  .build();',
     ].join("\n");
@@ -209,7 +201,7 @@ function buildRequestSnippet(
         ]
       : []),
     "req = Net::HTTP::Get.new(uri)",
-    `req['X-API-Key'] = '${apiKey}'`,
+    "req['X-API-Key'] = '$TWMD_API_KEY'",
     "res = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(req) }",
   ].join("\n");
 }
@@ -353,11 +345,9 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   const queryKeys = useMemo(() => (api.queryParameters ?? []).map((parameter) => parameter.name), [api.queryParameters]);
   const queryEntries = useMemo(() => collectQueryEntries(queryValues, queryKeys), [queryKeys, queryValues]);
   const querySignature = useMemo(() => JSON.stringify(queryEntries), [queryEntries]);
-  const maskedKey = maskApiKey(apiKey);
-
   const requestExampleCode = useMemo(
-    () => buildRequestSnippet(requestLanguage, api.method, `${baseUrl}${api.endpoint}`, maskedKey, queryEntries),
-    [api.endpoint, api.method, baseUrl, maskedKey, queryEntries, requestLanguage],
+    () => buildRequestSnippet(requestLanguage, api.method, `${baseUrl}${api.endpoint}`, queryEntries),
+    [api.endpoint, api.method, baseUrl, queryEntries, requestLanguage],
   );
 
   const statusExampleMap = useMemo(() => {
@@ -394,7 +384,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
 
     const runUrl = buildRunUrl(api.endpoint, queryEntries);
     setIsRunning(true);
-    setRunNotice("正在呼叫真實 API...");
+      setRunNotice("Running...");
     setResultCopied(false);
 
     try {
@@ -420,11 +410,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
         isLive: true,
       });
 
-      setRunNotice(
-        response.ok
-          ? "真實回應已更新。此請求會計入用量；儀表板可能有數秒快取延遲。"
-          : `請求失敗（${response.status}）。此請求仍可能計入用量，請以儀表板為準。`,
-      );
+      setRunNotice(response.ok ? "Response updated." : "");
     } catch {
       setLiveResult({
         status: "network_error",
@@ -443,7 +429,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
         isLive: true,
         usageCounted: false,
       });
-      setRunNotice("請求失敗：無法連線到 API。");
+      setRunNotice("");
     } finally {
       setIsRunning(false);
     }
@@ -578,7 +564,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
               aria-modal="true"
               aria-labelledby="api-playground-title"
               aria-describedby="api-playground-description"
-              className="relative flex h-[min(720px,calc(100vh-72px))] w-full max-w-[1160px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+            className="relative flex h-[min(720px,calc(100vh-72px))] w-full max-w-[1160px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="border-b border-slate-200/90 bg-slate-50/50 px-4 py-2.5 md:px-5">
@@ -616,8 +602,8 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                 {runNotice ? <p className="pt-1 text-[11px] text-slate-500">{runNotice}</p> : null}
               </div>
 
-              <div className="grid flex-1 min-h-0 grid-cols-1 md:grid-cols-[minmax(0,1.45fr)_minmax(360px,0.95fr)]">
-                <div className="min-h-0 border-b border-slate-200 p-4 md:border-b-0 md:border-r md:p-5">
+              <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[minmax(0,1.45fr)_minmax(360px,0.95fr)]">
+                <div className="min-h-0 overflow-y-auto border-b border-slate-200 p-4 md:border-b-0 md:border-r md:p-5">
                   <section className="space-y-1 border-b border-slate-200 pb-3">
                     <h3 id="api-playground-description" className="text-sm font-semibold text-slate-900">
                       試跑 API 請求
@@ -635,7 +621,6 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                             <span className="text-xs text-slate-500">string</span>
                             <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">必填</span>
                           </div>
-                          <p className="text-sm leading-5 text-slate-600">API key 僅保存在本頁狀態，不會儲存。送出 Run 會呼叫真實 API，並依你的方案計入用量。</p>
                         </div>
                         <input
                           type="password"
@@ -689,20 +674,15 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                   </section>
                 </div>
 
-                <div className="flex min-h-0 flex-col gap-3 p-4 md:p-5">
+                <div className="min-h-0 overflow-y-auto p-4 md:p-5">
+                  <div className="flex min-h-0 flex-col gap-3">
                   {liveResult ? (
-                    <section className="rounded-lg border border-emerald-200 bg-emerald-50/70">
-                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-emerald-200 px-3 py-2">
+                    <section className="rounded-lg border border-slate-200 bg-white">
+                      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-3 py-2">
                         <div className="flex items-center gap-2">
-                          <span className={cn("inline-block h-2.5 w-2.5 rounded-full", liveResult.status === "200" ? "bg-emerald-500" : "bg-amber-500")} />
-                          <span className="text-[11px] font-semibold text-emerald-900">
-                            {STATUS_LABEL[liveResult.status as (typeof RESPONSE_STATUS_ORDER)[number]] ?? `${liveResult.status} - Response`}
-                          </span>
-                          <span className="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-[10px] font-medium text-emerald-700">
-                            Live response
-                          </span>
-                          <span className="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-[10px] font-medium text-emerald-700">
-                            真實回應 · 已計入用量
+                          <span className={cn("inline-block h-2.5 w-2.5 rounded-full", liveResult.status === "200" ? "bg-emerald-500/80" : "bg-amber-600/80")} />
+                          <span className="text-[11px] font-semibold text-slate-800">
+                            {liveResult.status === "200" ? "200 OK" : liveResult.status === "504" ? "504 Timeout" : `${liveResult.status} Error`}
                           </span>
                           {liveResultIsStale ? (
                             <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">
@@ -711,13 +691,13 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                           ) : null}
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+                          <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-600">
                             Body
                           </span>
                           <button
                             type="button"
                             onClick={() => void handleCopyResult()}
-                            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-emerald-200 bg-white text-emerald-700 transition hover:bg-emerald-100"
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-100 hover:text-slate-800"
                             aria-label={resultCopied ? "已複製結果" : "複製結果"}
                             title={resultCopied ? "已複製" : "複製"}
                           >
@@ -726,7 +706,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                           <button
                             type="button"
                             onClick={handleDownloadResult}
-                            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-emerald-200 bg-white text-emerald-700 transition hover:bg-emerald-100"
+                            className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-100 hover:text-slate-800"
                             aria-label="下載結果 JSON"
                             title="下載"
                           >
@@ -735,19 +715,19 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                           <button
                             type="button"
                             onClick={() => setLiveResult(null)}
-                            className="inline-flex h-7 items-center rounded-md border border-emerald-200 bg-white px-2 text-[10px] font-medium text-emerald-700 transition hover:bg-emerald-100"
+                            className="inline-flex h-7 items-center rounded-md border border-slate-200 bg-white px-2 text-[10px] font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-800"
                           >
                             Clear result
                           </button>
                         </div>
                       </div>
-                      <pre className="max-h-[220px] overflow-auto px-3 pb-3 pt-2 text-[12px] leading-[1.55] text-emerald-950">
+                      <pre className="max-h-[260px] overflow-auto border-l-2 border-emerald-200 bg-emerald-50/35 px-3 pb-3 pt-2 text-[12px] leading-[1.55] text-slate-900">
                         <code className="font-mono whitespace-pre-wrap break-words">{liveResultCode}</code>
                       </pre>
                     </section>
                   ) : (
                     <section className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-3">
-                      <p className="text-xs text-slate-600">尚未執行。點擊 Run 後會呼叫真實 API，並在此顯示 Live response。</p>
+                      <p className="text-xs text-slate-600">尚未執行。點擊 Run 後會在此顯示執行結果。</p>
                     </section>
                   )}
 
@@ -770,6 +750,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                     header={responseHeader}
                     contentClassName="max-h-[350px] overflow-y-auto overflow-x-hidden px-3 pb-3 pt-1.5 text-[12px] leading-[1.55]"
                   />
+                  </div>
                 </div>
               </div>
             </div>
