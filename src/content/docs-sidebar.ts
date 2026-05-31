@@ -62,7 +62,7 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
     label: "公司與事件",
     groupIcon: "building-2",
     items: [
-      { title: "公司主檔 / Security Master", href: "/docs/api/company/issuer-profile" },
+      { title: "公司主檔 / Security Master", href: "/docs/api/company/security-master" },
       { title: "重大訊息", href: "/docs/api/company-events/issuer-announcements" },
       { title: "股利與公司行動", href: "/docs/api/company-events/corporate-actions" },
       { title: "注意 / 處置", href: "/docs/api/preview/mops-material-events" },

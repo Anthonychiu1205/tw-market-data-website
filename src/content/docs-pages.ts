@@ -1106,6 +1106,150 @@ const baseDocsPages: DocsPageEntry[] = [
     },
   },
   {
+    slug: ["api", "company", "security-master"],
+    href: "/docs/api/company/security-master",
+    navLabel: "公司主檔 / Security Master",
+    category: "api",
+    icon: "building",
+    title: "股票主檔 / Security Master",
+    subtitle: "Security Master read-only API，提供 AI-friendly 身分、覆蓋、血緣與資料缺口上下文。",
+    tier: "complete",
+    sections: [
+      { id: "overview", label: "Overview", paragraphs: [] },
+      { id: "endpoints", label: "Endpoints", paragraphs: [] },
+      { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+      { id: "response", label: "Response", paragraphs: [] },
+      { id: "ai-context", label: "AI Context", paragraphs: [] },
+      { id: "limitations", label: "Limitations", paragraphs: [] },
+      { id: "safe-usage", label: "Safe Usage", paragraphs: [] },
+    ],
+    apiReference: {
+      categoryLabel: "公司主檔",
+      method: "GET",
+      endpoint: "/v2/datasets/security-master",
+      overview: [
+        "Security Master 提供股票身分主檔（ticker/market/security_type）與 AI context packet，支援 research assistant、agent orchestration 與 dataset coverage 決策。",
+        "此頁同步兩個 read-only endpoint：`/v2/datasets/security-master`（列表）與 `/v2/securities/{ticker}`（單一查詢）。",
+      ],
+      requestDescription: [
+        "列表查詢：`GET /v2/datasets/security-master`，可用 `market/ticker/active_only/limit/include_ai_context`。",
+        "單一查詢：`GET /v2/securities/{ticker}`，可用 `market/include_coverage/include_data_gaps`。",
+        "若 `include_ai_context=true`，回應會帶 AI usage 所需 section 與 warning。 ",
+      ],
+      useCases: [
+        "建立 ticker→market/security_type 的 deterministic identity lookup。",
+        "在 pipeline 內先判斷 coverage/data_gaps，再決定是否查詢下游 dataset。",
+        "提供 agent 以 `source_lineage` 與 `survivorship_bias_warning` 做回答風險約束。",
+      ],
+      gettingStarted: [
+        "先呼叫 `/v2/datasets/security-master?market=TWSE&active_only=true&limit=50` 查看主檔與 coverage 概況。",
+        "再用 `/v2/securities/{ticker}` 拉單一標的 AI context。",
+        "TPEx 若為 held/unavailable，請依 `data_gaps` 與 `source_lineage` 顯示限制，不要假裝 official 覆蓋。",
+      ],
+      exampleRequestCurl: `curl -G "https://api.twmarketdata.com/v2/datasets/security-master" \\
+  -H "X-API-Key: your_api_key_here" \\
+  --data-urlencode "market=TWSE" \\
+  --data-urlencode "active_only=true" \\
+  --data-urlencode "limit=20" \\
+  --data-urlencode "include_ai_context=true"`,
+      queryParameters: [
+        { name: "market", type: "string", required: false, description: "市場別篩選（TWSE / TPEx）。可用於列表與單一 ticker 查詢。" },
+        { name: "ticker", type: "string", required: false, description: "列表 route 的 ticker 篩選條件（lookup route 用 path ticker）。" },
+        { name: "active_only", type: "boolean", required: false, description: "僅回傳 active 標的，預設 true（dataset route）。" },
+        { name: "limit", type: "integer", required: false, description: "dataset route 回傳筆數上限。" },
+        { name: "include_ai_context", type: "boolean", required: false, description: "dataset route 是否回傳 AI context packet（預設 true）。" },
+        { name: "include_coverage", type: "boolean", required: false, description: "lookup route 是否包含 dataset_coverage（預設 true）。" },
+        { name: "include_data_gaps", type: "boolean", required: false, description: "lookup route 是否包含 data_gaps（預設 true）。" },
+      ],
+      responseSummary: [
+        "回應重點 section：`security_identity`、`market_identity`、`dataset_coverage`、`source_lineage`、`data_gaps`。",
+        "同時提供 `safe_usage_notes`、`survivorship_bias_warning`、`available_tools_or_endpoints`。",
+      ],
+      responseFields: [
+        { path: "items[].security_identity", type: "object", description: "ticker/name/security_type/is_active 等主體識別欄位。" },
+        { path: "items[].market_identity", type: "object", description: "market/source_provider/source_role/source_confidence。" },
+        { path: "items[].dataset_coverage", type: "object", description: "各資料家族可用性（available/held/unknown/partial）。" },
+        { path: "items[].source_lineage", type: "object", description: "official-first lineage 與來源選擇上下文。" },
+        { path: "items[].data_gaps", type: "array", description: "缺口與限制（如 TPEx official source 未整合）。" },
+        { path: "items[].safe_usage_notes", type: "array", description: "安全使用註記（含 not_investment_advice）。" },
+        { path: "survivorship_bias_warning", type: "object", description: "回測使用風險提示（非完整 PIT lifecycle）。" },
+        { path: "available_tools_or_endpoints", type: "array", description: "可用工具/route（含 MCP tool plan 提示）。" },
+      ],
+      notes: [
+        "current_master_v1：目前不是完整歷史 PIT master。",
+        "not_survivorship_safe_for_historical_backtests：不可直接宣稱回測無生存者偏誤。",
+        "TPEx official issuer profile 尚未整合，部分 row 應標示 held/unavailable。",
+        "FinMind 僅作 benchmark，不是 production source of truth。",
+        "非投資建議（not investment advice）。",
+      ],
+      planRequirement: {
+        title: "Status / Scope",
+        bullets: [
+          "Dataset status: private_beta",
+          "Source policy: official-first",
+          "TWSE official issuer profile: available",
+          "TPEx: held for official enrichment",
+        ],
+      },
+      sidePanel: {
+        requestExample: `curl -G "https://api.twmarketdata.com/v2/securities/2330" \\
+  -H "X-API-Key: your_api_key_here" \\
+  --data-urlencode "market=TWSE" \\
+  --data-urlencode "include_coverage=true" \\
+  --data-urlencode "include_data_gaps=true"`,
+        codeExamples: {
+          python: `import requests\n\nurl = "https://api.twmarketdata.com/v2/securities/2330"\nheaders = {"X-API-Key": "your_api_key_here"}\nparams = {"market": "TWSE", "include_coverage": "true", "include_data_gaps": "true"}\nresp = requests.get(url, headers=headers, params=params)\nprint(resp.status_code)\nprint(resp.json())`,
+          javascript: `const url = "/v2/securities/2330?market=TWSE&include_coverage=true&include_data_gaps=true";\nconst response = await fetch(url, { headers: { "X-API-Key": "your_api_key_here" } });\nconst body = await response.json();\nconsole.log(response.status, body);`,
+          curl: `curl -G "https://api.twmarketdata.com/v2/datasets/security-master" \\
+  -H "X-API-Key: your_api_key_here" \\
+  --data-urlencode "market=TWSE" \\
+  --data-urlencode "active_only=true" \\
+  --data-urlencode "limit=20" \\
+  --data-urlencode "include_ai_context=true"`,
+        },
+        statusExamples: [
+          {
+            status: "200",
+            description: "成功回傳 Security Master AI context",
+            body: `{
+  "dataset_id": "security-master",
+  "items": [
+    {
+      "security_identity": {"ticker": "2330", "name_zh": "台灣積體電路製造股份有限公司", "market": "TWSE"},
+      "market_identity": {"market": "TWSE", "source_provider": "twse_official", "source_role": "official_twse_issuer_profile"},
+      "dataset_coverage": {"price": "available", "technical_indicators": "available"},
+      "source_lineage": {"source_policy": "official_first"},
+      "data_gaps": [],
+      "safe_usage_notes": ["not_investment_advice"],
+      "survivorship_bias_warning": {"enabled": true}
+    }
+  ],
+  "available_tools_or_endpoints": [
+    {"name": "security_master_lookup", "contract": "security_master_lookup(ticker, market?, include_coverage?, include_data_gaps?)"}
+  ]
+}`,
+          },
+          {
+            status: "404",
+            description: "查無 ticker（controlled not found）",
+            body: `{
+  "status": "not_found",
+  "reason": "security_not_found"
+}`,
+          },
+          {
+            status: "503",
+            description: "資料來源或表不可用（controlled unavailable）",
+            body: `{
+  "status": "unavailable",
+  "reason": "security_master_table_not_ready"
+}`,
+          },
+        ],
+      },
+    },
+  },
+  {
     slug: ["api", "company", "issuer-profile"],
     href: "/docs/api/company/issuer-profile",
     navLabel: "公司基本資料",
@@ -2423,6 +2567,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     href: "/docs/api/company",
     icon: "building",
     topics: [
+      { title: "股票主檔 / Security Master", href: "/docs/api/company/security-master", topicId: "security_master", tableName: "security_master_items", endpoint: "/v2/datasets/security-master", source: "TWSE official / TPEx held" },
       { title: "公司基本資料", href: "/docs/api/company/issuer-profile", topicId: "issuer_profile", tableName: "issuer_profile", endpoint: "/v2/datasets/issuer-profile", source: "TWSE / TPEx" },
     ],
   },
@@ -11183,7 +11328,7 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     label: "公司與事件",
     groupIcon: "building-2",
     items: [
-      { title: "公司主檔 / Security Master", href: "/docs/api/company/issuer-profile", icon: "building", status: "normalized" },
+      { title: "公司主檔 / Security Master", href: "/docs/api/company/security-master", icon: "building", status: "normalized" },
       { title: "重大訊息", href: "/docs/api/company-events/issuer-announcements", icon: "filings", status: "normalized" },
       { title: "股利與公司行動", href: "/docs/api/company-events/corporate-actions", icon: "guide", status: "normalized" },
       { title: "注意 / 處置", href: "/docs/api/preview/mops-material-events", icon: "news", status: "preview" },
