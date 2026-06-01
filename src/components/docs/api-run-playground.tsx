@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CodeBlock, type CodeBlockLanguage } from "@/src/components/docs/code-block";
 import type { ApiReferenceContent, ApiStatusExample } from "@/src/content/docs-pages";
 import { cn } from "@/src/lib/cn";
-import { buildRunUrl, createLiveRunResult, validateApiKey } from "@/src/lib/docs/run-playground";
+import { buildRunUrl, createLiveRunResult, mapRunErrorNotice, validateApiKey } from "@/src/lib/docs/run-playground";
 
 type ApiRunPlaygroundProps = {
   api: ApiReferenceContent;
@@ -372,7 +372,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   async function handleRunLiveRequest() {
     const keyValidation = validateApiKey(apiKey);
     if (!keyValidation.ok) {
-      setRunNotice(keyValidation.reason === "missing" ? "請先輸入 API key。" : "請使用有效的 API key，勿使用 placeholder。");
+      setRunNotice(keyValidation.reason === "missing" ? "請先輸入 API key。" : "請輸入有效 API key，而不是範例或遮罩文字。");
       return;
     }
 
@@ -410,7 +410,27 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
         isLive: true,
       });
 
-      setRunNotice(response.ok ? "Response updated." : "");
+      let notice = "";
+      if (!response.ok) {
+        let errorCode = "";
+        let requestId = "";
+        try {
+          const payload = JSON.parse(rawBody || "{}") as {
+            error?: { code?: string };
+            requestId?: string;
+          };
+          errorCode = payload.error?.code ?? "";
+          requestId = payload.requestId ?? "";
+        } catch {
+          // keep fallback notice mapping by status only.
+        }
+        notice = mapRunErrorNotice({
+          status: response.status,
+          errorCode,
+          requestId,
+        });
+      }
+      setRunNotice(response.ok ? "Response updated." : notice);
     } catch {
       setLiveResult({
         status: "network_error",

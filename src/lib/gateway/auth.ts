@@ -17,7 +17,7 @@ export type GatewayAuthContext = {
 export function parseApiKeyFromRequest(request: Request) {
   const headerValue = request.headers.get("x-api-key");
   if (!headerValue) {
-    throw new GatewayHttpError(401, "invalid_api_key");
+    throw new GatewayHttpError(401, "missing_api_key");
   }
 
   const normalized = headerValue.trim();
@@ -57,7 +57,7 @@ export async function authenticateApiKey(request: Request): Promise<GatewayAuthC
       },
     });
   } catch {
-    throw new GatewayHttpError(500, "internal_error", "API key lookup failed.", {
+    throw new GatewayHttpError(503, "api_key_lookup_unavailable", undefined, {
       stage: "api_key_auth",
     });
   }

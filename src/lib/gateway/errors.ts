@@ -1,7 +1,9 @@
 import "server-only";
 
 export type GatewayErrorCode =
+  | "missing_api_key"
   | "invalid_api_key"
+  | "api_key_lookup_unavailable"
   | "api_key_revoked"
   | "dataset_not_allowed"
   | "plan_not_entitled"
@@ -12,7 +14,9 @@ export type GatewayErrorCode =
   | "internal_error";
 
 const DEFAULT_MESSAGES: Record<GatewayErrorCode, string> = {
+  missing_api_key: "API key is required.",
   invalid_api_key: "Invalid API key.",
+  api_key_lookup_unavailable: "API key verification is temporarily unavailable.",
   api_key_revoked: "API key is revoked.",
   dataset_not_allowed: "Dataset is not allowed.",
   plan_not_entitled: "Current plan is not entitled for this dataset.",

@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import {
   buildRunUrl,
   createLiveRunResult,
+  mapRunErrorNotice,
   maskApiKey,
   validateApiKey,
 } from '../src/lib/docs/run-playground.ts';
@@ -29,6 +30,9 @@ test('validateApiKey blocks missing and placeholder keys', () => {
   assert.deepEqual(validateApiKey(''), { ok: false, reason: 'missing' });
   assert.deepEqual(validateApiKey('  your_api_key_here  '), { ok: false, reason: 'placeholder' });
   assert.deepEqual(validateApiKey('twmd_live_xxx_demo'), { ok: false, reason: 'placeholder' });
+  assert.deepEqual(validateApiKey('••••••••'), { ok: false, reason: 'placeholder' });
+  assert.deepEqual(validateApiKey('********'), { ok: false, reason: 'placeholder' });
+  assert.deepEqual(validateApiKey('$TWMD_API_KEY'), { ok: false, reason: 'placeholder' });
   assert.deepEqual(validateApiKey('twmd_live_real_abc12345'), { ok: true });
 });
 
@@ -57,4 +61,27 @@ test('playground does not persist API key in localStorage/sessionStorage', () =>
   assert.equal(source.includes('sessionStorage'), false);
   assert.equal(source.includes('CodeBlock'), true);
   assert.equal(source.includes('Example / Sample response'), true);
+});
+
+test('friendly run notices map backend auth error codes', () => {
+  assert.equal(
+    mapRunErrorNotice({ status: 503, errorCode: 'api_key_lookup_unavailable' }),
+    'API 金鑰驗證服務暫時不可用，請稍後再試。',
+  );
+  assert.equal(
+    mapRunErrorNotice({ status: 401, errorCode: 'invalid_api_key' }),
+    'API key 無效，請確認後再試。',
+  );
+  assert.equal(
+    mapRunErrorNotice({ status: 500, errorCode: 'internal_error', requestId: 'req_123' }),
+    '服務暫時無法處理請求。請稍後再試，或附上 requestId（req_123）聯繫我們。',
+  );
+});
+
+
+test('gateway auth contract uses explicit missing and lookup unavailable codes', () => {
+  const source = fs.readFileSync('/Volumes/DEV_USB/Projects/tw-market-data-website/src/lib/gateway/auth.ts', 'utf8');
+  assert.equal(source.includes('GatewayHttpError(401, "missing_api_key")'), true);
+  assert.equal(source.includes('GatewayHttpError(503, "api_key_lookup_unavailable"'), true);
+  assert.equal(source.includes('API key lookup failed.'), false);
 });
