@@ -1,0 +1,1210 @@
+# Website Dirty Tree Full Inventory
+
+## Repo status summary
+- modified tracked files: 0
+- staged files: 0
+- untracked status entries: 49
+- artifact files discovered: 227
+- docs/research files discovered: 69
+
+## Classification counts
+- `generated_validation_artifact`: 228
+- `historical_research_report`: 51
+- `margin_short_related_already_committed`: 13
+- `website_docs_related`: 5
+
+## Modified files
+- none
+
+## Staged files
+- none
+
+## Inventory
+- `artifacts/`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_console_layout_gate_decision_20260524T052323Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_console_layout_implementation_20260524T052323Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_console_layout_inventory_20260524T052323Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_console_layout_safety_20260524T052323Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_console_layout_validation_20260524T052323Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_dropdown_zindex_gate_decision_20260524T061210Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_dropdown_zindex_implementation_20260524T061210Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_dropdown_zindex_inventory_20260524T061210Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_dropdown_zindex_safety_20260524T061210Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_dropdown_zindex_validation_20260524T061210Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_fill_left_wrap_code_gate_decision_20260524T044210Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_fill_left_wrap_code_implementation_20260524T044210Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_fill_left_wrap_code_inventory_20260524T044210Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_fill_left_wrap_code_safety_20260524T044210Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_fill_left_wrap_code_validation_20260524T044210Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_icons_left_hierarchy_gate_decision_20260524T055212Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_icons_left_hierarchy_implementation_20260524T055212Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_icons_left_hierarchy_inventory_20260524T055212Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_icons_left_hierarchy_safety_20260524T055212Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_icons_left_hierarchy_validation_20260524T055212Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_layout_rhythm_code_wrap_gate_decision_20260524T045937Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_layout_rhythm_code_wrap_implementation_20260524T045937Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_layout_rhythm_code_wrap_inventory_20260524T045937Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_layout_rhythm_code_wrap_safety_20260524T045937Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_layout_rhythm_code_wrap_validation_20260524T045937Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_ratio_empty_space_gate_decision_20260524T042513Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_ratio_empty_space_implementation_20260524T042513Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_ratio_empty_space_inventory_20260524T042513Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_ratio_empty_space_safety_20260524T042513Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_playground_ratio_empty_space_validation_20260524T042513Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_compact_gate_decision_20260523T151600Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_compact_implementation_20260523T151600Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_compact_inventory_20260523T151600Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_compact_safety_20260523T151600Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_compact_validation_20260523T151600Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_density_polish_gate_decision_20260524T040253Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_density_polish_implementation_20260524T040253Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_density_polish_inventory_20260524T040253Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_density_polish_safety_20260524T040253Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_density_polish_validation_20260524T040253Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_financialdatasets_layout_gate_decision_20260524T041544Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_financialdatasets_layout_implementation_20260524T041544Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_financialdatasets_layout_inventory_20260524T041544Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_financialdatasets_layout_safety_20260524T041544Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_financialdatasets_layout_validation_20260524T041544Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_visual_refine_gate_decision_20260523T164909Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_visual_refine_implementation_20260523T164909Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_visual_refine_inventory_20260523T164909Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_visual_refine_safety_20260523T164909Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/api_run_playground_visual_refine_validation_20260523T164909Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/code_block_copy_icon_highlight_gate_decision_20260522T052109Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/code_block_copy_icon_highlight_implementation_20260522T052109Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/code_block_copy_icon_highlight_inventory_20260522T052109Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/code_block_copy_icon_highlight_safety_20260522T052109Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/code_block_copy_icon_highlight_validation_20260522T052109Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/code_block_remaining_exceptions_gate_decision_20260522T054425Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/code_block_remaining_exceptions_implementation_20260522T054425Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/code_block_remaining_exceptions_inventory_20260522T054425Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/code_block_remaining_exceptions_safety_20260522T054425Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/code_block_remaining_exceptions_validation_20260522T054425Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase1_gate_decision_20260522T041044Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase1_implementation_20260522T041044Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase1_inventory_20260522T041044Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase1_safety_20260522T041044Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase1_validation_20260522T041044Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase2_gate_decision_20260523T062046Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase2_gate_decision_20260523T062127Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase2_implementation_20260523T062046Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase2_implementation_20260523T062127Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase2_inventory_20260523T062046Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase2_inventory_20260523T062127Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase2_safety_20260523T062046Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase2_safety_20260523T062127Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase2_validation_20260523T062046Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dataset_slug_seo_phase2_validation_20260523T062127Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/datasets_ssr_crawler_audit_gate_decision_20260523T050203Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/datasets_ssr_crawler_audit_local_20260523T050203Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/datasets_ssr_crawler_audit_production_20260523T050203Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/datasets_ssr_crawler_audit_safety_20260523T050203Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dev_compile_latency_environment_20260523T142128Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dev_compile_latency_findings_20260523T142128Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dev_compile_latency_gate_decision_20260523T142128Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dev_compile_latency_measurements_20260523T142128Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dev_compile_latency_recommendations_20260523T142128Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/dev_compile_latency_safety_20260523T142128Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/docs_api_run_playground_gate_decision_20260523T145947Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/docs_api_run_playground_implementation_20260523T145947Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/docs_api_run_playground_inventory_20260523T145947Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/docs_api_run_playground_safety_20260523T145947Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/docs_api_run_playground_validation_20260523T145947Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/docs_sidebar_order_unique_icons_gate_decision_20260523T141241Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/docs_sidebar_order_unique_icons_implementation_20260523T141241Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/docs_sidebar_order_unique_icons_inventory_20260523T141241Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/docs_sidebar_order_unique_icons_safety_20260523T141241Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/docs_sidebar_order_unique_icons_validation_20260523T141241Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/frontend_docs_sidebar_endpoint_consistency_20260526T152856Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/frontend_docs_sidebar_endpoint_consistency_20260526T153003Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/frontend_docs_sidebar_endpoint_consistency_20260526T153102Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/guides_existing_seo_hardening_gate_decision_20260522T043312Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/guides_existing_seo_hardening_implementation_20260522T043312Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/guides_existing_seo_hardening_inventory_20260522T043312Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/guides_existing_seo_hardening_safety_20260522T043312Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/guides_existing_seo_hardening_validation_20260522T043312Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_article_pilot_gate_decision_20260524T070329Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_article_pilot_implementation_20260524T070329Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_article_pilot_inventory_20260524T070329Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_article_pilot_safety_20260524T070329Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_article_pilot_validation_20260524T070329Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_binance_style_nav_gate_decision_20260525T122545Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_binance_style_nav_implementation_20260525T122545Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_binance_style_nav_inventory_20260525T122545Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_binance_style_nav_safety_20260525T122545Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_binance_style_nav_validation_20260525T122545Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_collapsible_search_gate_decision_20260525T120745Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_collapsible_search_implementation_20260525T120745Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_collapsible_search_inventory_20260525T120745Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_collapsible_search_safety_20260525T120745Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_collapsible_search_validation_20260525T120745Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_faq_merge_gate_decision_20260524T063247Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_faq_merge_implementation_20260524T063247Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_faq_merge_inventory_20260524T063247Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_faq_merge_safety_20260524T063247Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_faq_merge_validation_20260524T063247Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_phase2_gate_decision_20260524T122723Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_phase2_implementation_20260524T122723Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_phase2_inventory_20260524T122723Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_phase2_safety_20260524T122723Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_phase2_validation_20260524T122723Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_phase3_gate_decision_20260525T040600Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_phase3_implementation_20260525T040600Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_phase3_inventory_20260525T040600Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_phase3_safety_20260525T040600Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_phase3_validation_20260525T040600Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_standalone_area_gate_decision_20260524T073137Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_standalone_area_implementation_20260524T073137Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_standalone_area_inventory_20260524T073137Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_standalone_area_safety_20260524T073137Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/help_center_standalone_area_validation_20260524T073137Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/llms_readability_cleanup_gate_decision_20260523T044310Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/llms_readability_cleanup_implementation_20260523T044310Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/llms_readability_cleanup_inventory_20260523T044310Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/llms_readability_cleanup_safety_20260523T044310Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/llms_readability_cleanup_validation_20260523T044310Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/margin_short_website_repo_handoff_audit_20260602T060532Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_build_hang_diagnosis_findings_20260523T053540Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_build_hang_diagnosis_gate_decision_20260523T053540Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_build_hang_diagnosis_inventory_20260523T053540Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_build_hang_diagnosis_reproduction_20260523T053540Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_build_hang_diagnosis_safety_20260523T053540Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_discoverability_gate_decision_20260522T035129Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_discoverability_implementation_20260522T035129Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_discoverability_inventory_20260522T035129Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_discoverability_safety_20260522T035129Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_discoverability_validation_20260522T035129Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_build_fix_gate_decision_20260523T072457Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_build_fix_implementation_20260523T072457Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_build_fix_inventory_20260523T072457Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_build_fix_reproduction_20260523T072457Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_build_fix_safety_20260523T072457Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_build_fix_validation_20260523T072457Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_pre_deploy_gate_decision_20260523T073845Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_pre_deploy_inventory_20260523T073845Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_pre_deploy_route_check_20260523T073845Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_pre_deploy_safety_20260523T073845Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_pre_deploy_validation_20260523T073845Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_production_deploy_gate_decision_20260523T075240Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_production_deploy_safety_20260523T075240Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_production_deploy_smoke_20260523T075240Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_llms_mcp_ready_production_deploy_validation_20260523T075240Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_deepening_phase1_gate_decision_20260523T051638Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_deepening_phase1_implementation_20260523T051638Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_deepening_phase1_inventory_20260523T051638Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_deepening_phase1_safety_20260523T051638Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_deepening_phase1_validation_20260523T051638Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_phase1_pre_deploy_gate_decision_20260523T055015Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_phase1_pre_deploy_inventory_20260523T055015Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_phase1_pre_deploy_route_check_20260523T055015Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_phase1_pre_deploy_safety_20260523T055015Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_phase1_pre_deploy_validation_20260523T055015Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_phase1_production_deploy_gate_decision_20260523T060055Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_phase1_production_deploy_safety_20260523T060055Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_phase1_production_deploy_smoke_20260523T060055Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/openapi_schema_phase1_production_deploy_validation_20260523T060055Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/provenance_coverage_seo_gate_decision_20260522T052410Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/provenance_coverage_seo_implementation_20260522T052410Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/provenance_coverage_seo_inventory_20260522T052410Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/provenance_coverage_seo_safety_20260522T052410Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/provenance_coverage_seo_validation_20260522T052410Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/qa-tech-indicators-content-check.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/qa-tech-indicators-desktop.png`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/qa-tech-indicators-mobile.png`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/remove_docs_plan_requirement_gate_decision_20260523T143945Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/remove_docs_plan_requirement_implementation_20260523T143945Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/remove_docs_plan_requirement_inventory_20260523T143945Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/remove_docs_plan_requirement_safety_20260523T143945Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/remove_docs_plan_requirement_validation_20260523T143945Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/remove_legacy_help_faq_gate_decision_20260526T030226Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/remove_legacy_help_faq_implementation_20260526T030226Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/remove_legacy_help_faq_inventory_20260526T030226Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/remove_legacy_help_faq_safety_20260526T030226Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/remove_legacy_help_faq_validation_20260526T030226Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/revert_phase2_dataset_and_openapi_phase2_gate_decision_20260523T064820Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/revert_phase2_dataset_and_openapi_phase2_implementation_20260523T064820Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/revert_phase2_dataset_and_openapi_phase2_inventory_20260523T064820Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/revert_phase2_dataset_and_openapi_phase2_revert_20260523T064820Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/revert_phase2_dataset_and_openapi_phase2_safety_20260523T064820Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/revert_phase2_dataset_and_openapi_phase2_validation_20260523T064820Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_ai_discoverability_gate_decision_20260522T033835Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_ai_discoverability_implementation_20260522T033835Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_ai_discoverability_inventory_20260522T033835Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_ai_discoverability_safety_20260522T033835Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_ai_discoverability_validation_20260522T033835Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_completeness_gap_audit_gate_decision_20260523T060816Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_completeness_gap_audit_inventory_20260523T060816Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_completeness_gap_audit_keyword_map_20260523T060816Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_completeness_gap_audit_next_tasks_20260523T060816Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_completeness_gap_audit_page_map_20260523T060816Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_completeness_gap_audit_safety_20260523T060816Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_docs_pre_deploy_audit_gate_decision_20260522T055906Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_docs_pre_deploy_audit_inventory_20260522T055906Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_docs_pre_deploy_audit_routes_20260522T055906Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_docs_pre_deploy_audit_safety_20260522T055906Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_docs_pre_deploy_audit_validation_20260522T055906Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_docs_production_deploy_gate_decision_20260522T061004Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_docs_production_deploy_safety_20260522T061004Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_docs_production_deploy_smoke_20260522T061004Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `artifacts/seo_docs_production_deploy_validation_20260522T061004Z.json`
+  - classification: `generated_validation_artifact`
+  - recommendation: `should_be_gitignored_candidate`
+  - note: Generated artifact output; likely unsuitable for routine tracking in website repo.
+- `docs/research/API_PLAYGROUND_CONSOLE_LAYOUT_20260524T052323Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/API_PLAYGROUND_DROPDOWN_ZINDEX_20260524T061210Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/API_PLAYGROUND_FILL_LEFT_WRAP_CODE_20260524T044210Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/API_PLAYGROUND_ICONS_LEFT_HIERARCHY_20260524T055212Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/API_PLAYGROUND_LAYOUT_RHYTHM_CODE_WRAP_20260524T045937Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/API_PLAYGROUND_RATIO_EMPTY_SPACE_20260524T042513Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/API_RUN_PLAYGROUND_COMPACT_20260523T151600Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/API_RUN_PLAYGROUND_DENSITY_POLISH_20260524T040253Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/API_RUN_PLAYGROUND_FINANCIALDATASETS_LAYOUT_20260524T041544Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/API_RUN_PLAYGROUND_VISUAL_REFINE_20260523T164909Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/CODE_BLOCK_COPY_ICON_HIGHLIGHT_20260522T052109Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/CODE_BLOCK_REMAINING_EXCEPTIONS_20260522T054425Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/DATASETS_SSR_CRAWLER_AUDIT_20260523T050203Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/DATASET_FACTORY_FUNDAMENTALS_WEBSITE_PREVIEW_SYNC_20260527T164949Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/DATASET_FACTORY_WEBSITE_DOCS_PREVIEW_SYNC_20260527T132012Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/DATASET_FACTORY_WEBSITE_DOCS_UI_CONTENT_QA_20260527T132547Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/DATASET_SLUG_SEO_PHASE1_20260522T041044Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/DATASET_SLUG_SEO_PHASE2_20260523T062046Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/DATASET_SLUG_SEO_PHASE2_20260523T062127Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/DEV_COMPILE_LATENCY_DIAGNOSIS_20260523T142128Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/DOCS_API_RUN_PLAYGROUND_20260523T145947Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/DOCS_SIDEBAR_ORDER_UNIQUE_ICONS_20260523T141241Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/FRONTEND_DOCS_SIDEBAR_ENDPOINT_CONSISTENCY_20260526T152856Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/FRONTEND_DOCS_SIDEBAR_ENDPOINT_CONSISTENCY_20260526T153003Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/FRONTEND_DOCS_SIDEBAR_ENDPOINT_CONSISTENCY_20260526T153102Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/GUIDES_EXISTING_SEO_HARDENING_20260522T043312Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/HELP_CENTER_ARTICLE_PILOT_20260524T070329Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/HELP_CENTER_BINANCE_STYLE_NAV_20260525T122545Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/HELP_CENTER_COLLAPSIBLE_SEARCH_20260525T120745Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/HELP_CENTER_FAQ_MERGE_20260524T063247Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/HELP_CENTER_PHASE2_20260524T122723Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/HELP_CENTER_PHASE3_20260525T040600Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/HELP_CENTER_STANDALONE_AREA_20260524T073137Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/LLMS_READABILITY_CLEANUP_20260523T044310Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/MARGIN_SHORT_DOCS_LEGACY_CONTRACT_CLEANUP_AUDIT_20260602T061740Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_BUILD_PROCESS_AUDIT_20260602T062143Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_BUILD_VALIDATION_RERUN_20260602T062143Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_CONTENT_CONSISTENCY_AUDIT_20260602T061147Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_CONTENT_CONSISTENCY_AUDIT_20260602T061846Z.md`
+  - classification: `website_docs_related`
+  - recommendation: `should_be_committed_candidate`
+  - note: Website research doc; review whether it should join a scoped documentation batch.
+- `docs/research/MARGIN_SHORT_WEBSITE_DEPLOY_APPROVAL_AUDIT_20260602T062600Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_DEPLOY_APPROVAL_PACKAGE_20260602T062600Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_DEPLOY_APPROVAL_RECHECK_20260602T062950Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_DEPLOY_PREFLIGHT_DECISION_20260602T061147Z.md`
+  - classification: `website_docs_related`
+  - recommendation: `should_be_committed_candidate`
+  - note: Website research doc; review whether it should join a scoped documentation batch.
+- `docs/research/MARGIN_SHORT_WEBSITE_DEPLOY_PREFLIGHT_DECISION_20260602T061846Z.md`
+  - classification: `website_docs_related`
+  - recommendation: `should_be_committed_candidate`
+  - note: Website research doc; review whether it should join a scoped documentation batch.
+- `docs/research/MARGIN_SHORT_WEBSITE_DEPLOY_ROLLBACK_PLAN_20260602T062600Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_DIRTY_TREE_TRIAGE_20260602T062950Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_MANUAL_REVIEW_CHECKLIST_20260602T062600Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_POST_CLEANUP_DEPLOY_PREFLIGHT_20260602T061740Z.md`
+  - classification: `website_docs_related`
+  - recommendation: `should_be_committed_candidate`
+  - note: Website research doc; review whether it should join a scoped documentation batch.
+- `docs/research/MARGIN_SHORT_WEBSITE_POST_SYNC_ROUTE_REVIEW_20260602T061147Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_POST_SYNC_ROUTE_REVIEW_20260602T061846Z.md`
+  - classification: `website_docs_related`
+  - recommendation: `should_be_committed_candidate`
+  - note: Website research doc; review whether it should join a scoped documentation batch.
+- `docs/research/MARGIN_SHORT_WEBSITE_SYNC_20260602_20260602T060532Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/MARGIN_SHORT_WEBSITE_SYNC_PLAN_20260602T060532Z.md`
+  - classification: `margin_short_related_already_committed`
+  - recommendation: `left_untouched`
+  - note: Margin-short chain file already committed in prior tasks; not part of current dirty tree.
+- `docs/research/OPENAPI_BUILD_HANG_DIAGNOSIS_20260523T053540Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/OPENAPI_DISCOVERABILITY_20260522T035129Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/OPENAPI_LLMS_MCP_READY_BUILD_FIX_20260523T072457Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/OPENAPI_LLMS_MCP_READY_PRE_DEPLOY_20260523T073845Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/OPENAPI_LLMS_MCP_READY_PRODUCTION_DEPLOY_20260523T075240Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/OPENAPI_SCHEMA_DEEPENING_PHASE1_20260523T051638Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/OPENAPI_SCHEMA_PHASE1_PRE_DEPLOY_20260523T055015Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/OPENAPI_SCHEMA_PHASE1_PRODUCTION_DEPLOY_20260523T060055Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/PROVENANCE_COVERAGE_SEO_20260522T052410Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/REMOVE_DOCS_PLAN_REQUIREMENT_20260523T143945Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/REMOVE_LEGACY_HELP_FAQ_20260526T030226Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/REVERT_PHASE2_DATASET_AND_OPENAPI_PHASE2_20260523T064820Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/SEO_AI_DISCOVERABILITY_HARDENING_20260522T033835Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/SEO_COMPLETENESS_GAP_AUDIT_20260523T060816Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/SEO_DOCS_PRE_DEPLOY_AUDIT_20260522T055906Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/SEO_DOCS_PRODUCTION_DEPLOY_20260522T061004Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
+- `docs/research/TW_MARKET_DATA_WEBSITE_MOPS_MATERIAL_EVENTS_DOCS_ALIGNMENT_REVIEW_20260524T162502Z.md`
+  - classification: `historical_research_report`
+  - recommendation: `needs_user_review`
+  - note: Historical website research report; may be valuable, but commit/archive policy should be decided explicitly.
