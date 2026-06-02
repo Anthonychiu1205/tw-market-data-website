@@ -171,6 +171,36 @@ export const datasetSeoEntries: readonly DatasetSeoEntry[] = [
     provider: "twse",
     marketScope: "TWSE",
   },
+  {
+    slug: "margin-short",
+    name: "融資融券",
+    seoTitle: "融資融券資料集 | TW Market Data",
+    seoDescription:
+      "融資融券資料集提供 TWSE private beta 的信用交易欄位，涵蓋融資/融券買賣、餘額、來源血緣與 data_gaps。",
+    shortDescription: "TWSE private beta 融資融券資料集，提供信用交易餘額、買賣與資料血緣。",
+    whatItIs:
+      "此資料集聚焦 TWSE 官方優先來源的融資融券資料，適合做市場槓桿、散戶情緒與籌碼擁擠度觀察；目前仍為 private beta。",
+    useCases: [
+      "觀察融資與融券餘額的變化與壓力。",
+      "與三大法人買賣超交叉分析信用交易風險。",
+      "在研究流程中保留 source_lineage 與 data_gaps 做可追溯判讀。",
+    ],
+    whyItMatters:
+      "融資融券可補充單看價格與法人流向看不到的市場槓桿與擁擠度訊號，對短中期風險監控特別重要。",
+    coverageNote:
+      "目前驗證 coverage 為 2026-03-10..2026-05-28，共 16,475 rows、1,272 檔 TWSE 標的；不宣稱 TPEx 或全市場覆蓋。",
+    freshnessNote: "目前以 private beta 方式提供，請在使用時保留 data_gaps、source_lineage 與 beta 限制說明。",
+    sourcePolicyNote:
+      "遵循 official-first 與 explicit lineage/data_gaps 原則；不暴露 raw/full body，不宣稱 securities lending 已納入同一契約。",
+    docsHref: "/docs/api/capital-flow/margin-short",
+    pricingHref: "/pricing",
+    keywords: ["融資融券 API", "信用交易資料", "台股籌碼資料", "margin short"],
+    jsonLdName: "融資融券資料集",
+    jsonLdDescription: "TWSE private beta 融資融券資料，支援信用交易與籌碼風險研究。",
+    sourceRole: "official_twse_mi_margn",
+    provider: "twse_official",
+    marketScope: "TWSE",
+  },
 ] as const;
 
 export function getDatasetBySlug(slug: string): DatasetSeoEntry | undefined {

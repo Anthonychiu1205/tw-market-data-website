@@ -2623,7 +2623,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     icon: "holdings",
     topics: [
       { title: "三大法人", href: "/docs/api/capital-flow/institutional-flow", topicId: "institutional_flow", tableName: "institutional_flow", endpoint: "/v2/datasets/institutional-flow", source: "TWSE / TPEx" },
-      { title: "融資融券", href: "/docs/api/capital-flow/margin-short", topicId: "margin_short", tableName: "margin_short", endpoint: "/v2/datasets/margin-short", source: "TWSE / TPEx" },
+      { title: "融資融券", href: "/docs/api/capital-flow/margin-short", topicId: "margin_short", tableName: "margin_short", endpoint: "/v2/datasets/margin-short", source: "TWSE official-first" },
     ],
   },
   {
@@ -10936,7 +10936,7 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         apiSection: group.id,
         icon: topic.icon ?? group.icon,
         title: "融資融券",
-        subtitle: "提供融資融券資料，適合用於籌碼風險監控與市場擁擠度觀察。",
+        subtitle: "提供 TWSE-only private beta 融資融券資料，適合用於籌碼風險監控與市場擁擠度觀察。",
         tier: "complete",
         sections: buildMarginShortApiSections(),
         apiReferenceFactory: () => buildMarginShortApiReference(),
