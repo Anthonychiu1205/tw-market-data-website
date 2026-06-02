@@ -2624,6 +2624,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     topics: [
       { title: "三大法人", href: "/docs/api/capital-flow/institutional-flow", topicId: "institutional_flow", tableName: "institutional_flow", endpoint: "/v2/datasets/institutional-flow", source: "TWSE / TPEx" },
       { title: "融資融券", href: "/docs/api/capital-flow/margin-short", topicId: "margin_short", tableName: "margin_short", endpoint: "/v2/datasets/margin-short", source: "TWSE official-first" },
+      { title: "整體融資融券", href: "/docs/api/capital-flow/total-margin-short", topicId: "total_margin_short", tableName: "total_margin_short", endpoint: "/v2/datasets/total-margin-short", source: "TWSE official-first" },
     ],
   },
   {
@@ -2759,6 +2760,7 @@ const usageFocusedTopicIds = new Set([
   "valuation_data",
   "institutional_flow",
   "margin_short",
+  "total_margin_short",
   "search_api",
   "query_api",
   "query_fields",
@@ -2788,6 +2790,7 @@ const topicWorkflowLinks: Record<string, Array<{ title: string; href: string }>>
     { title: "看籌碼", href: "/docs/workflows/capital-flow" },
   ],
   margin_short: [{ title: "看籌碼", href: "/docs/workflows/capital-flow" }],
+  total_margin_short: [{ title: "看籌碼", href: "/docs/workflows/capital-flow" }],
   index_data: [{ title: "看市場狀態", href: "/docs/workflows/market-status" }],
   market_breadth: [{ title: "看市場狀態", href: "/docs/workflows/market-status" }],
   interest_rate_snapshot: [{ title: "看市場狀態", href: "/docs/workflows/market-status" }],
@@ -8077,7 +8080,152 @@ console.log(data)`,
   };
 }
 
+function buildTotalMarginShortApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/total-margin-short";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/total-margin-short",
+    headers=headers,
+    params={
+        "market": "TWSE",
+        "start_date": "2026-03-10",
+        "end_date": "2026-05-14",
+        "limit": 3
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/total-margin-short?market=TWSE&start_date=2026-03-10&end_date=2026-05-14&limit=3",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/total-margin-short?market=TWSE&start_date=2026-03-10&end_date=2026-05-14&limit=3" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+
+  const successBody = JSON.stringify(
+    {
+      dataset: "total_margin_short",
+      rows: [
+        {
+          market: "TWSE",
+          trade_date: "2026-05-14",
+          margin_purchase_balance_total: 1234567,
+          short_sale_balance_total: 78901,
+          margin_purchase_buy_total: 3210,
+          margin_purchase_sell_total: 2880,
+          short_sale_buy_total: 420,
+          short_sale_sell_total: 390,
+          margin_purchase_amount_total: 6543210,
+          currency: "TWD",
+          market_scope: "TWSE",
+          source_provider: "twse_official",
+          source_role: "official_twse_mi_margn_summary",
+          source_lineage: {
+            provider: "twse_official",
+            family: "official_twse_mi_margn_summary",
+          },
+          data_gaps: [],
+          not_investment_advice: true,
+        },
+      ],
+      count: 1,
+      meta: {
+        plan: "pro",
+        row_limit: 3,
+        is_limited: false,
+      },
+    },
+    null,
+    2,
+  );
+
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "籌碼與資金",
+    endpoint,
+    method: "GET",
+    overview: [
+      "整體融資融券 API 以 TWSE-only private beta 方式提供，回報市場總體 credit aggregate 欄位。",
+      "文件保留 source_lineage、data_gaps 與 not_investment_advice，不得誤述為 TPEx/full-market 或 daily write cron 已啟用。",
+    ],
+    requestDescription: ["使用時請指定 market，建議限制在 TWSE。"],
+    useCases: ["觀察市場總量融資/融券買賣趨勢。", "配合籌碼面指標做風險情境判讀。", "對接私域研究流程時保留缺口欄位。"],
+    gettingStarted: [
+      "建議指定 market=TWSE。",
+      "可用 start_date/end_date 查詢現有種子驗證範圍（2026-03-10..2026-05-14）。",
+      "網站與 API 文案需保留 private beta、seed scope、no TPEx claim、not investment advice。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "market", type: "string", required: false, description: "建議指定 TWSE；本頁面不宣稱 TPEx 支援。" },
+      { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數。" },
+    ],
+    responseSummary: [
+      "回應固定為 dataset、rows、count，加上 meta；欄位需保留 source_lineage、data_gaps 與 not_investment_advice。",
+    ],
+    responseFields: [
+      { path: "rows[].market", type: "string", description: "市場別；目前網站僅公開 TWSE。" },
+      { path: "rows[].trade_date", type: "string", description: "交易日期（YYYY-MM-DD）。" },
+      { path: "rows[].margin_purchase_balance_total", type: "number|null", description: "融資餘額總額。" },
+      { path: "rows[].short_sale_balance_total", type: "number|null", description: "融券餘額總額。" },
+      { path: "rows[].margin_purchase_buy_total", type: "number|null", description: "融資買入總額。" },
+      { path: "rows[].margin_purchase_sell_total", type: "number|null", description: "融資賣出總額。" },
+      { path: "rows[].short_sale_buy_total", type: "number|null", description: "融券買進（回補）總額。" },
+      { path: "rows[].short_sale_sell_total", type: "number|null", description: "融券賣出總額。" },
+      { path: "rows[].margin_purchase_amount_total", type: "number|null", description: "融資交易總金額。" },
+      { path: "rows[].currency", type: "string", description: "幣別（如 TWD）。" },
+      { path: "rows[].market_scope", type: "string", description: "市場範圍；本 dataset 限 TWSE。" },
+      { path: "rows[].source_provider", type: "string", description: "來源提供者。" },
+      { path: "rows[].source_role", type: "string", description: "來源角色。" },
+      { path: "rows[].source_lineage", type: "object", description: "資料來源血緣；必須保留並於文案中說明。" },
+      { path: "rows[].data_gaps", type: "array", description: "資料缺口訊號。" },
+      { path: "rows[].not_investment_advice", type: "boolean", description: "非投資建議宣告。" },
+      { path: "count", type: "integer", description: "回傳資料筆數。" },
+    ],
+    notes: [
+      "目前 coverage 種子為 2026-03-10..2026-05-14，row_count=3（private beta seeded）。",
+      "TWSE-only、seed scope，且 no TPEx claim。",
+      "official-first 與 source_lineage/data_gaps 必須保留。",
+      "ratio tolerance 為 1e-6。",
+      "daily write cron not enabled。",
+    ],
+    planRequirement: { title: "Plan Requirement", bullets: ["Private beta access", "Developer", "Pro", "Enterprise"] },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳整體融資融券資料", body: successBody },
+        { status: "400", description: "查詢參數錯誤", body: `{"detail":"bad_request"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此 private beta 資料", body: `{"error":"dataset_not_entitled"}` },
+        { status: "404", description: "查無符合條件資料", body: `{"dataset":"total_margin_short","rows":[],"count":0}` },
+      ],
+    },
+  };
+}
+
 function buildMarginShortApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildTotalMarginShortApiSections(): DocsContentSection[] {
   return [
     { id: "overview", label: "Overview", paragraphs: [] },
     { id: "request", label: "Request", paragraphs: [] },
@@ -10952,6 +11100,22 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
       };
     }
 
+    if (topic.topicId === "total_margin_short") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "整體融資融券",
+        subtitle: "提供 TWSE-only private beta 總體融資融券彙總資料，適合用於市場風險背景觀測。",
+        tier: "complete",
+        sections: buildTotalMarginShortApiSections(),
+        apiReferenceFactory: () => buildTotalMarginShortApiReference(),
+      };
+    }
+
     if (topic.topicId === "company_news") {
       return {
         slug: hrefToSlug(topic.href),
@@ -11500,6 +11664,7 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     items: [
       { title: "三大法人買賣", href: "/docs/api/capital-flow/institutional-flow", icon: "holdings", status: "normalized" },
       { title: "融資融券", href: "/docs/api/capital-flow/margin-short", icon: "holdings", status: "normalized" },
+      { title: "整體融資融券", href: "/docs/api/capital-flow/total-margin-short", icon: "holdings", status: "normalized" },
       { title: "外資持股", href: "/docs/api/institutional-holdings", icon: "holdings", status: "preview" },
       { title: "借券資料", href: "/docs/api/capital-flow/margin-short", icon: "holdings", status: "normalized" },
     ],

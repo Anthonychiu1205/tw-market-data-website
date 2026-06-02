@@ -54,6 +54,7 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
     items: [
       { title: "三大法人買賣", href: "/docs/api/capital-flow/institutional-flow" },
       { title: "融資融券", href: "/docs/api/capital-flow/margin-short" },
+      { title: "整體融資融券", href: "/docs/api/capital-flow/total-margin-short" },
       { title: "外資持股", href: "/docs/api/institutional-holdings" },
       { title: "借券資料", href: "/docs/api/capital-flow/margin-short" },
     ],

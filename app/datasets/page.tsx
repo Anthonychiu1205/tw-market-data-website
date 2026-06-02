@@ -89,6 +89,13 @@ const datasetFamilies = [
         overviewHref: "/datasets/margin-short",
         note: "TWSE-only、private beta、no TPEx claim，且 daily write cron 尚未啟用。",
       },
+      {
+        name: "整體融資融券",
+        description: "TWSE private beta 市場總體融資融券匯總資料，提供市場買賣總值與欄位。",
+        href: "/docs/api/capital-flow/total-margin-short",
+        overviewHref: "/datasets/total-margin-short",
+        note: "TWSE-only private beta seeded、seed scope only，且未啟用 daily write cron。",
+      },
     ],
   },
   {
@@ -162,9 +169,10 @@ export default function DatasetsPage() {
       { "@type": "ListItem", position: 7, name: "現金流量表", url: "https://twmarketdata.com/docs/introduction" },
       { "@type": "ListItem", position: 8, name: "三大法人買賣超", url: "https://twmarketdata.com/datasets/institutional-flow" },
       { "@type": "ListItem", position: 9, name: "融資融券", url: "https://twmarketdata.com/datasets/margin-short" },
-      { "@type": "ListItem", position: 10, name: "估值資料", url: "https://twmarketdata.com/docs/api/financial-growth/valuation-data" },
-      { "@type": "ListItem", position: 11, name: "公司基本資料", url: "https://twmarketdata.com/docs/api/company/issuer-profile" },
-      { "@type": "ListItem", position: 12, name: "事件與公告 metadata", url: "https://twmarketdata.com/docs/api/company-events/events-calendar" },
+      { "@type": "ListItem", position: 10, name: "整體融資融券", url: "https://twmarketdata.com/datasets/total-margin-short" },
+      { "@type": "ListItem", position: 11, name: "估值資料", url: "https://twmarketdata.com/docs/api/financial-growth/valuation-data" },
+      { "@type": "ListItem", position: 12, name: "公司基本資料", url: "https://twmarketdata.com/docs/api/company/issuer-profile" },
+      { "@type": "ListItem", position: 13, name: "事件與公告 metadata", url: "https://twmarketdata.com/docs/api/company-events/events-calendar" },
     ],
   };
 
