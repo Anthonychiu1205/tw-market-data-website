@@ -28,6 +28,12 @@ const datasetFamilies = [
         description: "由價格與成交量衍生的研究指標；目前 baseline 以 TWSE 為主。",
         href: "/docs/introduction",
       },
+      {
+        name: "市場廣度",
+        description: "TWSE 市場漲跌家數與漲跌停彙整，屬於 private beta。",
+        href: "/docs/api/market-prices/market-breadth",
+        overviewHref: "/datasets/market-breadth",
+      },
     ],
   },
   {
@@ -170,9 +176,10 @@ export default function DatasetsPage() {
       { "@type": "ListItem", position: 8, name: "三大法人買賣超", url: "https://twmarketdata.com/datasets/institutional-flow" },
       { "@type": "ListItem", position: 9, name: "融資融券", url: "https://twmarketdata.com/datasets/margin-short" },
       { "@type": "ListItem", position: 10, name: "整體融資融券", url: "https://twmarketdata.com/datasets/total-margin-short" },
-      { "@type": "ListItem", position: 11, name: "估值資料", url: "https://twmarketdata.com/docs/api/financial-growth/valuation-data" },
-      { "@type": "ListItem", position: 12, name: "公司基本資料", url: "https://twmarketdata.com/docs/api/company/issuer-profile" },
-      { "@type": "ListItem", position: 13, name: "事件與公告 metadata", url: "https://twmarketdata.com/docs/api/company-events/events-calendar" },
+      { "@type": "ListItem", position: 11, name: "市場廣度", url: "https://twmarketdata.com/datasets/market-breadth" },
+      { "@type": "ListItem", position: 12, name: "估值資料", url: "https://twmarketdata.com/docs/api/financial-growth/valuation-data" },
+      { "@type": "ListItem", position: 13, name: "公司基本資料", url: "https://twmarketdata.com/docs/api/company/issuer-profile" },
+      { "@type": "ListItem", position: 14, name: "事件與公告 metadata", url: "https://twmarketdata.com/docs/api/company-events/events-calendar" },
     ],
   };
 

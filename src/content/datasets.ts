@@ -236,6 +236,36 @@ export const datasetSeoEntries: readonly DatasetSeoEntry[] = [
     provider: "twse_official",
     marketScope: "TWSE",
   },
+  {
+    slug: "market-breadth",
+    name: "市場廣度",
+    seoTitle: "市場廣度資料集 | TW Market Data",
+    seoDescription:
+      "TWSE 市場廣度資料集（日）提供漲跌家數、漲跌停家數與市場結構欄位，為 2026-05 私有測試種子資料。",
+    shortDescription: "TWSE 市場廣度（Private Beta）日資料，含漲跌/漲跌停與市場總量欄位。",
+    whatItIs:
+      "此資料集聚焦 TWSE 官方來源的市場廣度衍生指標，提供每日漲跌家數與總成交數據，適合觀察盤勢結構與風險脈絡。",
+    useCases: [
+      "追蹤市場日內整體偏弱 / 偏強信號。",
+      "搭配大盤指數與技術指標做盤勢監控。",
+      "在研究流程中保留 source_lineage 與 data_gaps 做可追溯判讀。",
+    ],
+    whyItMatters:
+      "市場廣度資料能補充個股訊號，補強「價格/成交」之外的市場總體結構判讀；對風險管理與策略濾網有直接參考價值。",
+    coverageNote:
+      "當前 coverage 為 2026-05-04 到 2026-05-27，共 18 筆種子資料，且為 TWSE-only。",
+    freshnessNote: "以 private beta 程度同步更新，請以回應中的 freshness 或 data_gaps 判讀即時可用性。",
+    sourcePolicyNote:
+      "採 official-first 與可追溯欄位標記，資料僅保留官方可驗證來源，不含 raw/body；不宣稱 TPEx/full-market 或每日 cron 已啟用。",
+    docsHref: "/docs/api/market-prices/market-breadth",
+    pricingHref: "/pricing",
+    keywords: ["市場廣度 API", "TWSE 市場廣度", "漲跌家數", "漲跌停 觀測"],
+    jsonLdName: "市場廣度資料集",
+    jsonLdDescription: "TWSE-only 市場廣度日資料，含 source_lineage、data_gaps 與 private beta 說明。",
+    sourceRole: "derived_market_breadth",
+    provider: "twse_official",
+    marketScope: "TWSE",
+  },
 ] as const;
 
 export function getDatasetBySlug(slug: string): DatasetSeoEntry | undefined {
