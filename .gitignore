@@ -28,3 +28,6 @@ coverage/
 *.tsbuildinfo
 .vercel
 .env*.local
+
+# generated artifacts
+artifacts/
