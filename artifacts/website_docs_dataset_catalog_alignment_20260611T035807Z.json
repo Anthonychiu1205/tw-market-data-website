@@ -1,0 +1,32 @@
+{
+  "task": "website_docs_dataset_catalog_alignment_with_current_database",
+  "source_repo": "/Volumes/DEV_USB/Projects/tw-feature-engine",
+  "website_repo": "/Volumes/DEV_USB/Projects/tw-market-data-website",
+  "db_write_performed": false,
+  "migration_performed": false,
+  "backend_behavior_changed": false,
+  "stale_routes_removed": [
+    "/v2/datasets/valuations",
+    "/v2/datasets/price-enhanced/market-overview"
+  ],
+  "replacement_routes": [
+    "/v2/datasets/valuation-core-daily",
+    "/v2/datasets/market-overview-snapshots"
+  ],
+  "support_internal_public_catalog_exposure_removed": true,
+  "current_snapshot_warnings_added": [
+    "day_trading_suspension: no_historical_completeness",
+    "day_trading_suspension: no_2022_2026_backfill",
+    "disposition_securities_period: no_historical_completeness",
+    "disposition_securities_period: no_2022_2026_backfill"
+  ],
+  "llms_synced_from_feature_engine": true,
+  "validation": {
+    "lint": "pass",
+    "typecheck": "not_available_as_npm_script",
+    "test": "not_available_as_npm_script",
+    "check_dataset_factory_docs": "pass",
+    "build": "pass"
+  },
+  "final_gate": "WEBSITE_DOCS_DATASET_CATALOG_ALIGNMENT_PASS"
+}

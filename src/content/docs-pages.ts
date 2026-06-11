@@ -187,7 +187,7 @@ const apiPlaceholderCatalog: Array<{
   { sectionId: "market-prices", slug: "historical-prices", navLabel: "歷史股價", title: "歷史股價", subtitle: "提供可回測的歷史行情資料，包含價格與成交量主欄位。", usage: "回測、風險模型與歷史績效分析" },
   { sectionId: "market-prices", slug: "realtime-prices", navLabel: "即時股價", title: "即時股價", subtitle: "提供接近即時的價格快照，用於監控與即時策略流程。", usage: "盤中監控、訊號觸發與即時風控" },
   { sectionId: "market-prices", slug: "company-overview", navLabel: "公司概況", title: "公司概況", subtitle: "提供單一公司的市場概況欄位，支援快速檢視與比對。", usage: "標的初步篩選、主檔查核與投研面板" },
-  { sectionId: "market-prices", slug: "market-overview", navLabel: "市場概況", title: "市場概況", subtitle: "提供市場層級的聚合資訊，用於盤勢與結構觀察。", usage: "市場廣度追蹤、盤中概況分析與風險監看" },
+  { sectionId: "market-prices", slug: "market-overview", navLabel: "市場概況", title: "市場概況", subtitle: "提供市場層級的官方快照資訊，用於盤勢與結構觀察。", usage: "TWSE 市場概況快照、seeded window 檢視與風險監看" },
   { sectionId: "segment-financials", slug: "segment-income-statement", navLabel: "分部損益表", title: "分部損益表", subtitle: "提供公司分部層級的損益欄位，支援結構化比較。", usage: "分部獲利分析、產品線表現追蹤與結構變化研究" },
   { sectionId: "segment-financials", slug: "segment-balance-sheet", navLabel: "分部資產負債表", title: "分部資產負債表", subtitle: "提供分部層級資產與負債資料，協助資本結構分析。", usage: "分部資本效率評估與風險曝險比較" },
   { sectionId: "segment-financials", slug: "segment-cash-flow", navLabel: "分部現金流量表", title: "分部現金流量表", subtitle: "提供分部現金流資料，補足公司整體現金流分析。", usage: "現金流品質檢查與分部資金運用分析" },
@@ -238,7 +238,7 @@ const apiEndpointPathMap: Record<string, string> = {
   "market-prices/historical-prices": "/v2/datasets/price-enhanced/historical",
   "market-prices/realtime-prices": "/v2/datasets/price-enhanced/realtime",
   "market-prices/company-overview": "/v2/datasets/price-enhanced/company-overview",
-  "market-prices/market-overview": "/v2/datasets/price-enhanced/market-overview",
+  "market-prices/market-overview": "/v2/datasets/market-overview-snapshots",
   "segment-financials/segment-income-statement": "/v1/segments/income-statement",
   "segment-financials/segment-balance-sheet": "/v1/segments/balance-sheet",
   "segment-financials/segment-cash-flow": "/v1/segments/cash-flow",
@@ -2597,7 +2597,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
       { title: "現金流量表", href: "/docs/api/financial-growth/cash-flow-statement", topicId: "cash_flow_statement", tableName: "fundamental_cash_flows", endpoint: "/v2/datasets/cash-flow-statement", source: "MOPS" },
       { title: "資產負債表", href: "/docs/api/financial-growth/balance-sheet", topicId: "balance_sheet", tableName: "fundamental_balance_sheets", endpoint: "/v2/datasets/balance-sheet", source: "MOPS" },
       { title: "財報資料（Canonical）", href: "/docs/api/financial-growth/financials-canonical", topicId: "financials_canonical", tableName: "fundamental_*", endpoint: "/v2/datasets/financials", source: "MOPS / Canonical Layer" },
-      { title: "估值資料（Canonical）", href: "/docs/api/financial-growth/valuations-canonical", topicId: "valuations_canonical", tableName: "valuation_core_daily", endpoint: "/v2/datasets/valuations", source: "MOPS / Canonical Layer" },
+      { title: "估值核心日資料（Canonical）", href: "/docs/api/financial-growth/valuations-canonical", topicId: "valuations_canonical", tableName: "valuation_core_daily", endpoint: "/v2/datasets/valuation-core-daily", source: "MOPS / Canonical Layer" },
     ],
   },
   {
@@ -2625,28 +2625,6 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
       { title: "三大法人", href: "/docs/api/capital-flow/institutional-flow", topicId: "institutional_flow", tableName: "institutional_flow", endpoint: "/v2/datasets/institutional-flow", source: "TWSE / TPEx" },
       { title: "融資融券", href: "/docs/api/capital-flow/margin-short", topicId: "margin_short", tableName: "margin_short", endpoint: "/v2/datasets/margin-short", source: "TWSE official-first" },
       { title: "整體融資融券", href: "/docs/api/capital-flow/total-margin-short", topicId: "total_margin_short", tableName: "total_margin_short", endpoint: "/v2/datasets/total-margin-short", source: "TWSE official-first" },
-    ],
-  },
-  {
-    id: "strategy-quant",
-    label: "策略與量化",
-    href: "/docs/api/strategy-quant",
-    icon: "chart",
-    topics: [
-      { title: "特徵資料", href: "/docs/api/strategy-quant/features", topicId: "features", tableName: "features", endpoint: "/v2/datasets/features", source: "平台派生資料" },
-      { title: "因子資料", href: "/docs/api/strategy-quant/factor-data", topicId: "factor_data", tableName: "factor_data", endpoint: "/v2/datasets/factor-data", source: "平台派生資料" },
-      { title: "時間對齊", href: "/docs/api/strategy-quant/time-alignment", topicId: "time_alignment", tableName: "time_alignment", endpoint: "/v2/datasets/time-alignment", source: "平台對齊層" },
-      { title: "條件篩選", href: "/docs/api/strategy-quant/screener", topicId: "screener", tableName: "screener", endpoint: "/v2/datasets/screener", source: "平台查詢層" },
-    ],
-  },
-  {
-    id: "taxonomy",
-    label: "分類與結構",
-    href: "/docs/api/taxonomy",
-    icon: "segments",
-    topics: [
-      { title: "公司分類", href: "/docs/api/taxonomy/theme-taxonomy", topicId: "theme_taxonomy", tableName: "theme_taxonomy", endpoint: "/v2/datasets/theme-taxonomy", source: "平台分類模型" },
-      { title: "指數分類", href: "/docs/api/taxonomy/index-classification", topicId: "index_classification", tableName: "index_classification", endpoint: "/v2/datasets/index-classification", source: "交易所分類 / 平台映射" },
     ],
   },
   {
@@ -3593,7 +3571,7 @@ console.log(data)`,
       "跨標的比較前，建議固定同一日期區間。",
       "若欄位為 null，通常代表當期無法穩定計算，不建議直接補零。",
       "日期以 Asia/Taipei 交易日語意（YYYY-MM-DD）為準。",
-      "Canonical 補充：`/v2/datasets/valuations` 為較低層查詢面（ticker/date_from/date_to）。",
+      "Canonical 補充：`/v2/datasets/valuation-core-daily` 為較低層查詢面（ticker/date_from/date_to）。",
       "一般產品整合建議優先使用本頁主公開 endpoint `/v2/datasets/valuation-data`。",
     ],
     planRequirement: {
@@ -4522,14 +4500,14 @@ function buildFinancialsCanonicalApiSections(): DocsContentSection[] {
 }
 
 function buildValuationsCanonicalApiReference(): ApiReferenceContent {
-  const endpoint = "/v2/datasets/valuations";
+  const endpoint = "/v2/datasets/valuation-core-daily";
   const codeExamples: ApiCodeExamples = {
     python: `import requests
 
 headers = {"X-API-Key": "your_api_key_here"}
 
 response = requests.get(
-    "https://api.twmarketdata.com/v2/datasets/valuations",
+    "https://api.twmarketdata.com/v2/datasets/valuation-core-daily",
     headers=headers,
     params={
         "ticker": "2330",
@@ -4540,22 +4518,22 @@ response = requests.get(
 )
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/valuations?ticker=2330&date_from=2026-01-01&date_to=2026-04-30&limit=10",
+  "https://api.twmarketdata.com/v2/datasets/valuation-core-daily?ticker=2330&date_from=2026-01-01&date_to=2026-04-30&limit=10",
   { headers: { "X-API-Key": "your_api_key_here" } }
 )
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/valuations?ticker=2330&date_from=2026-01-01&date_to=2026-04-30&limit=10" \\
+  --url "https://api.twmarketdata.com/v2/datasets/valuation-core-daily?ticker=2330&date_from=2026-01-01&date_to=2026-04-30&limit=10" \\
   --header "X-API-Key: your_api_key_here"`,
   };
   const successBody = JSON.stringify(
     {
       api_version: "v2",
-      endpoint: "/v2/datasets/valuations",
+      endpoint: "/v2/datasets/valuation-core-daily",
       request_id: "req_def456ghi789",
       plan_id: "free",
-      dataset: "valuations",
+      dataset: "valuation_core_daily",
       query: {
         ticker: "2330",
         date_from: "2026-01-01",

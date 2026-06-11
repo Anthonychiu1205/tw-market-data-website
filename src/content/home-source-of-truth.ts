@@ -187,29 +187,35 @@ export const HOME_SOURCE_OF_TRUTH_ITEMS = [
 }`,
   },
   {
-    id: "classification_query",
-    title: "分類與查詢",
-    description: "主題分類、指數分類、Search API、Query API 與 Screener",
-    responseLabel: "theme_taxonomy",
+    id: "market_structure_snapshot",
+    title: "市場結構快照",
+    description: "TWSE 當前快照型資料；需明確保留 current snapshot only 警告",
+    responseLabel: "day_trading_suspension",
     status: "200 OK",
-    responseTitle: "2330",
+    responseTitle: "current snapshot only",
     code: `{
-  "dataset": "theme_taxonomy",
-  "source_role": "canonical",
+  "dataset": "day_trading_suspension",
+  "source_role": "official_reference_snapshot",
   "lineage": {
-    "provider": "TW Market Data"
+    "provider": "TWSE"
   },
   "rows": [
     {
-      "symbol": "2330",
-      "themes": ["先進製程", "AI 供應鏈"],
-      "index_classifications": ["台灣50", "電子類股"]
+      "ticker": "1101",
+      "market": "TWSE",
+      "security_name": "台泥",
+      "suspension_start_date": "2026-06-09",
+      "suspension_end_date": "2026-06-09",
+      "event_name": "先買後賣現股當沖暫停"
     }
   ],
-  "related_endpoints": [
-    "/v2/search",
-    "/v2/query",
-    "/v2/datasets/screener"
+  "data_gaps": [
+    "twse_only_scope",
+    "no_historical_completeness",
+    "no_2022_2026_backfill"
+  ],
+  "related_datasets": [
+    "disposition_securities_period"
   ]
 }`,
   },
