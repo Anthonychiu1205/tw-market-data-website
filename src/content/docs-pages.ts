@@ -2483,9 +2483,9 @@ const topicPlanVisibility: Partial<Record<string, { bullets: string[] }>> = {
   },
   institutional_flow: {
     bullets: [
-      "Invited / Preview：可用（受控驗證）",
-      "Developer：可用（限制，僅限開發與測試）",
-      "Pro / Enterprise：尚未納入 available-now 商售邊界",
+      "Free：不可用",
+      "Developer：文件可見，非正式商售宣告",
+      "Pro / Enterprise：可用（TWSE-only；含商業使用）",
     ],
   },
   technical_indicators: {
@@ -2518,9 +2518,9 @@ const topicPlanVisibility: Partial<Record<string, { bullets: string[] }>> = {
   },
   dataset_factory_institutional_flow: {
     bullets: [
-      "Invited / Preview：可用（受控驗證）",
-      "Developer：可用（文件預覽，非正式商售宣告）",
-      "Pro / Enterprise：維持 production_ready=false，待後續產品化核准",
+      "Free：不可用",
+      "Developer：文件可見，非正式商售宣告",
+      "Pro / Enterprise：主公開 gateway 可用（TWSE-only）",
     ],
   },
   dataset_factory_technical_indicators: {
@@ -2622,7 +2622,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     href: "/docs/api/capital-flow",
     icon: "holdings",
     topics: [
-      { title: "三大法人", href: "/docs/api/capital-flow/institutional-flow", topicId: "institutional_flow", tableName: "institutional_flow", endpoint: "/v2/datasets/institutional-flow", source: "TWSE / TPEx" },
+      { title: "三大法人", href: "/docs/api/capital-flow/institutional-flow", topicId: "institutional_flow", tableName: "institutional_flow", endpoint: "/v2/datasets/institutional-flow", source: "TWSE official T86" },
       { title: "融資融券", href: "/docs/api/capital-flow/margin-short", topicId: "margin_short", tableName: "margin_short", endpoint: "/v2/datasets/margin-short", source: "TWSE official-first" },
       { title: "整體融資融券", href: "/docs/api/capital-flow/total-margin-short", topicId: "total_margin_short", tableName: "total_margin_short", endpoint: "/v2/datasets/total-margin-short", source: "TWSE official-first" },
     ],
@@ -2669,7 +2669,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
         topicId: "dataset_factory_institutional_flow",
         tableName: "institutional_flow",
         endpoint: "/v2/datasets/institutional-flow",
-        source: "TWSE / TPEx（contract-generated docs）",
+        source: "TWSE official T86（contract-generated docs）",
       },
       {
         title: "Technical Indicators（Preview）",
@@ -7824,7 +7824,7 @@ console.log(data)`,
         {
           symbol: "2330",
           date: "2026-04-22",
-          market: "TW",
+          market: "TWSE",
           foreign_net_buy_sell: 1523000,
           investment_trust_net_buy_sell: -320000,
           dealer_net_buy_sell: 180000,
@@ -7837,8 +7837,8 @@ console.log(data)`,
           dealer_sell: 470000,
           foreign_holding_ratio: 0.741,
           institutional_participation_ratio: 0.684,
-          provider: "twse_official",
-          source_role: "canonical",
+          provider: "twse_official_t86",
+          source_role: "official_twse_t86",
           lineage: {
             source_table: "institutional_flow_items",
           },
@@ -7907,10 +7907,11 @@ console.log(data)`,
     ],
     notes: [
       "本頁為主公開 route，已作為法人買賣超的正式查詢入口。",
+      "目前公開契約僅驗證 TWSE-only；不宣稱 TPEx coverage 或 full-market coverage。",
+      "若回應中看到 legacy market='TW'，那是歷史正規化值，不應解讀為 TPEx coverage。",
       "若需融資融券補充資料，請搭配 `/v2/datasets/margin-short`。",
-      "若需更底層籌碼流向面，請參考 `/v2/datasets/chip-flows`。",
     ],
-    planRequirement: { title: "Plan Requirement", bullets: ["Free（限制）", "Developer", "Pro", "Enterprise"] },
+    planRequirement: { title: "Plan Requirement", bullets: ["Free：不可用", "Developer：文件可見，非正式商售宣告", "Pro：可用（TWSE-only）", "Enterprise：可用（TWSE-only）"] },
     errorCases: ["200", "400", "401", "403", "404"],
     sidePanel: {
       requestExample: codeExamples.curl,

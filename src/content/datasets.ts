@@ -188,8 +188,9 @@ export const datasetSeoEntries: readonly DatasetSeoEntry[] = [
     whyItMatters:
       "法人資金流向常影響短中期價格結構，可補充純價格與財報資料對市場行為的解釋能力。",
     coverageNote:
-      "此資料集 coverage 正在持續補齊中，不應視為全市場/全期間已完整覆蓋。",
-    freshnessNote: "更新節奏與可用日期受官方來源供給影響，請以回應 metadata 與 data_gaps 為準。",
+      "目前公開驗證 coverage 為 2023-06-01..2026-05-28，且僅限 TWSE-only；不宣稱 TPEx 或 full-market 完整覆蓋。",
+    freshnessNote:
+      "更新節奏與可用日期受官方來源供給影響，請以回應 metadata 與 data_gaps 為準；若看到 legacy market='TW'，不得解讀為 TPEx coverage。",
     sourcePolicyNote:
       "僅納入官方/公開來源；缺漏與來源異常會顯式標記，不以推估值補齊。",
     docsHref: "/docs/api/capital-flow/institutional-flow",

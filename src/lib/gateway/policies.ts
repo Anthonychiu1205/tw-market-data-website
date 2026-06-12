@@ -66,6 +66,12 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
     requiredPlan: "pro",
     creditsCost: 2,
   },
+  "institutional-flow": {
+    datasetSlug: "institutional-flow",
+    backendPath: "/v2/datasets/institutional-flow",
+    requiredPlan: "pro",
+    creditsCost: 2,
+  },
   "valuation-data": {
     datasetSlug: "valuation-data",
     backendPath: "/v2/datasets/valuation-data",
