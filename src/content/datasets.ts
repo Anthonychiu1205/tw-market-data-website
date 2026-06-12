@@ -203,6 +203,37 @@ export const datasetSeoEntries: readonly DatasetSeoEntry[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "securities-lending",
+    name: "借券資料",
+    seoTitle: "借券資料集 | TW Market Data",
+    seoDescription:
+      "借券資料集提供 TWSE official TWT72U 借券餘額、借入、還券與資料缺口訊號，適合做借券供給與券源壓力研究。",
+    shortDescription: "TWSE-only 借券資料集，提供借券餘額、借入、還券、close price 與資料缺口訊號。",
+    whatItIs:
+      "此資料集整理 TWSE official TWT72U 借券日資料，保留借券餘額、借入、還券、market value、來源血緣與 data_gaps，適合做券源供給與借券壓力觀察。",
+    useCases: [
+      "觀察個股借券餘額與借入/還券變化。",
+      "識別可能的券源壓力與市場擁擠訊號。",
+      "在研究流程中保留 source_lineage 與 known gaps 做可追溯判讀。",
+    ],
+    whyItMatters:
+      "借券資料可補充價格、法人與信用交易之外的券源供給資訊，對觀察放空壓力、交易擁擠度與市場結構很有幫助。",
+    coverageNote:
+      "目前公開驗證 coverage 為 2020-01-02..2026-06-04，共 1,629,223 rows、1,292 檔 TWSE 標的；不宣稱 TPEx 或 full-market 覆蓋。",
+    freshnessNote:
+      "更新節奏與可用日期受官方來源供給影響，known source gaps 會保留在回應與文案中，不會用推估值補齊。",
+    sourcePolicyNote:
+      "遵循 official-first 與 explicit lineage/data_gaps 原則；僅宣稱 TWSE-only、保留 known source gaps，不暴露 raw/full body。",
+    docsHref: "/docs/api/capital-flow/securities-lending",
+    pricingHref: "/pricing",
+    keywords: ["借券 API", "securities lending", "台股借券資料", "借券餘額"],
+    jsonLdName: "借券資料集",
+    jsonLdDescription: "TWSE-only 借券資料，支援券源供給、借券壓力與市場結構研究。",
+    sourceRole: "official_twse_twt72u",
+    provider: "twse_official",
+    marketScope: "TWSE",
+  },
+  {
     slug: "margin-short",
     name: "融資融券",
     seoTitle: "融資融券資料集 | TW Market Data",

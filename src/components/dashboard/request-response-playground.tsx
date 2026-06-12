@@ -22,6 +22,7 @@ const PLAYGROUND_ENDPOINTS = [
   { value: "/v2/datasets/cash-flow-statement", label: "現金流量表", minPlan: "pro", fields: ["symbol", "period", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/balance-sheet", label: "資產負債表", minPlan: "pro", fields: ["symbol", "period", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/institutional-flow", label: "法人資金流向", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/securities-lending", label: "借券資料", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/margin-short", label: "融資融券", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/events", label: "事件日曆", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/structured-events", label: "結構化事件", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },

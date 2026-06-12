@@ -72,6 +72,12 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
     requiredPlan: "pro",
     creditsCost: 2,
   },
+  "securities-lending": {
+    datasetSlug: "securities-lending",
+    backendPath: "/v2/datasets/chip-deep-securities-lending-daily",
+    requiredPlan: "pro",
+    creditsCost: 2,
+  },
   "valuation-data": {
     datasetSlug: "valuation-data",
     backendPath: "/v2/datasets/valuation-data",

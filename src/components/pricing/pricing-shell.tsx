@@ -235,6 +235,7 @@ const creditsRows = [
   { dataset: "現金流量表", endpoint: "/v2/datasets/cash-flow-statement", cost: "2 credits / request" },
   { dataset: "技術指標", endpoint: "/v2/datasets/technical-indicators", cost: "2 credits / request" },
   { dataset: "法人買賣", endpoint: "/v2/datasets/institutional-flow", cost: "2 credits / request" },
+  { dataset: "借券資料", endpoint: "/v2/datasets/securities-lending", cost: "2 credits / request" },
   { dataset: "市場指數", endpoint: "/v2/datasets/index-data", cost: "2 credits / request" },
   { dataset: "公司新聞", endpoint: "/v2/datasets/company-news", cost: "2 credits / request" },
   { dataset: "主題分類", endpoint: "/v2/datasets/theme-taxonomy", cost: "1 credit / request" },

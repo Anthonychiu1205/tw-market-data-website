@@ -2488,6 +2488,13 @@ const topicPlanVisibility: Partial<Record<string, { bullets: string[] }>> = {
       "Pro / Enterprise：可用（TWSE-only；含商業使用）",
     ],
   },
+  securities_lending: {
+    bullets: [
+      "Free：不可用",
+      "Developer：文件可見，非正式商售宣告",
+      "Pro / Enterprise：可用（TWSE-only；含商業使用）",
+    ],
+  },
   technical_indicators: {
     bullets: [
       "Invited / Preview：可用（受控驗證）",
@@ -2623,6 +2630,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
     icon: "holdings",
     topics: [
       { title: "三大法人", href: "/docs/api/capital-flow/institutional-flow", topicId: "institutional_flow", tableName: "institutional_flow", endpoint: "/v2/datasets/institutional-flow", source: "TWSE official T86" },
+      { title: "借券資料", href: "/docs/api/capital-flow/securities-lending", topicId: "securities_lending", tableName: "securities_lending", endpoint: "/v2/datasets/securities-lending", source: "TWSE official TWT72U" },
       { title: "融資融券", href: "/docs/api/capital-flow/margin-short", topicId: "margin_short", tableName: "margin_short", endpoint: "/v2/datasets/margin-short", source: "TWSE official-first" },
       { title: "整體融資融券", href: "/docs/api/capital-flow/total-margin-short", topicId: "total_margin_short", tableName: "total_margin_short", endpoint: "/v2/datasets/total-margin-short", source: "TWSE official-first" },
     ],
@@ -7939,6 +7947,153 @@ function buildInstitutionalFlowApiSections(): DocsContentSection[] {
   ];
 }
 
+function buildSecuritiesLendingApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildSecuritiesLendingApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/securities-lending";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/securities-lending",
+    headers=headers,
+    params={
+        "symbol": "2330",
+        "market": "TWSE",
+        "start_date": "2026-05-20",
+        "end_date": "2026-06-04",
+        "limit": 3
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/securities-lending?symbol=2330&market=TWSE&start_date=2026-05-20&end_date=2026-06-04&limit=3",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/securities-lending?symbol=2330&market=TWSE&start_date=2026-05-20&end_date=2026-06-04&limit=3" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+
+  const successBody = JSON.stringify(
+    {
+      dataset: "securities_lending",
+      rows: [
+        {
+          ticker: "2330",
+          market: "TWSE",
+          trade_date: "2026-06-04",
+          prev_lending_balance: 1520000,
+          borrowed_volume: 82000,
+          returned_volume: 61000,
+          lending_balance: 1541000,
+          close_price: 952,
+          market_value: 1467032000,
+          provider: "twse_official",
+          source_role: "official_twse_twt72u",
+          source_family: "official_twse_twt72u",
+          lineage: {
+            source_table: "securities_lending_items",
+          },
+          data_gaps: [
+            "source_gaps_unavailable_dates=785",
+          ],
+          not_investment_advice: true,
+        },
+      ],
+      count: 1,
+      meta: {
+        plan: "pro",
+        row_limit: 3,
+        is_limited: false,
+      },
+    },
+    null,
+    2,
+  );
+
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "籌碼與資金",
+    endpoint,
+    method: "GET",
+    overview: [
+      "借券資料 API 提供 TWSE-only 的官方借券日資料，適合觀察券源供給、借券壓力與市場結構訊號。",
+      "本頁公開契約僅宣稱 TWSE official TWT72U；不宣稱 TPEx coverage、full-market coverage，且會保留 known source gaps。",
+    ],
+    requestDescription: ["使用此 endpoint 時，symbol 為必要參數，並建議明確指定 market=TWSE。"],
+    useCases: ["觀察借券餘額與借入/還券變化。", "識別可能的券源壓力與市場擁擠訊號。", "搭配價格、法人與融資融券資料做市場結構研究。"],
+    gettingStarted: [
+      "使用 symbol 指定標的，建議搭配 market=TWSE。",
+      "可用 start_date/end_date 查詢目前驗證 coverage 範圍（2020-01-02..2026-06-04）。",
+      "請在 workflow 內保留 data_gaps 與來源血緣，不要把 known source gaps 當成 0 或推估補齊。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "symbol", type: "string", required: true, description: "股票代碼。" },
+      { name: "market", type: "string", required: false, description: "建議指定 TWSE；本頁不宣稱 TPEx 支援。" },
+      { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數。" },
+    ],
+    responseSummary: ["回應固定為 dataset、rows、count，加上 meta；欄位需保留 data_gaps 與 not_investment_advice。"],
+    responseFields: [
+      { path: "rows[].ticker", type: "string", description: "標的代碼。" },
+      { path: "rows[].market", type: "string", description: "市場別；目前網站僅宣稱 TWSE。" },
+      { path: "rows[].trade_date", type: "string", description: "交易日期（YYYY-MM-DD）。" },
+      { path: "rows[].prev_lending_balance", type: "number|null", description: "前一日借券餘額。" },
+      { path: "rows[].borrowed_volume", type: "number|null", description: "當日借入數量。" },
+      { path: "rows[].returned_volume", type: "number|null", description: "當日還券數量。" },
+      { path: "rows[].lending_balance", type: "number|null", description: "當日借券餘額。" },
+      { path: "rows[].close_price", type: "number|null", description: "收盤價。" },
+      { path: "rows[].market_value", type: "number|null", description: "市值估算欄位。" },
+      { path: "rows[].provider", type: "string", description: "來源提供者。" },
+      { path: "rows[].source_role", type: "string", description: "來源角色。" },
+      { path: "rows[].source_family", type: "string", description: "來源家族。" },
+      { path: "rows[].lineage", type: "object|string|null", description: "來源追溯資訊。" },
+      { path: "rows[].data_gaps", type: "array", description: "資料缺口訊號，需保留於 downstream workflow。" },
+      { path: "rows[].not_investment_advice", type: "boolean", description: "非投資建議宣告。" },
+      { path: "count", type: "integer", description: "回傳資料筆數。" },
+      { path: "meta.plan", type: "string", description: "目前方案代碼。" },
+      { path: "meta.row_limit", type: "integer", description: "方案每次請求可回傳上限。" },
+      { path: "meta.is_limited", type: "boolean", description: "是否因方案限制而截斷資料。" },
+    ],
+    notes: [
+      "本頁為主公開 route，已作為借券資料的正式查詢入口。",
+      "目前公開契約僅驗證 TWSE-only；不宣稱 TPEx coverage 或 full-market coverage。",
+      "known source gaps 會保留在資料與文案中，不應自行推估補齊。",
+      "aggregate row 已排除，且本資料集不屬於 margin_short_lending mixed table。",
+      "若需法人資料補充，請搭配 `/v2/datasets/institutional-flow`；若需信用交易資料，請搭配 `/v2/datasets/margin-short`。",
+    ],
+    planRequirement: { title: "Plan Requirement", bullets: ["Free：不可用", "Developer：文件可見，非正式商售宣告", "Pro：可用（TWSE-only）", "Enterprise：可用（TWSE-only）"] },
+    errorCases: ["200", "400", "401", "403", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳借券資料", body: successBody },
+        { status: "400", description: "查詢參數錯誤", body: `{"detail":"bad_request"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "403", description: "目前方案無法存取此資料", body: `{"error":"dataset_not_entitled"}` },
+        { status: "404", description: "查無符合條件資料", body: `{"dataset":"securities_lending","rows":[],"count":0}` },
+      ],
+    },
+  };
+}
+
 function buildMarginShortApiReference(): ApiReferenceContent {
   const endpoint = "/v2/datasets/margin-short";
   const codeExamples: ApiCodeExamples = {
@@ -11073,6 +11228,22 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
         tier: "complete",
         sections: buildInstitutionalFlowApiSections(),
         apiReferenceFactory: () => buildInstitutionalFlowApiReference(),
+      };
+    }
+
+    if (topic.topicId === "securities_lending") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "借券資料",
+        subtitle: "提供 TWSE-only 借券資料，適合用於券源供給、借券壓力與市場結構觀察。",
+        tier: "complete",
+        sections: buildSecuritiesLendingApiSections(),
+        apiReferenceFactory: () => buildSecuritiesLendingApiReference(),
       };
     }
 
