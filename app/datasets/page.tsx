@@ -62,7 +62,8 @@ const datasetFamilies = [
       {
         name: "現金流量表",
         description: "追蹤公司營業、投資與籌資現金流，用於觀察獲利品質與現金創造能力。",
-        href: "/docs/introduction",
+        href: "/docs/api/financial-growth/cash-flow-statement",
+        overviewHref: "/datasets/cash-flow-statement",
       },
       {
         name: "估值資料",
@@ -172,7 +173,7 @@ export default function DatasetsPage() {
       { "@type": "ListItem", position: 4, name: "月營收", url: "https://twmarketdata.com/datasets/monthly-revenue" },
       { "@type": "ListItem", position: 5, name: "損益表", url: "https://twmarketdata.com/datasets/income-statement" },
       { "@type": "ListItem", position: 6, name: "資產負債表", url: "https://twmarketdata.com/datasets/balance-sheet" },
-      { "@type": "ListItem", position: 7, name: "現金流量表", url: "https://twmarketdata.com/docs/introduction" },
+      { "@type": "ListItem", position: 7, name: "現金流量表", url: "https://twmarketdata.com/datasets/cash-flow-statement" },
       { "@type": "ListItem", position: 8, name: "三大法人買賣超", url: "https://twmarketdata.com/datasets/institutional-flow" },
       { "@type": "ListItem", position: 9, name: "融資融券", url: "https://twmarketdata.com/datasets/margin-short" },
       { "@type": "ListItem", position: 10, name: "整體融資融券", url: "https://twmarketdata.com/datasets/total-margin-short" },

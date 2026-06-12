@@ -36,9 +36,11 @@ const ENDPOINT_ROWS: Record<"market" | "fundamentals" | "events", EndpointRow[]>
     { resource: "Market Prices", path: "/v2/datasets/market-prices", usageCost: "1 credit", docLabel: "查看文件", docHref: "/docs/api/market-prices/market-prices" },
   ],
   fundamentals: [
-    { resource: "Monthly Revenue", path: "/v2/datasets/monthly-revenue", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/monthly-revenue" },
-    { resource: "Income Statement", path: "/v2/datasets/income-statement", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/income-statement" },
-    { resource: "Valuation Data", path: "/v2/datasets/valuation-data", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/valuation-data" },
+    { resource: "Monthly Revenue", path: "/v2/datasets/monthly-revenue", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/financial-growth/monthly-revenue" },
+    { resource: "Income Statement", path: "/v2/datasets/income-statement", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/financial-growth/income-statement" },
+    { resource: "Balance Sheet", path: "/v2/datasets/balance-sheet", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/financial-growth/balance-sheet" },
+    { resource: "Cash Flow Statement", path: "/v2/datasets/cash-flow-statement", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/financial-growth/cash-flow-statement" },
+    { resource: "Valuation Data", path: "/v2/datasets/valuation-data", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/financial-growth/valuation-data" },
   ],
   events: [
     { resource: "Issuer Profile", path: "/v2/datasets/issuer-profile", usageCost: "1 credit", docLabel: "查看文件", docHref: "/docs/api/company/issuer-profile" },

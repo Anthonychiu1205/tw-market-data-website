@@ -230,7 +230,9 @@ const comparisonSections: ComparisonSection[] = [
 
 const creditsRows = [
   { dataset: "TWSE 日線價格", endpoint: "/v2/datasets/twse-daily-price", cost: "1 credit / request" },
-  { dataset: "財報三表（範例：損益表）", endpoint: "/v2/datasets/income-statement", cost: "2 credits / request" },
+  { dataset: "損益表", endpoint: "/v2/datasets/income-statement", cost: "2 credits / request" },
+  { dataset: "資產負債表", endpoint: "/v2/datasets/balance-sheet", cost: "2 credits / request" },
+  { dataset: "現金流量表", endpoint: "/v2/datasets/cash-flow-statement", cost: "2 credits / request" },
   { dataset: "技術指標", endpoint: "/v2/datasets/technical-indicators", cost: "2 credits / request" },
   { dataset: "法人買賣", endpoint: "/v2/datasets/institutional-flow", cost: "2 credits / request" },
   { dataset: "市場指數", endpoint: "/v2/datasets/index-data", cost: "2 credits / request" },

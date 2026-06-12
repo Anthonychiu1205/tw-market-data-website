@@ -142,6 +142,36 @@ export const datasetSeoEntries: readonly DatasetSeoEntry[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "cash-flow-statement",
+    name: "現金流量表",
+    seoTitle: "台股現金流量表資料集 | TW Market Data",
+    seoDescription:
+      "台股現金流量表資料集提供營業、投資與籌資現金流欄位，支援現金品質、資本配置與財務韌性研究。",
+    shortDescription: "公司營業、投資與籌資現金流的季度資料集。",
+    whatItIs:
+      "此資料集整理公司季度現金流量表核心欄位，支援獲利品質、現金創造能力與資本支出結構分析。",
+    useCases: [
+      "檢查營業現金流與淨利的一致性",
+      "分析投資與籌資活動對現金部位的影響",
+      "評估公司自由現金流與資本配置壓力",
+    ],
+    whyItMatters:
+      "現金流量表能補足只看損益表看不到的現金品質問題，是判斷企業財務韌性與資本效率的重要來源。",
+    coverageNote:
+      "不同公司與季度的揭露節奏可能不同，請以欄位可用性與 data_gaps 訊號判讀實際可用範圍。",
+    freshnessNote: "財報更新受官方揭露時點影響，請先確認最新可用季度。",
+    sourcePolicyNote:
+      "遵循 official/public-first 與可追溯欄位契約，不以未驗證來源補齊缺漏。",
+    docsHref: "/docs/api/financial-growth/cash-flow-statement",
+    pricingHref: "/pricing",
+    keywords: ["台股現金流量表 API", "營業現金流", "自由現金流", "財報資料"],
+    jsonLdName: "現金流量表資料集",
+    jsonLdDescription: "台股公司季度現金流量表資料，支援現金品質與財務韌性分析。",
+    sourceRole: "official_cash_flow_statement",
+    provider: "twse",
+    marketScope: "TWSE",
+  },
+  {
     slug: "institutional-flow",
     name: "三大法人買賣超",
     seoTitle: "三大法人買賣超資料集 | TW Market Data",

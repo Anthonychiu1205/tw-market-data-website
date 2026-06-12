@@ -48,6 +48,24 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
     requiredPlan: "developer",
     creditsCost: 3,
   },
+  "income-statement": {
+    datasetSlug: "income-statement",
+    backendPath: "/v2/datasets/income-statement",
+    requiredPlan: "pro",
+    creditsCost: 2,
+  },
+  "balance-sheet": {
+    datasetSlug: "balance-sheet",
+    backendPath: "/v2/datasets/balance-sheet",
+    requiredPlan: "pro",
+    creditsCost: 2,
+  },
+  "cash-flow-statement": {
+    datasetSlug: "cash-flow-statement",
+    backendPath: "/v2/datasets/cash-flow-statement",
+    requiredPlan: "pro",
+    creditsCost: 2,
+  },
   "valuation-data": {
     datasetSlug: "valuation-data",
     backendPath: "/v2/datasets/valuation-data",
@@ -82,4 +100,3 @@ export function isPlanAllowed(userPlan: GatewayPlanCode, requiredPlan: GatewayPl
 export function resolveDatasetPolicy(datasetSlug: string) {
   return DATASET_ACCESS_POLICIES[datasetSlug] ?? null;
 }
-

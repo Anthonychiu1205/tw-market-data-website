@@ -131,6 +131,8 @@ export const creditsReference = [
   { endpoint: "/v2/datasets/tpex-daily-price", unit: "每 1,000 次", cost: "NT$15" },
   { endpoint: "/v2/datasets/monthly-revenue", unit: "每 1,000 次", cost: "NT$18" },
   { endpoint: "/v2/datasets/income-statement", unit: "每 1,000 次", cost: "NT$20" },
+  { endpoint: "/v2/datasets/balance-sheet", unit: "每 1,000 次", cost: "NT$20" },
+  { endpoint: "/v2/datasets/cash-flow-statement", unit: "每 1,000 次", cost: "NT$20" },
   { endpoint: "/v2/datasets/valuation-data", unit: "每 1,000 次", cost: "NT$18" },
   { endpoint: "/v2/datasets/technical-indicators", unit: "每 1,000 次", cost: "NT$18" },
   { endpoint: "/v2/datasets/institutional-flow", unit: "每 1,000 次", cost: "NT$18" },
