@@ -2618,6 +2618,7 @@ const schemaReadyGroups: SchemaReadyGroup[] = [
       { title: "還原股價", href: "/docs/api/market-prices/adjusted-prices", topicId: "adjusted_prices", tableName: "adjusted_prices", endpoint: "/v2/datasets/adjusted-prices", source: "TWSE / TPEx" },
       { title: "技術指標", href: "/docs/api/market-prices/technical-indicators", topicId: "technical_indicators", tableName: "technical_indicators", endpoint: "/v2/datasets/technical-indicators", source: "TWSE（Non-TPEx, Stage0 baseline）" },
       { title: "市場指數 / Market Index", href: "/docs/api/market-prices/market-index", topicId: "market_index", tableName: "index_data_items", endpoint: "/v2/datasets/market-index", source: "TWSE official MI_INDEX / exact mapping" },
+      { title: "報酬指數 / Return Index Daily", href: "/docs/api/market-prices/return-index-daily", topicId: "return_index_daily", tableName: "return_index_daily", endpoint: "/v2/datasets/return-index-daily", source: "TWSE / TPEx official" },
       { title: "指數資料", href: "/docs/api/market-prices/index-data", topicId: "index_data", tableName: "index_data", endpoint: "/v2/datasets/index-data", source: "TWSE / TPEx" },
       { title: "市場廣度", href: "/docs/api/market-prices/market-breadth", topicId: "market_breadth", tableName: "market_breadth", endpoint: "/v2/datasets/market-breadth", source: "TWSE" },
       { title: "利率", href: "/docs/api/market-prices/interest-rate", topicId: "interest_rate_snapshot", tableName: "interest_rate_snapshot", endpoint: "/v2/datasets/interest-rate-snapshot", source: "中央銀行 / 公開資料平台" },
@@ -6102,6 +6103,159 @@ console.log(data)`,
 }
 
 function buildMarketIndexApiSections(): DocsContentSection[] {
+  return [
+    { id: "overview", label: "Overview", paragraphs: [] },
+    { id: "request", label: "Request", paragraphs: [] },
+    { id: "query-parameters", label: "Query Parameters", paragraphs: [] },
+    { id: "response-shape", label: "Response Shape", paragraphs: [] },
+    { id: "field-reference", label: "Field 說明", paragraphs: [] },
+    { id: "usage-notes", label: "Usage Notes", paragraphs: [] },
+    { id: "plan-requirement", label: "Plan Requirement", paragraphs: [] },
+  ];
+}
+
+function buildReturnIndexDailyApiReference(): ApiReferenceContent {
+  const endpoint = "/v2/datasets/return-index-daily";
+  const codeExamples: ApiCodeExamples = {
+    python: `import requests
+
+headers = {"X-API-Key": "your_api_key_here"}
+response = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/return-index-daily",
+    headers=headers,
+    params={
+        "market": "TWSE",
+        "index_id": "TAIEX_TOTAL_RETURN",
+        "start_date": "2026-05-01",
+        "end_date": "2026-05-29",
+        "limit": 10,
+    },
+)
+print(response.json())`,
+    javascript: `const res = await fetch(
+  "https://api.twmarketdata.com/v2/datasets/return-index-daily?market=TWSE&index_id=TAIEX_TOTAL_RETURN&start_date=2026-05-01&end_date=2026-05-29&limit=10",
+  { headers: { "X-API-Key": "your_api_key_here" } }
+)
+const data = await res.json()
+console.log(data)`,
+    curl: `curl --request GET \\
+  --url "https://api.twmarketdata.com/v2/datasets/return-index-daily?market=TWSE&index_id=TAIEX_TOTAL_RETURN&start_date=2026-05-01&end_date=2026-05-29&limit=10" \\
+  --header "X-API-Key: your_api_key_here"`,
+  };
+  const successBody = JSON.stringify(
+    {
+      dataset: "return_index_daily",
+      rows: [
+        {
+          trade_date: "2026-05-29",
+          market: "TWSE",
+          index_id: "TAIEX_TOTAL_RETURN",
+          index_name: "TAIEX Total Return Index",
+          return_index_value: 32145.67,
+          source_name: "TWSE official",
+          source_url: "https://www.twse.com.tw/",
+        },
+      ],
+      count: 1,
+      request_context: {
+        endpoint: "/v2/datasets/return-index-daily",
+        category: "total_return_index",
+        not_investment_advice: true,
+        warnings: [
+          "different_from_price_index",
+          "not_a_buy_sell_signal",
+        ],
+      },
+      meta: {
+        default_limit: 100,
+        max_limit: 500,
+      },
+    },
+    null,
+    2,
+  );
+
+  return {
+    layoutVariant: "data-api-standard",
+    categoryLabel: "市場與價格",
+    endpoint,
+    method: "GET",
+    overview: [
+      "Return Index Daily API 提供 TWSE / TPEx total return index daily data。",
+      "This dataset is a Total Return Index dataset and should be treated separately from price index datasets such as market-index or index-data.",
+    ],
+    requestDescription: [
+      "使用 `market` 與 `index_id` 指定目標 total return index。",
+      "可用 `start_date` / `end_date` 做區間查詢，`limit` 預設 100、最大 500。",
+    ],
+    useCases: [
+      "查詢 TWSE / TPEx total return index 的日度序列。",
+      "在研究流程中保留 total-return 與 price-index 的方法論區隔。",
+      "作為 official-first 指數回報觀察的 read-only dataset contract。",
+    ],
+    gettingStarted: [
+      "TWSE example：`market=TWSE&index_id=TAIEX_TOTAL_RETURN`。",
+      "TPEx example：`market=TPEx&index_id=TPEX_RETURN_INDEX`。",
+      "若要比較 price index，請使用獨立 dataset，不要直接把 total return index levels 當成相同口徑。",
+    ],
+    exampleRequestCurl: codeExamples.curl,
+    queryParameters: [
+      { name: "market", type: "string", required: true, description: "市場別。Allowed values：`TWSE`、`TPEx`。" },
+      { name: "index_id", type: "string", required: true, description: "指數代碼。Allowed values：`TAIEX_TOTAL_RETURN`、`TPEX_RETURN_INDEX`。" },
+      { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
+      { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
+      { name: "limit", type: "integer", required: false, description: "回傳筆數。預設 100，最大 500。" },
+    ],
+    responseSummary: [
+      "回應提供 daily total return index rows，並附 `request_context.not_investment_advice` 等 safety context。",
+      "欄位重點包含 `trade_date`、`market`、`index_id`、`index_name`、`return_index_value`、`source_name`、`source_url`。",
+    ],
+    responseFields: [
+      { path: "rows[].trade_date", type: "string", description: "交易日期（YYYY-MM-DD）。" },
+      { path: "rows[].market", type: "string", description: "市場別（TWSE / TPEx）。" },
+      { path: "rows[].index_id", type: "string", description: "total return index identifier。" },
+      { path: "rows[].index_name", type: "string", description: "total return index 顯示名稱。" },
+      { path: "rows[].return_index_value", type: "number|null", description: "當日 total return index value。" },
+      { path: "rows[].source_name", type: "string", description: "官方來源名稱。" },
+      { path: "rows[].source_url", type: "string", description: "官方來源 URL。" },
+      { path: "request_context.not_investment_advice", type: "boolean", description: "非投資建議 safety flag。" },
+      { path: "request_context.warnings", type: "array", description: "使用警示，包含 different_from_price_index / not_a_buy_sell_signal。" },
+      { path: "meta.default_limit", type: "integer", description: "預設 limit。" },
+      { path: "meta.max_limit", type: "integer", description: "最大 limit。" },
+    ],
+    notes: [
+      "Total Return Index。",
+      "Different from price index。",
+      "Source: TWSE / TPEx official。",
+      "Not investment advice。",
+      "Not a buy/sell signal。",
+      "It should not be compared directly with price index levels without understanding total-return methodology。",
+      "Do not merge this dataset into `market-index`; keep it as a separate endpoint contract.",
+    ],
+    planRequirement: {
+      title: "Status / Scope",
+      bullets: [
+        "Backend exposure_status: internal_api_only",
+        "Website implementation scope: API Docs / Playground only",
+        "No pricing / entitlement / dashboard changes in this rollout",
+        "public_sellable=false",
+      ],
+    },
+    errorCases: ["200", "400", "401", "404"],
+    sidePanel: {
+      requestExample: codeExamples.curl,
+      codeExamples,
+      statusExamples: [
+        { status: "200", description: "成功回傳 return index daily data", body: successBody },
+        { status: "400", description: "缺少必要參數或 index_id / market 不合法", body: `{"detail":"invalid_request"}` },
+        { status: "401", description: "缺少或無效 API key", body: `{"detail":"missing_api_key"}` },
+        { status: "404", description: "查無符合條件資料", body: `{"dataset":"return_index_daily","rows":[],"count":0}` },
+      ],
+    },
+  };
+}
+
+function buildReturnIndexDailyApiSections(): DocsContentSection[] {
   return [
     { id: "overview", label: "Overview", paragraphs: [] },
     { id: "request", label: "Request", paragraphs: [] },
@@ -11039,6 +11193,22 @@ const schemaReadyTopicPages: DocsPageEntry[] = schemaReadyGroups.flatMap((group)
       };
     }
 
+    if (topic.topicId === "return_index_daily") {
+      return {
+        slug: hrefToSlug(topic.href),
+        href: topic.href,
+        navLabel: topic.title,
+        category: "api",
+        apiSection: group.id,
+        icon: topic.icon ?? group.icon,
+        title: "Return Index Daily API",
+        subtitle: "TWSE / TPEx total return index daily data，獨立於 market-index 的 Total Return Index endpoint。",
+        tier: "complete",
+        sections: buildReturnIndexDailyApiSections(),
+        apiReferenceFactory: () => buildReturnIndexDailyApiReference(),
+      };
+    }
+
     if (topic.topicId === "market_breadth") {
       return {
         slug: hrefToSlug(topic.href),
@@ -11803,6 +11973,7 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
       { title: "還原股價", href: "/docs/api/market-prices/adjusted-prices", icon: "prices", status: "preview" },
       { title: "技術指標", href: "/docs/api/market-prices/technical-indicators", icon: "prices", status: "normalized" },
       { title: "市場指數 / Market Index", href: "/docs/api/market-prices/market-index", icon: "prices", status: "preview" },
+      { title: "報酬指數 / Return Index Daily", href: "/docs/api/market-prices/return-index-daily", icon: "prices", status: "preview" },
       { title: "市場指數", href: "/docs/api/market-prices/index-data", icon: "prices", status: "normalized" },
       { title: "市場廣度", href: "/docs/api/market-prices/market-breadth", icon: "prices", status: "normalized" },
       { title: "利率快照", href: "/docs/api/market-prices/interest-rate", icon: "rates", status: "normalized" },
