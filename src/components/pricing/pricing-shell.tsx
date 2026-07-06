@@ -29,7 +29,6 @@ import {
   getPricingPlanView,
   getPricingPlanViews,
   type PlanHighlightIcon,
-  type PricingPlanView,
 } from "@/src/lib/billing/plans";
 import { createCheckoutSession } from "@/src/lib/billing/checkout-actions";
 import { cn } from "@/src/lib/cn";
