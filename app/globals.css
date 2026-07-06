@@ -30,6 +30,21 @@ a {
   color: inherit;
 }
 
+/* UX polish: disable the native drag-ghost so users can't accidentally "pick up"
+   links, images, icons or buttons (text selection stays intact). */
+a,
+img,
+svg,
+button,
+[role="button"] {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+img {
+  user-select: none;
+}
+
 pre,
 code {
   font-family: var(--font-mono);
