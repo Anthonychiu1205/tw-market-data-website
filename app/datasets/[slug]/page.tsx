@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
+import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 import { getDatasetBySlug, datasetSeoEntries } from "@/src/content/datasets";
 
 type PageProps = {
@@ -38,11 +39,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: `/datasets/${dataset.slug}`,
       siteName: "TW Market Data",
       type: "article",
+      images: [getAbsoluteUrl(siteConfig.ogImagePath)],
     },
     twitter: {
       card: "summary_large_image",
       title: dataset.seoTitle,
       description: dataset.seoDescription,
+      images: [getAbsoluteUrl(siteConfig.ogImagePath)],
     },
   };
 }
