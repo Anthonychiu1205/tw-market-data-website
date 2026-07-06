@@ -73,8 +73,9 @@ npm run build
 
 ## Billing Integration
 
-- ECPay periodic credit-card checkout is integrated for `/pricing` paid plans.
-- Setup and callback details: `docs/BILLING_ECPAY_SETUP.md`
+- Polar inline embedded checkout is integrated for `/pricing` paid plans; subscription
+  provisioning is handled by the shared Polar webhook in the read API service.
+- Setup and product mapping: `docs/BILLING_POLAR_SETUP.md`
 
 ## API Keys Lifecycle
 

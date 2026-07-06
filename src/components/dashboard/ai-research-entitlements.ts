@@ -1,4 +1,4 @@
-export type AiResearchPlan = "free" | "developer" | "pro" | "team" | "enterprise";
+export type AiResearchPlan = "free" | "starter" | "pro" | "max" | "developer" | "enterprise";
 
 export type AiResearchEntitlement = {
   plan: AiResearchPlan;
@@ -30,21 +30,21 @@ const ENTITLEMENTS: Record<AiResearchPlan, AiResearchEntitlement> = {
     customWorkflow: false,
     statusLabel: "未開放",
     helperCopy: "此方案不開放 AI Research。",
-    upgradeCopy: "AI Research 為 Pro+ 功能。請升級至 Pro、Team 或 Enterprise 使用。",
+    upgradeCopy: "AI Research 為付費功能。請升級至 Starter 以上方案使用。",
   },
-  developer: {
-    plan: "developer",
-    displayName: "Developer",
+  starter: {
+    plan: "starter",
+    displayName: "Starter",
     access: "preview",
     canRunResearch: true,
     modeLabel: "Mock Preview",
     quotaLabel: "5 次預覽 / 月",
-    commercialUse: false,
+    commercialUse: true,
     batch: false,
     simulatedPortfolio: false,
     customWorkflow: false,
     statusLabel: "預覽",
-    helperCopy: "Mock preview only，僅供開發驗證流程，非商業使用。",
+    helperCopy: "Mock preview only，適合開發驗證流程。",
     upgradeCopy: null,
   },
   pro: {
@@ -62,9 +62,9 @@ const ENTITLEMENTS: Record<AiResearchPlan, AiResearchEntitlement> = {
     helperCopy: "提供單一 ticker 基本研究流程與 decision log。",
     upgradeCopy: null,
   },
-  team: {
-    plan: "team",
-    displayName: "Team",
+  max: {
+    plan: "max",
+    displayName: "Max",
     access: "full",
     canRunResearch: true,
     modeLabel: "Full",
@@ -75,6 +75,21 @@ const ENTITLEMENTS: Record<AiResearchPlan, AiResearchEntitlement> = {
     customWorkflow: false,
     statusLabel: "完整",
     helperCopy: "可用 batch 研究與 simulated portfolio（本輪僅顯示 UI，不做功能實作）。",
+    upgradeCopy: null,
+  },
+  developer: {
+    plan: "developer",
+    displayName: "Developer",
+    access: "full",
+    canRunResearch: true,
+    modeLabel: "Full+",
+    quotaLabel: "高頻研究額度",
+    commercialUse: true,
+    batch: true,
+    simulatedPortfolio: true,
+    customWorkflow: false,
+    statusLabel: "完整",
+    helperCopy: "最高自助研究額度，含 batch 與 simulated portfolio（本輪僅顯示 UI）。",
     upgradeCopy: null,
   },
   enterprise: {
@@ -99,5 +114,5 @@ export function getAiResearchEntitlement(plan: AiResearchPlan): AiResearchEntitl
 }
 
 export function listAiResearchPlans(): AiResearchPlan[] {
-  return ["free", "developer", "pro", "team", "enterprise"];
+  return ["free", "starter", "pro", "max", "developer", "enterprise"];
 }

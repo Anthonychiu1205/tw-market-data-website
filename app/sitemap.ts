@@ -28,6 +28,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/datasets/income-statement", changeFrequency: "weekly", priority: 0.85 },
     { path: "/datasets/balance-sheet", changeFrequency: "weekly", priority: 0.85 },
     { path: "/datasets/institutional-flow", changeFrequency: "weekly", priority: 0.85 },
+    { path: "/datasets/securities-lending", changeFrequency: "weekly", priority: 0.85 },
     { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
     { path: "/docs", changeFrequency: "weekly", priority: 0.9 },
     { path: "/blog", changeFrequency: "monthly", priority: 0.8 },

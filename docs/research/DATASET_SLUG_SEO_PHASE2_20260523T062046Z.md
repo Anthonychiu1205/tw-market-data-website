@@ -119,12 +119,6 @@ Route (app)
 ├ ƒ /api/auth/resend-verification
 ├ ƒ /api/auth/reset-password
 ├ ƒ /api/auth/verify-email
-├ ƒ /api/billing/ecpay/cancel
-├ ƒ /api/billing/ecpay/checkout
-├ ƒ /api/billing/ecpay/credits/create
-├ ƒ /api/billing/ecpay/credits/notify
-├ ƒ /api/billing/ecpay/notify
-├ ƒ /api/billing/ecpay/period-notify
 ├ ƒ /api/dashboard/api-keys
 ├ ƒ /api/dashboard/api-keys/[id]
 ├ ƒ /api/dashboard/api-keys/[id]/secret

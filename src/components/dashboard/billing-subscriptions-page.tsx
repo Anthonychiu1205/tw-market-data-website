@@ -121,7 +121,7 @@ export function BillingSubscriptionsPage({ currentPlanId, subscription }: Billin
         </section>
       ) : null}
 
-      <section className="mx-auto grid max-w-6xl grid-cols-1 gap-8 xl:grid-cols-3">
+      <section className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
         {plans.map((plan) => (
           <article
             key={plan.planCode}

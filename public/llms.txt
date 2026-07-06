@@ -1,66 +1,121 @@
-# TW Market Data
+Dataset Factory (machine-readable index)
+not_investment_advice=true
+rule:no_buy_sell_target_price_recommendation
+rule:preserve_data_gaps_and_unknowns
 
-TW Market Data 是台股資料 API，為 AI agent、量化研究、自動化系統與金融產品開發設計。
+allowed_dataset_ids:
+- balance_sheet
+- block_trade_daily
+- bond_convertible_reference
+- broker_branch_reference
+- business_indicator_monthly
+- capital_formation_events
+- cash_flow
+- company_risk_events
+- convertible_bond_institutional_flow
+- day_trading_suspension
+- disposition_securities_period
+- dividends
+- esg_tesg
+- etf_holdings
+- fund_etf_metadata
+- income_statement
+- insider_director_holdings
+- institutional_flow
+- margin_short
+- market_index
+- market_overview_snapshots
+- monthly_revenue
+- options_daily_taifex
+- ownership_distribution
+- securities_lending
+- security_master
+- stock_delisting_lifecycle
+- stock_price_limit_daily
+- stock_split_par_value_events
+- taifex_institutional_flow
+- taifex_options_settlement_price
+- tax_business_registration
+- technical_indicators
+- total_margin_short_daily
+- valuation_core_daily
+- valuation_data
+- warrants_reference
 
-## Base URL
+datasets:
+- id=balance_sheet; status=production_baseline; production_ready=false; route=/v2/datasets/balance-sheet
+- id=block_trade_daily; status=private_beta; production_ready=false; route=/v2/datasets/block-trade-daily
+- id=bond_convertible_reference; status=private_beta; production_ready=false; route=/v2/datasets/bond-convertible-reference
+- id=broker_branch_reference; status=production_baseline; production_ready=false; route=/v2/datasets/broker-branch-reference
+- id=business_indicator_monthly; status=private_beta; production_ready=false; route=/v2/datasets/business-indicator-monthly
+- id=capital_formation_events; status=private_beta; production_ready=false; route=/v2/datasets/capital-formation-events
+- id=cash_flow; status=production_baseline; production_ready=false; route=/v2/datasets/cash-flow
+- id=company_risk_events; status=private_beta; production_ready=false; route=/v2/datasets/company-risk-events
+- id=convertible_bond_institutional_flow; status=production_baseline; production_ready=false; route=/v2/datasets/convertible-bond-institutional-flow
+- id=day_trading_suspension; status=trusted_current_snapshot_only; production_ready=false; route=/v2/datasets/day-trading-suspension
+- id=disposition_securities_period; status=trusted_current_snapshot_only; production_ready=false; route=/v2/datasets/disposition-securities-period
+- id=dividends; status=trusted_current_snapshot_only; production_ready=false; route=/v2/datasets/dividends
+- id=esg_tesg; status=private_beta; production_ready=false; route=/v2/datasets/esg-tesg
+- id=etf_holdings; status=private_beta; production_ready=false; route=/v2/datasets/etf-holdings
+- id=fund_etf_metadata; status=private_beta; production_ready=false; route=/v2/datasets/fund-etf-metadata
+- id=income_statement; status=production_baseline; production_ready=false; route=/v2/datasets/income-statement
+- id=insider_director_holdings; status=private_beta; production_ready=false; route=/v2/datasets/insider-director-holdings
+- id=institutional_flow; status=production_baseline; production_ready=false; route=/v2/datasets/institutional-flow
+- id=margin_short; status=dataset_factory_ready; production_ready=false; route=/v2/datasets/margin-short
+- id=market_index; status=production_baseline; production_ready=false; route=/v2/datasets/market-index
+- id=market_overview_snapshots; status=production_baseline; production_ready=false; route=/v2/datasets/market-overview-snapshots
+- id=monthly_revenue; status=product_table_written_35month; production_ready=false; route=/v2/datasets/monthly-revenue
+- id=options_daily_taifex; status=private_beta; production_ready=false; route=/v2/datasets/options-daily-taifex
+- id=ownership_distribution; status=private_beta; production_ready=false; route=/v2/datasets/ownership-distribution
+- id=securities_lending; status=trusted_baseline; production_ready=false; route=/v2/datasets/chip-deep-securities-lending-daily
+- id=security_master; status=production_baseline; production_ready=false; route=/v2/datasets/security-master
+- id=stock_delisting_lifecycle; status=private_beta; production_ready=false; route=/v2/datasets/stock-delisting-lifecycle
+- id=stock_price_limit_daily; status=private_beta; production_ready=false; route=/v2/datasets/stock-price-limit-daily
+- id=stock_split_par_value_events; status=private_beta; production_ready=false; route=/v2/datasets/stock-split-par-value-events
+- id=taifex_institutional_flow; status=private_beta; production_ready=false; route=/v2/datasets/taifex-institutional-flow
+- id=taifex_options_settlement_price; status=private_beta; production_ready=false; route=/v2/datasets/taifex-options-settlement-price
+- id=tax_business_registration; status=private_beta; production_ready=false; route=/v2/datasets/tax-business-registration
+- id=technical_indicators; status=production_baseline; production_ready=false; route=/v2/datasets/technical-indicators
+- id=total_margin_short_daily; status=trusted_baseline; production_ready=false; route=/v2/datasets/total-margin-short
+- id=valuation_core_daily; status=production_baseline; production_ready=false; route=/v2/datasets/valuation-core-daily
+- id=valuation_data; status=production_baseline; production_ready=false; route=/v2/datasets/valuation-data
+- id=warrants_reference; status=private_beta; production_ready=false; route=/v2/datasets/warrants-reference
 
-https://twmarketdata.com
-
-## Authentication
-
-- API access uses an API key workflow through the dashboard.
-- Access scope, rate limits and dataset availability depend on plan and rollout status.
-- Do not include secrets in prompts, logs or public client code.
-
-## Main Documentation
-
-- Introduction: https://twmarketdata.com/docs/introduction
-- Dataset catalog: https://twmarketdata.com/datasets
-- Pricing: https://twmarketdata.com/pricing
-- OpenAPI: https://twmarketdata.com/openapi.json
-- Full LLM index: https://twmarketdata.com/llms-full.txt
-
-## Core Dataset Pages
-
-- TWSE daily price: https://twmarketdata.com/datasets/twse-daily-price
-- Monthly revenue: https://twmarketdata.com/datasets/monthly-revenue
-- Income statement: https://twmarketdata.com/datasets/income-statement
-- Balance sheet: https://twmarketdata.com/datasets/balance-sheet
-- Institutional flow: https://twmarketdata.com/datasets/institutional-flow
-
-## API Documentation Groups
-
-- Market prices: https://twmarketdata.com/docs/api/market-prices/twse-daily-price
-- Fundamentals: https://twmarketdata.com/docs/api/financial-growth/monthly-revenue
-- Institutional flow: https://twmarketdata.com/docs/api/capital-flow/institutional-flow
-- Company profile: https://twmarketdata.com/docs/api/company/issuer-profile
-- OpenAPI reference: https://twmarketdata.com/docs/openapi-spec
-
-## AI Agent Notes
-
-- Preserve data_gaps, coverage and freshness context in downstream workflows.
-- TW Market Data provides data infrastructure, not investment advice.
-- No trading action guidance is provided from this index.
-- MCP references are preview/planned; do not assume a hosted production MCP server is available.
-- Production MCP tooling will require stable OpenAPI contracts, dataset coverage audits, entitlement controls, and explicit productization approval.
-
-## Dataset Factory Preview Docs
-
-- dataset_ids: balance_sheet, cash_flow, income_statement, institutional_flow, technical_indicators, valuation_data
-- Overview (preview): https://twmarketdata.com/docs/api/dataset-factory
-- Institutional Flow (preview): https://twmarketdata.com/docs/api/dataset-factory/institutional-flow
-- Technical Indicators (preview): https://twmarketdata.com/docs/api/dataset-factory/technical-indicators
-- Valuation Data (preview): https://twmarketdata.com/docs/api/dataset-factory/valuation-data
-- Income Statement (preview): https://twmarketdata.com/docs/api/dataset-factory/income-statement
-- Balance Sheet (preview): https://twmarketdata.com/docs/api/dataset-factory/balance-sheet
-- Cash Flow (preview): https://twmarketdata.com/docs/api/dataset-factory/cash-flow
-- production_ready=false for all listed Dataset Factory preview docs
-- verified fundamentals window: 2023Q2..2026Q1 only
-- do not claim complete historical coverage outside verified window
-- Preserve data_gaps visibility and contract limitations
-- No trading-action guidance output
-
-## Support
-
-- Contact: https://twmarketdata.com/contact
-- Email: avenra.platform@gmail.com
+links:
+- docs/generated/datasets/balance_sheet.md
+- docs/generated/datasets/block_trade_daily.md
+- docs/generated/datasets/bond_convertible_reference.md
+- docs/generated/datasets/broker_branch_reference.md
+- docs/generated/datasets/business_indicator_monthly.md
+- docs/generated/datasets/capital_formation_events.md
+- docs/generated/datasets/cash_flow.md
+- docs/generated/datasets/company_risk_events.md
+- docs/generated/datasets/convertible_bond_institutional_flow.md
+- docs/generated/datasets/day_trading_suspension.md
+- docs/generated/datasets/disposition_securities_period.md
+- docs/generated/datasets/dividends.md
+- docs/generated/datasets/esg_tesg.md
+- docs/generated/datasets/etf_holdings.md
+- docs/generated/datasets/fund_etf_metadata.md
+- docs/generated/datasets/income_statement.md
+- docs/generated/datasets/insider_director_holdings.md
+- docs/generated/datasets/institutional_flow.md
+- docs/generated/datasets/margin_short.md
+- docs/generated/datasets/market_index.md
+- docs/generated/datasets/market_overview_snapshots.md
+- docs/generated/datasets/monthly_revenue.md
+- docs/generated/datasets/options_daily_taifex.md
+- docs/generated/datasets/ownership_distribution.md
+- docs/generated/datasets/securities_lending.md
+- docs/generated/datasets/security_master.md
+- docs/generated/datasets/stock_delisting_lifecycle.md
+- docs/generated/datasets/stock_price_limit_daily.md
+- docs/generated/datasets/stock_split_par_value_events.md
+- docs/generated/datasets/taifex_institutional_flow.md
+- docs/generated/datasets/taifex_options_settlement_price.md
+- docs/generated/datasets/tax_business_registration.md
+- docs/generated/datasets/technical_indicators.md
+- docs/generated/datasets/total_margin_short_daily.md
+- docs/generated/datasets/valuation_core_daily.md
+- docs/generated/datasets/valuation_data.md
+- docs/generated/datasets/warrants_reference.md

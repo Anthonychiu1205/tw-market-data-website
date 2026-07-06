@@ -142,6 +142,36 @@ export const datasetSeoEntries: readonly DatasetSeoEntry[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "cash-flow-statement",
+    name: "現金流量表",
+    seoTitle: "台股現金流量表資料集 | TW Market Data",
+    seoDescription:
+      "台股現金流量表資料集提供營業、投資與籌資現金流欄位，支援現金品質、資本配置與財務韌性研究。",
+    shortDescription: "公司營業、投資與籌資現金流的季度資料集。",
+    whatItIs:
+      "此資料集整理公司季度現金流量表核心欄位，支援獲利品質、現金創造能力與資本支出結構分析。",
+    useCases: [
+      "檢查營業現金流與淨利的一致性",
+      "分析投資與籌資活動對現金部位的影響",
+      "評估公司自由現金流與資本配置壓力",
+    ],
+    whyItMatters:
+      "現金流量表能補足只看損益表看不到的現金品質問題，是判斷企業財務韌性與資本效率的重要來源。",
+    coverageNote:
+      "不同公司與季度的揭露節奏可能不同，請以欄位可用性與 data_gaps 訊號判讀實際可用範圍。",
+    freshnessNote: "財報更新受官方揭露時點影響，請先確認最新可用季度。",
+    sourcePolicyNote:
+      "遵循 official/public-first 與可追溯欄位契約，不以未驗證來源補齊缺漏。",
+    docsHref: "/docs/api/financial-growth/cash-flow-statement",
+    pricingHref: "/pricing",
+    keywords: ["台股現金流量表 API", "營業現金流", "自由現金流", "財報資料"],
+    jsonLdName: "現金流量表資料集",
+    jsonLdDescription: "台股公司季度現金流量表資料，支援現金品質與財務韌性分析。",
+    sourceRole: "official_cash_flow_statement",
+    provider: "twse",
+    marketScope: "TWSE",
+  },
+  {
     slug: "institutional-flow",
     name: "三大法人買賣超",
     seoTitle: "三大法人買賣超資料集 | TW Market Data",
@@ -158,8 +188,9 @@ export const datasetSeoEntries: readonly DatasetSeoEntry[] = [
     whyItMatters:
       "法人資金流向常影響短中期價格結構，可補充純價格與財報資料對市場行為的解釋能力。",
     coverageNote:
-      "此資料集 coverage 正在持續補齊中，不應視為全市場/全期間已完整覆蓋。",
-    freshnessNote: "更新節奏與可用日期受官方來源供給影響，請以回應 metadata 與 data_gaps 為準。",
+      "目前公開驗證 coverage 為 2023-06-01..2026-05-28，且僅限 TWSE-only；不宣稱 TPEx 或 full-market 完整覆蓋。",
+    freshnessNote:
+      "更新節奏與可用日期受官方來源供給影響，請以回應 metadata 與 data_gaps 為準；若看到 legacy market='TW'，不得解讀為 TPEx coverage。",
     sourcePolicyNote:
       "僅納入官方/公開來源；缺漏與來源異常會顯式標記，不以推估值補齊。",
     docsHref: "/docs/api/capital-flow/institutional-flow",
@@ -169,6 +200,37 @@ export const datasetSeoEntries: readonly DatasetSeoEntry[] = [
     jsonLdDescription: "台股外資、投信、自營商每日買賣超資料，支援籌碼與資金流向研究。",
     sourceRole: "official_twse_t86",
     provider: "twse",
+    marketScope: "TWSE",
+  },
+  {
+    slug: "securities-lending",
+    name: "借券資料",
+    seoTitle: "借券資料集 | TW Market Data",
+    seoDescription:
+      "借券資料集提供 TWSE official TWT72U 借券餘額、借入、還券與資料缺口訊號，適合做借券供給與券源壓力研究。",
+    shortDescription: "TWSE-only 借券資料集，提供借券餘額、借入、還券、close price 與資料缺口訊號。",
+    whatItIs:
+      "此資料集整理 TWSE official TWT72U 借券日資料，保留借券餘額、借入、還券、market value、來源血緣與 data_gaps，適合做券源供給與借券壓力觀察。",
+    useCases: [
+      "觀察個股借券餘額與借入/還券變化。",
+      "識別可能的券源壓力與市場擁擠訊號。",
+      "在研究流程中保留 source_lineage 與 known gaps 做可追溯判讀。",
+    ],
+    whyItMatters:
+      "借券資料可補充價格、法人與信用交易之外的券源供給資訊，對觀察放空壓力、交易擁擠度與市場結構很有幫助。",
+    coverageNote:
+      "目前公開驗證 coverage 為 2020-01-02..2026-06-04，共 1,629,223 rows、1,292 檔 TWSE 標的；不宣稱 TPEx 或 full-market 覆蓋。",
+    freshnessNote:
+      "更新節奏與可用日期受官方來源供給影響，known source gaps 會保留在回應與文案中，不會用推估值補齊。",
+    sourcePolicyNote:
+      "遵循 official-first 與 explicit lineage/data_gaps 原則；僅宣稱 TWSE-only、保留 known source gaps，不暴露 raw/full body。",
+    docsHref: "/docs/api/capital-flow/securities-lending",
+    pricingHref: "/pricing",
+    keywords: ["借券 API", "securities lending", "台股借券資料", "借券餘額"],
+    jsonLdName: "借券資料集",
+    jsonLdDescription: "TWSE-only 借券資料，支援券源供給、借券壓力與市場結構研究。",
+    sourceRole: "official_twse_twt72u",
+    provider: "twse_official",
     marketScope: "TWSE",
   },
   {
@@ -198,6 +260,71 @@ export const datasetSeoEntries: readonly DatasetSeoEntry[] = [
     jsonLdName: "融資融券資料集",
     jsonLdDescription: "TWSE private beta 融資融券資料，支援信用交易與籌碼風險研究。",
     sourceRole: "official_twse_mi_margn",
+    provider: "twse_official",
+    marketScope: "TWSE",
+  },
+  {
+    slug: "total-margin-short",
+    name: "整體融資融券",
+    seoTitle: "整體融資融券資料集 | TW Market Data",
+    seoDescription:
+      "TWSE 市場層級融資融券匯總資料（Private Beta，種子資料）摘要，提供整體市場買賣與餘額視角。",
+    shortDescription: "TWSE private beta 台股市場總體融資融券彙總資料，含總值欄位與資料血緣。",
+    whatItIs:
+      "本資料集提供 TWSE 官方優先來源的總體融資融券匯總欄位，觀察市場信用資金規模、整體槓桿與市場壓力。",
+    useCases: [
+      "觀察市場層級融資/融券總額變化趨勢。",
+      "作為籌碼風險監控的總量背景參考。",
+      "在研究流程中搭配個券資料與法人資料做市場結構判讀。",
+    ],
+    whyItMatters:
+      "總量視角可避免只看個別標的而誤判市場風險，能提供更穩健的資金面背景資訊。",
+    coverageNote:
+      "目前為 private beta seeded scope：2026-03-10、2026-04-10、2026-05-14 共 3 筆；不宣稱 full-market or TPEx 全量覆蓋。",
+    freshnessNote: "目前採 private beta 種子供應，請以 API 回應中的 data_gaps 與返回範圍為判讀依據。",
+    sourcePolicyNote:
+      "官方來源優先，僅保留可驗證欄位；明確保留 source_lineage 與 data_gaps，不宣稱未證實的 cron 寫入。",
+    docsHref: "/docs/api/capital-flow/total-margin-short",
+    pricingHref: "/pricing",
+    keywords: [
+      "整體融資融券 API",
+      "TWSE 融資融券 匯總",
+      "市場層級信貸彙總",
+      "margin short total",
+    ],
+    jsonLdName: "整體融資融券資料集",
+    jsonLdDescription: "TWSE private beta 種子範圍的總體融資融券匯總資料，含來源血緣與缺口欄位。",
+    sourceRole: "official_twse_mi_margn_summary",
+    provider: "twse_official",
+    marketScope: "TWSE",
+  },
+  {
+    slug: "market-breadth",
+    name: "市場廣度",
+    seoTitle: "市場廣度資料集 | TW Market Data",
+    seoDescription:
+      "TWSE 市場廣度資料集（日）提供漲跌家數、漲跌停家數與市場結構欄位，為 2026-05 私有測試種子資料。",
+    shortDescription: "TWSE 市場廣度（Private Beta）日資料，含漲跌/漲跌停與市場總量欄位。",
+    whatItIs:
+      "此資料集聚焦 TWSE 官方來源的市場廣度衍生指標，提供每日漲跌家數與總成交數據，適合觀察盤勢結構與風險脈絡。",
+    useCases: [
+      "追蹤市場日內整體偏弱 / 偏強信號。",
+      "搭配大盤指數與技術指標做盤勢監控。",
+      "在研究流程中保留 source_lineage 與 data_gaps 做可追溯判讀。",
+    ],
+    whyItMatters:
+      "市場廣度資料能補充個股訊號，補強「價格/成交」之外的市場總體結構判讀；對風險管理與策略濾網有直接參考價值。",
+    coverageNote:
+      "當前 coverage 為 2026-05-04 到 2026-05-27，共 18 筆種子資料，且為 TWSE-only。",
+    freshnessNote: "以 private beta 程度同步更新，請以回應中的 freshness 或 data_gaps 判讀即時可用性。",
+    sourcePolicyNote:
+      "採 official-first 與可追溯欄位標記，資料僅保留官方可驗證來源，不含 raw/body；不宣稱 TPEx/full-market 或每日 cron 已啟用。",
+    docsHref: "/docs/api/market-prices/market-breadth",
+    pricingHref: "/pricing",
+    keywords: ["市場廣度 API", "TWSE 市場廣度", "漲跌家數", "漲跌停 觀測"],
+    jsonLdName: "市場廣度資料集",
+    jsonLdDescription: "TWSE-only 市場廣度日資料，含 source_lineage、data_gaps 與 private beta 說明。",
+    sourceRole: "derived_market_breadth",
     provider: "twse_official",
     marketScope: "TWSE",
   },

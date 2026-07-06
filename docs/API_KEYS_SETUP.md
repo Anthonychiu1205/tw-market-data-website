@@ -351,7 +351,7 @@ npm run seed:test-wallet
   - `SEED_WALLET_USER_EMAIL`
   - `SEED_WALLET_CREDITS`
   - `CONFIRM_SEED_TEST_WALLET=true`
-- 會建立 `adjustment` 交易供測試，不會觸發 ECPay。
+- 會建立 `adjustment` 交易供測試，不會觸發任何金流。
 
 ### Usage CSV export（optional）
 

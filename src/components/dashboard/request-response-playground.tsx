@@ -12,33 +12,35 @@ const PLAYGROUND_ENDPOINTS = [
   { value: "/v2/datasets/tpex-daily-price", label: "TPEx 日線價格", minPlan: "free", fields: ["symbol", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/issuer-profile", label: "公司基本資料", minPlan: "free", fields: ["symbol", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/monthly-revenue", label: "月營收", minPlan: "free", fields: ["symbol", "period", "limit"] as PlaygroundField[] },
-  { value: "/v2/datasets/valuation-data", label: "估值資料", minPlan: "developer", fields: ["symbol", "limit"] as PlaygroundField[] },
-  { value: "/v2/datasets/technical-indicators", label: "技術指標", minPlan: "developer", fields: ["symbol", "limit"] as PlaygroundField[] },
-  { value: "/v2/datasets/issuer-announcements", label: "公司公告", minPlan: "developer", fields: ["symbol", "limit"] as PlaygroundField[] },
-  { value: "/v2/datasets/index-data", label: "市場指數", minPlan: "developer", fields: ["limit"] as PlaygroundField[] },
-  { value: "/v2/datasets/market-breadth", label: "市場廣度", minPlan: "developer", fields: ["limit"] as PlaygroundField[] },
-  { value: "/v2/datasets/interest-rate-snapshot", label: "利率快照", minPlan: "developer", fields: ["limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/valuation-data", label: "估值資料", minPlan: "starter", fields: ["symbol", "limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/technical-indicators", label: "技術指標", minPlan: "starter", fields: ["symbol", "limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/issuer-announcements", label: "公司公告", minPlan: "starter", fields: ["symbol", "limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/index-data", label: "市場指數", minPlan: "starter", fields: ["limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/market-breadth", label: "市場廣度", minPlan: "starter", fields: ["limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/interest-rate-snapshot", label: "利率快照", minPlan: "starter", fields: ["limit"] as PlaygroundField[] },
   { value: "/v2/datasets/income-statement", label: "損益表", minPlan: "pro", fields: ["symbol", "period", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/cash-flow-statement", label: "現金流量表", minPlan: "pro", fields: ["symbol", "period", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/balance-sheet", label: "資產負債表", minPlan: "pro", fields: ["symbol", "period", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/institutional-flow", label: "法人資金流向", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/securities-lending", label: "借券資料", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/margin-short", label: "融資融券", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/events", label: "事件日曆", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/structured-events", label: "結構化事件", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/corporate-actions", label: "公司行動", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },
   { value: "/v2/datasets/dividends", label: "股利", minPlan: "pro", fields: ["symbol", "limit"] as PlaygroundField[] },
-  { value: "/v2/datasets/theme-taxonomy", label: "主題分類", minPlan: "team", fields: ["limit"] as PlaygroundField[] },
-  { value: "/v2/datasets/index-classification", label: "指數分類", minPlan: "team", fields: ["limit"] as PlaygroundField[] },
-  { value: "/v2/datasets/company-news", label: "公司新聞（Preview）", minPlan: "team", fields: ["symbol", "startDate", "endDate", "limit"] as PlaygroundField[] },
-  { value: "/v2/datasets/market-news", label: "市場新聞（Preview）", minPlan: "team", fields: ["startDate", "endDate", "limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/theme-taxonomy", label: "主題分類", minPlan: "max", fields: ["limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/index-classification", label: "指數分類", minPlan: "max", fields: ["limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/company-news", label: "公司新聞（Preview）", minPlan: "max", fields: ["symbol", "startDate", "endDate", "limit"] as PlaygroundField[] },
+  { value: "/v2/datasets/market-news", label: "市場新聞（Preview）", minPlan: "max", fields: ["startDate", "endDate", "limit"] as PlaygroundField[] },
 ] as const;
 
 const PLAN_LEVEL = {
   free: 0,
-  developer: 1,
+  starter: 1,
   pro: 2,
-  team: 3,
-  enterprise: 4,
+  max: 3,
+  developer: 4,
+  enterprise: 5,
 } as const;
 
 type PlanCode = keyof typeof PLAN_LEVEL;
@@ -62,9 +64,10 @@ type RequestResponsePlaygroundProps = {
 function normalizePlanCode(planCode: string): PlanCode {
   const normalized = planCode.trim().toLowerCase();
   if (normalized === "enterprise") return "enterprise";
-  if (normalized === "team") return "team";
-  if (normalized === "pro") return "pro";
   if (normalized === "developer") return "developer";
+  if (normalized === "max") return "max";
+  if (normalized === "pro") return "pro";
+  if (normalized === "starter") return "starter";
   return "free";
 }
 

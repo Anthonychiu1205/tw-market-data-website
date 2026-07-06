@@ -28,6 +28,12 @@ const datasetFamilies = [
         description: "由價格與成交量衍生的研究指標；目前 baseline 以 TWSE 為主。",
         href: "/docs/introduction",
       },
+      {
+        name: "市場廣度",
+        description: "TWSE 市場漲跌家數與漲跌停彙整，屬於 private beta。",
+        href: "/docs/api/market-prices/market-breadth",
+        overviewHref: "/datasets/market-breadth",
+      },
     ],
   },
   {
@@ -56,7 +62,8 @@ const datasetFamilies = [
       {
         name: "現金流量表",
         description: "追蹤公司營業、投資與籌資現金流，用於觀察獲利品質與現金創造能力。",
-        href: "/docs/introduction",
+        href: "/docs/api/financial-growth/cash-flow-statement",
+        overviewHref: "/datasets/cash-flow-statement",
       },
       {
         name: "估值資料",
@@ -88,6 +95,20 @@ const datasetFamilies = [
         href: "/docs/api/capital-flow/margin-short",
         overviewHref: "/datasets/margin-short",
         note: "TWSE-only、private beta、no TPEx claim，且 daily write cron 尚未啟用。",
+      },
+      {
+        name: "借券資料",
+        description: "TWSE official TWT72U 借券資料，整理借券餘額、借入、還券、資料血緣與 known source gaps。",
+        href: "/docs/api/capital-flow/securities-lending",
+        overviewHref: "/datasets/securities-lending",
+        note: "TWSE-only、no TPEx claim、known source gaps preserved，不宣稱 full-market 覆蓋。",
+      },
+      {
+        name: "整體融資融券",
+        description: "TWSE private beta 市場總體融資融券匯總資料，提供市場買賣總值與欄位。",
+        href: "/docs/api/capital-flow/total-margin-short",
+        overviewHref: "/datasets/total-margin-short",
+        note: "TWSE-only private beta seeded、seed scope only，且未啟用 daily write cron。",
       },
     ],
   },
@@ -159,12 +180,15 @@ export default function DatasetsPage() {
       { "@type": "ListItem", position: 4, name: "月營收", url: "https://twmarketdata.com/datasets/monthly-revenue" },
       { "@type": "ListItem", position: 5, name: "損益表", url: "https://twmarketdata.com/datasets/income-statement" },
       { "@type": "ListItem", position: 6, name: "資產負債表", url: "https://twmarketdata.com/datasets/balance-sheet" },
-      { "@type": "ListItem", position: 7, name: "現金流量表", url: "https://twmarketdata.com/docs/introduction" },
+      { "@type": "ListItem", position: 7, name: "現金流量表", url: "https://twmarketdata.com/datasets/cash-flow-statement" },
       { "@type": "ListItem", position: 8, name: "三大法人買賣超", url: "https://twmarketdata.com/datasets/institutional-flow" },
       { "@type": "ListItem", position: 9, name: "融資融券", url: "https://twmarketdata.com/datasets/margin-short" },
-      { "@type": "ListItem", position: 10, name: "估值資料", url: "https://twmarketdata.com/docs/api/financial-growth/valuation-data" },
-      { "@type": "ListItem", position: 11, name: "公司基本資料", url: "https://twmarketdata.com/docs/api/company/issuer-profile" },
-      { "@type": "ListItem", position: 12, name: "事件與公告 metadata", url: "https://twmarketdata.com/docs/api/company-events/events-calendar" },
+      { "@type": "ListItem", position: 10, name: "借券資料", url: "https://twmarketdata.com/datasets/securities-lending" },
+      { "@type": "ListItem", position: 11, name: "整體融資融券", url: "https://twmarketdata.com/datasets/total-margin-short" },
+      { "@type": "ListItem", position: 12, name: "市場廣度", url: "https://twmarketdata.com/datasets/market-breadth" },
+      { "@type": "ListItem", position: 13, name: "估值資料", url: "https://twmarketdata.com/docs/api/financial-growth/valuation-data" },
+      { "@type": "ListItem", position: 14, name: "公司基本資料", url: "https://twmarketdata.com/docs/api/company/issuer-profile" },
+      { "@type": "ListItem", position: 15, name: "事件與公告 metadata", url: "https://twmarketdata.com/docs/api/company-events/events-calendar" },
     ],
   };
 

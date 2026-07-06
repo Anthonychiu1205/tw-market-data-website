@@ -1,5 +1,15 @@
-export type BillingCycle = "monthly" | "yearly";
-export type PlanCode = "developer" | "pro" | "team" | "enterprise";
+// 6-tier USD monthly plan model, aligned with the read API canonical plan ladder
+// (free/starter/pro/max/developer/enterprise). The paid tiers map 1:1 to Polar
+// subscription products; the read API's Polar webhook is the single source of truth
+// for provisioning, so these codes must match it exactly.
+// Authoritative per-tier values (monthly USD / api keys / RPM / monthly quota):
+//   free       $0     1 key   RPM 60      500/mo        no financial_statements, non-commercial, 1mo history
+//   starter    $20    2 keys  RPM 300     10,000/mo     no financial_statements, commercial, 1yr history
+//   pro        $100   5 keys  RPM 1,200   100,000/mo    all datasets, 5yr history
+//   max        $200   10 keys RPM 3,000   300,000/mo    all datasets, full history
+//   developer  $2000  20 keys RPM 12,000  3,000,000/mo  all datasets, full history, webhook
+//   enterprise contact custom custom      custom        all datasets, full_raw, dedicated
+export type PlanCode = "starter" | "pro" | "max" | "developer" | "enterprise";
 export type PricingPlanCode = PlanCode | "free";
 
 export type PlanHighlightIcon =
@@ -29,7 +39,6 @@ export type BillingPlan = {
   planCode: PlanCode;
   displayName: string;
   monthlyAmount: number | null;
-  yearlyAmount: number | null;
   apiKeyLimit: number | null;
   datasetLimit: string;
   isContactOnly: boolean;
@@ -40,9 +49,7 @@ export type PricingPlanView = {
   displayName: string;
   summary: string;
   monthlyAmount: number | null;
-  yearlyAmount: number | null;
   monthlyHint: string;
-  yearlyHint: string;
   usageMultiplier: string;
   highlights: PlanHighlight[];
   ctaLabel: string;
@@ -54,112 +61,128 @@ export type PricingPlanView = {
 };
 
 export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
-  developer: {
-    planCode: "developer",
-    displayName: "Developer",
-    monthlyAmount: 690,
-    yearlyAmount: 8280,
+  starter: {
+    planCode: "starter",
+    displayName: "Starter",
+    monthlyAmount: 20,
     apiKeyLimit: 2,
-    datasetLimit: "10 個資料集",
+    datasetLimit: "全部資料集（不含財報三表）",
     isContactOnly: false,
   },
   pro: {
     planCode: "pro",
     displayName: "Pro",
-    monthlyAmount: 1490,
-    yearlyAmount: 17880,
+    monthlyAmount: 100,
     apiKeyLimit: 5,
-    datasetLimit: "20 個資料集",
+    datasetLimit: "全部資料集（含財報三表）",
     isContactOnly: false,
   },
-  team: {
-    planCode: "team",
-    displayName: "Team",
-    monthlyAmount: 6000,
-    yearlyAmount: 72000,
+  max: {
+    planCode: "max",
+    displayName: "Max",
+    monthlyAmount: 200,
     apiKeyLimit: 10,
-    datasetLimit: "多數可用資料集（依 coverage 狀態）",
+    datasetLimit: "全部資料集（完整歷史）",
+    isContactOnly: false,
+  },
+  developer: {
+    planCode: "developer",
+    displayName: "Developer",
+    monthlyAmount: 2000,
+    apiKeyLimit: 20,
+    datasetLimit: "全部資料集（含 webhook）",
     isContactOnly: false,
   },
   enterprise: {
     planCode: "enterprise",
     displayName: "Enterprise",
     monthlyAmount: null,
-    yearlyAmount: null,
     apiKeyLimit: null,
     datasetLimit: "客製資料範圍",
     isContactOnly: true,
   },
 };
 
-const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "displayName" | "monthlyAmount" | "yearlyAmount" | "isContactOnly" | "apiKeyLimit" | "datasetLimit">> = {
+const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "displayName" | "monthlyAmount" | "isContactOnly" | "apiKeyLimit" | "datasetLimit">> = {
   enterprise: {
     summary: "以已驗證資料集為核心，搭配客製化方案。",
     monthlyHint: "客製合約",
-    yearlyHint: "客製合約",
     usageMultiplier: "Custom",
     highlights: [
-      { text: "verified datasets（依 coverage 狀態）", icon: "database" },
+      { text: "全部資料集（依 coverage 狀態）", icon: "database" },
       { text: "API key / 配額 / RPM 可客製", icon: "key" },
       { text: "商業使用與進階權限", icon: "shield" },
-      { text: "SLA 與專屬支援可談", icon: "headphones" },
-      { text: "客製資料供應", icon: "layers3" },
-      { text: "高頻 production 支援", icon: "server" },
-      { text: "專屬導入協助", icon: "briefcase" },
+      { text: "專屬基礎設施與 SLA 可談", icon: "server" },
+      { text: "Webhook 與歷史回補", icon: "workflow" },
+      { text: "專屬支援", icon: "headphones" },
     ],
     ctaLabel: "聯繫我們",
     href: "/contact",
   },
-  team: {
-    summary: "團隊級用量與已驗證資料集。",
+  developer: {
+    summary: "最高自助層級，高頻 production 與 webhook。",
     monthlyHint: "月付方案",
-    yearlyHint: "年付方案",
-    usageMultiplier: "20x",
+    usageMultiplier: "200 req/s",
     highlights: [
-      { text: "verified datasets（依 coverage 狀態）", icon: "database" },
-      { text: "API Keys 10", icon: "key" },
-      { text: "RPM 600", icon: "gauge" },
-      { text: "每日上限 20,000 credits / 每月 included 500,000 credits", icon: "activity" },
-      { text: "高頻 API 存取", icon: "zap" },
-      { text: "團隊協作支援", icon: "users" },
-      { text: "多 API key 管理", icon: "workflow" },
-      { text: "低延遲資料更新", icon: "clock3" },
+      { text: "全部資料集（含財報三表）", icon: "database" },
+      { text: "API Keys 20", icon: "key" },
+      { text: "RPM 12,000", icon: "gauge" },
+      { text: "每月 included 3,000,000 requests", icon: "activity" },
+      { text: "Webhook 開通", icon: "workflow" },
+      { text: "完整歷史與回補", icon: "clock3" },
+      { text: "商業使用", icon: "shield" },
       { text: "優先支援", icon: "headphones" },
     ],
-    ctaLabel: "選擇團隊方案",
+    ctaLabel: "選擇 Developer",
+    href: "/dashboard",
+  },
+  max: {
+    summary: "高頻用量與完整歷史深度。",
+    monthlyHint: "月付方案",
+    usageMultiplier: "50 req/s",
+    highlights: [
+      { text: "全部資料集（含財報三表）", icon: "database" },
+      { text: "API Keys 10", icon: "key" },
+      { text: "RPM 3,000", icon: "gauge" },
+      { text: "每月 included 300,000 requests", icon: "activity" },
+      { text: "完整歷史深度", icon: "clock3" },
+      { text: "商業使用", icon: "shield" },
+      { text: "高頻 API 存取", icon: "zap" },
+      { text: "優先支援", icon: "headphones" },
+    ],
+    ctaLabel: "選擇 Max",
     href: "/dashboard",
     featured: true,
   },
   pro: {
     summary: "進階資料與正式商業使用。",
     monthlyHint: "月付方案",
-    yearlyHint: "年付方案",
-    usageMultiplier: "5x",
+    usageMultiplier: "20 req/s",
     highlights: [
-      { text: "20 個資料集可用", icon: "database" },
+      { text: "全部資料集（含財報三表）", icon: "database" },
       { text: "API Keys 5", icon: "key" },
-      { text: "RPM 120", icon: "gauge" },
-      { text: "每日上限 4,000 credits / 每月 included 100,000 credits", icon: "activity" },
+      { text: "RPM 1,200", icon: "gauge" },
+      { text: "每月 included 100,000 requests", icon: "activity" },
       { text: "商業使用", icon: "shield" },
-      { text: "API key usage insights", icon: "layers3" },
-      { text: "歷史資料存取", icon: "clock3" },
+      { text: "5 年歷史深度", icon: "clock3" },
+      { text: "歷史回補", icon: "layers3" },
     ],
-    ctaLabel: "選擇專業方案",
+    ctaLabel: "選擇 Pro",
     href: "/dashboard",
   },
-  developer: {
-    summary: "開發驗證與輕量整合。",
+  starter: {
+    summary: "輕量整合與正式商業使用起點。",
     monthlyHint: "月付方案",
-    yearlyHint: "年付方案",
-    usageMultiplier: "1x",
+    usageMultiplier: "5 req/s",
     highlights: [
-      { text: "10 個資料集可用", icon: "database" },
+      { text: "全部資料集（不含財報三表）", icon: "database" },
       { text: "API Keys 2", icon: "key" },
-      { text: "RPM 30", icon: "gauge" },
-      { text: "每日上限 800 credits / 每月 included 20,000 credits", icon: "activity" },
-      { text: "基本用量總覽", icon: "sparkles" },
+      { text: "RPM 300", icon: "gauge" },
+      { text: "每月 included 10,000 requests", icon: "activity" },
+      { text: "商業使用", icon: "shield" },
+      { text: "1 年歷史深度", icon: "clock3" },
     ],
-    ctaLabel: "選擇開發者方案",
+    ctaLabel: "選擇 Starter",
     href: "/dashboard",
   },
 };
@@ -167,27 +190,26 @@ const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "di
 const FREE_PLAN_VIEW: PricingPlanView = {
   planCode: "free",
   displayName: "Free",
-  summary: "5 個資料集，快速接入與測試。",
-  monthlyAmount: null,
-  yearlyAmount: null,
+  summary: "免費接入與測試，非商業使用。",
+  monthlyAmount: 0,
   monthlyHint: "免費方案",
-  yearlyHint: "免費方案",
-  usageMultiplier: "—",
+  usageMultiplier: "1 req/s",
   highlights: [
-    { text: "5 個資料集：twse_daily_price、monthly_revenue、income_statement、balance_sheet、institutional_flow", icon: "database" },
-    { text: "API Keys 1 把、RPM 10", icon: "key" },
+    { text: "基礎資料集（不含財報三表）", icon: "database" },
+    { text: "API Keys 1、RPM 60", icon: "key" },
+    { text: "每月 included 500 requests", icon: "activity" },
     { text: "基本 usage 顯示", icon: "sparkles" },
   ],
   ctaLabel: "開始使用",
   href: "/dashboard",
   isContactOnly: false,
   apiKeyLimit: 1,
-  datasetLimit: "5 個資料集",
+  datasetLimit: "基礎資料集（不含財報三表）",
 };
 
-export const PRICING_PLAN_ORDER: PricingPlanCode[] = ["enterprise", "team", "pro", "developer", "free"];
-export const BILLING_SUBSCRIPTION_PLAN_ORDER: Exclude<PlanCode, "enterprise">[] = ["team", "pro", "developer"];
-export const PAID_PLAN_CODES: Exclude<PlanCode, "enterprise">[] = ["developer", "pro", "team"];
+export const PRICING_PLAN_ORDER: PricingPlanCode[] = ["enterprise", "developer", "max", "pro", "starter", "free"];
+export const BILLING_SUBSCRIPTION_PLAN_ORDER: Exclude<PlanCode, "enterprise">[] = ["starter", "pro", "max", "developer"];
+export const PAID_PLAN_CODES: Exclude<PlanCode, "enterprise">[] = ["starter", "pro", "max", "developer"];
 
 export function isPlanCode(value: string): value is PlanCode {
   return Object.prototype.hasOwnProperty.call(BILLING_PLANS, value);
@@ -201,46 +223,9 @@ export function getPlanByCode(planCode: PlanCode) {
   return BILLING_PLANS[planCode];
 }
 
-export function getPlanAmount(planCode: Exclude<PlanCode, "enterprise">, billingCycle: BillingCycle) {
-  const plan = BILLING_PLANS[planCode];
-  return billingCycle === "monthly" ? plan.monthlyAmount : plan.yearlyAmount;
-}
-
-export function getPeriodConfig(billingCycle: BillingCycle) {
-  if (billingCycle === "yearly") {
-    return {
-      periodType: "Y",
-      frequency: 1,
-      execTimes: 99,
-    } as const;
-  }
-
-  return {
-    periodType: "M",
-    frequency: 1,
-    execTimes: 999,
-  } as const;
-}
-
-export function normalizeBillingCycle(input: string | null | undefined): BillingCycle | null {
-  if (input === "monthly" || input === "yearly") {
-    return input;
-  }
-  return null;
-}
-
-export function getPlanDisplayLabel(planCode: Exclude<PlanCode, "enterprise">, billingCycle: BillingCycle) {
-  const plan = BILLING_PLANS[planCode];
-  return `${plan.displayName} ${billingCycle === "monthly" ? "Monthly" : "Yearly"}`;
-}
-
 export function formatPlanCurrency(amount: number | null) {
   if (amount === null) return "聯繫我們";
-  return `NT$${new Intl.NumberFormat("en-US").format(amount)}`;
-}
-
-export function getPlanAmountByCycle(plan: Pick<PricingPlanView, "monthlyAmount" | "yearlyAmount">, billingCycle: BillingCycle) {
-  return billingCycle === "monthly" ? plan.monthlyAmount : plan.yearlyAmount;
+  return `$${new Intl.NumberFormat("en-US").format(amount)}`;
 }
 
 export function getPricingPlanView(planCode: PricingPlanCode): PricingPlanView {
@@ -255,7 +240,6 @@ export function getPricingPlanView(planCode: PricingPlanCode): PricingPlanView {
     planCode,
     displayName: plan.displayName,
     monthlyAmount: plan.monthlyAmount,
-    yearlyAmount: plan.yearlyAmount,
     isContactOnly: plan.isContactOnly,
     apiKeyLimit: plan.apiKeyLimit,
     datasetLimit: plan.datasetLimit,

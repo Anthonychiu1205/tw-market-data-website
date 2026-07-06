@@ -461,7 +461,12 @@ function renderSection(section: DashboardSection, props: DashboardConsoleProps) 
   if (section === "billing") {
     if (props.currentPath === "/billing/subscriptions") {
       const currentPlanId = props.subscription?.planCode;
-      if (currentPlanId === "developer" || currentPlanId === "pro" || currentPlanId === "team") {
+      if (
+        currentPlanId === "starter" ||
+        currentPlanId === "pro" ||
+        currentPlanId === "max" ||
+        currentPlanId === "developer"
+      ) {
         return (
           <BillingSubscriptionsPage
             currentPlanId={currentPlanId}

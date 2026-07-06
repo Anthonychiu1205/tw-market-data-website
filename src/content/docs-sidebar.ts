@@ -30,6 +30,7 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
       { title: "還原股價", href: "/docs/api/market-prices/adjusted-prices" },
       { title: "技術指標", href: "/docs/api/market-prices/technical-indicators" },
       { title: "市場指數 / Market Index", href: "/docs/api/market-prices/market-index" },
+      { title: "報酬指數 / Return Index Daily", href: "/docs/api/market-prices/return-index-daily" },
       { title: "市場指數", href: "/docs/api/market-prices/index-data" },
       { title: "市場廣度", href: "/docs/api/market-prices/market-breadth" },
       { title: "利率快照", href: "/docs/api/market-prices/interest-rate" },
@@ -54,8 +55,9 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
     items: [
       { title: "三大法人買賣", href: "/docs/api/capital-flow/institutional-flow" },
       { title: "融資融券", href: "/docs/api/capital-flow/margin-short" },
+      { title: "整體融資融券", href: "/docs/api/capital-flow/total-margin-short" },
       { title: "外資持股", href: "/docs/api/institutional-holdings" },
-      { title: "借券資料", href: "/docs/api/capital-flow/margin-short" },
+      { title: "借券資料", href: "/docs/api/capital-flow/securities-lending" },
     ],
   },
   {
@@ -70,26 +72,6 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
     ],
   },
   {
-    id: "taxonomy",
-    label: "分類與結構",
-    groupIcon: "network",
-    items: [
-      { title: "產業分類", href: "/docs/api/taxonomy/theme-taxonomy" },
-      { title: "題材分類", href: "/docs/api/segments" },
-      { title: "指數成分", href: "/docs/api/taxonomy/index-classification" },
-    ],
-  },
-  {
-    id: "strategy-quant",
-    label: "策略與量化",
-    groupIcon: "activity",
-    items: [
-      { title: "特徵資料集", href: "/docs/api/strategy-quant/features" },
-      { title: "AI 研究訊號", href: "/docs/api/strategy-quant/factor-data" },
-      { title: "回測資料準備", href: "/docs/api/strategy-quant/time-alignment" },
-    ],
-  },
-  {
     id: "query-tools",
     label: "查詢與工具",
     groupIcon: "search-code",
@@ -97,7 +79,6 @@ export const docsSidebarApiGroups: DocsSidebarNavGroup[] = [
       { title: "Dataset Factory", href: "/docs/api/dataset-factory" },
       { title: "Coverage Registry", href: "/docs/market-coverage" },
       { title: "Release Status", href: "/docs/sdk/release-status" },
-      { title: "Query Examples", href: "/docs/api/query-tools/query-examples" },
     ],
   },
 ];

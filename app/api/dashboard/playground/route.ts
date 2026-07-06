@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 
 import { getSession } from "@/src/auth/session";
 
-const ENDPOINT_OPTIONS = [
+type EndpointOption = { path: string; requiresSymbol: boolean; backendPath?: string };
+
+const ENDPOINT_OPTIONS: readonly EndpointOption[] = [
   { path: "/v2/datasets/twse-daily-price", requiresSymbol: true },
   { path: "/v2/datasets/tpex-daily-price", requiresSymbol: true },
   { path: "/v2/datasets/issuer-profile", requiresSymbol: true },
@@ -17,6 +19,7 @@ const ENDPOINT_OPTIONS = [
   { path: "/v2/datasets/cash-flow-statement", requiresSymbol: true },
   { path: "/v2/datasets/balance-sheet", requiresSymbol: true },
   { path: "/v2/datasets/institutional-flow", requiresSymbol: true },
+  { path: "/v2/datasets/securities-lending", backendPath: "/v2/datasets/chip-deep-securities-lending-daily", requiresSymbol: true },
   { path: "/v2/datasets/margin-short", requiresSymbol: true },
   { path: "/v2/datasets/events", requiresSymbol: true },
   { path: "/v2/datasets/structured-events", requiresSymbol: true },
@@ -26,7 +29,7 @@ const ENDPOINT_OPTIONS = [
   { path: "/v2/datasets/index-classification", requiresSymbol: false },
   { path: "/v2/datasets/company-news", requiresSymbol: true },
   { path: "/v2/datasets/market-news", requiresSymbol: false },
-] as const;
+];
 
 function getBackendBaseUrl() {
   const base = process.env.BACKEND_API_BASE_URL;
@@ -105,7 +108,8 @@ export async function POST(request: Request) {
   if (startDate) query.set("start_date", startDate);
   if (endDate) query.set("end_date", endDate);
 
-  const targetUrl = `${baseUrl}${endpoint}?${query.toString()}`;
+  const targetPath = endpointConfig.backendPath ?? endpoint;
+  const targetUrl = `${baseUrl}${targetPath}?${query.toString()}`;
 
   try {
     const response = await fetch(targetUrl, {
