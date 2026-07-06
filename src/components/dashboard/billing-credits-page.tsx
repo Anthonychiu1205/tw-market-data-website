@@ -16,7 +16,6 @@ import { Download, RefreshCw } from "lucide-react";
 
 import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
-import { CreditPurchaseDialog } from "@/src/components/dashboard/credit-purchase-dialog";
 import { formatCredits, formatTwd, getCreditPackageViews } from "@/src/lib/billing/credits";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
 import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
@@ -187,8 +186,6 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
   const lastFocusRefreshAtRef = useRef<number>(0);
   const [activeTab, setActiveTab] = useState<"market" | "fundamentals" | "events">("market");
   const [activeMonthIndex, setActiveMonthIndex] = useState(MONTH_KEYS.length - 1);
-  const [isPurchaseDialogOpen, setIsPurchaseDialogOpen] = useState(false);
-  const [checkoutMessage, setCheckoutMessage] = useState<string | null>(null);
   const [transactionFilter, setTransactionFilter] = useState<"all" | "usage" | "purchase" | "adjustment">("all");
   const activeMonthKey = MONTH_KEYS[activeMonthIndex];
   const spendSeries = SPEND_SERIES[activeMonthKey] ?? [];
@@ -262,17 +259,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
               : getCreditsModeDescription(creditsModeState)}
           </p>
           <p className="mt-1 text-xs font-medium text-slate-600">模式：{getCreditsModeLabel(creditsModeState)}</p>
-          {checkoutMessage ? <p className="mt-2 text-xs text-slate-600">{checkoutMessage}</p> : null}
-          <button
-            type="button"
-            onClick={() => {
-              setCheckoutMessage(null);
-              setIsPurchaseDialogOpen(true);
-            }}
-            className={buttonClass("primary", "mt-6 h-12 rounded-2xl px-5 text-sm font-semibold")}
-          >
-            購買 credits
-          </button>
+          <p className="mt-6 text-xs text-slate-500">Credits 儲值將隨用量計費（Meters）一併開放，敬請期待。</p>
         </DashboardCard>
 
         <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
@@ -554,7 +541,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
                           {transaction.type === "purchase" ? (
                             <div className="space-y-1">
                               <p>{transaction.packageCode ? `方案 ${transaction.packageCode}` : "儲值"}</p>
-                              <p className="text-xs text-slate-500">provider：{transaction.provider ?? "ecpay"}</p>
+                              <p className="text-xs text-slate-500">provider：{transaction.provider ?? "—"}</p>
                             </div>
                           ) : null}
                           {transaction.type === "adjustment" ? (
@@ -594,14 +581,6 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
           </div>
         </DashboardCard>
       </section>
-
-      <CreditPurchaseDialog
-        open={isPurchaseDialogOpen}
-        onOpenChange={setIsPurchaseDialogOpen}
-        onCheckoutOpened={(message) => {
-          setCheckoutMessage(message);
-        }}
-      />
     </div>
   );
 }
