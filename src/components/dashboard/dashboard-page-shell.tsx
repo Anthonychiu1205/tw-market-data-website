@@ -1,6 +1,9 @@
+import { Suspense } from "react";
+
 import { AuthRuntimeUnavailableError } from "@/src/auth/session";
 import { getRequiredSession } from "@/src/lib/auth/session";
-import { DashboardConsole } from "@/src/components/dashboard/dashboard-console";
+import { renderSection } from "@/src/components/dashboard/dashboard-console";
+import { DashboardSidebar } from "@/src/components/dashboard/dashboard-sidebar";
 import { type DashboardSection } from "@/src/content/dashboard";
 import type {
   ApiKeysSummary,
@@ -147,9 +150,114 @@ type DashboardPageShellProps = {
   currentHref: string;
 };
 
+type DashboardSectionDataProps = {
+  session: Awaited<ReturnType<typeof getRequiredSession>>;
+  section: DashboardSection;
+  currentPath: string;
+  currentHref: string;
+  entitlement: Awaited<ReturnType<typeof getDashboardEntitlementForUser>>;
+  creditsModeState: ReturnType<typeof assertCreditsDeductionRuntimeSafe>;
+};
+
+function SectionSkeleton() {
+  return (
+    <div className="space-y-3" aria-hidden="true">
+      <div className="h-24 animate-pulse rounded-2xl bg-slate-100" />
+      <div className="h-44 animate-pulse rounded-2xl bg-slate-100" />
+      <div className="h-72 animate-pulse rounded-2xl bg-slate-100" />
+    </div>
+  );
+}
+
 export async function DashboardPageShell({ section, currentPath, currentHref }: DashboardPageShellProps) {
-  const dashboardLoadStartedAt = nowMs();
   const creditsModeState = assertCreditsDeductionRuntimeSafe();
+
+  let session: Awaited<ReturnType<typeof getRequiredSession>>;
+  try {
+    session = await getRequiredSession();
+  } catch (error) {
+    if (error instanceof AuthRuntimeUnavailableError) {
+      return (
+        <div className="h-[calc(100dvh-73px)] overflow-hidden px-4 py-4 lg:px-8 lg:py-6">
+          <div className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)]">
+            <aside className="min-h-0 h-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-4">
+              <p className="text-sm font-semibold text-slate-900">控制台</p>
+              <p className="mt-1 text-xs text-slate-500">服務狀態</p>
+            </aside>
+            <main className="min-h-0 min-w-0 h-full overflow-y-auto pr-1">
+              <section className="rounded-2xl border border-slate-200 bg-white p-6">
+                <h1 className="text-lg font-semibold tracking-tight text-slate-900">登入服務暫時不可用，請稍後再試。</h1>
+                <p className="mt-2 text-sm text-slate-600">如果問題持續發生，請聯繫我們協助排查。</p>
+              </section>
+            </main>
+          </div>
+        </div>
+      );
+    }
+    throw error;
+  }
+
+  // The entitlement drives the sidebar plan label. It is fast for non-billing sections
+  // (skipBackendSummaryLookup); billing reads the backend, but its content is
+  // backend-bound anyway. The heavy per-section data streams in below.
+  const entitlement = await getDashboardEntitlementForUser({
+    userId: session.id,
+    email: session.email,
+    skipBackendSummaryLookup: section !== "billing",
+  }).catch((error) => {
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    console.warn(`[dashboard] failed to resolve entitlement (${errorName})`);
+    return {
+      planCode: "free",
+      planName: "Free",
+      source: "fallback" as const,
+      isEntitled: false,
+      apiKeyLimit: 1,
+      datasetLimit: "基礎資料集（不含財報三表）",
+      requestLimitLabel: "每月 included 500 requests / RPM 60",
+    };
+  });
+
+  // Static frame (sidebar + plan) renders immediately; the data-heavy section content
+  // streams in via Suspense so first paint no longer waits for every backend call.
+  return (
+    <div className="h-[calc(100dvh-73px)] overflow-hidden px-4 py-4 lg:px-8 lg:py-6">
+      <div className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)]">
+        <aside className="min-h-0 h-full overflow-hidden">
+          <DashboardSidebar
+            email={session.email}
+            section={section}
+            plan={entitlement.planName}
+            currentPath={currentPath}
+            currentHref={currentHref}
+          />
+        </aside>
+        <main className="min-h-0 min-w-0 h-full overflow-y-auto pr-1">
+          <Suspense fallback={<SectionSkeleton />}>
+            <DashboardSectionData
+              session={session}
+              section={section}
+              currentPath={currentPath}
+              currentHref={currentHref}
+              entitlement={entitlement}
+              creditsModeState={creditsModeState}
+            />
+          </Suspense>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+async function DashboardSectionData({
+  session,
+  section,
+  currentPath,
+  currentHref,
+  entitlement,
+  creditsModeState,
+}: DashboardSectionDataProps) {
+  const dashboardLoadStartedAt = nowMs();
   const usageIsDryRun = !creditsModeState.enabled;
 
   const needsApiKeys = section === "overview" || section === "keys";
@@ -161,60 +269,6 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
   const needsReconciliation = section === "usage" || currentPath === "/billing/credits";
 
   try {
-    let session: Awaited<ReturnType<typeof getRequiredSession>>;
-    try {
-      session = await timedStage("auth/session", () => getRequiredSession());
-    } catch (error) {
-      if (error instanceof AuthRuntimeUnavailableError) {
-        logStageDuration("total", dashboardLoadStartedAt, false);
-        return (
-          <div className="h-[calc(100dvh-73px)] overflow-hidden px-4 py-4 lg:px-8 lg:py-6">
-            <div className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)]">
-              <aside className="min-h-0 h-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-4">
-                <p className="text-sm font-semibold text-slate-900">控制台</p>
-                <p className="mt-1 text-xs text-slate-500">服務狀態</p>
-              </aside>
-              <main className="min-h-0 min-w-0 h-full overflow-y-auto pr-1">
-                <section className="rounded-2xl border border-slate-200 bg-white p-6">
-                  <h1 className="text-lg font-semibold tracking-tight text-slate-900">登入服務暫時不可用，請稍後再試。</h1>
-                  <p className="mt-2 text-sm text-slate-600">如果問題持續發生，請聯繫我們協助排查。</p>
-                </section>
-              </main>
-            </div>
-          </div>
-        );
-      }
-      throw error;
-    }
-
-    // API keys in dashboard currently use local Prisma source, not backend self-serve list.
-    console.info("[dashboard-load] stage=backendApiKeys durationMs=0 ok=true");
-    // Backend account/usage fallback intentionally deferred in P1 to avoid blocking first paint.
-    console.info("[dashboard-load] stage=backendAccountSummary durationMs=0 ok=true");
-    console.info("[dashboard-load] stage=backendUsageSummary durationMs=0 ok=true");
-    console.info("[dashboard-load] stage=backendUsageRequests durationMs=0 ok=true");
-
-    const entitlementPromise = timedStage("entitlement/subscription", () =>
-      getDashboardEntitlementForUser({
-        userId: session.id,
-        email: session.email,
-        // Billing pages need the real plan from the backend; other sections defer the
-        // lookup for first paint and fall back to free.
-        skipBackendSummaryLookup: section !== "billing",
-      }),
-    ).catch((error) => {
-      const errorName = error instanceof Error ? error.name : "UnknownError";
-      console.warn(`[dashboard] failed to resolve entitlement (${errorName})`);
-      return {
-        planCode: "free",
-        planName: "Free",
-        source: "fallback" as const,
-        isEntitled: false,
-        apiKeyLimit: 1,
-        datasetLimit: "基礎資料集（不含財報三表）",
-        requestLimitLabel: "每月 included 500 requests / RPM 60",
-      };
-    });
 
     const apiKeysPromise: Promise<ApiKeysSummary> = needsApiKeys
       ? timedStage("apiKeys", () => getApiKeysSummaryForUser(session.id)).catch((error) => {
@@ -273,7 +327,6 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
       : Promise.resolve(null);
 
     const [
-      entitlement,
       apiKeys,
       localUsageSummary,
       localUsageRows,
@@ -282,7 +335,6 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
       creditTransactions,
       reconciliation,
     ] = await Promise.all([
-      entitlementPromise,
       apiKeysPromise,
       localUsageSummaryPromise,
       localUsageRowsPromise,
@@ -336,66 +388,58 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
 
     logStageDuration("total", dashboardLoadStartedAt, true);
 
-    return (
-      <div className="h-[calc(100dvh-73px)] overflow-hidden px-4 py-4 lg:px-8 lg:py-6">
-        <DashboardConsole
-          email={session.email}
-          section={section}
-          currentPath={currentPath}
-          currentHref={currentHref}
-          billing={FALLBACK_BILLING}
-          usage={resolvedUsage}
-          usageRequests={resolvedUsageRequests}
-          apiKeys={apiKeys}
-          entitlement={entitlement}
-          subscription={
-            billingDisplaySubscription
-              ? {
-                  id: billingDisplaySubscription.id,
-                  planCode: billingDisplaySubscription.planCode,
-                  status: billingDisplaySubscription.status,
-                  billingCycle: billingDisplaySubscription.billingCycle,
-                  currentPeriodEnd: billingDisplaySubscription.currentPeriodEnd,
-                  cancelAtPeriodEnd: billingDisplaySubscription.cancelAtPeriodEnd,
-                  cancelReason: billingDisplaySubscription.cancelReason,
-                  cancelReasonDetail: billingDisplaySubscription.cancelReasonDetail,
-                }
-              : null
+    return renderSection(section, {
+      email: session.email,
+      section,
+      currentPath,
+      currentHref,
+      billing: FALLBACK_BILLING,
+      usage: resolvedUsage,
+      usageRequests: resolvedUsageRequests,
+      apiKeys,
+      entitlement,
+      subscription: billingDisplaySubscription
+        ? {
+            id: billingDisplaySubscription.id,
+            planCode: billingDisplaySubscription.planCode,
+            status: billingDisplaySubscription.status,
+            billingCycle: billingDisplaySubscription.billingCycle,
+            currentPeriodEnd: billingDisplaySubscription.currentPeriodEnd,
+            cancelAtPeriodEnd: billingDisplaySubscription.cancelAtPeriodEnd,
+            cancelReason: billingDisplaySubscription.cancelReason,
+            cancelReasonDetail: billingDisplaySubscription.cancelReasonDetail,
           }
-          creditWalletBalance={creditWallet?.balance ?? 0}
-          creditsModeState={creditsModeState}
-          usageReconciliation={
-            reconciliation
-              ? {
-                  windowDays: reconciliation.windowDays,
-                  walletBalance: reconciliation.walletBalance,
-                  totalUsageEvents: reconciliation.totalUsageEvents,
-                  totalChargedCredits: reconciliation.totalChargedCredits,
-                  totalTransactionCredits: reconciliation.totalTransactionCredits,
-                  mismatchedRequestIds: reconciliation.mismatchedRequestIds,
-                  orphanUsageEvents: reconciliation.orphanUsageEvents,
-                  orphanUsageTransactions: reconciliation.orphanUsageTransactions,
-                  duplicateUsageTransactions: reconciliation.duplicateUsageTransactions,
-                }
-              : null
+        : null,
+      creditWalletBalance: creditWallet?.balance ?? 0,
+      creditsModeState,
+      usageReconciliation: reconciliation
+        ? {
+            windowDays: reconciliation.windowDays,
+            walletBalance: reconciliation.walletBalance,
+            totalUsageEvents: reconciliation.totalUsageEvents,
+            totalChargedCredits: reconciliation.totalChargedCredits,
+            totalTransactionCredits: reconciliation.totalTransactionCredits,
+            mismatchedRequestIds: reconciliation.mismatchedRequestIds,
+            orphanUsageEvents: reconciliation.orphanUsageEvents,
+            orphanUsageTransactions: reconciliation.orphanUsageTransactions,
+            duplicateUsageTransactions: reconciliation.duplicateUsageTransactions,
           }
-          creditTransactions={creditTransactions.map((item) => ({
-            id: item.id,
-            type: item.type,
-            status: item.status,
-            amountTwd: item.amountTwd,
-            credits: item.credits,
-            balanceAfter: item.balanceAfter,
-            provider: item.provider,
-            merchantTradeNo: item.merchantTradeNo,
-            providerTradeNo: item.providerTradeNo,
-            packageCode: item.packageCode,
-            description: item.description,
-            createdAt: item.createdAt.toISOString(),
-          }))}
-        />
-      </div>
-    );
+        : null,
+      creditTransactions: creditTransactions.map((item) => ({
+        id: item.id,
+        type: item.type,
+        status: item.status,
+        amountTwd: item.amountTwd,
+        credits: item.credits,
+        balanceAfter: item.balanceAfter,
+        provider: item.provider,
+        merchantTradeNo: item.merchantTradeNo,
+        providerTradeNo: item.providerTradeNo,
+        packageCode: item.packageCode,
+        description: item.description,
+        createdAt: item.createdAt.toISOString(),
+      })),
+    });
   } catch (error) {
     logStageDuration("total", dashboardLoadStartedAt, false);
     throw error;
