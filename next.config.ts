@@ -8,8 +8,11 @@ const cspDirectives = [
   "default-src 'self'",
   "base-uri 'self'",
   "form-action 'self' mailto:",
-  // Polar inline embedded checkout renders its hosted checkout in an iframe.
-  "frame-src 'self' https://*.polar.sh https://buy.polar.sh",
+  // Polar inline embedded checkout renders its hosted checkout in an iframe. The
+  // PRODUCTION checkout session is served on the BARE domain (https://polar.sh/checkout/...),
+  // which a "*.polar.sh" wildcard does NOT match — so polar.sh must be listed explicitly,
+  // otherwise the browser blocks the iframe ("this content is blocked").
+  "frame-src 'self' https://polar.sh https://*.polar.sh",
   "frame-ancestors 'none'",
   "object-src 'none'",
   "img-src 'self' data: blob:",
@@ -18,7 +21,7 @@ const cspDirectives = [
   // We can tighten this later with nonce/hash-based policies.
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline'",
-  "connect-src 'self'",
+  "connect-src 'self' https://polar.sh https://*.polar.sh",
   ...(isProduction ? ["upgrade-insecure-requests"] : []),
 ];
 
