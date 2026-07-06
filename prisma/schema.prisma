@@ -23,8 +23,6 @@ model User {
   role                String              @default("user")
   accounts            Account[]
   sessions            Session[]
-  subscriptions       Subscription[]
-  billingPayments     BillingPayment[]
   creditWallet        CreditWallet?
   creditTransactions  CreditTransaction[]
   apiKeys             ApiKey[]
@@ -97,67 +95,6 @@ model PasswordResetToken {
   @@index([email])
   @@index([expiresAt])
   @@index([consumedAt])
-}
-
-model Subscription {
-  id                 String    @id @default(cuid())
-  userId             String
-  provider           String    @default("ecpay")
-  planCode           String
-  billingCycle       String
-  status             String    @default("pending")
-  amount             Int
-  currency           String    @default("TWD")
-  merchantTradeNo    String    @unique
-  ecpayTradeNo       String?
-  periodType         String?
-  frequency          Int?
-  execTimes          Int?
-  startedAt          DateTime?
-  currentPeriodStart DateTime?
-  currentPeriodEnd   DateTime?
-  cancelAtPeriodEnd  Boolean   @default(false)
-  cancelledAt        DateTime?
-  cancelReason       String?
-  cancelReasonDetail String?
-  rawInitialNotify   Json?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-
-  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  payments BillingPayment[]
-
-  @@index([userId])
-  @@index([status])
-  @@index([planCode])
-}
-
-model BillingPayment {
-  id                String    @id @default(cuid())
-  subscriptionId    String?
-  userId            String
-  provider          String    @default("ecpay")
-  merchantTradeNo   String
-  providerPaymentId String    @unique
-  amount            Int
-  currency          String    @default("TWD")
-  status            String    @default("pending")
-  ecpayTradeNo      String?
-  ecpayPaymentType  String?
-  ecpayRtnCode      String?
-  ecpayRtnMsg       String?
-  paidAt            DateTime?
-  rawNotify         Json?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([subscriptionId])
-  @@index([merchantTradeNo])
-  @@index([status])
 }
 
 model CreditWallet {

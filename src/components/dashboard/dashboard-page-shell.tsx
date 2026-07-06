@@ -8,10 +8,8 @@ import type {
   UsageRequestsSummary,
   UsageSummary,
 } from "@/src/lib/backend-adapter";
-import {
-  getBillingDisplaySubscriptionForUser,
-  getDashboardEntitlementForUser,
-} from "@/src/lib/billing/subscription";
+import { getBillingSummary } from "@/src/lib/backend-adapter";
+import { getDashboardEntitlementForUser } from "@/src/lib/billing/subscription";
 import { getCreditTransactionsForUser, getCreditWalletForUser } from "@/src/lib/billing/credits";
 import { assertCreditsDeductionRuntimeSafe } from "@/src/lib/billing/credits-mode";
 import { getUsageCreditReconciliationForUser } from "@/src/lib/billing/reconciliation";
@@ -20,6 +18,14 @@ import { getRecentApiUsageForUser, getUsageSummaryForUser } from "@/src/lib/gate
 
 function nowMs() {
   return Date.now();
+}
+
+function parseRenewalDate(value: string | null | undefined): Date | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === "—") return null;
+  const parsed = new Date(trimmed);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function logStageDuration(stage: string, startedAt: number, ok: boolean) {
@@ -192,7 +198,9 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
       getDashboardEntitlementForUser({
         userId: session.id,
         email: session.email,
-        skipBackendSummaryLookup: true,
+        // Billing pages need the real plan from the backend; other sections defer the
+        // lookup for first paint and fall back to free.
+        skipBackendSummaryLookup: section !== "billing",
       }),
     ).catch((error) => {
       const errorName = error instanceof Error ? error.name : "UnknownError";
@@ -203,8 +211,8 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
         source: "fallback" as const,
         isEntitled: false,
         apiKeyLimit: 1,
-        datasetLimit: "5 個資料集",
-        requestLimitLabel: "每日上限 100 credits / 每月 included 2,000 credits / RPM 10",
+        datasetLimit: "基礎資料集（不含財報三表）",
+        requestLimitLabel: "每月 included 500 requests / RPM 60",
       };
     });
 
@@ -232,10 +240,10 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
         })
       : Promise.resolve([]);
 
-    const billingDisplaySubscriptionPromise = needsBillingDisplaySubscription
-      ? timedStage("billingDisplaySubscription", () => getBillingDisplaySubscriptionForUser(session.id)).catch((error) => {
+    const billingSummaryPromise: Promise<BillingSummary | null> = needsBillingDisplaySubscription
+      ? timedStage("billingSummary", () => getBillingSummary(session.email)).catch((error) => {
           const errorName = error instanceof Error ? error.name : "UnknownError";
-          console.warn(`[dashboard] failed to fetch billing display subscription (${errorName})`);
+          console.warn(`[dashboard] failed to fetch billing summary (${errorName})`);
           return null;
         })
       : Promise.resolve(null);
@@ -269,7 +277,7 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
       apiKeys,
       localUsageSummary,
       localUsageRows,
-      billingDisplaySubscription,
+      billingSummary,
       creditWallet,
       creditTransactions,
       reconciliation,
@@ -278,11 +286,28 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
       apiKeysPromise,
       localUsageSummaryPromise,
       localUsageRowsPromise,
-      billingDisplaySubscriptionPromise,
+      billingSummaryPromise,
       creditWalletPromise,
       creditTransactionsPromise,
       reconciliationPromise,
     ]);
+
+    // Build the billing display subscription from the backend (single source of
+    // truth). No subscription is stored locally; cancellation is via Customer Portal.
+    const isBillingEntitled = entitlement.isEntitled && entitlement.planCode !== "free";
+    const renewalDate = parseRenewalDate(billingSummary?.renewalDate);
+    const billingDisplaySubscription = isBillingEntitled
+      ? {
+          id: "polar",
+          planCode: entitlement.planCode,
+          status: (billingSummary?.subscriptionStatus ?? "active").toLowerCase(),
+          billingCycle: "monthly",
+          currentPeriodEnd: renewalDate,
+          cancelAtPeriodEnd: false,
+          cancelReason: null as string | null,
+          cancelReasonDetail: null as string | null,
+        }
+      : null;
 
     const linkedByRequestId = new Map<string, { linked: boolean; transactionStatus: string | null; transactionCredits: number }>();
     if (reconciliation?.recentRows) {

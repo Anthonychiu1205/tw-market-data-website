@@ -1,6 +1,6 @@
 import "server-only";
 
-export type GatewayPlanCode = "free" | "developer" | "pro" | "team" | "enterprise";
+export type GatewayPlanCode = "free" | "starter" | "pro" | "max" | "developer" | "enterprise";
 
 export type DatasetPolicy = {
   datasetSlug: string;
@@ -11,10 +11,11 @@ export type DatasetPolicy = {
 
 const PLAN_LEVEL: Record<GatewayPlanCode, number> = {
   free: 0,
-  developer: 1,
+  starter: 1,
   pro: 2,
-  team: 3,
-  enterprise: 4,
+  max: 3,
+  developer: 4,
+  enterprise: 5,
 };
 
 export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
@@ -39,13 +40,13 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "technical-indicators": {
     datasetSlug: "technical-indicators",
     backendPath: "/v2/datasets/technical-indicators",
-    requiredPlan: "developer",
+    requiredPlan: "starter",
     creditsCost: 3,
   },
   "monthly-revenue": {
     datasetSlug: "monthly-revenue",
     backendPath: "/v2/datasets/monthly-revenue",
-    requiredPlan: "developer",
+    requiredPlan: "starter",
     creditsCost: 3,
   },
   "income-statement": {
@@ -81,7 +82,7 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "valuation-data": {
     datasetSlug: "valuation-data",
     backendPath: "/v2/datasets/valuation-data",
-    requiredPlan: "developer",
+    requiredPlan: "starter",
     creditsCost: 2,
   },
   "issuer-profile": {
@@ -99,9 +100,10 @@ export const DATASET_CREDIT_COSTS = Object.fromEntries(
 export function normalizePlanCode(input: string | null | undefined): GatewayPlanCode {
   const normalized = (input ?? "").trim().toLowerCase();
   if (normalized === "enterprise") return "enterprise";
-  if (normalized === "team") return "team";
-  if (normalized === "pro") return "pro";
   if (normalized === "developer") return "developer";
+  if (normalized === "max") return "max";
+  if (normalized === "pro") return "pro";
+  if (normalized === "starter") return "starter";
   return "free";
 }
 

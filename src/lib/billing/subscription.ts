@@ -1,11 +1,10 @@
 import "server-only";
 
-import type { Subscription } from "@prisma/client";
-
-import { prisma } from "@/src/lib/auth/prisma";
 import { getAccountSummary } from "@/src/lib/backend-adapter";
 import { BILLING_PLANS, type PlanCode } from "@/src/lib/billing/plans";
 
+// "subscription" is retained for display compatibility; the website no longer stores
+// subscriptions, so entitlements now resolve from the backend or fall back to free.
 export type DashboardEntitlementSource = "subscription" | "backend" | "fallback";
 
 export type DashboardEntitlement = {
@@ -57,113 +56,19 @@ function getPlanMeta(planCode: string) {
     planCode: "free",
     planName: "Free",
     apiKeyLimit: 1,
-    datasetLimit: "5 個資料集",
+    datasetLimit: "基礎資料集（不含財報三表）",
     requestLimitLabel: REQUEST_LIMIT_LABELS.free,
   };
 }
 
-export function isSubscriptionCurrentlyEntitled(subscription: Pick<Subscription, "status" | "currentPeriodEnd"> | null) {
-  if (!subscription) {
-    return false;
-  }
-
-  if (!subscription.currentPeriodEnd) {
-    return false;
-  }
-
-  const periodEnd = subscription.currentPeriodEnd.getTime();
-  if (Number.isNaN(periodEnd) || periodEnd <= Date.now()) {
-    return false;
-  }
-
-  return subscription.status === "active" || subscription.status === "cancelled";
-}
-
-export async function getActiveSubscriptionForUser(userId: string) {
-  const subscriptions = await prisma.subscription.findMany({
-    where: {
-      userId,
-      status: {
-        in: ["active", "cancelled"],
-      },
-    },
-    orderBy: [{ currentPeriodEnd: "desc" }, { updatedAt: "desc" }],
-  });
-
-  return subscriptions.find((subscription) => isSubscriptionCurrentlyEntitled(subscription)) ?? null;
-}
-
-export async function getLatestSubscriptionForUser(userId: string) {
-  return await prisma.subscription.findFirst({
-    where: { userId },
-    orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
-  });
-}
-
-function isFutureDate(date: Date | null) {
-  if (!date) return false;
-  const value = date.getTime();
-  return Number.isFinite(value) && value > Date.now();
-}
-
-function isBillingEffectiveSubscription(subscription: Pick<Subscription, "status" | "currentPeriodEnd" | "cancelAtPeriodEnd">) {
-  const status = subscription.status.toLowerCase();
-  const hasFuturePeriod = isFutureDate(subscription.currentPeriodEnd);
-
-  if (status === "active" && (hasFuturePeriod || !subscription.currentPeriodEnd)) {
-    return true;
-  }
-
-  if (status === "cancelled" && (subscription.cancelAtPeriodEnd || hasFuturePeriod) && hasFuturePeriod) {
-    return true;
-  }
-
-  return false;
-}
-
-export async function getBillingDisplaySubscriptionForUser(userId: string) {
-  const subscriptions = await prisma.subscription.findMany({
-    where: { userId },
-    orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
-  });
-
-  let latestPending: Subscription | null = null;
-  let latestPastDueOrFailed: Subscription | null = null;
-  let latestCancelled: Subscription | null = null;
-
-  for (const subscription of subscriptions) {
-    const status = subscription.status.toLowerCase();
-
-    if (isBillingEffectiveSubscription(subscription)) {
-      return subscription;
-    }
-
-    if (status === "pending" && !latestPending) {
-      latestPending = subscription;
-      continue;
-    }
-
-    if ((status === "past_due" || status === "failed") && !latestPastDueOrFailed) {
-      latestPastDueOrFailed = subscription;
-      continue;
-    }
-
-    if (status === "cancelled" && !latestCancelled) {
-      latestCancelled = subscription;
-      continue;
-    }
-  }
-
-  return latestPending ?? latestPastDueOrFailed ?? latestCancelled ?? null;
-}
-
-export async function getUserPlanCode(userId: string) {
-  const subscription = await getActiveSubscriptionForUser(userId);
-  return subscription?.planCode ?? null;
-}
-
+/**
+ * Resolve the dashboard entitlement (plan meta) for a user. The single source of
+ * truth is the shared read API (fed by the Polar webhook); the website stores no
+ * subscription of its own. `backendPlan` short-circuits the HTTP lookup when the
+ * caller already has the plan; `skipBackendSummaryLookup` returns the free fallback
+ * without any backend call (used for fast first paint).
+ */
 export async function getDashboardEntitlementForUser({
-  userId,
   email,
   backendPlan,
   skipBackendSummaryLookup = false,
@@ -173,33 +78,20 @@ export async function getDashboardEntitlementForUser({
   backendPlan?: string;
   skipBackendSummaryLookup?: boolean;
 }): Promise<DashboardEntitlement> {
-  try {
-    const subscription = await getActiveSubscriptionForUser(userId);
-    if (subscription) {
-      const meta = getPlanMeta(subscription.planCode);
-      return {
-        ...meta,
-        source: "subscription",
-        subscriptionStatus: subscription.status,
-        isEntitled: true,
-      };
-    }
-  } catch (error) {
-    const errorName = error instanceof Error ? error.name : "UnknownError";
-    console.warn(`[billing-entitlement] failed to resolve active subscription (${errorName})`);
-  }
-
   const resolveFromBackendPlan = (plan: string): DashboardEntitlement => {
     const backendPlanCode = normalizePlanCode(plan);
     const meta = getPlanMeta(backendPlanCode);
-    const isEntitled = backendPlanCode !== "free";
-
     return {
       ...meta,
       source: "backend",
       subscriptionStatus: undefined,
-      isEntitled,
+      isEntitled: backendPlanCode !== "free",
     };
+  };
+
+  const freeFallback = (): DashboardEntitlement => {
+    const meta = getPlanMeta("free");
+    return { ...meta, source: "fallback", subscriptionStatus: undefined, isEntitled: false };
   };
 
   if (backendPlan) {
@@ -207,13 +99,7 @@ export async function getDashboardEntitlementForUser({
   }
 
   if (skipBackendSummaryLookup) {
-    const fallbackMeta = getPlanMeta("free");
-    return {
-      ...fallbackMeta,
-      source: "fallback",
-      subscriptionStatus: undefined,
-      isEntitled: false,
-    };
+    return freeFallback();
   }
 
   try {
@@ -224,11 +110,5 @@ export async function getDashboardEntitlementForUser({
     console.warn(`[billing-entitlement] failed to resolve backend summary (${errorName})`);
   }
 
-  const fallbackMeta = getPlanMeta("free");
-  return {
-    ...fallbackMeta,
-    source: "fallback",
-    subscriptionStatus: undefined,
-    isEntitled: false,
-  };
+  return freeFallback();
 }

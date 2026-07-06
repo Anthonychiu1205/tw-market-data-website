@@ -1,6 +1,7 @@
 import "server-only";
 
-import { getActiveSubscriptionForUser } from "@/src/lib/billing/subscription";
+import { prisma } from "@/src/lib/auth/prisma";
+import { getAccountSummary } from "@/src/lib/backend-adapter";
 import { GatewayHttpError, sanitizeGatewayErrorMessage } from "@/src/lib/gateway/errors";
 import { isPlanAllowed, normalizePlanCode, type DatasetPolicy, type GatewayPlanCode } from "@/src/lib/gateway/policies";
 
@@ -24,12 +25,15 @@ export async function resolveUserPlanCode(
   requestId = "n/a",
 ): Promise<{ planCode: GatewayPlanCode; source: "subscription" | "fallback" }> {
   try {
-    const activeSubscription = await getActiveSubscriptionForUser(userId);
-    if (activeSubscription) {
-      return {
-        planCode: normalizePlanCode(activeSubscription.planCode),
-        source: "subscription",
-      };
+    // Single source of truth = the shared read API (fed by the Polar webhook). Resolve
+    // the user's email, then read the backend plan; no local subscription is stored.
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+    if (user?.email) {
+      const summary = await getAccountSummary(user.email);
+      const planCode = normalizePlanCode(summary.plan);
+      if (planCode !== "free") {
+        return { planCode, source: "subscription" };
+      }
     }
   } catch (error) {
     const errorName = error instanceof Error ? error.name : "UnknownError";
@@ -40,7 +44,7 @@ export async function resolveUserPlanCode(
       errorName,
       message,
     });
-    // Fail-open to free tier for gateway reads; avoids internal errors when subscription storage is unavailable.
+    // Fail-open to free tier for gateway reads; avoids internal errors when the backend is unavailable.
   }
 
   return {
