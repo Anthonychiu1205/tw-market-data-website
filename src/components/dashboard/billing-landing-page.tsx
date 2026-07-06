@@ -33,12 +33,11 @@ function formatPlanName(planCode: string) {
   return planCode;
 }
 
-function formatPlanAmount(planCode: string, billingCycle: string) {
+function formatPlanAmount(planCode: string) {
   if (!isPlanCode(planCode)) return "—";
   const plan = getPlanByCode(planCode);
-  const amount = billingCycle === "yearly" ? plan.yearlyAmount : plan.monthlyAmount;
-  if (amount === null) return "聯繫我們";
-  return `${formatPlanCurrency(amount)}${billingCycle === "yearly" ? " / 年" : " / 月"}`;
+  if (plan.monthlyAmount === null) return "聯繫我們";
+  return `${formatPlanCurrency(plan.monthlyAmount)} / 月`;
 }
 
 function getToneClass(tone: ReturnType<typeof getSubscriptionStatusTone>) {
@@ -93,7 +92,7 @@ export function BillingLandingPage({ subscription }: BillingLandingPageProps) {
         {subscription ? (
           <div className="mt-3 space-y-2 text-sm text-slate-700">
             <p>方案：{formatPlanName(subscription.planCode)}</p>
-            <p>方案價格：{formatPlanAmount(subscription.planCode, subscription.billingCycle)}</p>
+            <p>方案價格：{formatPlanAmount(subscription.planCode)}</p>
             {statusLabel && statusDescription && statusTone ? (
               <div className={`rounded-xl border px-3 py-2 ${getToneClass(statusTone)}`}>
                 <p className="text-sm font-medium">狀態：{statusLabel}</p>

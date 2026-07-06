@@ -8,6 +8,8 @@ const cspDirectives = [
   "default-src 'self'",
   "base-uri 'self'",
   "form-action 'self' mailto:",
+  // Polar inline embedded checkout renders its hosted checkout in an iframe.
+  "frame-src 'self' https://*.polar.sh https://buy.polar.sh",
   "frame-ancestors 'none'",
   "object-src 'none'",
   "img-src 'self' data: blob:",

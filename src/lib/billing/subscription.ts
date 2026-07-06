@@ -20,10 +20,11 @@ export type DashboardEntitlement = {
 };
 
 const REQUEST_LIMIT_LABELS: Record<string, string> = {
-  free: "每日上限 100 credits / 每月 included 2,000 credits / RPM 10",
-  developer: "每日上限 800 credits / 每月 included 20,000 credits / RPM 30",
-  pro: "每日上限 4,000 credits / 每月 included 100,000 credits / RPM 120",
-  team: "每日上限 20,000 credits / 每月 included 500,000 credits / RPM 600",
+  free: "每月 included 500 requests / RPM 60",
+  starter: "每月 included 10,000 requests / RPM 300",
+  pro: "每月 included 100,000 requests / RPM 1,200",
+  max: "每月 included 300,000 requests / RPM 3,000",
+  developer: "每月 included 3,000,000 requests / RPM 12,000",
   enterprise: "客製配額",
 };
 
@@ -31,9 +32,10 @@ function normalizePlanCode(input: string | null | undefined): string {
   const normalized = (input ?? "").trim().toLowerCase();
   if (!normalized) return "free";
   if (normalized.includes("enterprise")) return "enterprise";
-  if (normalized.includes("team")) return "team";
-  if (normalized.includes("pro")) return "pro";
   if (normalized.includes("developer")) return "developer";
+  if (normalized.includes("max")) return "max";
+  if (normalized.includes("pro")) return "pro";
+  if (normalized.includes("starter")) return "starter";
   if (normalized.includes("free")) return "free";
   return "free";
 }
