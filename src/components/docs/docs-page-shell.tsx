@@ -37,6 +37,8 @@ import {
 } from "@/src/content/docs-sidebar";
 import type { DocsSidebarNavGroup, DocsSidebarNavItem } from "@/src/content/docs-sidebar";
 import { cn } from "@/src/lib/cn";
+import { getAbsoluteUrl } from "@/src/config/site";
+import { JsonLd } from "@/src/components/seo/json-ld";
 
 import { TocNav } from "./toc-nav";
 
@@ -50,6 +52,7 @@ type DocsPageShellProps = {
   page: {
     title: string;
     subtitle: string;
+    href: string;
     sections: DocsSection[];
   };
   children: React.ReactNode;
@@ -297,8 +300,19 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
   const sidebarTopOffset = SITE_HEADER_HEIGHT_PX + DESKTOP_SIDEBAR_TOP_GAP_PX;
   const sidebarHeight = `calc(100vh - ${sidebarTopOffset + DESKTOP_SIDEBAR_BOTTOM_GAP_PX}px)`;
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "首頁", item: getAbsoluteUrl("/") },
+      { "@type": "ListItem", position: 2, name: "文件", item: getAbsoluteUrl("/docs") },
+      { "@type": "ListItem", position: 3, name: page.title, item: getAbsoluteUrl(page.href) },
+    ],
+  };
+
   return (
     <div className="w-full px-8 py-10 lg:px-16">
+      <JsonLd data={breadcrumbLd} />
       <div className="grid gap-8 lg:gap-10 lg:grid-cols-[200px_minmax(0,1fr)_380px]">
         <aside className="hidden lg:block">
           <div
