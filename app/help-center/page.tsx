@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 
 import { HelpCenterShell } from "@/src/components/help/help-center-shell";
-import { helpCenterPageMeta } from "@/src/content/help-center";
+import { helpCategories, helpCenterPageMeta } from "@/src/content/help-center";
+import { JsonLd } from "@/src/components/seo/json-ld";
 
 export const metadata: Metadata = {
   title: `${helpCenterPageMeta.title} | TW Market Data`,
@@ -11,6 +12,27 @@ export const metadata: Metadata = {
   },
 };
 
+// FAQPage structured data built from the on-page Q&A (invisible; search-engine only).
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: helpCategories
+    .flatMap((category) => category.topics)
+    .map((topic) => ({
+      "@type": "Question",
+      name: topic.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: topic.answer,
+      },
+    })),
+};
+
 export default function HelpCenterStandalonePage() {
-  return <HelpCenterShell mode="help" />;
+  return (
+    <>
+      <JsonLd data={faqLd} />
+      <HelpCenterShell mode="help" />
+    </>
+  );
 }

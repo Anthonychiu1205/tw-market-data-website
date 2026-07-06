@@ -5,6 +5,32 @@ import { PricingShell } from "@/src/components/pricing/pricing-shell";
 import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
+import { getPricingPlanViews } from "@/src/lib/billing/plans";
+
+// Offers derived from the local plan SSOT (plans.ts) — monthly, USD. Paid tiers carry a
+// concrete price; the contact-only tier is described without a price.
+const pricingOffers = getPricingPlanViews().map((plan) => {
+  const offer: Record<string, unknown> = {
+    "@type": "Offer",
+    name: `${plan.displayName} plan`,
+    category: "SubscriptionService",
+    url: getAbsoluteUrl("/pricing"),
+  };
+  if (plan.monthlyAmount !== null) {
+    offer.price = String(plan.monthlyAmount);
+    offer.priceCurrency = "USD";
+    offer.availability = "https://schema.org/InStock";
+    offer.priceSpecification = {
+      "@type": "UnitPriceSpecification",
+      price: String(plan.monthlyAmount),
+      priceCurrency: "USD",
+      unitText: "MONTH",
+    };
+  } else {
+    offer.description = "客製方案，請聯繫我們";
+  }
+  return offer;
+});
 
 // Public, statically generated, revalidated hourly. Plan data comes from the local
 // SSOT (plans.ts constants), so this page never calls the backend at request time and
@@ -22,10 +48,7 @@ const offersLd = {
     name: "TW Market Data",
   },
   url: getAbsoluteUrl("/pricing"),
-  offers: {
-    "@type": "OfferCatalog",
-    name: "TW Market Data Pricing Plans",
-  },
+  offers: pricingOffers,
 };
 
 export const metadata: Metadata = {
