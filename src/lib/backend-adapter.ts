@@ -13,7 +13,7 @@ class BackendFetchTimeoutError extends Error {
   }
 }
 
-const DEFAULT_BACKEND_FETCH_TIMEOUT_MS = 2500;
+const DEFAULT_BACKEND_FETCH_TIMEOUT_MS = 5000;
 const DEFAULT_BACKEND_SUMMARY_CACHE_TTL_MS = 10_000;
 
 type BackendMemoryCacheEntry<T> = {
@@ -361,7 +361,9 @@ export async function getAccountSummary(email: string): Promise<AccountSummary> 
   if (live?.data) {
     const payload = live.data;
     const result: AccountSummary = {
-      plan: getString(payload.plan || payload.plan_name, "Developer"),
+      // Default to the minimal plan when the live payload omits it — never assume a
+      // higher tier than the account actually has.
+      plan: getString(payload.plan || payload.plan_name, "free"),
       accessStatus: getString(payload.accessStatus || payload.access_status, "Active"),
       enabledDatasets: getNumber(payload.enabledDatasets || payload.enabled_datasets, datasetProducts.length),
       integrationMode: "live",
@@ -370,8 +372,11 @@ export async function getAccountSummary(email: string): Promise<AccountSummary> 
     return result;
   }
 
+  // When the backend is unavailable (timeout/error), fall back to the MINIMUM plan.
+  // Showing a higher tier than the user actually has would be misleading and could
+  // imply access they don't have — always degrade downward, never upward.
   const fallbackResult: AccountSummary = {
-    plan: "Developer",
+    plan: "free",
     accessStatus: "Active",
     enabledDatasets: datasetProducts.length,
     integrationMode: "fallback",

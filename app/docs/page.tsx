@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 
+// Static, revalidated hourly — no request-time backend call.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "文件",
   description: "TW Market Data 文件入口，包含 Quick Start、API Model、資料血緣與市場覆蓋範圍。",

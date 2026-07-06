@@ -12,7 +12,6 @@ import { cn } from "@/src/lib/cn";
 import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
 import { ApiKeysManager } from "@/src/components/dashboard/api-keys-manager";
-import { DashboardSidebar } from "@/src/components/dashboard/dashboard-sidebar";
 import { BillingLandingPage } from "@/src/components/dashboard/billing-landing-page";
 import { BillingSubscriptionsPage } from "@/src/components/dashboard/billing-subscriptions-page";
 import { BillingCreditsPage } from "@/src/components/dashboard/billing-credits-page";
@@ -438,7 +437,7 @@ function SupportPanel() {
   );
 }
 
-function renderSection(section: DashboardSection, props: DashboardConsoleProps) {
+export function renderSection(section: DashboardSection, props: DashboardConsoleProps) {
   const quotaRatio = props.usage.monthlyQuota > 0 ? props.usage.monthlyUsed / props.usage.monthlyQuota : 0;
   const creditState: CreditState = props.usageRequests.insufficientCredits
     ? "exhausted"
@@ -535,21 +534,3 @@ function renderSection(section: DashboardSection, props: DashboardConsoleProps) 
   );
 }
 
-export function DashboardConsole(props: DashboardConsoleProps) {
-  return (
-    <div className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)]">
-      <aside className="min-h-0 h-full overflow-hidden">
-        <DashboardSidebar
-          email={props.email}
-          section={props.section}
-          plan={props.entitlement.planName}
-          currentPath={props.currentPath}
-          currentHref={props.currentHref}
-        />
-      </aside>
-      <main className="min-h-0 min-w-0 h-full overflow-y-auto pr-1">
-        {renderSection(props.section, props)}
-      </main>
-    </div>
-  );
-}
