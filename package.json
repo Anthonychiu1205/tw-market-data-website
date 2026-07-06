@@ -8,7 +8,6 @@
     "start": "next start",
     "lint": "eslint",
     "check:safe-redirect": "node scripts/check_safe_redirect.mjs",
-    "check:ecpay-checkmac": "node scripts/check_ecpay_checkmac.mjs",
     "check:deployment-env": "node scripts/check_deployment_env.mjs",
     "smoke:gateway-dry-run": "node scripts/smoke_gateway_dry_run.mjs",
     "smoke:gateway-deduction-mode": "node scripts/smoke_gateway_deduction_mode.mjs",

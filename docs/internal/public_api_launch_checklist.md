@@ -60,7 +60,7 @@
 ```bash
 npm run lint
 npm run build
-npm run check:ecpay-checkmac
+npm run check:deployment-env
 npm run smoke:gateway-dry-run
 npm run check:wallet-integrity
 ```

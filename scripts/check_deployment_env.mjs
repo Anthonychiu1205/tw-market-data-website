@@ -3,7 +3,13 @@ const GOOGLE_PRIMARY = ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"];
 const GOOGLE_FALLBACK = ["AUTH_GOOGLE_ID", "AUTH_GOOGLE_SECRET"];
 const OPTIONAL_AUTH_URL_KEYS = ["NEXTAUTH_URL", "AUTH_URL"];
 const OPTIONAL_SITE_URL = "NEXT_PUBLIC_SITE_URL";
-const ECPAY_KEYS = ["ECPAY_ENV", "ECPAY_MERCHANT_ID", "ECPAY_HASH_KEY", "ECPAY_HASH_IV"];
+const POLAR_KEYS = [
+  "POLAR_ACCESS_TOKEN",
+  "POLAR_PRODUCT_ID_STARTER",
+  "POLAR_PRODUCT_ID_PRO",
+  "POLAR_PRODUCT_ID_MAX",
+  "POLAR_PRODUCT_ID_DEVELOPER",
+];
 
 function hasValue(name) {
   const value = process.env[name];
@@ -124,7 +130,7 @@ if (hasValue(OPTIONAL_SITE_URL)) {
   );
 }
 
-for (const key of ECPAY_KEYS) {
+for (const key of POLAR_KEYS) {
   const ok = hasValue(key);
   printStatus(key, ok);
   if (!ok) {
@@ -132,13 +138,11 @@ for (const key of ECPAY_KEYS) {
   }
 }
 
-const ecpayEnv = (process.env.ECPAY_ENV || "").trim().toLowerCase();
-if (ecpayEnv) {
-  const isValidEcpayEnv = ecpayEnv === "stage" || ecpayEnv === "production";
-  printInfo("ECPAY_ENV value", isValidEcpayEnv ? ecpayEnv : `invalid:${ecpayEnv}`);
-  if (!isValidEcpayEnv) {
-    failures += 1;
-  }
+const polarApiBase = (process.env.POLAR_API_BASE || "").trim();
+if (polarApiBase) {
+  printInfo("POLAR_API_BASE value", polarApiBase);
+} else {
+  printInfo("POLAR_API_BASE value", "not set (defaults to production https://api.polar.sh)");
 }
 
 if (failures > 0) {

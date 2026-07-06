@@ -206,22 +206,6 @@ export function getPlanAmount(planCode: Exclude<PlanCode, "enterprise">, billing
   return billingCycle === "monthly" ? plan.monthlyAmount : plan.yearlyAmount;
 }
 
-export function getPeriodConfig(billingCycle: BillingCycle) {
-  if (billingCycle === "yearly") {
-    return {
-      periodType: "Y",
-      frequency: 1,
-      execTimes: 99,
-    } as const;
-  }
-
-  return {
-    periodType: "M",
-    frequency: 1,
-    execTimes: 999,
-  } as const;
-}
-
 export function normalizeBillingCycle(input: string | null | undefined): BillingCycle | null {
   if (input === "monthly" || input === "yearly") {
     return input;
