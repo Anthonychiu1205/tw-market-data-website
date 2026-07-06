@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 
 import { getSession } from "@/src/auth/session";
 
-const ENDPOINT_OPTIONS = [
+type EndpointOption = { path: string; requiresSymbol: boolean; backendPath?: string };
+
+const ENDPOINT_OPTIONS: readonly EndpointOption[] = [
   { path: "/v2/datasets/twse-daily-price", requiresSymbol: true },
   { path: "/v2/datasets/tpex-daily-price", requiresSymbol: true },
   { path: "/v2/datasets/issuer-profile", requiresSymbol: true },
@@ -27,7 +29,7 @@ const ENDPOINT_OPTIONS = [
   { path: "/v2/datasets/index-classification", requiresSymbol: false },
   { path: "/v2/datasets/company-news", requiresSymbol: true },
   { path: "/v2/datasets/market-news", requiresSymbol: false },
-] as const;
+];
 
 function getBackendBaseUrl() {
   const base = process.env.BACKEND_API_BASE_URL;
