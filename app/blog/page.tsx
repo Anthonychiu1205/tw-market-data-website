@@ -4,6 +4,9 @@ import { BlogIndex } from "@/src/components/blog/blog-index";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 import { getAllBlogPosts } from "@/src/content/blog-posts";
 
+// Static, revalidated hourly — blog content comes from the repo, no backend call.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: "觀點文章",
   description: "台股資料 API、資料工程、量化研究與 AI agent workflow 的產品筆記。",

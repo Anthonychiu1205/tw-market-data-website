@@ -30,6 +30,9 @@ function resolveDocsCanonical(href: string) {
   return docsCanonicalAliases[href] ?? href;
 }
 
+// Static (generateStaticParams), revalidated hourly — repo-driven docs, no backend.
+export const revalidate = 3600;
+
 export async function generateStaticParams() {
   return docsPages.map((page) => ({ slug: page.slug }));
 }

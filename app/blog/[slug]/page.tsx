@@ -5,6 +5,9 @@ import { BlogArticle } from "@/src/components/blog/blog-article";
 import { siteConfig } from "@/src/config/site";
 import { getAllBlogPosts, getBlogPostBySlug } from "@/src/content/blog-posts";
 
+// Static (generateStaticParams), revalidated hourly — repo-driven markdown, no backend.
+export const revalidate = 3600;
+
 type BlogDetailPageProps = {
   params: Promise<{ slug: string }>;
 };

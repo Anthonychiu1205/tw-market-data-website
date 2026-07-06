@@ -6,6 +6,11 @@ import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 
+// Public, statically generated, revalidated hourly. Plan data comes from the local
+// SSOT (plans.ts constants), so this page never calls the backend at request time and
+// stays instant regardless of API cold starts.
+export const revalidate = 3600;
+
 const offersLd = {
   "@context": "https://schema.org",
   "@type": "Product",
