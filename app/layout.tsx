@@ -11,6 +11,7 @@ const organizationLd = {
   "@type": "Organization",
   name: "TW Market Data",
   url: siteConfig.url,
+  logo: getAbsoluteUrl(siteConfig.ogImagePath),
   email: siteConfig.supportEmail,
 };
 
