@@ -197,13 +197,15 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
     throw error;
   }
 
-  // The entitlement drives the sidebar plan label. It is fast for non-billing sections
-  // (skipBackendSummaryLookup); billing reads the backend, but its content is
-  // backend-bound anyway. The heavy per-section data streams in below.
+  // The entitlement drives the sidebar plan label and must reflect the user's REAL tier
+  // on every section (previously overview skipped the backend and hard-defaulted to Free,
+  // so a paid user saw "Free" on the landing page). Resolve it for all sections; the
+  // backend summary is memoized (~10s) + fail-open to free, so it is one cheap call.
+  // The heavy per-section data streams in below.
   const entitlement = await getDashboardEntitlementForUser({
     userId: session.id,
     email: session.email,
-    skipBackendSummaryLookup: section !== "billing",
+    skipBackendSummaryLookup: false,
   }).catch((error) => {
     const errorName = error instanceof Error ? error.name : "UnknownError";
     console.warn(`[dashboard] failed to resolve entitlement (${errorName})`);
