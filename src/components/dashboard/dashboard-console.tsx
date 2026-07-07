@@ -19,6 +19,7 @@ import { UsagePageShell } from "@/src/components/dashboard/usage-page-shell";
 import { RequestResponsePlayground } from "@/src/components/dashboard/request-response-playground";
 import { OverviewUsageChart } from "@/src/components/dashboard/overview-usage-chart";
 import { AccountProfileForm } from "@/src/components/dashboard/account-profile-form";
+import { ResearchTerminalEntryCard } from "@/src/components/dashboard/research-terminal-entry-card";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
 import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
 
@@ -447,14 +448,17 @@ export function renderSection(section: DashboardSection, props: DashboardConsole
 
   if (section === "overview") {
     return (
-      <OverviewPanel
-        entitlement={props.entitlement}
-        usage={props.usage}
-        apiKeys={props.apiKeys}
-        creditState={creditState}
-        creditWalletBalance={props.creditWalletBalance}
-        creditsModeState={props.creditsModeState}
-      />
+      <div className="space-y-6">
+        <ResearchTerminalEntryCard />
+        <OverviewPanel
+          entitlement={props.entitlement}
+          usage={props.usage}
+          apiKeys={props.apiKeys}
+          creditState={creditState}
+          creditWalletBalance={props.creditWalletBalance}
+          creditsModeState={props.creditsModeState}
+        />
+      </div>
     );
   }
   if (section === "billing") {
