@@ -93,6 +93,30 @@ export default function PricingPage() {
             </Link>
           </div>
         </section>
+
+        {/* Two product lines: the data API (priced below) and the upcoming research
+            terminal (details pending SP1 — placeholder only, no hardcoded price). */}
+        <section className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-slate-900 bg-white p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold tracking-tight text-slate-900">資料 API</h2>
+              <span className="rounded-full bg-slate-900 px-2.5 py-0.5 text-[11px] font-semibold text-white">現正供應</span>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              以 TWSE-first 官方台股資料為底的 REST API，依方案配額與用量計價。下方即為各層級方案。
+            </p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold tracking-tight text-slate-900">投研終端</h2>
+              <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700">即將推出</span>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              線上投研工作台（因子、資料檢視與研究流程）。方案與定價細節將於後續公布。
+            </p>
+          </div>
+        </section>
+
         <PricingShell />
       </Container>
     </>
