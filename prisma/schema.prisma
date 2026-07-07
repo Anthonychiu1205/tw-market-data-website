@@ -182,3 +182,15 @@ model ApiUsageEvent {
   @@index([createdAt])
   @@index([requestId])
 }
+
+model AuthAttempt {
+  id        String   @id @default(cuid())
+  // sha256(scope + ":" + identifier); identifier is never stored in plaintext
+  // (email / userId / ip are all hashed before landing here).
+  bucket    String
+  outcome   String // "fail" | "success"
+  createdAt DateTime @default(now())
+
+  @@index([bucket, createdAt])
+  @@index([createdAt])
+}
