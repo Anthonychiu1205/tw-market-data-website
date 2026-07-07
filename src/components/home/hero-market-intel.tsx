@@ -6,8 +6,9 @@ import { getMarketMarqueeSnapshotView } from "@/src/lib/market-marquee-snapshot"
 const MARKET_LABELS = ["加權指數", "櫃買指數", "台灣50", "電子類股", "金融保險"] as const;
 
 function toneClass(trend: "up" | "down" | "neutral") {
-  if (trend === "up") return "text-emerald-600";
-  if (trend === "down") return "text-red-600";
+  // Taiwan convention: 紅漲綠跌 (red = up, green = down), aligned with market-marquee-track.
+  if (trend === "up") return "text-rose-500";
+  if (trend === "down") return "text-emerald-600";
   return "text-slate-500";
 }
 
