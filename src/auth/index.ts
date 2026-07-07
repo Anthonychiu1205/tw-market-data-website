@@ -10,6 +10,15 @@ const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET ?? process.env.AUTH_
 const isProduction = process.env.NODE_ENV === "production";
 const authDebug = process.env.AUTH_DEBUG === "true";
 
+// BM-9: let first-party subdomains (terminal. etc.) share the apex login state by
+// scoping the session cookie to the whole zone instead of host-only. Production only;
+// local/preview stays host-only (domain undefined).
+// Security precondition: every *.twmarketdata.com must be a first-party trusted host,
+// since they all receive this cookie. The cookie is httpOnly (subdomain JS can't read
+// it) but subdomain *servers* do receive it — so no untrusted subdomain may exist.
+const useSecureCookies = isProduction;
+const ssoCookieDomain = isProduction ? ".twmarketdata.com" : undefined;
+
 function isLocalhostUrl(url: string | undefined) {
   if (!url) return false;
 
@@ -44,6 +53,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "database",
+  },
+  // BM-9: only override the session cookie so it is sent to all first-party
+  // subdomains. Do NOT touch csrfToken / any __Host- cookie (the __Host- spec forbids
+  // a Domain attribute; adding one breaks sign-in). sameSite stays "lax" (subdomains
+  // are same-site). In non-production, ssoCookieDomain is undefined → host-only.
+  cookies: {
+    sessionToken: {
+      name: `${useSecureCookies ? "__Secure-" : ""}authjs.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+        domain: ssoCookieDomain,
+      },
+    },
   },
   trustHost,
   debug: isProduction ? authDebug : true,
