@@ -39,6 +39,10 @@ export type BillingPlan = {
   planCode: PlanCode;
   displayName: string;
   monthlyAmount: number | null;
+  // Annual price in USD = monthly × 10 (i.e. "2 months free" vs paying monthly ×12).
+  // null for contact-only tiers. Display-only for now — yearly Polar checkout is not
+  // wired yet (no yearly price id), so the pricing UI treats annual as "coming soon".
+  annualAmount: number | null;
   apiKeyLimit: number | null;
   datasetLimit: string;
   isContactOnly: boolean;
@@ -49,6 +53,7 @@ export type PricingPlanView = {
   displayName: string;
   summary: string;
   monthlyAmount: number | null;
+  annualAmount: number | null;
   monthlyHint: string;
   usageMultiplier: string;
   highlights: PlanHighlight[];
@@ -65,6 +70,7 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     planCode: "starter",
     displayName: "Starter",
     monthlyAmount: 20,
+    annualAmount: 200,
     apiKeyLimit: 2,
     datasetLimit: "全部資料集（不含財報三表）",
     isContactOnly: false,
@@ -73,6 +79,7 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     planCode: "pro",
     displayName: "Pro",
     monthlyAmount: 100,
+    annualAmount: 1000,
     apiKeyLimit: 5,
     datasetLimit: "全部資料集（含財報三表）",
     isContactOnly: false,
@@ -81,6 +88,7 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     planCode: "max",
     displayName: "Max",
     monthlyAmount: 200,
+    annualAmount: 2000,
     apiKeyLimit: 10,
     datasetLimit: "全部資料集（完整歷史）",
     isContactOnly: false,
@@ -89,6 +97,7 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     planCode: "developer",
     displayName: "Developer",
     monthlyAmount: 2000,
+    annualAmount: 20000,
     apiKeyLimit: 20,
     datasetLimit: "全部資料集（含 webhook）",
     isContactOnly: false,
@@ -97,13 +106,14 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     planCode: "enterprise",
     displayName: "Enterprise",
     monthlyAmount: null,
+    annualAmount: null,
     apiKeyLimit: null,
     datasetLimit: "客製資料範圍",
     isContactOnly: true,
   },
 };
 
-const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "displayName" | "monthlyAmount" | "isContactOnly" | "apiKeyLimit" | "datasetLimit">> = {
+const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "displayName" | "monthlyAmount" | "annualAmount" | "isContactOnly" | "apiKeyLimit" | "datasetLimit">> = {
   enterprise: {
     summary: "以已驗證資料集為核心，搭配客製化方案。",
     monthlyHint: "客製合約",
@@ -192,6 +202,7 @@ const FREE_PLAN_VIEW: PricingPlanView = {
   displayName: "Free",
   summary: "免費接入與測試，非商業使用。",
   monthlyAmount: 0,
+  annualAmount: 0,
   monthlyHint: "免費方案",
   usageMultiplier: "1 req/s",
   highlights: [
@@ -240,6 +251,7 @@ export function getPricingPlanView(planCode: PricingPlanCode): PricingPlanView {
     planCode,
     displayName: plan.displayName,
     monthlyAmount: plan.monthlyAmount,
+    annualAmount: plan.annualAmount,
     isContactOnly: plan.isContactOnly,
     apiKeyLimit: plan.apiKeyLimit,
     datasetLimit: plan.datasetLimit,
