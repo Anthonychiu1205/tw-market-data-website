@@ -177,6 +177,11 @@ export function PricingShell() {
             >
               <div className="flex h-full flex-col">
                 <div className="flex min-h-[300px] flex-col">
+                  {plan.planCode === "pro" ? (
+                    <span className="mb-3 inline-flex w-fit items-center rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
+                      最受歡迎
+                    </span>
+                  ) : null}
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-[1.65rem] font-medium tracking-tight text-slate-900">{plan.displayName}</h3>
                     <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{plan.usageMultiplier}</span>
