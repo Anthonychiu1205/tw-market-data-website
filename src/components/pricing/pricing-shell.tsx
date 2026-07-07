@@ -91,6 +91,8 @@ export function PricingShell() {
 
   const [pendingPlan, setPendingPlan] = useState<string | null>(null);
   const [errorPlan, setErrorPlan] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
+  const isAnnual = billingCycle === "annual";
 
   async function handleUpgrade(planCode: string) {
     if (pendingPlan) return;
@@ -100,7 +102,7 @@ export function PricingShell() {
     void trackEvent(
       {
         event: "pricing_upgrade_clicked",
-        properties: { planCode, billingCycle: "monthly", contactOnly: false },
+        properties: { planCode, billingCycle, contactOnly: false },
         context: { source: "client", page: "/pricing" },
       },
       { dedupeKey: `pricing-upgrade:${planCode}`, dedupeMs: 2000 },
@@ -133,7 +135,35 @@ export function PricingShell() {
       <section className="space-y-6">
         <div className="text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">選擇你的方案</h2>
-          <p className="mt-2 text-sm text-slate-500">月繳、以 USD 計價，站內完成結帳。</p>
+          <p className="mt-2 text-sm text-slate-500">以 USD 計價，站內完成結帳。</p>
+
+          <div className="mt-6 flex justify-center">
+            <div className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1" role="group" aria-label="計費週期">
+              <button
+                type="button"
+                aria-pressed={!isAnnual}
+                onClick={() => setBillingCycle("monthly")}
+                className={cn(
+                  "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+                  !isAnnual ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700",
+                )}
+              >
+                月繳
+              </button>
+              <button
+                type="button"
+                aria-pressed={isAnnual}
+                onClick={() => setBillingCycle("annual")}
+                className={cn(
+                  "flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+                  isAnnual ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700",
+                )}
+              >
+                年繳
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">送 2 個月</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-4">
@@ -154,9 +184,12 @@ export function PricingShell() {
 
                   <div className="mt-10 min-h-[64px]">
                     <p className="whitespace-nowrap text-4xl font-medium tracking-tight text-slate-900">
-                      {formatPlanCurrency(plan.monthlyAmount)}
-                      <span className="ml-1.5 inline-block align-baseline text-sm font-normal text-slate-400"> / 月</span>
+                      {formatPlanCurrency(isAnnual ? plan.annualAmount : plan.monthlyAmount)}
+                      <span className="ml-1.5 inline-block align-baseline text-sm font-normal text-slate-400"> / {isAnnual ? "年" : "月"}</span>
                     </p>
+                    {isAnnual ? (
+                      <p className="mt-1 text-xs font-medium text-emerald-700">年繳 = 月價 ×10，等於送 2 個月。</p>
+                    ) : null}
                   </div>
 
                   <p className="mt-6 text-sm font-normal leading-6 text-slate-600">{plan.summary}</p>
@@ -165,12 +198,18 @@ export function PricingShell() {
                     <button
                       type="button"
                       className={cn(CARD_CTA_CLASS, "disabled:cursor-not-allowed disabled:opacity-60")}
-                      disabled={pendingPlan === plan.planCode}
+                      disabled={isAnnual || pendingPlan === plan.planCode}
                       onClick={() => handleUpgrade(plan.planCode)}
                     >
-                      {pendingPlan === plan.planCode ? "開啟結帳中…" : plan.ctaLabel}
+                      {isAnnual
+                        ? "年繳即將開放"
+                        : pendingPlan === plan.planCode
+                          ? "開啟結帳中…"
+                          : plan.ctaLabel}
                     </button>
-                    {errorPlan === plan.planCode ? (
+                    {isAnnual ? (
+                      <p className="mt-2 text-xs text-slate-500">年繳結帳即將開放；如需立即開通請先切換為月繳。</p>
+                    ) : errorPlan === plan.planCode ? (
                       <p className="mt-2 text-xs text-red-600">結帳暫時無法開啟，請稍後再試或聯繫我們。</p>
                     ) : null}
                   </div>
