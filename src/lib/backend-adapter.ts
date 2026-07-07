@@ -412,19 +412,24 @@ export async function getAccountSummary(email: string): Promise<AccountSummary> 
 }
 
 export async function getBillingSummary(email: string): Promise<BillingSummary> {
-  const live = await fetchFromCandidates<Record<string, unknown>>(email, [
-    "/v1/billing/summary",
-    "/v1/billing/subscription",
-    "/billing/summary",
-  ]);
+  // Single source of truth = the read API /v2 account summary. The old /v1/billing/*
+  // paths never existed on the backend, so every call 404'd and fell back to "trial",
+  // which the UI renders as "狀態待確認" even for an active subscription. Read the
+  // subscription status off the account object returned by /v2/account/summary.
+  const live = await fetchFromCandidates<Record<string, unknown>>(email, ["/v2/account/summary"]);
 
   if (live?.data) {
     const payload = live.data;
+    const account =
+      payload.account && typeof payload.account === "object"
+        ? (payload.account as Record<string, unknown>)
+        : payload;
     return {
-      subscriptionStatus: getString(payload.subscriptionStatus || payload.subscription_status, "active"),
+      subscriptionStatus: getString(account.subscription_status ?? payload.subscription_status, "active"),
+      // The account summary does not carry renewal date / balance — keep "-" (non-critical).
       renewalDate: getString(payload.renewalDate || payload.renewal_date, "-"),
       currentBalance: getString(payload.currentBalance || payload.current_balance, "-"),
-      portalAvailable: getBoolean(payload.portalAvailable ?? payload.portal_available, false),
+      portalAvailable: getBoolean(account.portal_access_enabled ?? payload.portal_available, false),
       checkoutAvailable: getBoolean(payload.checkoutAvailable ?? payload.checkout_available, false),
       integrationMode: "live",
     };
