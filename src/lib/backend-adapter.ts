@@ -157,6 +157,18 @@ function resolveFetchTimeoutMs() {
   return DEFAULT_BACKEND_FETCH_TIMEOUT_MS;
 }
 
+// The tier lookup (getAccountSummary) is the single source of truth for the user's plan.
+// Cold Render Free instances can take several seconds to answer; give this one call more
+// room so a cold start does not false-negative the user down to "free". Still fail-open.
+function resolveAccountSummaryTimeoutMs() {
+  const raw = process.env.BACKEND_ACCOUNT_SUMMARY_TIMEOUT_MS;
+  const parsed = Number.parseInt(String(raw ?? "").trim(), 10);
+  if (Number.isFinite(parsed) && parsed >= 300) {
+    return parsed;
+  }
+  return Math.max(resolveFetchTimeoutMs(), 9000);
+}
+
 function getBase() {
   const base = process.env.BACKEND_API_BASE_URL;
   if (!base) return null;
@@ -177,8 +189,9 @@ async function fetchWithTimeout(input: {
   stage: string;
   url: string;
   init: RequestInit;
+  timeoutMs?: number;
 }) {
-  const timeoutMs = resolveFetchTimeoutMs();
+  const timeoutMs = input.timeoutMs ?? resolveFetchTimeoutMs();
   const startedAt = Date.now();
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -214,6 +227,7 @@ async function fetchFromCandidates<T>(
   email: string,
   paths: string[],
   init?: RequestInit,
+  timeoutMs?: number,
 ): Promise<FetchResult<T> | null> {
   const base = getBase();
   if (!base) return null;
@@ -223,6 +237,7 @@ async function fetchFromCandidates<T>(
       const response = await fetchWithTimeout({
         stage: `fetch:${path}`,
         url: `${base}${path}`,
+        timeoutMs,
         init: {
           cache: "no-store",
           ...init,
@@ -352,20 +367,31 @@ export async function getAccountSummary(email: string): Promise<AccountSummary> 
     return cached;
   }
 
-  const live = await fetchFromCandidates<Record<string, unknown>>(email, [
-    "/v1/account/summary",
-    "/v1/account",
-    "/account/summary",
-  ]);
+  // Single source of truth = the read API, resolved by email. The backend exposes this
+  // only under /v2 (the old /v1/* paths always 404'd → everyone fell back to "free").
+  const live = await fetchFromCandidates<Record<string, unknown>>(
+    email,
+    ["/v2/account/summary"],
+    undefined,
+    resolveAccountSummaryTimeoutMs(),
+  );
 
   if (live?.data) {
     const payload = live.data;
+    const account =
+      payload.account && typeof payload.account === "object"
+        ? (payload.account as Record<string, unknown>)
+        : null;
+    const enabledFromAccount =
+      account && Array.isArray(account.enabled_datasets)
+        ? (account.enabled_datasets as unknown[]).length
+        : undefined;
     const result: AccountSummary = {
-      // Default to the minimal plan when the live payload omits it — never assume a
-      // higher tier than the account actually has.
-      plan: getString(payload.plan || payload.plan_name, "free"),
+      // Real plan comes from account.plan; default to the minimal plan when omitted —
+      // never assume a higher tier than the account actually has.
+      plan: getString(account?.plan ?? payload.plan ?? payload.plan_name, "free"),
       accessStatus: getString(payload.accessStatus || payload.access_status, "Active"),
-      enabledDatasets: getNumber(payload.enabledDatasets || payload.enabled_datasets, datasetProducts.length),
+      enabledDatasets: enabledFromAccount ?? getNumber(payload.enabledDatasets || payload.enabled_datasets, datasetProducts.length),
       integrationMode: "live",
     };
     setBackendCacheValue(cacheKey, result);
