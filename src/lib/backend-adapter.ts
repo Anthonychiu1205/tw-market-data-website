@@ -426,8 +426,9 @@ export async function getBillingSummary(email: string): Promise<BillingSummary> 
         : payload;
     return {
       subscriptionStatus: getString(account.subscription_status ?? payload.subscription_status, "active"),
-      // The account summary does not carry renewal date / balance — keep "-" (non-critical).
-      renewalDate: getString(payload.renewalDate || payload.renewal_date, "-"),
+      // Renewal date = the subscription's current_period_end (from read_api end_ts); when
+      // absent it stays "-". The account summary does not carry a balance — keep "-".
+      renewalDate: getString(account.current_period_end ?? payload.renewalDate ?? payload.renewal_date, "-"),
       currentBalance: getString(payload.currentBalance || payload.current_balance, "-"),
       portalAvailable: getBoolean(account.portal_access_enabled ?? payload.portal_available, false),
       checkoutAvailable: getBoolean(payload.checkoutAvailable ?? payload.checkout_available, false),
