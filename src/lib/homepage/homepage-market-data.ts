@@ -236,18 +236,77 @@ function normalizeTaiExRow(row: AnyRecord): HomepageMarketItem | null {
   };
 }
 
+// Service-token call for the curated homepage indices endpoint. Uses BACKEND_API_TOKEN
+// (server-side only) so the homepage does not depend on a data api key.
+async function safeFetchServiceJson(path: string): Promise<{ ok: boolean; payload: unknown | null }> {
+  const baseUrl = getTwFeatureEngineBaseUrl();
+  const token = process.env.BACKEND_API_TOKEN;
+  if (!baseUrl || !token) return { ok: false, payload: null };
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(`${baseUrl}${path}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+      signal: controller.signal,
+      next: { revalidate: REVALIDATE_SECONDS },
+    });
+    if (!res.ok) return { ok: false, payload: null };
+    return { ok: true, payload: await res.json() };
+  } catch {
+    return { ok: false, payload: null };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+// Overlay a live index row from /v2/homepage/market-indices onto its static placeholder.
+function liveItemFromApiRow(row: AnyRecord, base: HomepageMarketItem): HomepageMarketItem {
+  const value = toNumber(row.value);
+  if (value === null) return base;
+  const change = toNumber(row.change) ?? 0;
+  const changePct = toNumber(row.change_pct);
+  const asOf = typeof row.as_of === "string" && row.as_of.length >= 10 ? row.as_of.slice(0, 10) : base.asOf;
+  return {
+    ...base,
+    value: formatNumber(value),
+    change: formatSigned(change),
+    percent: changePct === null ? "" : `${formatSigned(changePct)}%`,
+    trend: inferTrend(changePct ?? change),
+    asOf,
+    sourceMode: "live_api",
+  };
+}
+
 export async function getHomepageMarketSnapshot(): Promise<HomepageMarketSnapshot> {
-  const result = await safeFetchJson("/v2/datasets/market-index?index_code=TWSE_TAIEX&market=TWSE&latest=true&limit=1&include_data_gaps=true");
-  if (result.ok) {
-    const rows = getRows(result.payload);
-    const taiex = rows.length > 0 ? normalizeTaiExRow(rows[0]) : null;
-    if (taiex) {
-      const items = [taiex, ...FALLBACK_MARKET_ITEMS.filter((item) => item.id !== taiex.id)];
+  const result = await safeFetchServiceJson("/v2/homepage/market-indices");
+  if (result.ok && isRecord(result.payload) && Array.isArray(result.payload.indices)) {
+    // Backend keys (twse_taiex / sector_ele / sector_fin) match the placeholder item ids.
+    const liveByKey = new Map<string, AnyRecord>();
+    for (const row of result.payload.indices) {
+      if (isRecord(row) && typeof row.key === "string") liveByKey.set(row.key, row);
+    }
+
+    let liveCount = 0;
+    const items = FALLBACK_MARKET_ITEMS.map((base) => {
+      const row = liveByKey.get(base.id);
+      if (!row) return base; // 櫃買/台灣50 have no backend data → stay honest demo.
+      const item = liveItemFromApiRow(row, base);
+      if (item.sourceMode === "live_api") liveCount += 1;
+      return item;
+    });
+
+    if (liveCount > 0) {
+      const asOf = typeof result.payload.as_of === "string" ? result.payload.as_of.slice(0, 10) : null;
       return {
         items,
         sourceMode: "live_api",
-        statusLabel: "每日更新 · 資料來源：TW Feature Engine（TAIEX 即時，其他為展示資料）",
-        updatedAt: taiex.asOf,
+        statusLabel:
+          liveCount >= items.length
+            ? "每日更新 · 資料來源：TW Feature Engine（即時）"
+            : "每日更新 · 加權指數與電子/金融為即時，櫃買/台灣50 為展示資料",
+        updatedAt: asOf ?? FALLBACK_AS_OF,
       };
     }
   }
