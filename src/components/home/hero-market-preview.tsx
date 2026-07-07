@@ -91,7 +91,7 @@ export function HeroMarketPreview() {
             </div>
             <div className="text-right">
               <p className="text-xl font-semibold tracking-tight text-slate-900">NT$ 892</p>
-              <p className="text-sm font-medium text-emerald-600">+1.24%</p>
+              <p className="text-sm font-medium text-rose-500">+1.24%</p>
             </div>
           </div>
 
