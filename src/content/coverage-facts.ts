@@ -42,3 +42,31 @@ export const datasetTemporalCoverage: Record<string, string> = {
   "twse-daily-price": `${coverageFacts.twseDailyPrice.earliestDate}/${coverageFacts.twseDailyPrice.latestDate}`,
   "monthly-revenue": `${coverageFacts.monthlyRevenue.earliestPeriod}/${coverageFacts.monthlyRevenue.latestPeriod}`,
 };
+
+// Per-endpoint coverage mini-table (BENCH-01 §2). Keyed by dataset slug (last docs path segment).
+// Only DB-verified values are filled; any field left undefined renders as "coming" — NEVER fabricate.
+// `includesDelisted`: true = full price history retained for stopped-trading names; undefined = coming.
+export type DatasetCoverageRow = {
+  instruments?: string; // 標的數
+  startYear?: string; // 起始年
+  updateTiming?: string; // 更新時點 (no verified cadence yet → left undefined = coming)
+  includesDelisted?: boolean; // 含已下市
+};
+
+export const datasetCoverageTable: Record<string, DatasetCoverageRow> = {
+  "twse-daily-price": {
+    instruments: coverageFacts.twseDailyPrice.stocks.toLocaleString("en-US"),
+    startYear: coverageFacts.twseDailyPrice.earliestDate.slice(0, 4),
+    includesDelisted: true, // 311 stopped-trading names retained (262 with official delisting date)
+  },
+  "tpex-daily-price": {
+    instruments: coverageFacts.tpexDailyPrice.stocks.toLocaleString("en-US"),
+    startYear: coverageFacts.tpexDailyPrice.earliestDate.slice(0, 4),
+    includesDelisted: true,
+  },
+  "monthly-revenue": {
+    instruments: coverageFacts.monthlyRevenue.stocks.toLocaleString("en-US"),
+    startYear: coverageFacts.monthlyRevenue.earliestPeriod.slice(0, 4),
+    // includesDelisted / updateTiming: not verified → coming
+  },
+};

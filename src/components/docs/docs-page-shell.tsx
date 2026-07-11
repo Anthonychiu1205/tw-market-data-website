@@ -403,6 +403,12 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
 
         {/* Content column centered at ~760px (§A) with generous line-height for scan-reading (§B). */}
         <main className={cn("mx-auto w-full min-w-0", mainMaxWidth)}>
+          {/* AI-agent hint on every docs page (BENCH-01 §2, FDS per-page practice). */}
+          <p className="mb-4 text-xs text-slate-400">
+            AI agent？先讀{" "}
+            <Link href="/llms.txt" className="underline underline-offset-2 hover:text-slate-600">/llms.txt</Link>{" "}
+            取得全站索引。
+          </p>
           <section className="border-b border-slate-200 pb-8">
             {/* eyebrow → H1 → tagline (§B) */}
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{pageLabel}</p>

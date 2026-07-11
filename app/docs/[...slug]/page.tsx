@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { ApiRunPlayground } from "@/src/components/docs/api-run-playground";
 import { ApiSidePanel } from "@/src/components/docs/api-side-panel";
+import { ApiCoverageTable, ApiLimitations } from "@/src/components/docs/api-coverage-and-limits";
 import { CodeBlock } from "@/src/components/docs/code-block";
 import { DocsLandingContent } from "@/src/components/docs/docs-landing-content";
 import { DocsPageShell } from "@/src/components/docs/docs-page-shell";
@@ -90,15 +91,19 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
   if (page.apiReference) {
     const api = page.apiReference;
     const successStatusExample = api.sidePanel.statusExamples.find((example) => example.status === "200");
+    // Dataset slug = last docs path segment (e.g. "twse-daily-price"), used for the coverage table.
+    const datasetSlug = page.slug[page.slug.length - 1];
 
     if (api.layoutVariant === "data-api-standard") {
       const tocSections = normalizeDocsSections([
         { id: "overview", label: "Overview" },
+        { id: "coverage", label: "覆蓋範圍" },
         { id: "request", label: "Request" },
         { id: "query-parameters", label: "Query Parameters" },
         { id: "response-shape", label: "Response Shape" },
         { id: "field-reference", label: "Field 說明" },
         { id: "usage-notes", label: "Usage Notes / 使用建議" },
+        { id: "limitations", label: "限制與注意" },
         ...(api.planRequirement ? [{ id: "plan-requirement", label: api.planRequirement.title ?? "Plan Requirement" }] : []),
       ]).map(({ id, label }) => ({ id, label }));
 
@@ -140,6 +145,8 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
                 ))}
               </ul>
             </section>
+
+            <ApiCoverageTable slug={datasetSlug} />
 
             <section className="space-y-3 border-b border-slate-200 pb-8">
               <SectionHeading id="request">Request</SectionHeading>
@@ -221,6 +228,8 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               </ul>
             </section>
 
+            <ApiLimitations slug={datasetSlug} />
+
             {api.planRequirement ? (
               <section className="space-y-3">
                 <SectionHeading id="plan-requirement">{api.planRequirement.title ?? "Plan Requirement"}</SectionHeading>
@@ -247,12 +256,14 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
     const tocSections = normalizeDocsSections([
       { id: "overview", label: "Overview" },
+      { id: "coverage", label: "覆蓋範圍" },
       ...(api.planRequirement ? [{ id: "plan-requirement", label: api.planRequirement.title ?? "適用方案" }] : []),
       { id: "request", label: "Request" },
       { id: "response", label: "Response" },
       { id: "field-reference", label: "Field 說明" },
       { id: "best-practices", label: "使用建議" },
       { id: "error-boundaries", label: "錯誤與邊界情況" },
+      { id: "limitations", label: "限制與注意" },
     ]).map(({ id, label }) => ({ id, label }));
 
     return (
@@ -290,6 +301,8 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               </p>
             ))}
           </section>
+
+          <ApiCoverageTable slug={datasetSlug} />
 
           {api.planRequirement ? (
             <section className="space-y-3 border-b border-slate-200 pb-8">
@@ -401,6 +414,8 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               ))}
             </ul>
           </section>
+
+          <ApiLimitations slug={datasetSlug} />
 
           <section className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
             <p className="text-sm text-slate-700">
