@@ -311,6 +311,16 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
   const sidebarTopOffset = SITE_HEADER_HEIGHT_PX + DESKTOP_SIDEBAR_TOP_GAP_PX;
   const sidebarHeight = `calc(100vh - ${sidebarTopOffset + DESKTOP_SIDEBAR_BOTTOM_GAP_PX}px)`;
 
+  // Two column layouts measured against financialdatasets.ai (DOCS-01 §A/§B):
+  //  - API endpoint pages (they pass a code panel via rightPanelContent) get a WIDE right column
+  //    (420) so the request/response panel isn't cramped; the middle narrows to ~540 (max 560).
+  //  - Text pages (TOC only) keep a narrow right column (220) and a wider ~680 reading column.
+  const isApiPage = Boolean(rightPanelContent);
+  const gridClass = isApiPage
+    ? "lg:grid-cols-[256px_minmax(0,1fr)_420px] lg:gap-11"
+    : "lg:grid-cols-[256px_minmax(0,1fr)_220px] lg:gap-10";
+  const mainMaxWidth = isApiPage ? "max-w-[560px]" : "max-w-[680px]";
+
   const breadcrumbLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -322,9 +332,9 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
   };
 
   return (
-    <div className="w-full px-8 py-10 lg:px-16">
+    <div className="mx-auto w-full max-w-[1400px] px-6 py-10 lg:px-[68px]">
       <JsonLd data={breadcrumbLd} />
-      <div className="grid gap-8 lg:gap-12 lg:grid-cols-[256px_minmax(0,1fr)_220px]">
+      <div className={cn("grid gap-8", gridClass)}>
         <aside className="hidden lg:block">
           <div
             ref={sidebarScrollRef}
@@ -392,7 +402,7 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
         </aside>
 
         {/* Content column centered at ~760px (§A) with generous line-height for scan-reading (§B). */}
-        <main className="mx-auto w-full min-w-0 max-w-[760px]">
+        <main className={cn("mx-auto w-full min-w-0", mainMaxWidth)}>
           <section className="border-b border-slate-200 pb-8">
             {/* eyebrow → H1 → tagline (§B) */}
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{pageLabel}</p>
