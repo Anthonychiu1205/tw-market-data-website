@@ -69,13 +69,9 @@ export default async function HomePage() {
               <h1 className="max-w-[760px] text-[48px] font-semibold leading-[1.04] tracking-[-0.04em] text-slate-950 lg:text-[60px]">
                 台股資料 API，為系統與量化流程而設計
               </h1>
-              {/* Above-the-fold citable fact sentence (AEO 1.3): explicit subject + verifiable
-                  scope + the genuine differentiator (per-response lineage, disclosed data_gaps
-                  preserved rather than inferred). Every claim is checked against
-                  home-source-of-truth.ts — no drift-prone aggregate numbers are asserted. */}
               <p className="mt-7 max-w-[700px] text-[19px] leading-9 text-slate-600">
-                TW Market Data 是 TWSE-first 的台股資料 API，涵蓋日線價格、MOPS 月營收、財報三表、三大法人籌碼、估值與技術指標。<br />
-                每筆回應都附帶來源 lineage，並如實保留已揭露的 data_gaps、不以推測值補洞——為 AI agent、自動化流程與量化研究而設計。
+                為 AI agent、自動化流程與量化研究提供一致的台股資料 API。<br />
+                以 TWSE 上市資料為核心，已驗證資料集會清楚標示 coverage window、來源與限制。
               </p>
               <div className="mt-9 flex gap-4">
                 <Link href="/login" className={buttonClass("secondary")}>
@@ -148,23 +144,6 @@ export default async function HomePage() {
               </Link>
               <Link href="/register" className={buttonClass("primary")}>
                 註冊
-              </Link>
-            </div>
-            <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-slate-600">
-              <Link href="/docs/sdk/python-sdk" className="hover:text-slate-900">
-                Python SDK
-              </Link>
-              <span className="text-slate-300">|</span>
-              <Link href="/docs/sdk/javascript-sdk" className="hover:text-slate-900">
-                TypeScript SDK
-              </Link>
-              <span className="text-slate-300">|</span>
-              <Link href="/docs/ai-agents/mcp-server-preview" className="hover:text-slate-900">
-                MCP Preview
-              </Link>
-              <span className="text-slate-300">|</span>
-              <Link href="/docs/ai-agents/agent-workflow-examples" className="hover:text-slate-900">
-                AI Agent Workflow
               </Link>
             </div>
           </div>
