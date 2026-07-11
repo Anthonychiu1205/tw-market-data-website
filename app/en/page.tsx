@@ -57,20 +57,6 @@ export const metadata: Metadata = {
   },
 };
 
-/**
- * CONTENT SLOT — Cowork fills the final English body per the terminology glossary.
- * Renders a visible draft marker in non-production so reviewers can see what is pending; renders
- * nothing in production (the section headings + true seed copy stand until real copy lands).
- */
-function ContentSlot({ note }: { note: string }) {
-  if (process.env.NODE_ENV === "production") return null;
-  return (
-    <p className="mt-3 rounded-md border border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
-      CONTENT SLOT (Cowork, per glossary): {note}
-    </p>
-  );
-}
-
 export default function EnglishHomePage() {
   return (
     // lang="en" scopes the content language until the app/[locale] migration sets <html lang="en">.
@@ -91,7 +77,10 @@ export default function EnglishHomePage() {
             valuations and technical indicators. Every response carries source lineage and preserves
             disclosed data gaps rather than inferring missing values.
           </p>
-          <ContentSlot note="Expand the value proposition (2–3 sentences): who it's for (engineers / quant / AI agents), the honest-coverage differentiator, and the TWSE-first boundary. No full-market or survivorship claims beyond disclosed coverage." />
+          <p className="mt-4 text-base leading-8 text-slate-600">
+            Built for developers and quant researchers: query first-party Taiwan market data from
+            your code over a REST API, or connect it to AI agents over an MCP server (preview).
+          </p>
           <div className="mt-8 flex flex-wrap gap-3">
             {/* Points at the existing docs until the /en/docs/* pages ship (next i18n increment). */}
             <Link href="/docs/introduction" className={buttonClass("primary")}>
@@ -106,21 +95,44 @@ export default function EnglishHomePage() {
           </div>
         </section>
 
-        <section>
+        <section className="space-y-3">
           <h2 className="text-2xl font-semibold tracking-tight text-slate-950">What you get</h2>
-          <ContentSlot note="Dataset families as a short list with one honest line each (daily price, monthly revenue, financial statements, institutional flow, valuation, technical indicators). Mirror the zh homepage scope; keep TPEx-historical-depth-deferred disclosure." />
+          <ul className="list-disc space-y-2 pl-5 text-base leading-7 text-slate-700">
+            <li>
+              Official first-party data — sourced from TWSE, TPEx, MOPS and TAIFEX, with coverage and
+              data gaps disclosed, not hidden.
+            </li>
+            <li>
+              Taiwan-specific fundamentals US vendors don&apos;t carry — monthly revenue (a
+              monthly-frequency signal) and daily three-major-institutional-investor (三大法人) flow.
+            </li>
+            <li>
+              Built for AI agents — machine-readable docs, OpenAPI, and an MCP server (preview).
+              Start free.
+            </li>
+          </ul>
         </section>
 
-        <section>
+        <section className="space-y-3">
           <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
             Built for honest, reproducible research
           </h2>
-          <ContentSlot note="Explain source lineage + preserved data_gaps + reconciliation as the differentiator. Verifiable, no fabricated numbers." />
+          <p className="text-base leading-7 text-slate-700">
+            TW Market Data is a TWSE-first verified baseline. Every response carries source lineage
+            and preserves disclosed data gaps rather than inferring missing values, so your research
+            stays reproducible. TPEx historical depth is still being expanded, and we make no
+            full-market claim.
+          </p>
         </section>
 
-        <section>
-          <h2 className="text-2xl font-semibold tracking-tight text-slate-950">Start building</h2>
-          <ContentSlot note="Quick-start CTA: link to /en/docs/quick-start and the 5-symbols-free-no-key line (align with BENCH-01 once live)." />
+        <section className="space-y-3">
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
+            What we don&apos;t provide (by design)
+          </h2>
+          <p className="text-base leading-7 text-slate-700">
+            Real-time quotes, intraday bars and crypto are out of scope. We focus on being a
+            trustworthy source of end-of-day and fundamental Taiwan data.
+          </p>
         </section>
       </Container>
     </div>

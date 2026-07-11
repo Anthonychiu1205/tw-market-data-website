@@ -18,7 +18,7 @@ export const xDefaultLocale: Locale = "en";
 // awaiting Cowork content) AND the zh homepage does NOT emit hreflang to it — so there is no
 // "hreflang points to noindex URL" warning. Flip to true once app/en/page.tsx content slots are
 // filled: it turns on EN indexing and activates the reciprocal hreflang cluster in one place.
-export const EN_HOMEPAGE_READY = false;
+export const EN_HOMEPAGE_READY = true;
 
 /**
  * Map a zh-Hant path to its English counterpart under /en.

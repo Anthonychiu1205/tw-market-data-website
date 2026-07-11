@@ -58,7 +58,8 @@ export default async function AnswerPage({ params }: PageProps) {
   }
 
   const pageUrl = getAbsoluteUrl(`/answers/${page.slug}`);
-  const datasetUrl = `/datasets/${page.cta.datasetSlug}`;
+  const ctaHref = page.cta.href;
+  const isProd = process.env.NODE_ENV === "production";
 
   const breadcrumbLd = {
     "@context": "https://schema.org",
@@ -103,17 +104,36 @@ export default async function AnswerPage({ params }: PageProps) {
             )}
           </header>
 
-          {page.sections.map((section) => (
-            <section key={section.heading} className="space-y-2">
-              <h2 className="text-xl font-semibold text-slate-950">{section.heading}</h2>
-              <ContentSlot note={section.slot} />
-            </section>
-          ))}
+          {page.sections.map((section) => {
+            const hasBody = Boolean(section.body || section.bullets?.length || section.code);
+            // In production, skip sections that carry only an unfilled content slot so a published
+            // page never shows a bare heading with no content.
+            if (!hasBody && isProd) return null;
+            return (
+              <section key={section.heading} className="space-y-3">
+                <h2 className="text-xl font-semibold text-slate-950">{section.heading}</h2>
+                {section.body ? <p className="text-base leading-7 text-slate-700">{section.body}</p> : null}
+                {section.bullets?.length ? (
+                  <ul className="list-disc space-y-2 pl-5 text-base leading-7 text-slate-700">
+                    {section.bullets.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                ) : null}
+                {section.code ? (
+                  <pre className="overflow-x-auto rounded-xl bg-slate-950 p-4 text-sm leading-6 text-slate-100">
+                    <code>{section.code}</code>
+                  </pre>
+                ) : null}
+                {section.slot ? <ContentSlot note={section.slot} /> : null}
+              </section>
+            );
+          })}
 
           <section className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-            <p className="text-sm text-slate-600">Related dataset</p>
+            <p className="text-sm text-slate-600">Related</p>
             <div className="mt-3 flex flex-wrap gap-3">
-              <Link href={datasetUrl} className={buttonClass("primary")}>
+              <Link href={ctaHref} className={buttonClass("primary")}>
                 {page.cta.label}
               </Link>
               <Link href="/docs/introduction" className={buttonClass("secondary")}>
