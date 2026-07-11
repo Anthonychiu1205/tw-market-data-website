@@ -80,18 +80,37 @@ export default async function DatasetSlugPage({ params }: PageProps) {
     ],
   };
 
+  // The description folds in this dataset's coverage / freshness / source-policy disclosure.
+  // That honest, dataset-specific metadata is the unique content that makes each of these pages
+  // eligible for (and differentiated in) Google Dataset Search — no competitor can copy it.
+  const datasetDescription = [
+    dataset.jsonLdDescription,
+    `涵蓋範圍：${dataset.coverageNote}`,
+    `更新頻率：${dataset.freshnessNote}`,
+    `資料來源政策：${dataset.sourcePolicyNote}`,
+  ].join(" ");
+
+  const organization = {
+    "@type": "Organization",
+    name: "TW Market Data",
+    url: "https://twmarketdata.com",
+  };
+
+  // No variableMeasured / temporalCoverage: the dataset model does not carry an authoritative
+  // per-dataset field list or start date, and fabricating one (the old code hardcoded the same
+  // PE/PB/dividend variables onto every dataset) is worse than omitting it. Both fields are
+  // optional for Dataset Search eligibility; they can be added later from real source metadata.
   const datasetLd = {
     "@context": "https://schema.org",
     "@type": "Dataset",
     name: dataset.jsonLdName,
-    description: dataset.jsonLdDescription,
+    description: datasetDescription,
     url: pageUrl,
     isAccessibleForFree: false,
-    creator: {
-      "@type": "Organization",
-      name: "TW Market Data",
-      url: "https://twmarketdata.com",
-    },
+    spatialCoverage: "Taiwan",
+    license: "https://twmarketdata.com/terms",
+    creator: organization,
+    publisher: organization,
     keywords: dataset.keywords,
     includedInDataCatalog: {
       "@type": "DataCatalog",
@@ -106,7 +125,6 @@ export default async function DatasetSlugPage({ params }: PageProps) {
         encodingFormat: "application/json",
       },
     ],
-    variableMeasured: ["pe_ratio", "pb_ratio", "dividend_yield", "data_gaps"],
   };
 
   return (

@@ -79,35 +79,41 @@ export type MarketMarqueeViewPayload = {
   note?: string;
 };
 
+// `href` is a PUBLIC, crawlable destination only. Curated snapshot rows describe data
+// availability rather than a specific public article, so they carry no href — the homepage
+// renders them as plain, non-clickable rows. Never point these at /login: a login wall is a
+// dead end for visitors and, for crawlers, an indexable auth page (GSC flags it). Backend feeds
+// may still supply a real public source_url (MOPS/TWSE), which is honored as an external link.
 const CURATED_FALLBACK_NEWS: MarketMarqueeNewsItem[] = [
   {
     title: "公開資訊觀測站月營收資料陸續更新，市場關注營收成長動能",
     source: "MOPS",
     category: "月營收",
-    href: "/login",
+    href: "",
   },
   {
     title: "電子類股成交比重維持高檔，AI 供應鏈仍為盤面焦點",
     source: "TWSE",
     category: "市場概況",
-    href: "/login",
+    href: "",
   },
   {
     title: "上市櫃公司重大訊息與公告資料可供事件研究流程使用",
     source: "MOPS",
     category: "公司事件",
-    href: "/login",
+    href: "",
   },
   {
     title: "技術指標、估值與財報資料可供 API 查詢與模型分析",
     source: "TWMD",
     category: "資料集",
-    href: "/login",
+    href: "",
   },
 ];
 
 function buildNewsList(news: MarketMarqueeNewsItem[]): MarketMarqueeNewsItem[] {
-  const cleaned = news.filter((item) => item.title && item.source && item.category && item.href);
+  // href is optional (public source URL only); rows without one still render as text.
+  const cleaned = news.filter((item) => item.title && item.source && item.category);
   const newsCandidates = [...cleaned, ...CURATED_FALLBACK_NEWS];
   const uniqueNews = Array.from(
     new Map(newsCandidates.map((item) => [item.title, item])).values()
@@ -162,7 +168,8 @@ function pickNewsHref(row: AnyRecord): string {
     const value = row[key];
     if (typeof value === "string" && value.trim()) return value.trim();
   }
-  return "/login";
+  // No public source URL — leave empty so the row renders as non-clickable text (never /login).
+  return "";
 }
 
 function normalizeNewsItem(row: AnyRecord, defaults: { source: string; category: string }): MarketSnapshotNewsItem | null {
@@ -622,7 +629,7 @@ function normalizeSnapshot(value: unknown): MarketMarqueeSnapshot | null {
             title: item.title,
             source: item.source,
             category: item.category,
-            href: typeof item.href === "string" ? item.href : "/login",
+            href: typeof item.href === "string" ? item.href : "",
           } satisfies MarketMarqueeNewsItem;
         })
         .filter((item): item is MarketMarqueeNewsItem => item !== null)

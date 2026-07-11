@@ -7,30 +7,29 @@ import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 import { getPricingPlanViews } from "@/src/lib/billing/plans";
 
-// Offers derived from the local plan SSOT (plans.ts) — monthly, USD. Paid tiers carry a
-// concrete price; the contact-only tier is described without a price.
-const pricingOffers = getPricingPlanViews().map((plan) => {
-  const offer: Record<string, unknown> = {
+// Offers derived from the local plan SSOT (plans.ts) — monthly, USD. Only tiers that carry a
+// concrete price are emitted as schema.org Offer objects: an Offer without `price` /
+// `priceCurrency` triggers a "missing field price" warning in Google Rich Results Test, so the
+// contact-only (Enterprise) tier is intentionally excluded from the structured offers array
+// (it is still shown on the visible page). Every emitted entry is a fully-specified Offer with
+// a numeric price string + priceCurrency, which is the valid object type GSC expects.
+const pricingOffers = getPricingPlanViews()
+  .filter((plan) => plan.monthlyAmount !== null)
+  .map((plan) => ({
     "@type": "Offer",
     name: `${plan.displayName} plan`,
     category: "SubscriptionService",
     url: getAbsoluteUrl("/pricing"),
-  };
-  if (plan.monthlyAmount !== null) {
-    offer.price = String(plan.monthlyAmount);
-    offer.priceCurrency = "USD";
-    offer.availability = "https://schema.org/InStock";
-    offer.priceSpecification = {
+    price: String(plan.monthlyAmount),
+    priceCurrency: "USD",
+    availability: "https://schema.org/InStock",
+    priceSpecification: {
       "@type": "UnitPriceSpecification",
       price: String(plan.monthlyAmount),
       priceCurrency: "USD",
       unitText: "MONTH",
-    };
-  } else {
-    offer.description = "客製方案，請聯繫我們";
-  }
-  return offer;
-});
+    },
+  }));
 
 // Public, statically generated, revalidated hourly. Plan data comes from the local
 // SSOT (plans.ts constants), so this page never calls the backend at request time and

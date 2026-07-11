@@ -12,6 +12,13 @@ function toneClass(trend: "up" | "down" | "neutral") {
   return "text-slate-500";
 }
 
+// A news row is only rendered as a link when it points at a real public (external) source.
+// Internal/auth-gated destinations (e.g. /login) are never linked from this public marketing
+// surface — a login wall is a dead end for visitors and an indexable auth page for crawlers.
+function isPublicNewsHref(href: string): boolean {
+  return /^https?:\/\//i.test(href);
+}
+
 export async function HeroMarketIntel() {
   const [marketSnapshot, newsSnapshot] = await Promise.all([
     getHomepageMarketSnapshot(),
@@ -27,7 +34,7 @@ export async function HeroMarketIntel() {
         <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_12px_34px_rgba(15,23,42,0.05)]">
           <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
             <p className="text-base font-semibold text-slate-900">市場指標</p>
-            <Link href="/login" className="text-sm font-medium text-slate-400 transition hover:text-slate-700">
+            <Link href="/datasets" className="text-sm font-medium text-slate-400 transition hover:text-slate-700">
               查看全部資料 &gt;
             </Link>
           </div>
@@ -47,24 +54,42 @@ export async function HeroMarketIntel() {
         <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_12px_34px_rgba(15,23,42,0.05)]">
           <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
             <p className="text-base font-semibold text-slate-900">市場新聞</p>
-            <Link href="/login" className="text-sm font-medium text-slate-400 transition hover:text-slate-700">
+            <Link href="/datasets" className="text-sm font-medium text-slate-400 transition hover:text-slate-700">
               查看更多 &gt;
             </Link>
           </div>
 
           <div className="mt-4 space-y-1">
-            {newsItems.map((news, index) => (
-              <Link
-                key={`hero-news-${index}`}
-                href={news.href}
-                className="grid grid-cols-[64px_minmax(0,1fr)] items-start gap-3 rounded-xl px-3 py-2 text-sm leading-6 text-slate-600 transition hover:bg-slate-50 hover:text-slate-950"
-              >
+            {newsItems.map((news, index) => {
+              const rowClass =
+                "grid grid-cols-[64px_minmax(0,1fr)] items-start gap-3 rounded-xl px-3 py-2 text-sm leading-6 text-slate-600 transition";
+              const badge = (
                 <span className="mt-0.5 inline-flex h-6 w-14 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-[11px] font-medium text-slate-500">
                   {news.source}
                 </span>
-                <span className="min-w-0 leading-6">{news.title}</span>
-              </Link>
-            ))}
+              );
+              const body = <span className="min-w-0 leading-6">{news.title}</span>;
+
+              // Only rows backed by a real public source URL become links; the rest are
+              // non-clickable text so crawlers are never funnelled into a login wall.
+              return isPublicNewsHref(news.href) ? (
+                <a
+                  key={`hero-news-${index}`}
+                  href={news.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${rowClass} hover:bg-slate-50 hover:text-slate-950`}
+                >
+                  {badge}
+                  {body}
+                </a>
+              ) : (
+                <div key={`hero-news-${index}`} className={rowClass}>
+                  {badge}
+                  {body}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
