@@ -6,6 +6,7 @@ import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 import { getDatasetBySlug, datasetSeoEntries } from "@/src/content/datasets";
+import { datasetTemporalCoverage } from "@/src/content/coverage-facts";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -96,10 +97,13 @@ export default async function DatasetSlugPage({ params }: PageProps) {
     url: "https://twmarketdata.com",
   };
 
-  // No variableMeasured / temporalCoverage: the dataset model does not carry an authoritative
-  // per-dataset field list or start date, and fabricating one (the old code hardcoded the same
-  // PE/PB/dividend variables onto every dataset) is worse than omitting it. Both fields are
-  // optional for Dataset Search eligibility; they can be added later from real source metadata.
+  // temporalCoverage is added only for datasets whose coverage window is DB-verified
+  // (coverage-facts.ts); the rest omit it rather than fabricate a start date. No variableMeasured:
+  // the model has no authoritative per-dataset field list (the old code hardcoded the same
+  // PE/PB/dividend variables onto every dataset), so omitting is correct. Both are optional for
+  // Dataset Search eligibility.
+  const temporalCoverage = datasetTemporalCoverage[dataset.slug];
+
   const datasetLd = {
     "@context": "https://schema.org",
     "@type": "Dataset",
@@ -108,6 +112,7 @@ export default async function DatasetSlugPage({ params }: PageProps) {
     url: pageUrl,
     isAccessibleForFree: false,
     spatialCoverage: "Taiwan",
+    ...(temporalCoverage ? { temporalCoverage } : {}),
     license: "https://twmarketdata.com/terms",
     creator: organization,
     publisher: organization,

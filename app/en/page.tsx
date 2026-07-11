@@ -5,6 +5,10 @@ import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 import { EN_HOMEPAGE_READY, hreflangLanguages } from "@/src/config/i18n";
+import { coverageFacts } from "@/src/content/coverage-facts";
+
+const twse = coverageFacts.twseDailyPrice;
+const twseStocks = twse.stocks.toLocaleString("en-US");
 
 // English landing page — SEO-01 §3 reference template (the "1 樣板頁" of the bilingual scaffold).
 // Pattern demonstrated here (title money-word + hreflang cluster + JSON-LD + content slots) is the
@@ -27,10 +31,11 @@ const softwareApplicationLd = {
   operatingSystem: "Web",
   url: getAbsoluteUrl("/en"),
   description:
-    "TWSE-first Taiwan stock market data API. Daily prices, MOPS monthly revenue, financial " +
-    "statements, three-major-institutional-investor flows, valuations and technical indicators. " +
-    "Every response carries source lineage and preserves disclosed data_gaps rather than inferring " +
-    "missing values.",
+    `TWSE-first Taiwan stock market data API. TWSE daily prices since ${twse.earliestDate} ` +
+    "(including full price history for stocks that have stopped trading), MOPS monthly revenue, " +
+    "financial statements, three-major-institutional-investor flows, valuations and technical " +
+    "indicators. Every response carries source lineage and preserves disclosed data_gaps rather " +
+    "than inferring missing values.",
 };
 
 export const metadata: Metadata = {
@@ -81,6 +86,14 @@ export default function EnglishHomePage() {
             Built for developers and quant researchers: query first-party Taiwan market data from
             your code over a REST API, or connect it to AI agents over an MCP server (preview).
           </p>
+          {/* Citable coverage fact sentence — every figure is DB-verified (coverage-facts.ts). */}
+          <p className="mt-4 text-base leading-8 text-slate-600">
+            Coverage includes TWSE daily prices since {twse.earliestDate} ({twse.rowsDisplay} rows
+            across {twseStocks} stocks, plus {twse.stoppedTradingStocks} stocks that have since
+            stopped trading, for survivorship-bias-free backtests), TPEx daily prices since{" "}
+            {coverageFacts.tpexDailyPrice.earliestDate.slice(0, 4)}, and monthly revenue since{" "}
+            {coverageFacts.monthlyRevenue.earliestPeriod.slice(0, 4)}.
+          </p>
           <div className="mt-8 flex flex-wrap gap-3">
             {/* Points at the existing docs until the /en/docs/* pages ship (next i18n increment). */}
             <Link href="/docs/introduction" className={buttonClass("primary")}>
@@ -103,8 +116,14 @@ export default function EnglishHomePage() {
               data gaps disclosed, not hidden.
             </li>
             <li>
-              Taiwan-specific fundamentals US vendors don&apos;t carry — monthly revenue (a
-              monthly-frequency signal) and daily three-major-institutional-investor (三大法人) flow.
+              Taiwan-specific fundamentals US vendors don&apos;t carry — monthly revenue since{" "}
+              {coverageFacts.monthlyRevenue.earliestPeriod.slice(0, 4)} (a monthly-frequency signal)
+              and daily three-major-institutional-investor (三大法人) flow.
+            </li>
+            <li>
+              Survivorship-bias-free — full price history is retained for {twse.stoppedTradingStocks}{" "}
+              stocks that have stopped trading, so point-in-time backtests aren&apos;t biased toward
+              today&apos;s survivors.
             </li>
             <li>
               Built for AI agents — machine-readable docs, OpenAPI, and an MCP server (preview).

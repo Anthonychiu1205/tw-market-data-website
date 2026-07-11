@@ -2,11 +2,16 @@
 // first 2–3 sentences answer it, then the body expands. Every page carries FAQPage schema and a CTA.
 //
 // Content discipline (SEO-01 §3 / AEO-01 / C-6):
-//   - Every claim is checked against the site SSOT. Numbers with no SSOT backing (e.g. "since 2004",
-//     "201 delisted stocks", "weekly reconciliation") are NOT shipped — the page stays draft/noindex
-//     with an amber content slot until a verified figure exists.
+//   - Every coverage NUMBER comes from src/content/coverage-facts.ts (D's DB-verified marketing-safe
+//     facts). Anything not listed there is not written. "Weekly official reconciliation" and a
+//     production hosted MCP endpoint are explicitly NOT claimable yet (roadmap / preview only).
 //   - English copy follows docs/seo/en-terminology-glossary.md.
 //   - FAQPage schema is emitted only from populated `faq` entries (real Q&A) — never placeholder.
+
+import { coverageFacts } from "@/src/content/coverage-facts";
+
+const twse = coverageFacts.twseDailyPrice;
+const twseStocks = twse.stocks.toLocaleString("en-US");
 //
 // Verified SSOT facts used below:
 //   - REST: `GET https://api.twmarketdata.com/v2/datasets/<slug>?ticker=2330&limit=10`, header
@@ -64,7 +69,7 @@ export const answerPages: readonly AnswerPageEntry[] = [
         heading: "Free and official options first",
         bullets: [
           "Official portals (TWSE / TPEx / MOPS OpenAPI) — free and authoritative, but fragmented across endpoints, rate-limited, and without a unified schema. Best for a one-off pull when you don't mind the plumbing.",
-          "Community datasets — useful for research, with variable coverage and freshness, and usually no reconciliation or SLA.",
+          "Community datasets — useful for research, with variable coverage and freshness, and usually no SLA.",
         ],
       },
       {
@@ -148,7 +153,7 @@ export const answerPages: readonly AnswerPageEntry[] = [
     description:
       "Taiwan-listed companies publish monthly revenue via MOPS — an early monthly-frequency fundamental most markets lack. How to access it via API.",
     shortAnswer:
-      "Taiwan-listed companies are required to report monthly revenue, generally by the 10th of the following month — a monthly-frequency fundamental signal that most markets, including the US, do not publish. TW Market Data provides this monthly revenue series with the filing timeline captured, so you can build point-in-time features without look-ahead bias. See the dataset page for the exact coverage window.",
+      "Taiwan-listed companies are required to report monthly revenue, generally by the 10th of the following month — a monthly-frequency fundamental signal that most markets, including the US, do not publish. TW Market Data provides this monthly revenue series back to January 2010, with the statutory filing timeline captured, so you can build point-in-time features without look-ahead bias.",
     sections: [
       {
         heading: "Why it matters",
@@ -177,35 +182,48 @@ export const answerPages: readonly AnswerPageEntry[] = [
     status: "published",
   },
   {
-    // STAY DRAFT: the survivorship angle depends on delisted-stock price coverage figures ("201
-    // delisted stocks", full delisted price history) that have NO SSOT backing. General-education
-    // sections are real; the TW-Market-Data-specific claim is an amber slot until coverage is verified.
+    // Coverage figures are DB-verified (coverage-facts.ts): 311 stopped-trading TWSE stocks with
+    // full price history (262 with an official delisting date), history since 2004-02-11.
     slug: "survivorship-bias-free-taiwan-equity-data",
     locale: "en",
     question: "Survivorship-bias-free Taiwan equity data",
     description:
       "Why delisted-stock price history matters for backtests, and how to build a survivorship-bias-free Taiwan equity universe.",
-    shortAnswer: "",
+    shortAnswer:
+      "Most Taiwan price datasets silently drop companies once they stop trading, which inflates backtest returns through survivorship bias. " +
+      `TW Market Data keeps the full daily price history of the TWSE universe — ${twseStocks} stocks and ${twse.rowsDisplay} daily rows since ${twse.earliestDate} — including ${twse.stoppedTradingStocks} stocks that have since stopped trading (delisted or long-suspended), ${twse.delistedWithOfficialDate} of them with an official delisting date. ` +
+      "So your universe as-of any past date reflects what was actually tradable then, not just today's survivors.",
     sections: [
       {
         heading: "What survivorship bias is and why it distorts backtests",
         body:
-          "Survivorship bias occurs when a dataset silently drops companies that were delisted, so a backtest only sees today's survivors. That inflates returns and understates risk, because the failures that would have hurt the strategy are missing from the historical universe.",
+          "Survivorship bias occurs when a dataset silently drops companies that stopped trading, so a backtest only sees today's survivors. That inflates returns and understates risk, because the failures that would have hurt the strategy are missing from the historical universe.",
       },
       {
         heading: "What you need for a point-in-time universe",
         body:
-          "Reconstructing the universe as-of a past date requires delisted-stock price history plus a last-trading-date / delisting registry, so the universe reflects what was actually tradable then rather than what still trades today.",
+          "Reconstructing the universe as-of a past date requires the price history of stocks that later stopped trading, plus a last-trading-date / delisting reference, so the universe reflects what was actually tradable then rather than what still trades today.",
       },
       {
-        heading: "How TW Market Data handles delisted names",
-        slot:
-          "VERIFY BEFORE PUBLISH: confirm from SSOT exactly what delisted coverage TW Market Data provides (delisting-lifecycle dataset status, whether delisted daily price history is included, and any real count). Do NOT assert '201 delisted stocks' or 'full price history' without a source. Link the real dataset page once confirmed.",
+        heading: "How TW Market Data handles stopped-trading names",
+        body:
+          `The TWSE daily price series retains ${twse.stoppedTradingStocks} stocks that have stopped trading (delisted or long-suspended for more than 90 days), ${twse.delistedWithOfficialDate} of them carrying an official delisting date. Coverage runs from ${twse.earliestDate}, and TPEx daily prices go back to ${coverageFacts.tpexDailyPrice.earliestDate}, so you can reconstruct a point-in-time universe rather than only today's survivors.`,
       },
     ],
-    faq: [],
+    faq: [
+      {
+        question: "Do you include delisted / stopped-trading stocks?",
+        answer:
+          `Yes. The TWSE daily price history retains ${twse.stoppedTradingStocks} stocks that have stopped trading (delisted or long-suspended), ${twse.delistedWithOfficialDate} of them with an official delisting date, so backtests can be survivorship-bias-free.`,
+      },
+      {
+        question: "How far back does the Taiwan price history go?",
+        answer:
+          `TWSE daily prices go back to ${twse.earliestDate} (${twse.rowsDisplay} rows across ${twseStocks} stocks); TPEx daily prices go back to ${coverageFacts.tpexDailyPrice.earliestDate}.`,
+      },
+    ],
     cta: { label: "TWSE daily price dataset", href: "/datasets/twse-daily-price" },
-    status: "draft",
+    status: "published",
   },
   {
     slug: "taiwan-institutional-investor-flow-data",
