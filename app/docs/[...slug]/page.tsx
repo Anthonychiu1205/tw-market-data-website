@@ -151,9 +151,9 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
             <section className="space-y-3 border-b border-slate-200 pb-8">
               <SectionHeading id="query-parameters">Query Parameters</SectionHeading>
-              <div className="overflow-hidden rounded-lg border border-slate-200">
+              <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                  <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
                       <th className="px-3 py-2 font-medium">欄位</th>
                       <th className="px-3 py-2 font-medium">型別</th>
@@ -161,7 +161,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
                       <th className="px-3 py-2 font-medium">說明</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 bg-white">
+                  <tbody className="divide-y divide-slate-100">
                     {(api.queryParameters ?? []).map((parameter) => (
                       <tr key={parameter.name}>
                         <td className="px-3 py-2 font-mono text-xs text-slate-700">{parameter.name}</td>
@@ -189,16 +189,16 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
             <section className="space-y-3 border-b border-slate-200 pb-8">
               <SectionHeading id="field-reference">Field 說明</SectionHeading>
-              <div className="overflow-hidden rounded-lg border border-slate-200">
+              <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                  <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
                       <th className="px-3 py-2 font-medium">欄位路徑</th>
                       <th className="px-3 py-2 font-medium">型別</th>
                       <th className="px-3 py-2 font-medium">說明</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 bg-white">
+                  <tbody className="divide-y divide-slate-100">
                     {(api.responseFields ?? []).map((field) => (
                       <tr key={field.path}>
                         <td className="px-3 py-2 font-mono text-xs text-slate-700">{field.path}</td>

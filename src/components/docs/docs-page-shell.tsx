@@ -5,21 +5,28 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
   Bot,
-  BookOpen,
   Braces,
+  BrainCircuit,
   Building2,
+  CandlestickChart,
   ChevronDown,
+  Code2,
+  Compass,
   FileCheck,
+  FileCode,
   FileSpreadsheet,
   GitBranch,
-  Home,
-  LifeBuoy,
+  KeyRound,
   Landmark,
-  LineChart,
-  Network,
+  LayoutGrid,
+  LifeBuoy,
+  Megaphone,
+  Plug,
   Rocket,
+  ScrollText,
   Search,
-  ShieldCheck,
+  Users,
+  Waypoints,
   Wrench,
 } from "lucide-react";
 import Link from "next/link";
@@ -60,6 +67,9 @@ type DocsPageShellProps = {
   rightPanelTitle?: string;
   rightPanelContent?: React.ReactNode;
   pageLabel?: string;
+  // §G-5 ending guide ("Ready? → Quick Start"). Optional slot rendered after the content; the
+  // per-page copy is authored by Cowork. Absent = nothing rendered.
+  nextGuide?: React.ReactNode;
 };
 
 function itemHasActivePath(item: DocsSidebarNavItem, pathname: string): boolean {
@@ -101,45 +111,44 @@ function readSidebarScrollTopFromSession(): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
+// API group icons (§F): each distinct, zero duplicates with the item icons below. Only the five
+// groupIcon values actually used by docsSidebarApiGroups are mapped; others render nothing.
 function GroupIcon({ groupIcon, className }: { groupIcon: DocsSidebarNavGroup["groupIcon"]; className?: string }) {
   switch (groupIcon) {
-    case "line-chart":
-      return <LineChart className={className} aria-hidden="true" />;
-    case "file-spreadsheet":
+    case "line-chart": // 市場與價格
+      return <CandlestickChart className={className} aria-hidden="true" />;
+    case "file-spreadsheet": // 財務與成長
       return <FileSpreadsheet className={className} aria-hidden="true" />;
-    case "landmark":
+    case "landmark": // 籌碼與資金
       return <Landmark className={className} aria-hidden="true" />;
-    case "building-2":
-      return <Building2 className={className} aria-hidden="true" />;
-    case "network":
-      return <Network className={className} aria-hidden="true" />;
-    case "activity":
-      return <Activity className={className} aria-hidden="true" />;
-    case "search-code":
+    case "building-2": // 公司與事件
+      return <Megaphone className={className} aria-hidden="true" />;
+    case "search-code": // 查詢與工具
       return <Search className={className} aria-hidden="true" />;
-    case "book-open":
-      return <BookOpen className={className} aria-hidden="true" />;
+    default:
+      return null;
   }
 }
 
+// §F: every left-nav item gets its own lucide icon — zero duplicates across the whole nav.
 function getOverviewItemIcon(href: string) {
   switch (href) {
     case "/docs/introduction":
-      return Home;
+      return LayoutGrid;
     case "/docs/quick-start":
       return Rocket;
     case "/docs/authentication":
-      return ShieldCheck;
+      return KeyRound;
     case "/docs/source-policy":
       return FileCheck;
     case "/docs/data-freshness-lineage":
-      return GitBranch;
+      return Waypoints;
     case "/docs/api-model":
       return Braces;
     case "/docs/tools-and-mcp":
       return Wrench;
     default:
-      return Home;
+      return LayoutGrid;
   }
 }
 
@@ -148,35 +157,37 @@ function getGuideItemIcon(href: string) {
     case "/docs/workflows/company-fundamentals":
       return Building2;
     case "/docs/workflows/capital-flow":
-      return Landmark;
+      return Users;
     case "/docs/workflows/market-status":
       return Activity;
     case "/docs/workflows/fast-data-access":
-      return Search;
+      return Compass;
     case "/docs/workflows/strategy-ai":
-      return Bot;
+      return BrainCircuit;
     default:
-      return Building2;
+      return Compass;
   }
 }
 
 function getSdkItemIcon(href: string) {
   switch (href) {
+    case "/docs/sdk/release-status":
+      return GitBranch;
     case "/docs/sdk/python-sdk":
-      return Braces;
+      return FileCode;
     case "/docs/sdk/javascript-sdk":
-      return Braces;
+      return Code2;
     default:
-      return Braces;
+      return FileCode;
   }
 }
 
 function getAiAgentItemIcon(href: string) {
   switch (href) {
     case "/docs/ai-agents/mcp-server-preview":
-      return Wrench;
+      return Plug;
     case "/docs/ai-agents/tool-manifest":
-      return Search;
+      return ScrollText;
     case "/docs/ai-agents/agent-workflow-examples":
       return Bot;
     default:
@@ -188,7 +199,7 @@ function getHelpItemIcon() {
   return LifeBuoy;
 }
 
-export function DocsPageShell({ page, children, tocSections, rightPanelTitle, rightPanelContent, pageLabel = "文件" }: DocsPageShellProps) {
+export function DocsPageShell({ page, children, tocSections, rightPanelTitle, rightPanelContent, pageLabel = "文件", nextGuide }: DocsPageShellProps) {
   const pathname = usePathname();
   const sections: DocsSection[] = useMemo(
     () => normalizeDocsSections(tocSections ?? page.sections).map((section) => ({ id: section.id, label: section.label })),
@@ -313,7 +324,7 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
   return (
     <div className="w-full px-8 py-10 lg:px-16">
       <JsonLd data={breadcrumbLd} />
-      <div className="grid gap-8 lg:gap-10 lg:grid-cols-[200px_minmax(0,1fr)_380px]">
+      <div className="grid gap-8 lg:gap-12 lg:grid-cols-[256px_minmax(0,1fr)_220px]">
         <aside className="hidden lg:block">
           <div
             ref={sidebarScrollRef}
@@ -380,13 +391,18 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
           </div>
         </aside>
 
-        <main className="min-w-0">
+        {/* Content column centered at ~760px (§A) with generous line-height for scan-reading (§B). */}
+        <main className="mx-auto w-full min-w-0 max-w-[760px]">
           <section className="border-b border-slate-200 pb-8">
-            <p className="text-xs font-semibold tracking-wide text-slate-500">{pageLabel}</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">{page.title}</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{page.subtitle}</p>
+            {/* eyebrow → H1 → tagline (§B) */}
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{pageLabel}</p>
+            <h1 className="mt-2 text-[2rem] font-semibold leading-tight tracking-tight text-slate-900">{page.title}</h1>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">{page.subtitle}</p>
           </section>
-          <div>{children}</div>
+          <div className="text-[15px] leading-7 text-slate-700">{children}</div>
+          {nextGuide ? (
+            <div className="mt-12 border-t border-slate-200 pt-6 text-sm text-slate-600">{nextGuide}</div>
+          ) : null}
         </main>
 
         <aside className="hidden lg:block">
