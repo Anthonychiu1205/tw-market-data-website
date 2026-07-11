@@ -611,7 +611,7 @@ const baseDocsPages: DocsPageEntry[] = [
     category: "overview",
     icon: "book",
     title: "台股資料 API 基礎設施",
-    subtitle: "為 AI agent、量化研究與自動化系統而生。",
+    subtitle: "為 AI agent、量化研究與自動化系統打造的台股資料來源。",
     tier: "complete",
     sections: [
       {

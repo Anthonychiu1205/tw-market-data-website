@@ -11,11 +11,10 @@ type SectionHeadingProps = {
 export function SectionHeading({ id, children, className }: SectionHeadingProps) {
   return (
     <h2 id={id} className={cn("group scroll-mt-24 text-xl font-semibold tracking-tight text-slate-900", className)}>
-      <Link href={`#${id}`} className="-mx-1 inline-flex min-h-8 items-center gap-2 rounded-sm px-1 hover:text-slate-700">
+      {/* Heading stays anchor-linkable (TOC targets #id), but the hover "#" affordance is hidden
+          site-wide per request — no anchor icon appears on hover/focus. */}
+      <Link href={`#${id}`} className="-mx-1 inline-flex min-h-8 items-center rounded-sm px-1 hover:text-slate-700">
         <span>{children}</span>
-        <span className="inline-flex h-5 w-5 items-center justify-center text-slate-300 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-          #
-        </span>
       </Link>
     </h2>
   );
