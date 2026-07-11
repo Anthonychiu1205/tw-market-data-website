@@ -368,7 +368,7 @@ function buildApiQueryParameters(item: ApiPlaceholderItem): ApiQueryParameter[] 
   }
 
   return [
-    { name: "ticker", type: "string", required: true, description: "股票代碼，例如 2330。" },
+    { name: "symbol", type: "string", required: true, description: "股票代碼，例如 2330。" },
     { name: "date", type: "string", required: false, description: "指定日期（YYYY-MM-DD）。" },
     { name: "start_date", type: "string", required: false, description: "查詢區間起始日期。" },
     { name: "end_date", type: "string", required: false, description: "查詢區間結束日期。" },
@@ -407,8 +407,8 @@ function buildApiResponseFields(item: ApiPlaceholderItem): ApiResponseField[] {
 
 function buildApiCodeExamples(item: ApiPlaceholderItem): ApiCodeExamples {
   const endpoint = getApiEndpointPath(item);
-  const requiresTicker = buildApiQueryParameters(item).some((parameter) => parameter.name === "ticker" && parameter.required);
-  const query = requiresTicker ? "ticker=2330&limit=10" : "limit=10";
+  const requiresTicker = buildApiQueryParameters(item).some((parameter) => parameter.name === "symbol" && parameter.required);
+  const query = requiresTicker ? "symbol=2330&limit=10" : "limit=10";
   const url = `https://api.twmarketdata.com${endpoint}?${query}`;
 
   return {
@@ -424,7 +424,7 @@ function buildApiStatusExamples(item: ApiPlaceholderItem): ApiStatusExample[] {
   const source = sectionSourceMap[item.sectionId];
   const sample = getApiSampleData(item);
   const traceId = `${dataset}_2330_20260421`;
-  const hasTicker = buildApiQueryParameters(item).some((parameter) => parameter.name === "ticker" && parameter.required);
+  const hasTicker = buildApiQueryParameters(item).some((parameter) => parameter.name === "symbol" && parameter.required);
 
   const successBody = JSON.stringify(
     {
@@ -455,7 +455,7 @@ function buildApiStatusExamples(item: ApiPlaceholderItem): ApiStatusExample[] {
         {
           error: {
             code: "BAD_REQUEST",
-            message: hasTicker ? "ticker 格式錯誤，請使用交易所股票代碼。" : "查詢參數格式錯誤。",
+            message: hasTicker ? "symbol 格式錯誤，請使用交易所股票代碼。" : "查詢參數格式錯誤。",
           },
         },
         null,
@@ -478,7 +478,7 @@ function buildApiStatusExamples(item: ApiPlaceholderItem): ApiStatusExample[] {
     },
     {
       status: "404",
-      description: "查無資料或 ticker 不存在。",
+      description: "查無資料或 symbol 不存在。",
       body: JSON.stringify(
         {
           dataset,
@@ -1049,10 +1049,10 @@ const baseDocsPages: DocsPageEntry[] = [
       ],
       exampleRequestCurl: `curl -G "https://api.twmd.example/v1/analyst-estimates" \\
   -H "X-API-Key: your_api_key_here" \\
-  --data-urlencode "ticker=2330" \\
+  --data-urlencode "symbol=2330" \\
   --data-urlencode "latest=true"`,
       queryParameters: [
-        { name: "ticker", type: "string", required: true, description: "公司代號，例如 2330。" },
+        { name: "symbol", type: "string", required: true, description: "公司代號，例如 2330。" },
         { name: "period", type: "string", required: false, description: "目標財報期間，例如 2025-Q4。" },
         { name: "latest", type: "boolean", required: false, description: "true 時僅回傳最新可用預估。預設 false。" },
       ],
@@ -1076,7 +1076,7 @@ const baseDocsPages: DocsPageEntry[] = [
       sidePanel: {
         requestExample: `curl -G "https://api.twmd.example/v1/analyst-estimates" \\
   -H "X-API-Key: your_api_key_here" \\
-  --data-urlencode "ticker=2330" \\
+  --data-urlencode "symbol=2330" \\
   --data-urlencode "period=2025-Q4"`,
         statusExamples: [
           {
@@ -1098,7 +1098,7 @@ const baseDocsPages: DocsPageEntry[] = [
   ]
 }`,
           },
-          { status: "400", description: "缺少必要參數 ticker", body: `{"error":{"code":"invalid_request","message":"ticker is required"}}` },
+          { status: "400", description: "缺少必要參數 symbol", body: `{"error":{"code":"invalid_request","message":"symbol is required"}}` },
           { status: "401", description: "API key 無效或缺失", body: `{"error":{"code":"unauthorized","message":"invalid api key"}}` },
           { status: "404", description: "此主題尚未開通", body: `{"error":{"code":"not_found","message":"dataset not available in current rollout"}}` },
         ],
@@ -1154,7 +1154,7 @@ const baseDocsPages: DocsPageEntry[] = [
   --data-urlencode "include_ai_context=true"`,
       queryParameters: [
         { name: "market", type: "string", required: false, description: "市場別篩選（TWSE / TPEx）。可用於列表與單一 ticker 查詢。" },
-        { name: "ticker", type: "string", required: false, description: "列表 route 的 ticker 篩選條件（lookup route 用 path ticker）。" },
+        { name: "symbol", type: "string", required: false, description: "列表 route 的 symbol 篩選條件（單一查詢 lookup route 用 path ticker）。" },
         { name: "active_only", type: "boolean", required: false, description: "僅回傳 active 標的，預設 true（dataset route）。" },
         { name: "limit", type: "integer", required: false, description: "dataset route 回傳筆數上限。" },
         { name: "include_ai_context", type: "boolean", required: false, description: "dataset route 是否回傳 AI context packet（預設 true）。" },
@@ -1286,9 +1286,9 @@ const baseDocsPages: DocsPageEntry[] = [
       ],
       exampleRequestCurl: `curl -G "https://api.twmd.example/v2/datasets/issuer-profile" \\
   -H "X-API-Key: your_api_key_here" \\
-  --data-urlencode "ticker=2330"`,
+  --data-urlencode "symbol=2330"`,
       queryParameters: [
-        { name: "ticker", type: "string", required: false, description: "公司代號。與 query 至少擇一。" },
+        { name: "symbol", type: "string", required: false, description: "公司代號。與 query 至少擇一。" },
         { name: "query", type: "string", required: false, description: "公司名稱或代號關鍵字。" },
         { name: "market", type: "string", required: false, description: "市場別篩選，例如 TWSE、TPEx。" },
       ],
@@ -1378,10 +1378,10 @@ const baseDocsPages: DocsPageEntry[] = [
       ],
       exampleRequestCurl: `curl -G "https://api.twmd.example/v1/earnings" \\
   -H "X-API-Key: your_api_key_here" \\
-  --data-urlencode "ticker=2330" \\
+  --data-urlencode "symbol=2330" \\
   --data-urlencode "latest=true"`,
       queryParameters: [
-        { name: "ticker", type: "string", required: true, description: "公司代號，例如 2330。" },
+        { name: "symbol", type: "string", required: true, description: "公司代號，例如 2330。" },
         { name: "period", type: "string", required: false, description: "財報期間，例如 2025-Q4 或 2025。" },
         { name: "report_type", type: "string", required: false, description: "quarterly 或 annual；未提供時由系統依資料可用性回傳。" },
         { name: "latest", type: "boolean", required: false, description: "true 時僅回傳最新一期。" },
@@ -1410,7 +1410,7 @@ const baseDocsPages: DocsPageEntry[] = [
       sidePanel: {
         requestExample: `curl -G "https://api.twmd.example/v1/earnings" \\
   -H "X-API-Key: your_api_key_here" \\
-  --data-urlencode "ticker=2330" \\
+  --data-urlencode "symbol=2330" \\
   --data-urlencode "period=2025-Q4"`,
         statusExamples: [
           {
@@ -1544,10 +1544,10 @@ const baseDocsPages: DocsPageEntry[] = [
       gettingStarted: ["帶入 API key 與 ticker。", "可加 date 或 latest 控制快照範圍。", "回應欄位請統一轉為數值型別後再計算。"],
       exampleRequestCurl: `curl -G "https://api.twmd.example/v1/financial-metrics" \\
   -H "X-API-Key: your_api_key_here" \\
-  --data-urlencode "ticker=2330" \\
+  --data-urlencode "symbol=2330" \\
   --data-urlencode "latest=true"`,
       queryParameters: [
-        { name: "ticker", type: "string", required: true, description: "公司代號。" },
+        { name: "symbol", type: "string", required: true, description: "公司代號。" },
         { name: "date", type: "string", required: false, description: "快照日期，格式 YYYY-MM-DD。" },
         { name: "latest", type: "boolean", required: false, description: "是否僅回傳最新快照。" },
       ],
@@ -1579,7 +1579,7 @@ const baseDocsPages: DocsPageEntry[] = [
       sidePanel: {
         requestExample: `curl -G "https://api.twmd.example/v1/financial-metrics" \\
   -H "X-API-Key: your_api_key_here" \\
-  --data-urlencode "ticker=2330"`,
+  --data-urlencode "symbol=2330"`,
         statusExamples: [
           {
             status: "200",
@@ -1600,7 +1600,7 @@ const baseDocsPages: DocsPageEntry[] = [
   ]
 }`,
           },
-          { status: "400", description: "參數錯誤", body: `{"error":{"code":"invalid_request","message":"ticker is required"}}` },
+          { status: "400", description: "參數錯誤", body: `{"error":{"code":"invalid_request","message":"symbol is required"}}` },
           { status: "401", description: "認證失敗", body: `{"error":{"code":"unauthorized","message":"invalid api key"}}` },
           { status: "404", description: "查無資料", body: `{"error":{"code":"not_found","message":"financial metrics not found"}}` },
         ],
@@ -2903,7 +2903,7 @@ response = requests.get(
 )
 print(response.json())`,
     javascript: `const response = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/issuer-profile?ticker=2330",
+  "https://api.twmarketdata.com/v2/datasets/issuer-profile?symbol=2330",
   {
     headers: {
       "X-API-Key": "your_api_key_here"
@@ -2915,7 +2915,7 @@ const data = await response.json();
 console.log(data);`,
     curl: `curl -G "https://api.twmarketdata.com/v2/datasets/issuer-profile" \\
   -H "X-API-Key: your_api_key_here" \\
-  --data-urlencode "ticker=2330"`,
+  --data-urlencode "symbol=2330"`,
   };
 
   const successBody = JSON.stringify(
@@ -2958,12 +2958,12 @@ console.log(data);`,
     ],
     gettingStarted: [
       "在 header 放入 X-API-Key。",
-      "先以 ticker=2330 驗證回應結構。",
+      "先以 symbol=2330 驗證回應結構。",
       "再依需求加入 market、limit。",
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: true, description: "股票代碼，用於查詢單一公司。" },
+      { name: "symbol", type: "string", required: true, description: "股票代碼，用於查詢單一公司。" },
       { name: "market", type: "string", required: false, description: "市場別（上市 / 上櫃；若後端已支持）。" },
       { name: "limit", type: "integer", required: false, description: "回傳筆數限制（若後端支持）。" },
       { name: "offset", type: "integer", required: false, description: "分頁偏移（若後端支持）。" },
@@ -3012,7 +3012,7 @@ console.log(data);`,
             {
               error: {
                 code: "BAD_REQUEST",
-                message: "ticker 格式錯誤，請使用有效股票代碼。",
+                message: "symbol 格式錯誤，請使用有效股票代碼。",
               },
             },
             null,
@@ -3094,7 +3094,7 @@ response = requests.get(
 
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/financial-metrics?ticker=2330&period=quarterly&limit=10",
+  "https://api.twmarketdata.com/v2/datasets/financial-metrics?symbol=2330&period=quarterly&limit=10",
   {
     headers: {
       "X-API-Key": "your_api_key_here"
@@ -3105,7 +3105,7 @@ print(response.json())`,
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/financial-metrics?ticker=2330&period=quarterly&limit=10" \\
+  --url "https://api.twmarketdata.com/v2/datasets/financial-metrics?symbol=2330&period=quarterly&limit=10" \\
   --header "X-API-Key: your_api_key_here"`,
   };
 
@@ -3166,7 +3166,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: true, description: "股票代碼。" },
+      { name: "symbol", type: "string", required: true, description: "股票代碼。" },
       { name: "period", type: "string", required: false, description: "資料期間（quarterly / annual）。" },
       { name: "limit", type: "integer", required: false, description: "回傳筆數。" },
       { name: "offset", type: "integer", required: false, description: "分頁。" },
@@ -4327,7 +4327,7 @@ response = requests.get(
 )
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/financials?ticker=2330&statement_type=income_statement&period_type=quarterly&date_from=2025-01-01&date_to=2026-12-31&limit=5",
+  "https://api.twmarketdata.com/v2/datasets/financials?symbol=2330&statement_type=income_statement&period_type=quarterly&date_from=2025-01-01&date_to=2026-12-31&limit=5",
   {
     headers: { "X-API-Key": "your_api_key_here" }
   }
@@ -4335,7 +4335,7 @@ print(response.json())`,
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/financials?ticker=2330&statement_type=income_statement&period_type=quarterly&date_from=2025-01-01&date_to=2026-12-31&limit=5" \\
+  --url "https://api.twmarketdata.com/v2/datasets/financials?symbol=2330&statement_type=income_statement&period_type=quarterly&date_from=2025-01-01&date_to=2026-12-31&limit=5" \\
   --header "X-API-Key: your_api_key_here"`,
   };
   const successBody = JSON.stringify(
@@ -4449,7 +4449,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: false, description: "股票代碼（canonical route 使用 ticker）。" },
+      { name: "symbol", type: "string", required: false, description: "股票代碼（例如 2330）。" },
       { name: "statement_type", type: "string", required: false, description: "income_statement / balance_sheet / cash_flow。" },
       { name: "period_type", type: "string", required: false, description: "quarterly / annual / ttm。" },
       { name: "date_from", type: "string", required: false, description: "期間起始（YYYY-MM-DD）。" },
@@ -4527,13 +4527,13 @@ response = requests.get(
 )
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/valuation-core-daily?ticker=2330&date_from=2026-01-01&date_to=2026-04-30&limit=10",
+  "https://api.twmarketdata.com/v2/datasets/valuation-core-daily?symbol=2330&date_from=2026-01-01&date_to=2026-04-30&limit=10",
   { headers: { "X-API-Key": "your_api_key_here" } }
 )
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/valuation-core-daily?ticker=2330&date_from=2026-01-01&date_to=2026-04-30&limit=10" \\
+  --url "https://api.twmarketdata.com/v2/datasets/valuation-core-daily?symbol=2330&date_from=2026-01-01&date_to=2026-04-30&limit=10" \\
   --header "X-API-Key: your_api_key_here"`,
   };
   const successBody = JSON.stringify(
@@ -4613,7 +4613,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: false, description: "股票代碼（canonical route 使用 ticker）。" },
+      { name: "symbol", type: "string", required: false, description: "股票代碼（例如 2330）。" },
       { name: "date_from", type: "string", required: false, description: "起始日期（YYYY-MM-DD）。" },
       { name: "date_to", type: "string", required: false, description: "結束日期（YYYY-MM-DD）。" },
       { name: "limit", type: "integer", required: false, description: "回傳筆數（預設 100，最大 5000）。" },
@@ -4689,13 +4689,13 @@ response = requests.get(
 )
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/market-prices?ticker=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&limit=10",
+  "https://api.twmarketdata.com/v2/datasets/market-prices?symbol=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&limit=10",
   { headers: { "X-API-Key": "your_api_key_here" } }
 )
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/market-prices?ticker=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&limit=10" \\
+  --url "https://api.twmarketdata.com/v2/datasets/market-prices?symbol=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&limit=10" \\
   --header "X-API-Key: your_api_key_here"`,
   };
   const successBody = JSON.stringify(
@@ -4786,7 +4786,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: false, description: "股票代碼（canonical route 使用 ticker）。" },
+      { name: "symbol", type: "string", required: false, description: "股票代碼（例如 2330）。" },
       { name: "market", type: "string", required: false, description: "TWSE 或 TPEx。" },
       { name: "date_from", type: "string", required: false, description: "起始日期（YYYY-MM-DD）。" },
       { name: "date_to", type: "string", required: false, description: "結束日期（YYYY-MM-DD）。" },
@@ -4863,13 +4863,13 @@ response = requests.get(
 )
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/adjusted-prices?ticker=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&adjustment_basis=price_only&limit=10",
+  "https://api.twmarketdata.com/v2/datasets/adjusted-prices?symbol=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&adjustment_basis=price_only&limit=10",
   { headers: { "X-API-Key": "your_api_key_here" } }
 )
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/adjusted-prices?ticker=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&adjustment_basis=price_only&limit=10" \\
+  --url "https://api.twmarketdata.com/v2/datasets/adjusted-prices?symbol=2330&market=TWSE&date_from=2026-01-01&date_to=2026-04-30&adjustment_basis=price_only&limit=10" \\
   --header "X-API-Key: your_api_key_here"`,
   };
   const successBody = JSON.stringify(
@@ -4972,7 +4972,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: false, description: "股票代碼（canonical route 使用 ticker）。" },
+      { name: "symbol", type: "string", required: false, description: "股票代碼（例如 2330）。" },
       { name: "market", type: "string", required: false, description: "TWSE 或 TPEx。" },
       { name: "date_from", type: "string", required: false, description: "起始日期（YYYY-MM-DD）。" },
       { name: "date_to", type: "string", required: false, description: "結束日期（YYYY-MM-DD）。" },
@@ -5452,7 +5452,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker / symbol", type: "string", required: true, description: "股票代碼（建議使用 ticker；若現有 SDK 使用 symbol，沿用現有命名）。" },
+      { name: "symbol", type: "string", required: true, description: "股票代碼（例如 2330）。" },
       { name: "start_date", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
       { name: "end_date", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
       { name: "market", type: "string", required: false, description: "市場代碼（目前 Stage0 baseline 為 TWSE）。" },
@@ -5605,7 +5605,7 @@ response = requests.get(
 
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/issuer-announcements?ticker=2330&limit=20",
+  "https://api.twmarketdata.com/v2/datasets/issuer-announcements?symbol=2330&limit=20",
   {
     headers: {
       "X-API-Key": "your_api_key_here"
@@ -5616,7 +5616,7 @@ print(response.json())`,
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/issuer-announcements?ticker=2330&limit=20" \\
+  --url "https://api.twmarketdata.com/v2/datasets/issuer-announcements?symbol=2330&limit=20" \\
   --header "X-API-Key: your_api_key_here"`,
   };
 
@@ -5706,7 +5706,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: true, description: "股票代碼，用於查詢單一公司公告資料。" },
+      { name: "symbol", type: "string", required: true, description: "股票代碼，用於查詢單一公司公告資料。" },
       { name: "date_from", type: "string", required: false, description: "查詢起始日期（YYYY-MM-DD）。" },
       { name: "date_to", type: "string", required: false, description: "查詢結束日期（YYYY-MM-DD）。" },
       { name: "category", type: "string", required: false, description: "公告分類過濾。" },
@@ -6578,13 +6578,13 @@ response = requests.get(
 )
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/theme-taxonomy?ticker=2330&limit=20",
+  "https://api.twmarketdata.com/v2/datasets/theme-taxonomy?symbol=2330&limit=20",
   { headers: { "X-API-Key": "your_api_key_here" } }
 )
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/theme-taxonomy?ticker=2330&limit=20" \\
+  --url "https://api.twmarketdata.com/v2/datasets/theme-taxonomy?symbol=2330&limit=20" \\
   --header "X-API-Key: your_api_key_here"`,
   };
   const successBody = JSON.stringify(
@@ -6655,7 +6655,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: false, description: "股票代碼。" },
+      { name: "symbol", type: "string", required: false, description: "股票代碼。" },
       { name: "market", type: "string", required: false, description: "市場代碼（例如 TWSE、TPEx）。" },
       { name: "sector", type: "string", required: false, description: "產業大類篩選。" },
       { name: "industry", type: "string", required: false, description: "產業細分類篩選。" },
@@ -7727,7 +7727,7 @@ console.log(data)`,
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
       { name: "company_code", type: "string", required: false, description: "公司代碼。建議與日期範圍搭配，避免 unbounded query。" },
-      { name: "ticker", type: "string", required: false, description: "股票代碼，可替代 company_code。" },
+      { name: "symbol", type: "string", required: false, description: "股票代碼，可替代 company_code。" },
       { name: "date_from", type: "string", required: true, description: "查詢起始日期（YYYY-MM-DD），需與 date_to 成對出現。" },
       { name: "date_to", type: "string", required: true, description: "查詢結束日期（YYYY-MM-DD），需與 date_from 成對出現。" },
       { name: "limit", type: "integer", required: false, description: "回傳筆數上限，預設 50，最大 100。" },
@@ -7831,13 +7831,13 @@ response = requests.get(
 )
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/chip-flows?ticker=2330&market=tw&participant_type=foreign&date_from=2026-04-01&date_to=2026-04-22&limit=50",
+  "https://api.twmarketdata.com/v2/datasets/chip-flows?symbol=2330&market=tw&participant_type=foreign&date_from=2026-04-01&date_to=2026-04-22&limit=50",
   { headers: { "X-API-Key": "your_api_key_here" } }
 )
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/chip-flows?ticker=2330&market=tw&participant_type=foreign&date_from=2026-04-01&date_to=2026-04-22&limit=50" \\
+  --url "https://api.twmarketdata.com/v2/datasets/chip-flows?symbol=2330&market=tw&participant_type=foreign&date_from=2026-04-01&date_to=2026-04-22&limit=50" \\
   --header "X-API-Key: your_api_key_here"`,
   };
   const successBody = JSON.stringify(
@@ -7899,7 +7899,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: false, description: "股票代碼。" },
+      { name: "symbol", type: "string", required: false, description: "股票代碼。" },
       { name: "market", type: "string", required: false, description: "市場代碼，預設 tw。" },
       { name: "flow_type", type: "string", required: false, description: "流向類型過濾。" },
       { name: "participant_type", type: "string", required: false, description: "參與者類型過濾。" },
@@ -8559,7 +8559,7 @@ response = requests.get(
 
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/events?ticker=2330&start_date=2026-01-01&end_date=2026-04-30&limit=20",
+  "https://api.twmarketdata.com/v2/datasets/events?symbol=2330&start_date=2026-01-01&end_date=2026-04-30&limit=20",
   {
     headers: {
       "X-API-Key": "your_api_key_here"
@@ -8570,7 +8570,7 @@ print(response.json())`,
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/events?ticker=2330&start_date=2026-01-01&end_date=2026-04-30&limit=20" \\
+  --url "https://api.twmarketdata.com/v2/datasets/events?symbol=2330&start_date=2026-01-01&end_date=2026-04-30&limit=20" \\
   --header "X-API-Key: your_api_key_here"`,
   };
 
@@ -8627,7 +8627,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: true, description: "股票代碼，用於查詢單一公司的事件資料。" },
+      { name: "symbol", type: "string", required: true, description: "股票代碼，用於查詢單一公司的事件資料。" },
       { name: "start_date", type: "string", required: false, description: "查詢起始日期。" },
       { name: "end_date", type: "string", required: false, description: "查詢結束日期。" },
       { name: "limit", type: "integer", required: false, description: "回傳筆數限制。" },
@@ -8766,7 +8766,7 @@ response = requests.get(
 
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/structured-events?ticker=2330&start_date=2026-01-01&end_date=2026-04-30&limit=20",
+  "https://api.twmarketdata.com/v2/datasets/structured-events?symbol=2330&start_date=2026-01-01&end_date=2026-04-30&limit=20",
   {
     headers: {
       "X-API-Key": "your_api_key_here"
@@ -8777,7 +8777,7 @@ print(response.json())`,
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/structured-events?ticker=2330&start_date=2026-01-01&end_date=2026-04-30&limit=20" \\
+  --url "https://api.twmarketdata.com/v2/datasets/structured-events?symbol=2330&start_date=2026-01-01&end_date=2026-04-30&limit=20" \\
   --header "X-API-Key: your_api_key_here"`,
   };
 
@@ -8834,7 +8834,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: true, description: "股票代碼，用於查詢單一公司的結構化事件資料。" },
+      { name: "symbol", type: "string", required: true, description: "股票代碼，用於查詢單一公司的結構化事件資料。" },
       { name: "start_date", type: "string", required: false, description: "查詢起始日期。" },
       { name: "end_date", type: "string", required: false, description: "查詢結束日期。" },
       { name: "event_type", type: "string", required: false, description: "事件類型（若目前 schema 有正式支持）。" },
@@ -8975,7 +8975,7 @@ response = requests.get(
 
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/corporate-actions?ticker=2330&start_date=2024-01-01&end_date=2026-04-30&limit=20",
+  "https://api.twmarketdata.com/v2/datasets/corporate-actions?symbol=2330&start_date=2024-01-01&end_date=2026-04-30&limit=20",
   {
     headers: {
       "X-API-Key": "your_api_key_here"
@@ -8986,7 +8986,7 @@ print(response.json())`,
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/corporate-actions?ticker=2330&start_date=2024-01-01&end_date=2026-04-30&limit=20" \\
+  --url "https://api.twmarketdata.com/v2/datasets/corporate-actions?symbol=2330&start_date=2024-01-01&end_date=2026-04-30&limit=20" \\
   --header "X-API-Key: your_api_key_here"`,
   };
 
@@ -9042,7 +9042,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: true, description: "股票代碼，用於查詢單一公司的公司行動資料。" },
+      { name: "symbol", type: "string", required: true, description: "股票代碼，用於查詢單一公司的公司行動資料。" },
       { name: "start_date", type: "string", required: false, description: "查詢起始日期。" },
       { name: "end_date", type: "string", required: false, description: "查詢結束日期。" },
       { name: "action_type", type: "string", required: false, description: "公司行動類型（若目前 schema 有正式支持）。" },
@@ -9183,7 +9183,7 @@ response = requests.get(
 
 print(response.json())`,
     javascript: `const res = await fetch(
-  "https://api.twmarketdata.com/v2/datasets/dividends?ticker=2330&start_date=2024-01-01&end_date=2026-04-30&limit=20",
+  "https://api.twmarketdata.com/v2/datasets/dividends?symbol=2330&start_date=2024-01-01&end_date=2026-04-30&limit=20",
   {
     headers: {
       "X-API-Key": "your_api_key_here"
@@ -9194,7 +9194,7 @@ print(response.json())`,
 const data = await res.json()
 console.log(data)`,
     curl: `curl --request GET \\
-  --url "https://api.twmarketdata.com/v2/datasets/dividends?ticker=2330&start_date=2024-01-01&end_date=2026-04-30&limit=20" \\
+  --url "https://api.twmarketdata.com/v2/datasets/dividends?symbol=2330&start_date=2024-01-01&end_date=2026-04-30&limit=20" \\
   --header "X-API-Key: your_api_key_here"`,
   };
 
@@ -9250,7 +9250,7 @@ console.log(data)`,
     ],
     exampleRequestCurl: codeExamples.curl,
     queryParameters: [
-      { name: "ticker", type: "string", required: true, description: "股票代碼，用於查詢單一公司的股利資料。" },
+      { name: "symbol", type: "string", required: true, description: "股票代碼，用於查詢單一公司的股利資料。" },
       { name: "start_date", type: "string", required: false, description: "查詢起始日期。" },
       { name: "end_date", type: "string", required: false, description: "查詢結束日期。" },
       { name: "dividend_type", type: "string", required: false, description: "股利類型（若目前 schema 有正式支持）。" },
