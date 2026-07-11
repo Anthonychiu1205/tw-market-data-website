@@ -1,0 +1,128 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+import { buttonClass } from "@/src/components/ui/button";
+import { Container } from "@/src/components/ui/container";
+import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
+import { EN_HOMEPAGE_READY, hreflangLanguages } from "@/src/config/i18n";
+
+// English landing page — SEO-01 §3 reference template (the "1 樣板頁" of the bilingual scaffold).
+// Pattern demonstrated here (title money-word + hreflang cluster + JSON-LD + content slots) is the
+// blueprint for the rest of /en/*.
+//
+// DRAFT until Cowork fills the content slots per docs/seo/en-terminology-glossary.md:
+//   - robots.index is false so thin/placeholder copy is NOT indexed and the hreflang cluster stays
+//     dormant (Google ignores hreflang to a noindex URL). Flip `DRAFT` to false once the body copy
+//     is finalized — that single switch turns on indexing AND activates hreflang.
+//   - No machine-translated prose is shipped here; the slots below are placeholders, not final copy.
+// Readiness is the shared EN_HOMEPAGE_READY switch (src/config/i18n.ts) so the zh homepage's
+// reciprocal hreflang and this page's indexability flip together.
+const DRAFT = !EN_HOMEPAGE_READY;
+
+const softwareApplicationLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "TW Market Data",
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Web",
+  url: getAbsoluteUrl("/en"),
+  description:
+    "TWSE-first Taiwan stock market data API. Daily prices, MOPS monthly revenue, financial " +
+    "statements, three-major-institutional-investor flows, valuations and technical indicators. " +
+    "Every response carries source lineage and preserves disclosed data_gaps rather than inferring " +
+    "missing values.",
+};
+
+export const metadata: Metadata = {
+  // Money-word title per SEO-01 §3.3.
+  title: "Taiwan Stock Market Data API | TWSE, Financials, Institutional Flow",
+  description:
+    "TWSE-first Taiwan stock market data API for engineers, quant research and AI agents — " +
+    "daily prices, monthly revenue, financial statements and institutional flows, with source " +
+    "lineage and disclosed data gaps.",
+  alternates: {
+    canonical: "/en",
+    languages: hreflangLanguages("/", "/en"),
+  },
+  robots: DRAFT ? { index: false, follow: true } : { index: true, follow: true },
+  openGraph: {
+    title: "Taiwan Stock Market Data API | TW Market Data",
+    description:
+      "TWSE-first Taiwan stock market data API with source lineage and honest coverage disclosure.",
+    url: getAbsoluteUrl("/en"),
+    siteName: "TW Market Data",
+    locale: "en",
+    type: "website",
+    images: [getAbsoluteUrl(siteConfig.ogImagePath)],
+  },
+};
+
+/**
+ * CONTENT SLOT — Cowork fills the final English body per the terminology glossary.
+ * Renders a visible draft marker in non-production so reviewers can see what is pending; renders
+ * nothing in production (the section headings + true seed copy stand until real copy lands).
+ */
+function ContentSlot({ note }: { note: string }) {
+  if (process.env.NODE_ENV === "production") return null;
+  return (
+    <p className="mt-3 rounded-md border border-dashed border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+      CONTENT SLOT (Cowork, per glossary): {note}
+    </p>
+  );
+}
+
+export default function EnglishHomePage() {
+  return (
+    // lang="en" scopes the content language until the app/[locale] migration sets <html lang="en">.
+    <div lang="en">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationLd) }}
+      />
+      <Container className="space-y-12 py-12 sm:py-16">
+        <section className="max-w-3xl">
+          <h1 className="text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
+            Taiwan Stock Market Data API
+          </h1>
+          {/* Seed subhead is TRUE and glossary-controlled (safe to ship); expand via slot below. */}
+          <p className="mt-6 text-lg leading-8 text-slate-600">
+            TW Market Data is a TWSE-first Taiwan stock market data API covering daily prices, MOPS
+            monthly revenue, financial statements, three-major-institutional-investor flows,
+            valuations and technical indicators. Every response carries source lineage and preserves
+            disclosed data gaps rather than inferring missing values.
+          </p>
+          <ContentSlot note="Expand the value proposition (2–3 sentences): who it's for (engineers / quant / AI agents), the honest-coverage differentiator, and the TWSE-first boundary. No full-market or survivorship claims beyond disclosed coverage." />
+          <div className="mt-8 flex flex-wrap gap-3">
+            {/* Points at the existing docs until the /en/docs/* pages ship (next i18n increment). */}
+            <Link href="/docs/introduction" className={buttonClass("primary")}>
+              Read the docs
+            </Link>
+            <Link href="/pricing" className={buttonClass("secondary")}>
+              Pricing
+            </Link>
+            <Link href="/datasets" className={buttonClass("secondary")}>
+              Browse datasets
+            </Link>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-950">What you get</h2>
+          <ContentSlot note="Dataset families as a short list with one honest line each (daily price, monthly revenue, financial statements, institutional flow, valuation, technical indicators). Mirror the zh homepage scope; keep TPEx-historical-depth-deferred disclosure." />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
+            Built for honest, reproducible research
+          </h2>
+          <ContentSlot note="Explain source lineage + preserved data_gaps + reconciliation as the differentiator. Verifiable, no fabricated numbers." />
+        </section>
+
+        <section>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-950">Start building</h2>
+          <ContentSlot note="Quick-start CTA: link to /en/docs/quick-start and the 5-symbols-free-no-key line (align with BENCH-01 once live)." />
+        </section>
+      </Container>
+    </div>
+  );
+}

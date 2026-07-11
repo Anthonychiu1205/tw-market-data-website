@@ -1,5 +1,8 @@
 # /llms.txt 雙語站點導覽 — 提案 + 歸屬說明 (AEO-01 §1.2)
 
+> **路由 / 優先序（老闆裁決）**：本提案交付 **`tw-feature-engine` owner**（llms 生成器所在 repo）。
+> **標低優先**：待 backfill 忙完再接。網站端不動 `public/llms.txt`（sync gate 已綠、禁破壞）。
+
 ## 稽核結論 (現狀)
 
 | 項目 | 現狀 | 判定 |

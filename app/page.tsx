@@ -12,6 +12,7 @@ import { buttonClass } from "@/src/components/ui/button";
 import { SourceOfTruthSectionDeferred } from "@/src/components/home/source-of-truth-section-deferred";
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
+import { EN_HOMEPAGE_READY, hreflangLanguages } from "@/src/config/i18n";
 import { getHomepageCoverageMetrics } from "@/src/lib/homepage/homepage-market-data";
 
 const softwareApplicationLd = {
@@ -31,6 +32,9 @@ export const metadata: Metadata = {
     "TWSE-first verified Taiwan financial data API，提供已驗證資料集並明確標示 coverage window、來源與限制。",
   alternates: {
     canonical: "/",
+    // Reciprocal hreflang cluster with /en — only emitted once the English homepage is
+    // content-complete (EN_HOMEPAGE_READY), so we never point hreflang at a noindex draft.
+    ...(EN_HOMEPAGE_READY ? { languages: hreflangLanguages("/", "/en") } : {}),
   },
   openGraph: {
     title: "台股資料 API 基礎設施 | TW Market Data",
