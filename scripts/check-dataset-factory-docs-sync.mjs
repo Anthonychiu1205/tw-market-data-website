@@ -23,14 +23,14 @@ const docsSidebarPath = resolve(ROOT, "src/content/docs-sidebar.ts");
 const sitePath = resolve(ROOT, "src/content/site.ts");
 const homeSourcePath = resolve(ROOT, "src/content/home-source-of-truth.ts");
 const llmsPath = resolve(ROOT, "public/llms.txt");
-const llmsFullPath = resolve(ROOT, "public/llms-full.txt");
+// NOTE: llms-full.txt ownership moved to the website (app/llms-full.txt/route.ts, generated from
+// the docs source), so it is no longer a pipeline-synced static file and is not checked here.
 
 const docsPages = requireFile(docsPagesPath);
 const docsSidebar = requireFile(docsSidebarPath);
 const siteContent = requireFile(sitePath);
 const homeSourceContent = requireFile(homeSourcePath);
 const llms = requireFile(llmsPath);
-const llmsFull = requireFile(llmsFullPath);
 
 assert(docsPages.includes("/v2/datasets/valuation-core-daily"), "docs-pages missing valuation-core-daily route");
 assert(!docsPages.includes("/v2/datasets/valuations"), "docs-pages still references stale /v2/datasets/valuations route");
@@ -78,7 +78,6 @@ for (const [label, content] of [
   ["site", siteContent],
   ["home-source-of-truth", homeSourceContent],
   ["llms", llms],
-  ["llms-full", llmsFull],
 ]) {
   if (secretsLikePattern.test(content)) {
     failures.push(`${label} contains secrets-like pattern`);
@@ -89,11 +88,8 @@ if (existsSync(SOURCE_MANIFEST)) {
   try {
     const manifest = JSON.parse(readFileSync(SOURCE_MANIFEST, "utf8"));
     const sourceLlmsPath = resolve("/Volumes/DEV_USB/Projects/tw-feature-engine", manifest.llms?.source_path ?? "docs/generated/llms.txt");
-    const sourceLlmsFullPath = resolve("/Volumes/DEV_USB/Projects/tw-feature-engine", manifest.llms_full?.source_path ?? "docs/generated/llms-full.txt");
     const sourceLlms = requireFile(sourceLlmsPath);
-    const sourceLlmsFull = requireFile(sourceLlmsFullPath);
     assert(llms === sourceLlms, "public/llms.txt is not synced to feature-engine generated llms.txt");
-    assert(llmsFull === sourceLlmsFull, "public/llms-full.txt is not synced to feature-engine generated llms-full.txt");
   } catch {
     failures.push("source manifest parse failed");
   }

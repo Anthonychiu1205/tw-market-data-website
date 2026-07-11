@@ -48,7 +48,7 @@ export function ApiCoverageTable({ slug }: { slug: string }) {
 
 // Honest platform-wide limitations (all true; see 差異聲明). Per-endpoint specifics can be added to
 // DATASET_LIMITATIONS later without touching layout.
-const PLATFORM_LIMITATIONS: string[] = [
+export const PLATFORM_LIMITATIONS: string[] = [
   "覆蓋非全市場、全期間；實際範圍以上方覆蓋小表與回應中的 data_gaps 為準。",
   "資料有缺會如實標記，不以推測值補洞。",
   "本平台聚焦日頻與基本面資料；不提供即時報價、盤中分K與加密貨幣。",

@@ -21,6 +21,27 @@ const HABITS: { term: string; desc: string }[] = [
   { term: "額度看方案", desc: "每把金鑰的每分鐘請求數與每月用量依方案計。" },
 ];
 
+// Plain-text version for /llms-full.txt. Reuses the same curl sample + HABITS; lead/error lines
+// mirror the JSX below — keep in sync.
+export function authenticationLlmsMarkdown(): string {
+  return [
+    "每個請求都帶 X-API-Key 標頭。金鑰在儀表板（/dashboard）自己建立、輪替、撤銷，不用聯絡我們。",
+    "```bash",
+    curlExample,
+    "```",
+    "",
+    "### 幾個習慣",
+    ...HABITS.map((h) => `- ${h.term} — ${h.desc}`),
+    "",
+    "### 常見錯誤",
+    "- 401 — 金鑰沒帶或無效。",
+    "- 403 — 你的方案沒有這個資料集的權限。",
+    "- 429（速率限制）— rate-limit 回應與 Retry-After 標頭建置中；超過方案 RPM／額度的行為以上線公告為準。",
+    "",
+    "下一步 → 來源政策（/docs/data-provenance）",
+  ].join("\n");
+}
+
 export function AuthenticationContent() {
   return (
     <div className="space-y-8 py-8">

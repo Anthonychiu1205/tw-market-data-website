@@ -39,6 +39,33 @@ const DESIGN_PRINCIPLES: { term: string; desc: string }[] = [
   { term: "給機器讀的", desc: "為程式呼叫最佳化，不是給人瀏覽的網頁。" },
 ];
 
+// Plain-text version for /llms-full.txt (auto-generated docs bundle). Reuses the same data arrays
+// as the component; the few lead sentences mirror the JSX below — keep in sync.
+export function introductionLlmsMarkdown(): string {
+  const lines: string[] = [
+    "TW Market Data 把 TWSE、TPEx、MOPS、TAIFEX 的官方資料，整理成一致、好串接的 REST API。所有資料都由我們直接從官方來源收錄、解析後供應，不經二手。",
+    "每一筆回應都附上來源與 knowledge_date；資料有缺就如實標記，絕不用推估值把洞補起來。",
+    "",
+    "### 可存取的資料",
+    `上市個股日線最早回溯到 ${twseYear} 年，並保留 ${twse.stoppedTradingStocks} 檔已停止交易（下市／長期停牌）股票的完整價史。`,
+    ...DATASETS.map((d) => `- ${d.name} — ${d.desc} (${d.href})`),
+    "上櫃（TPEx）日線與還原股價目前為 beta，覆蓋範圍逐集標示。",
+    "",
+    "### 資料格式",
+    ...DATA_FORMAT.map((f) => `- ${f.term} — ${f.desc}`),
+    "",
+    "### 為誰而建",
+    "- 需要餵資料的 AI 金融 agent 與 LLM 流程",
+    "- 量化研究與因子開發",
+    "- 回測與自動化交易系統",
+    "- fintech 產品的內部資料層",
+    "",
+    "### 設計原則",
+    ...DESIGN_PRINCIPLES.map((p) => `- ${p.term} — ${p.desc}`),
+  ];
+  return lines.join("\n");
+}
+
 export function DocsLandingContent() {
   return (
     <div className="space-y-8 py-8">
