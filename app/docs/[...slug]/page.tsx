@@ -8,6 +8,7 @@ import { CodeBlock } from "@/src/components/docs/code-block";
 import { DocsLandingContent } from "@/src/components/docs/docs-landing-content";
 import { DocsPageShell } from "@/src/components/docs/docs-page-shell";
 import { QuickStartContent } from "@/src/components/docs/quick-start-content";
+import { AuthenticationContent } from "@/src/components/docs/authentication-content";
 import { SectionHeading } from "@/src/components/docs/section-heading";
 import { buttonClass } from "@/src/components/ui/button";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
@@ -426,6 +427,14 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
     return (
       <DocsPageShell page={pageForShell} pageLabel="Overview">
         <DocsLandingContent />
+      </DocsPageShell>
+    );
+  }
+
+  if (page.slug.join("/") === "authentication") {
+    return (
+      <DocsPageShell page={pageForShell} pageLabel="Overview">
+        <AuthenticationContent />
       </DocsPageShell>
     );
   }

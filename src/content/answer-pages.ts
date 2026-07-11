@@ -14,7 +14,7 @@ const twse = coverageFacts.twseDailyPrice;
 const twseStocks = twse.stocks.toLocaleString("en-US");
 //
 // Verified SSOT facts used below:
-//   - REST: `GET https://api.twmarketdata.com/v2/datasets/<slug>?ticker=2330&limit=10`, header
+//   - REST: `GET https://api.twmarketdata.com/v2/datasets/<slug>?symbol=2330&limit=10`, header
 //     `X-API-Key` (src/content/docs-pages.ts).
 //   - Dataset slugs: twse-daily-price, monthly-revenue, institutional-flow, ... (src/content/datasets.ts).
 //   - Free plan: basic datasets excl. financial statements, 1 key, quota-limited (src/lib/billing/plans.ts).
@@ -118,7 +118,7 @@ export const answerPages: readonly AnswerPageEntry[] = [
         heading: "Python quick start",
         body: "Request the TWSE daily price dataset and read the JSON rows:",
         code:
-          'import requests\n\nheaders = {"X-API-Key": "your_api_key_here"}\nurl = "https://api.twmarketdata.com/v2/datasets/twse-daily-price?ticker=2330&limit=10"\nprint(requests.get(url, headers=headers).json())',
+          'import requests\n\nheaders = {"X-API-Key": "your_api_key_here"}\nurl = "https://api.twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=10"\nprint(requests.get(url, headers=headers).json())',
       },
       {
         heading: "Read coverage and data gaps before you rely on a series",
@@ -140,7 +140,7 @@ export const answerPages: readonly AnswerPageEntry[] = [
       {
         question: "What does a request look like?",
         answer:
-          "GET https://api.twmarketdata.com/v2/datasets/twse-daily-price?ticker=2330&limit=10 with an X-API-Key header returns JSON daily price rows.",
+          "GET https://api.twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=10 with an X-API-Key header returns JSON daily price rows.",
       },
     ],
     cta: { label: "Read the quick start", href: "/docs/quick-start" },
@@ -278,7 +278,7 @@ export const answerPages: readonly AnswerPageEntry[] = [
         heading: "用 Python 抓台股日線（quick start）",
         body: "帶 X-API-Key 呼叫日線價格 dataset，讀取 JSON rows：",
         code:
-          'import requests\n\nheaders = {"X-API-Key": "your_api_key_here"}\nurl = "https://api.twmarketdata.com/v2/datasets/twse-daily-price?ticker=2330&limit=10"\nprint(requests.get(url, headers=headers).json())',
+          'import requests\n\nheaders = {"X-API-Key": "your_api_key_here"}\nurl = "https://api.twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=10"\nprint(requests.get(url, headers=headers).json())',
       },
       {
         heading: "如何正確判讀 coverage 與 data_gaps",
@@ -300,7 +300,7 @@ export const answerPages: readonly AnswerPageEntry[] = [
       {
         question: "可以用 Python 抓台股歷史資料嗎？",
         answer:
-          "可以。在 header 帶 X-API-Key 呼叫對應 dataset 端點（例如 /v2/datasets/twse-daily-price?ticker=2330&limit=10），取得 JSON rows 後即可寫入 DataFrame；使用前先讀 freshness 與 data_gaps 訊號。",
+          "可以。在 header 帶 X-API-Key 呼叫對應 dataset 端點（例如 /v2/datasets/twse-daily-price?symbol=2330&limit=10），取得 JSON rows 後即可寫入 DataFrame；使用前先讀 freshness 與 data_gaps 訊號。",
       },
       {
         question: "有涵蓋 TPEx（上櫃）歷史嗎？",
