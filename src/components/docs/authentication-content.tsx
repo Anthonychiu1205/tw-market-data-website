@@ -4,43 +4,11 @@ import Link from "next/link";
 
 import { CodeBlock } from "@/src/components/docs/code-block";
 import { SectionHeading } from "@/src/components/docs/section-heading";
+// Shared server-safe content (also feeds /llms-full.txt). Query param `symbol`; do NOT change.
+import { authCurl as curlExample, authHabits as HABITS } from "@/src/content/docs-guide-content";
 
-// Query param `symbol` + header `X-API-Key` match the homepage code sample and /openapi.json.
-// Error codes are only asserted where the gateway route actually returns them (401 / 403 verified
-// in app/v2/datasets/[dataset]/route.ts). 429 + Retry-After are NOT implemented yet → marked as
-// building, not stated as live behavior.
 const linkClass =
   "font-medium text-slate-900 underline decoration-slate-300 underline-offset-2 hover:text-slate-700";
-
-const curlExample = `curl "https://api.twmarketdata.com/v2/datasets/monthly-revenue?symbol=2330" \\
-  -H "X-API-Key: $TWMD_API_KEY"`;
-
-const HABITS: { term: string; desc: string }[] = [
-  { term: "金鑰只放標頭，別放網址", desc: "免得留在伺服器日誌或瀏覽紀錄裡。" },
-  { term: "一個環境一把金鑰", desc: "開發跟正式分開，哪把外洩就撤哪把（多把金鑰依方案提供）。" },
-  { term: "額度看方案", desc: "每把金鑰的每分鐘請求數與每月用量依方案計。" },
-];
-
-// Plain-text version for /llms-full.txt. Reuses the same curl sample + HABITS; lead/error lines
-// mirror the JSX below — keep in sync.
-export function authenticationLlmsMarkdown(): string {
-  return [
-    "每個請求都帶 X-API-Key 標頭。金鑰在儀表板（/dashboard）自己建立、輪替、撤銷，不用聯絡我們。",
-    "```bash",
-    curlExample,
-    "```",
-    "",
-    "### 幾個習慣",
-    ...HABITS.map((h) => `- ${h.term} — ${h.desc}`),
-    "",
-    "### 常見錯誤",
-    "- 401 — 金鑰沒帶或無效。",
-    "- 403 — 你的方案沒有這個資料集的權限。",
-    "- 429（速率限制）— rate-limit 回應與 Retry-After 標頭建置中；超過方案 RPM／額度的行為以上線公告為準。",
-    "",
-    "下一步 → 來源政策（/docs/data-provenance）",
-  ].join("\n");
-}
 
 export function AuthenticationContent() {
   return (

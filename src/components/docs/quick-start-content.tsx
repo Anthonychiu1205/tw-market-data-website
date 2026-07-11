@@ -4,58 +4,16 @@ import Link from "next/link";
 
 import { CodeBlock } from "@/src/components/docs/code-block";
 import { SectionHeading } from "@/src/components/docs/section-heading";
+// Shared server-safe content (also feeds /llms-full.txt). curlExample/pythonExample use the SSOT
+// query param `symbol`; do NOT change to "ticker".
+import {
+  quickStartCurl as curlExample,
+  quickStartPython as pythonExample,
+  quickStartNextDatasets as NEXT_DATASETS,
+} from "@/src/content/docs-guide-content";
 
-// Endpoint base, path, query param (symbol) and header (X-API-Key) match the homepage code sample
-// (api-demo-section.tsx) and /openapi.json — the two SSOTs. Do NOT change to "ticker": the wire
-// query param is `symbol` (openapi's TickerParam.name === "symbol").
 const linkClass =
   "font-medium text-slate-900 underline decoration-slate-300 underline-offset-2 hover:text-slate-700";
-
-const curlExample = `curl "https://api.twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=10" \\
-  -H "X-API-Key: $TWMD_API_KEY"`;
-
-const pythonExample = `import requests
-
-r = requests.get(
-    "https://api.twmarketdata.com/v2/datasets/twse-daily-price",
-    params={"symbol": "2330", "limit": 10},
-    headers={"X-API-Key": TWMD_API_KEY},
-)
-data = r.json()`;
-
-// hub-and-spoke: verified real docs slugs.
-const NEXT_DATASETS: { href: string; name: string }[] = [
-  { href: "/docs/api/market-prices/twse-daily-price", name: "上市日線" },
-  { href: "/docs/api/financial-growth/monthly-revenue", name: "月營收" },
-  { href: "/docs/api/capital-flow/institutional-flow", name: "三大法人" },
-  { href: "/docs/api/financial-growth/income-statement", name: "財報三表" },
-];
-
-// Plain-text version for /llms-full.txt. Reuses the same code samples + data; lead lines mirror
-// the JSX below — keep in sync.
-export function quickStartLlmsMarkdown(): string {
-  return [
-    "### 1. 拿一把 API 金鑰",
-    "到儀表板（/dashboard）註冊，並在後台建立一把 API 金鑰。金鑰放在請求標頭，別放進網址。",
-    "",
-    "### 2. 打第一個請求",
-    "每個資料端點都是 GET /v2/datasets/{資料集}，用 X-API-Key 標頭帶上金鑰。",
-    "```bash",
-    curlExample,
-    "```",
-    "```python",
-    pythonExample,
-    "```",
-    "",
-    "### 3. 看回應",
-    "回傳 typed JSON，每筆都帶來源；缺的資料如實留空，不會亂補。欄位說明在各資料集頁（/datasets）。",
-    "",
-    "### 接下來",
-    `- 挑一個資料集開始：${NEXT_DATASETS.map((d) => `${d.name} (${d.href})`).join("、")}。`,
-    "- 想看額度與方案 → 方案價格（/pricing）。",
-    "- 下一步 → 認證（/docs/authentication）",
-  ].join("\n");
-}
 
 export function QuickStartContent() {
   return (

@@ -1,7 +1,6 @@
 import { PLATFORM_LIMITATIONS } from "@/src/components/docs/api-coverage-and-limits";
-import { authenticationLlmsMarkdown } from "@/src/components/docs/authentication-content";
 import { introductionLlmsMarkdown } from "@/src/components/docs/docs-landing-content";
-import { quickStartLlmsMarkdown } from "@/src/components/docs/quick-start-content";
+import { authenticationLlmsMarkdown, quickStartLlmsMarkdown } from "@/src/content/docs-guide-content";
 import { siteConfig } from "@/src/config/site";
 import { datasetCoverageTable } from "@/src/content/coverage-facts";
 import { datasetSeoEntries } from "@/src/content/datasets";
