@@ -611,22 +611,22 @@ const baseDocsPages: DocsPageEntry[] = [
     category: "overview",
     icon: "book",
     title: "台股資料 API 基礎設施",
-    subtitle: "為 AI agent、量化研究與自動化系統提供可驗證、結構一致、來源可追溯的台股資料。",
+    subtitle: "為 AI agent、量化研究與自動化系統而生。",
     tier: "complete",
     sections: [
       {
-        id: "docs-portals",
-        label: "文件入口",
+        id: "what-you-can-access",
+        label: "可存取的資料",
         paragraphs: [],
       },
       {
-        id: "what-you-can-access",
-        label: "目前可存取的資料",
+        id: "data-format",
+        label: "資料格式",
         paragraphs: [],
       },
       {
         id: "built-for",
-        label: "適合使用者",
+        label: "為誰而建",
         paragraphs: [],
       },
       {
