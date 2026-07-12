@@ -115,6 +115,18 @@ export async function createSelfServeKey(email: string, label: string): Promise<
   return { key: json as SelfServeKey, apiKey };
 }
 
+// Re-fetch the full sk_live_ for a key. Only works for keys created after the API's at-rest
+// encryption shipped; older (hash-only) keys make the API return secret_unavailable / 404.
+export async function revealSelfServeKey(email: string, keyId: string): Promise<string> {
+  const json = await withToken(email, (token) =>
+    ssvFetch(`/v2/self-serve/api-keys/${encodeURIComponent(keyId)}/reveal`, {
+      method: "GET",
+      headers: { "x-self-serve-token": token },
+    }),
+  );
+  return typeof json.api_key === "string" ? json.api_key : "";
+}
+
 export async function revokeSelfServeKey(email: string, keyId: string): Promise<void> {
   await withToken(email, (token) =>
     ssvFetch(`/v2/self-serve/api-keys/${encodeURIComponent(keyId)}/revoke`, {
