@@ -73,6 +73,8 @@ const FALLBACK_API_KEYS: ApiKeysSummary = {
   canCreate: true,
   canRevoke: true,
   integrationMode: "live",
+  keyLimit: null,
+  createDisabledReason: null,
 };
 
 const FALLBACK_USAGE_SUMMARY: UsageSummary = {
@@ -273,7 +275,9 @@ async function DashboardSectionData({
   try {
 
     const apiKeysPromise: Promise<ApiKeysSummary> = needsApiKeys
-      ? timedStage("apiKeys", () => getApiKeysSummaryForUser(session.email)).catch((error) => {
+      ? timedStage("apiKeys", () =>
+          getApiKeysSummaryForUser(session.email, { planKeyLimit: entitlement.apiKeyLimit ?? null }),
+        ).catch((error) => {
           const errorName = error instanceof Error ? error.name : "UnknownError";
           console.warn(`[dashboard] failed to fetch api keys (${errorName})`);
           return FALLBACK_API_KEYS;

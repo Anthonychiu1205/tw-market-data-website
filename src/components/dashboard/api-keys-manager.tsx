@@ -12,6 +12,10 @@ type ApiKeysManagerProps = {
   initialKeys: ApiKeyItem[];
   canCreate: boolean;
   canRevoke: boolean;
+  // Max active keys the plan allows; null/undefined = no client-side cap (server still enforces).
+  keyLimit?: number | null;
+  // Server-provided reason the create action is unavailable (used when it isn't a plain limit hit).
+  createDisabledReason?: string | null;
 };
 
 type CreateApiKeyResponse = {
@@ -25,8 +29,6 @@ type ToastItem = {
   message: string;
   exiting: boolean;
 };
-
-const MAX_ACTIVE_KEYS = 5;
 
 // Robust copy: try the async Clipboard API, then fall back to a hidden textarea + execCommand.
 // The fallback matters because after an `await fetch(...)` some browsers (notably Safari) drop the
@@ -72,7 +74,13 @@ function formatDateTime(raw: string | null | undefined) {
   }).format(date);
 }
 
-export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysManagerProps) {
+export function ApiKeysManager({
+  initialKeys,
+  canCreate,
+  canRevoke,
+  keyLimit,
+  createDisabledReason,
+}: ApiKeysManagerProps) {
   const [keys, setKeys] = useState(initialKeys);
   const [newKeyName, setNewKeyName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,8 +98,20 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
   const revokedCount = keys.length - activeKeys.length;
   const visibleKeys = useMemo(() => (showRevoked ? keys : activeKeys), [activeKeys, keys, showRevoked]);
   const hasKeys = visibleKeys.length > 0;
-  const canCreateNow = canCreate && activeKeys.length < MAX_ACTIVE_KEYS;
+  // Revoked keys never count toward the limit (activeKeys already excludes them). The plan limit is
+  // authoritative; when it's null/undefined there's no client cap and the server stays the gate.
+  const atPlanLimit = typeof keyLimit === "number" && activeKeys.length >= keyLimit;
+  const canCreateNow = canCreate && !atPlanLimit;
   const canSubmit = canCreateNow && !isSubmitting;
+
+  // Why the Create button is disabled — shown as inline hint + button tooltip so it's never silent.
+  const createDisabledHint = isSubmitting
+    ? null
+    : atPlanLimit
+      ? `已達方案金鑰上限（${keyLimit} 把）。請先撤銷未使用的金鑰，或升級方案以提高上限。`
+      : !canCreate
+        ? createDisabledReason ?? "目前方案無法新增 API 金鑰，請升級方案或聯繫我們。"
+        : null;
 
   function publishKeysUpdate(nextKeys: ApiKeyItem[]) {
     if (typeof window === "undefined") return;
@@ -169,7 +189,11 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
       if (error instanceof Error && error.message === "invalid_api_key_name") {
         setErrorMessage("請輸入 1 到 40 字的金鑰名稱。");
       } else if (error instanceof Error && error.message === "api_key_limit_reached") {
-        setErrorMessage("目前最多只能保留 5 把啟用中的 API 金鑰。");
+        setErrorMessage(
+          typeof keyLimit === "number"
+            ? `已達方案金鑰上限（${keyLimit} 把）。請先撤銷未使用的金鑰，或升級方案以提高上限。`
+            : "已達方案金鑰上限。請先撤銷未使用的金鑰，或升級方案以提高上限。",
+        );
       } else if (error instanceof Error && error.message === "api_key_encryption_unavailable") {
         setErrorMessage("目前無法安全建立可複製的金鑰，請稍後再試或聯繫管理員。");
       } else {
@@ -424,7 +448,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
         </div>
       ) : null}
 
-      <div className="flex items-center justify-start">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <button
           type="button"
           disabled={!canCreateNow}
@@ -432,14 +456,17 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
             setErrorMessage(null);
             setIsModalOpen(true);
           }}
+          title={createDisabledHint ?? undefined}
           className={buttonClass("primary", "h-11 rounded-2xl px-6 text-sm")}
         >
           Create
         </button>
+        {createDisabledHint ? <p className="text-xs text-amber-600">{createDisabledHint}</p> : null}
       </div>
 
       <p className="text-xs text-slate-500">
         API key 可用於呼叫 /v2 API。請妥善保存，若外洩請立即撤銷並重建。
+        {typeof keyLimit === "number" ? `目前方案可保留 ${keyLimit} 把啟用中的金鑰。` : null}
       </p>
       {errorMessage ? <p className="text-xs text-red-600">{errorMessage}</p> : null}
 

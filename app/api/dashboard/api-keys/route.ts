@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getSession } from "@/src/auth/session";
 import { createApiKeyForUser, getApiKeysSummaryForUser } from "@/src/lib/api-keys/service";
+import { getDashboardEntitlementForUser } from "@/src/lib/billing/subscription";
 
 export const runtime = "nodejs";
 
@@ -12,7 +13,19 @@ export async function GET() {
   }
 
   try {
-    const summary = await getApiKeysSummaryForUser(session.email);
+    // Resolve the plan limit from the same authoritative entitlement the dashboard shell uses, so a
+    // client refetch (after create/revoke) computes canCreate against the real plan cap, not the
+    // conservative account-summary fallback. Fail-open to the account/default limit on error.
+    const entitlement = await getDashboardEntitlementForUser({
+      userId: session.id,
+      email: session.email,
+      skipBackendSummaryLookup: false,
+    }).catch(() => null);
+
+    const summary = await getApiKeysSummaryForUser(
+      session.email,
+      entitlement ? { planKeyLimit: entitlement.apiKeyLimit ?? null } : undefined,
+    );
     return NextResponse.json(summary);
   } catch {
     // Self-serve API unreachable / error — surface a clear failure rather than a broken dashboard.
