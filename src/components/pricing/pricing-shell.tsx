@@ -269,6 +269,11 @@ export function PricingShell() {
           ))}
         </div>
 
+        {/* B-11 enterprise self-serve note (FRICTION-01 §C-1): keep contact, don't block self-serve. */}
+        <p className="text-center text-sm text-slate-600">
+          企業 / 客製：<span className="font-medium text-slate-900">標準方案可直接刷卡開通</span>；需要專屬額度、發票或 SLA 再「聯繫我們」。
+        </p>
+
         <p className="text-center text-xs text-slate-500">
           本服務提供資料 API、工具與文件，不提供投資建議、個股推薦或交易訊號。
         </p>
