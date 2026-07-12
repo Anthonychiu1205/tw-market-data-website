@@ -31,26 +31,11 @@ export async function GET(_request: Request, context: Context) {
 
   const params = await context.params;
   const result = await getApiKeySecretForUser({
-    userId: session.id,
+    email: session.email,
     apiKeyId: params.id,
   });
 
-  if (!result.ok) {
-    if (result.error === "not_found") {
-      return NextResponse.json({ error: "not_found" }, { status: 404 });
-    }
-    if (result.error === "revoked") {
-      return NextResponse.json({ error: "api_key_revoked" }, { status: 409 });
-    }
-    return NextResponse.json({ error: "secret_unavailable" }, { status: 409 });
-  }
-
-  return NextResponse.json(
-    { secret: result.secret },
-    {
-      headers: {
-        "Cache-Control": "no-store",
-      },
-    },
-  );
+  // Unified key model (P0): the raw sk_live_ is shown once at creation and is not retrievable
+  // afterwards, so this endpoint always reports the secret as unavailable.
+  return NextResponse.json({ error: result.error }, { status: 409 });
 }

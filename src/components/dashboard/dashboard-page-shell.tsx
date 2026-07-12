@@ -273,7 +273,7 @@ async function DashboardSectionData({
   try {
 
     const apiKeysPromise: Promise<ApiKeysSummary> = needsApiKeys
-      ? timedStage("apiKeys", () => getApiKeysSummaryForUser(session.id)).catch((error) => {
+      ? timedStage("apiKeys", () => getApiKeysSummaryForUser(session.email)).catch((error) => {
           const errorName = error instanceof Error ? error.name : "UnknownError";
           console.warn(`[dashboard] failed to fetch api keys (${errorName})`);
           return FALLBACK_API_KEYS;

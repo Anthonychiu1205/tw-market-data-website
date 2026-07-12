@@ -17,7 +17,7 @@ export async function DELETE(_request: Request, context: Context) {
 
   const params = await context.params;
   const result = await revokeApiKeyForUser({
-    userId: session.id,
+    email: session.email,
     apiKeyId: params.id,
   });
 

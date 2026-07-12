@@ -11,8 +11,13 @@ export async function GET() {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const summary = await getApiKeysSummaryForUser(session.id);
-  return NextResponse.json(summary);
+  try {
+    const summary = await getApiKeysSummaryForUser(session.email);
+    return NextResponse.json(summary);
+  } catch {
+    // Self-serve API unreachable / error — surface a clear failure rather than a broken dashboard.
+    return NextResponse.json({ error: "api_keys_unavailable" }, { status: 502 });
+  }
 }
 
 export async function POST(request: Request) {
@@ -25,7 +30,7 @@ export async function POST(request: Request) {
 
   try {
     const created = await createApiKeyForUser({
-      userId: session.id,
+      email: session.email,
       name: payload?.name,
     });
 
@@ -38,19 +43,23 @@ export async function POST(request: Request) {
       { status: 201 },
     );
   } catch (error) {
-    if (error instanceof Error && error.message === "invalid_api_key_name") {
+    const code = error instanceof Error ? error.message : "";
+
+    if (code === "invalid_api_key_name") {
       return NextResponse.json({ error: "invalid_api_key_name" }, { status: 400 });
     }
-
-    if (error instanceof Error && error.message === "api_key_limit_reached") {
+    if (code === "api_key_limit_reached") {
       return NextResponse.json({ error: "api_key_limit_reached" }, { status: 409 });
     }
-
-    if (
-      error instanceof Error &&
-      (error.message === "api_key_encryption_secret_missing" || error.message === "api_key_encryption_secret_too_short")
-    ) {
-      return NextResponse.json({ error: "api_key_encryption_unavailable" }, { status: 503 });
+    // Self-serve gate errors (need an active subscription + entitlement to mint a key).
+    if (code === "subscription_required") {
+      return NextResponse.json({ error: "subscription_required" }, { status: 402 });
+    }
+    if (code === "entitlement_inactive") {
+      return NextResponse.json({ error: "entitlement_inactive" }, { status: 403 });
+    }
+    if (code === "self_serve_unavailable") {
+      return NextResponse.json({ error: "api_keys_unavailable" }, { status: 503 });
     }
 
     return NextResponse.json({ error: "api_key_create_failed" }, { status: 500 });
