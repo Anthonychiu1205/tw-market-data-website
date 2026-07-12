@@ -39,14 +39,13 @@ export function AuthenticationContent() {
         <SectionHeading id="errors">常見錯誤</SectionHeading>
         <ul className="space-y-2.5 text-[15px] leading-7 text-slate-700">
           <li>
-            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[13px]">401</code> — 金鑰沒帶或無效。
+            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[13px]">401 missing_api_key</code> — 金鑰沒帶或無效（免 key 五檔 2330/2317/2454/0050/2603 除外，直接回 200）。
           </li>
           <li>
-            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[13px]">403</code> — 你的方案沒有這個資料集的權限。
+            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[13px]">402 not_entitled_for_dataset</code> — 你的方案沒有這個資料集的權限（付費牆）。
           </li>
           <li>
-            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[13px]">429</code>（速率限制）— rate-limit 回應與{" "}
-            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[13px]">Retry-After</code> 標頭建置中；超過方案 RPM／額度的行為以上線公告為準。
+            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[13px]">429</code> — 超出配額 / 速率限制。
           </li>
         </ul>
         <p className="pt-2 text-[15px] leading-7 text-slate-700">

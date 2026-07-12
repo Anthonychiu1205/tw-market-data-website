@@ -9,6 +9,7 @@ import { SectionHeading } from "@/src/components/docs/section-heading";
 import {
   quickStartCurl as curlExample,
   quickStartPython as pythonExample,
+  quickStartNoKeyCurl,
   quickStartNextDatasets as NEXT_DATASETS,
 } from "@/src/content/docs-guide-content";
 
@@ -18,6 +19,16 @@ const linkClass =
 export function QuickStartContent() {
   return (
     <div className="space-y-8 py-8">
+      {/* Step 0: zero-registration no-key trial (FRICTION-01), placed before "拿 key". */}
+      <section className="space-y-4 border-b border-slate-200 pb-8">
+        <SectionHeading id="try-no-key">步驟 0 · 零註冊先試一筆（免 key）</SectionHeading>
+        <p className="text-[15px] leading-7 text-slate-700">
+          這 5 檔可直接打、不用金鑰：2330 台積電 / 2317 鴻海 / 2454 聯發科 / 0050 / 2603。貼給你的 AI 或直接 curl：
+        </p>
+        <CodeBlock code={quickStartNoKeyCurl} language="bash" copyButtonVariant="icon" />
+        <p className="text-sm leading-7 text-slate-600">（其他股票 / 其他資料集才需要下面的 API key。）</p>
+      </section>
+
       <section className="space-y-3 border-b border-slate-200 pb-8">
         <SectionHeading id="get-api-key">1. 拿一把 API 金鑰</SectionHeading>
         <p className="text-[15px] leading-7 text-slate-700">
