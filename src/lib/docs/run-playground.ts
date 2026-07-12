@@ -5,7 +5,7 @@ export type LiveRunResult = {
   usageCounted: boolean;
 };
 
-const PLACEHOLDER_TOKENS = ["<api-key>", "your_api_key_here", "twmd_live_xxx", "placeholder", "demo", "test_key", "$twmd_api_key", "your_api_key"];
+const PLACEHOLDER_TOKENS = ["<api-key>", "your_api_key_here", "twmd_live_xxx", "sk_live_xxx", "placeholder", "demo", "test_key", "$twmd_api_key", "your_api_key"];
 
 export function sanitizeApiKeyInput(value: string): string {
   return value.trim();

@@ -10395,7 +10395,7 @@ pip install -e packages/python-sdk`,
             code: `from twmarketdata import TWMarketDataClient
 
 client = TWMarketDataClient(
-    api_key="twmd_live_xxx",
+    api_key="sk_live_xxx",
     base_url="https://twmarketdata.com",
     timeout=10,
 )`,
@@ -10469,7 +10469,7 @@ except UpstreamError:
         codeBlocks: [
           {
             language: "text",
-            code: `export TWMD_API_KEY=twmd_live_xxx
+            code: `export TWMD_API_KEY=sk_live_xxx
 export TWMD_BASE_URL=https://twmarketdata.com`,
           },
         ],
@@ -10499,7 +10499,7 @@ export TWMD_BASE_URL=https://twmarketdata.com`,
             code: `import { TWMarketDataClient } from "@twmarketdata/sdk";
 
 const client = new TWMarketDataClient({
-  apiKey: "twmd_live_xxx",
+  apiKey: "sk_live_xxx",
   baseUrl: "https://twmarketdata.com",
   timeoutMs: 10000,
 });`,
@@ -10614,7 +10614,7 @@ try {
 npm install --ignore-scripts
 npm run build
 
-TWMD_API_KEY=twmd_live_xxx \\
+TWMD_API_KEY=sk_live_xxx \\
 node dist/index.js get_twse_daily_price '{"symbol":"2330","limit":1}'`,
           },
         ],
@@ -10732,8 +10732,8 @@ node dist/index.js get_twse_daily_price '{"symbol":"2330","limit":1}'`,
         codeBlocks: [
           {
             language: "text",
-            code: `TWMD_API_KEY=twmd_live_xxx node examples/agents/simple_research_agent.ts
-TWMD_API_KEY=twmd_live_xxx python3 examples/agents/simple_research_agent.py`,
+            code: `TWMD_API_KEY=sk_live_xxx node examples/agents/simple_research_agent.ts
+TWMD_API_KEY=sk_live_xxx python3 examples/agents/simple_research_agent.py`,
           },
         ],
       },

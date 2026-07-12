@@ -1,5 +1,11 @@
 import "server-only";
 
+// LEGACY (P0 key-system unification): this authenticates `twmd_live_` keys against the website's
+// local Prisma `ApiKey` table — the OLD system. New keys are `sk_live_` in the API's
+// read_api_api_keys (issued via self-serve) and authenticate directly at api.twmarketdata.com; they
+// are NOT in this table. This path now only serves the legacy `/v2` datasets PROXY
+// (app/v2/datasets/[dataset]/route.ts) for pre-migration twmd_live_ keys. Retire together with that
+// proxy route once it is confirmed dead (spec §4 — "另議").
 import { prisma } from "@/src/lib/auth/prisma";
 import { GatewayHttpError } from "@/src/lib/gateway/errors";
 import { hashApiKey } from "@/src/lib/security/api-keys";

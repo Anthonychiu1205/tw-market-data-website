@@ -1,179 +1,127 @@
 import "server-only";
 
-import type { ApiKey } from "@prisma/client";
-
 import type { ApiKeyItem, ApiKeysSummary } from "@/src/lib/backend-adapter";
-import { prisma } from "@/src/lib/auth/prisma";
-import { assertValidApiKeyName, generateApiKey, getApiKeyPrefix, hashApiKey, maskApiKey } from "@/src/lib/security/api-keys";
-import { decryptSecret, encryptSecret, getEncryptionVersion } from "@/src/lib/security/secret-encryption";
+import {
+  createSelfServeKey,
+  getSelfServeAccount,
+  listSelfServeKeys,
+  revokeSelfServeKey,
+  SelfServeError,
+  type SelfServeKey,
+} from "@/src/lib/api-keys/self-serve-client";
+import { assertValidApiKeyName } from "@/src/lib/security/api-keys";
 
-const MAX_ACTIVE_API_KEYS_PER_USER = 5;
+// P0 key-system unification: the account page's key lifecycle now runs entirely through the API's
+// self-serve endpoints (keys stored in read_api_api_keys as sk_live_). No local Prisma ApiKey rows,
+// no twmd_live_ generation. Functions key off the user's EMAIL (the API derives the account_id from
+// it deterministically). The sk_live_ raw is returned once on create and is never retrievable later.
+
+const DEFAULT_API_KEY_LIMIT = 3;
 const API_KEYS_SUMMARY_CACHE_TTL_MS = 8_000;
 
-type ApiKeysSummaryCacheEntry = {
-  value: ApiKeysSummary;
-  expiresAt: number;
-};
-
+type ApiKeysSummaryCacheEntry = { value: ApiKeysSummary; expiresAt: number };
 const apiKeysSummaryCache = new Map<string, ApiKeysSummaryCacheEntry>();
 
-function nowMs() {
-  return Date.now();
-}
-
-function getApiKeysSummaryCache(userId: string) {
-  const entry = apiKeysSummaryCache.get(userId);
+function getApiKeysSummaryCache(email: string) {
+  const entry = apiKeysSummaryCache.get(email);
   if (!entry) return null;
-  if (entry.expiresAt <= nowMs()) {
-    apiKeysSummaryCache.delete(userId);
+  if (entry.expiresAt <= Date.now()) {
+    apiKeysSummaryCache.delete(email);
     return null;
   }
   return entry.value;
 }
 
-function setApiKeysSummaryCache(userId: string, value: ApiKeysSummary) {
-  apiKeysSummaryCache.set(userId, {
-    value,
-    expiresAt: nowMs() + API_KEYS_SUMMARY_CACHE_TTL_MS,
-  });
+function setApiKeysSummaryCache(email: string, value: ApiKeysSummary) {
+  apiKeysSummaryCache.set(email, { value, expiresAt: Date.now() + API_KEYS_SUMMARY_CACHE_TTL_MS });
 }
 
-function invalidateApiKeysSummaryCache(userId: string) {
-  apiKeysSummaryCache.delete(userId);
+function invalidateApiKeysSummaryCache(email: string) {
+  apiKeysSummaryCache.delete(email);
 }
 
-function toApiKeyItem(row: ApiKey): ApiKeyItem {
+function toApiKeyItem(key: SelfServeKey): ApiKeyItem {
+  const prefix = key.prefix ?? "";
   return {
-    id: row.id,
-    name: row.name,
-    keyPrefix: row.keyPrefix,
-    maskedKey: maskApiKey(row.keyPrefix),
-    canCopy: row.status === "active" && Boolean(row.encryptedSecret),
-    status: row.status,
-    lastUsed: row.lastUsedAt ? row.lastUsedAt.toISOString() : "-",
-    createdAt: row.createdAt.toISOString(),
-    revokedAt: row.revokedAt ? row.revokedAt.toISOString() : null,
+    id: key.key_id,
+    name: key.label ?? "",
+    keyPrefix: prefix,
+    // The list endpoint only ever returns a masked prefix; the raw sk_live_ is shown once on create.
+    maskedKey: prefix,
+    canCopy: false,
+    status: key.status,
+    lastUsed: key.last_used_at ?? "-",
+    createdAt: key.created_at,
+    revokedAt: key.revoked_at ?? null,
   };
 }
 
-export async function getApiKeysSummaryForUser(userId: string): Promise<ApiKeysSummary> {
-  const cached = getApiKeysSummaryCache(userId);
-  if (cached) {
-    return cached;
-  }
+export async function getApiKeysSummaryForUser(email: string): Promise<ApiKeysSummary> {
+  const cached = getApiKeysSummaryCache(email);
+  if (cached) return cached;
 
-  const keys = await prisma.apiKey.findMany({
-    where: { userId },
-    orderBy: [{ createdAt: "desc" }],
-  });
+  const [keys, account] = await Promise.all([
+    listSelfServeKeys(email),
+    getSelfServeAccount(email).catch(() => ({}) as Record<string, unknown>),
+  ]);
+
   const activeCount = keys.filter((item) => item.status === "active").length;
+  const limit = typeof account.api_keys_limit === "number" ? account.api_keys_limit : DEFAULT_API_KEY_LIMIT;
 
   const result: ApiKeysSummary = {
     keys: keys.map(toApiKeyItem),
-    canCreate: activeCount < MAX_ACTIVE_API_KEYS_PER_USER,
+    canCreate: activeCount < limit,
     canRevoke: true,
     integrationMode: "live",
   };
-  setApiKeysSummaryCache(userId, result);
+  setApiKeysSummaryCache(email, result);
   return result;
 }
 
-export async function createApiKeyForUser(input: { userId: string; name?: string | null }) {
+export async function createApiKeyForUser(input: { email: string; name?: string | null }) {
   const validName = assertValidApiKeyName(input.name);
 
-  const activeCount = await prisma.apiKey.count({
-    where: {
-      userId: input.userId,
-      status: "active",
-    },
-  });
-
-  if (activeCount >= MAX_ACTIVE_API_KEYS_PER_USER) {
-    throw new Error("api_key_limit_reached");
-  }
-
-  const rawKey = generateApiKey();
-  const keyPrefix = getApiKeyPrefix(rawKey);
-  const keyHash = hashApiKey(rawKey);
-
-  const created = await prisma.apiKey.create({
-    data: {
-      userId: input.userId,
-      name: validName,
-      keyPrefix,
-      keyHash,
-      encryptedSecret: encryptSecret(rawKey),
-      encryptionVersion: getEncryptionVersion(),
-      status: "active",
-    },
-  });
-
-  invalidateApiKeysSummaryCache(input.userId);
-
-  return {
-    apiKey: toApiKeyItem(created),
-    secret: rawKey,
-  };
-}
-
-export async function getApiKeySecretForUser(input: { userId: string; apiKeyId: string }) {
-  const key = await prisma.apiKey.findFirst({
-    where: {
-      id: input.apiKeyId,
-      userId: input.userId,
-    },
-    select: {
-      id: true,
-      status: true,
-      encryptedSecret: true,
-    },
-  });
-
-  if (!key) {
-    return { ok: false as const, error: "not_found" as const };
-  }
-
-  if (key.status !== "active") {
-    return { ok: false as const, error: "revoked" as const };
-  }
-
-  if (!key.encryptedSecret) {
-    return { ok: false as const, error: "secret_unavailable" as const };
-  }
-
   try {
-    const secret = decryptSecret(key.encryptedSecret);
-    return { ok: true as const, secret };
-  } catch {
-    return { ok: false as const, error: "secret_unavailable" as const };
+    const { key, apiKey } = await createSelfServeKey(input.email, validName);
+    invalidateApiKeysSummaryCache(input.email);
+    return {
+      apiKey: toApiKeyItem(key),
+      secret: apiKey, // sk_live_ raw — surfaced to the client once, never stored.
+    };
+  } catch (error) {
+    if (error instanceof SelfServeError) {
+      // Surface the API's machine code; the route maps it to a status. api_key_limit_exceeded is
+      // normalized to the existing api_key_limit_reached signal the UI already understands.
+      throw new Error(error.code === "api_key_limit_exceeded" ? "api_key_limit_reached" : error.code);
+    }
+    throw error;
   }
 }
 
-export async function revokeApiKeyForUser(input: { userId: string; apiKeyId: string }) {
-  const ownedKey = await prisma.apiKey.findFirst({
-    where: {
+// The unified model does not store a retrievable raw key (sk_live_ is shown once at creation), so
+// "copy again later" is no longer possible — always report the secret as unavailable.
+export async function getApiKeySecretForUser(_input: { email: string; apiKeyId: string }) {
+  return { ok: false as const, error: "secret_unavailable" as const };
+}
+
+export async function revokeApiKeyForUser(input: { email: string; apiKeyId: string }) {
+  try {
+    await revokeSelfServeKey(input.email, input.apiKeyId);
+    invalidateApiKeysSummaryCache(input.email);
+    const revokedItem: ApiKeyItem = {
       id: input.apiKeyId,
-      userId: input.userId,
-    },
-  });
-
-  if (!ownedKey) {
-    return { ok: false as const, notFound: true };
-  }
-
-  if (ownedKey.status === "revoked") {
-    return { ok: true as const, apiKey: toApiKeyItem(ownedKey), alreadyRevoked: true };
-  }
-
-  const updated = await prisma.apiKey.update({
-    where: { id: ownedKey.id },
-    data: {
+      name: "",
+      maskedKey: "",
+      canCopy: false,
       status: "revoked",
-      revokedAt: new Date(),
-    },
-  });
-
-  invalidateApiKeysSummaryCache(input.userId);
-
-  return { ok: true as const, apiKey: toApiKeyItem(updated), alreadyRevoked: false };
+      lastUsed: "-",
+      revokedAt: new Date().toISOString(),
+    };
+    return { ok: true as const, apiKey: revokedItem, alreadyRevoked: false };
+  } catch (error) {
+    if (error instanceof SelfServeError && (error.status === 404 || error.code === "api_key_not_found")) {
+      return { ok: false as const, notFound: true };
+    }
+    throw error;
+  }
 }
