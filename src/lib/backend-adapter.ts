@@ -125,6 +125,11 @@ export type ApiKeysSummary = {
   canCreate: boolean;
   canRevoke: boolean;
   integrationMode: IntegrationMode;
+  // Max active keys the plan allows; null = unlimited (enterprise). Drives the client create-gate
+  // and the disabled-reason hint. undefined only on legacy fallbacks that predate this field.
+  keyLimit?: number | null;
+  // Human-readable reason the Create button is disabled (limit reached / can't create), else null.
+  createDisabledReason?: string | null;
 };
 
 export type ProductCatalogRow = {

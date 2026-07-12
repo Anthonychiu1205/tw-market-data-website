@@ -283,6 +283,8 @@ function OverviewPanel({
             initialKeys={apiKeys.keys}
             canCreate={apiKeys.canCreate}
             canRevoke={apiKeys.canRevoke}
+            keyLimit={apiKeys.keyLimit}
+            createDisabledReason={apiKeys.createDisabledReason}
           />
         </div>
       </DashboardCard>
@@ -313,6 +315,8 @@ function KeysPanel({ apiKeys }: { apiKeys: ApiKeysSummary }) {
             initialKeys={apiKeys.keys}
             canCreate={apiKeys.canCreate}
             canRevoke={apiKeys.canRevoke}
+            keyLimit={apiKeys.keyLimit}
+            createDisabledReason={apiKeys.createDisabledReason}
           />
         </div>
       </DashboardCard>

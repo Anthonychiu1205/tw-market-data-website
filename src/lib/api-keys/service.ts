@@ -23,22 +23,46 @@ const API_KEYS_SUMMARY_CACHE_TTL_MS = 8_000;
 type ApiKeysSummaryCacheEntry = { value: ApiKeysSummary; expiresAt: number };
 const apiKeysSummaryCache = new Map<string, ApiKeysSummaryCacheEntry>();
 
-function getApiKeysSummaryCache(email: string) {
-  const entry = apiKeysSummaryCache.get(email);
+function getApiKeysSummaryCache(cacheKey: string) {
+  const entry = apiKeysSummaryCache.get(cacheKey);
   if (!entry) return null;
   if (entry.expiresAt <= Date.now()) {
-    apiKeysSummaryCache.delete(email);
+    apiKeysSummaryCache.delete(cacheKey);
     return null;
   }
   return entry.value;
 }
 
-function setApiKeysSummaryCache(email: string, value: ApiKeysSummary) {
-  apiKeysSummaryCache.set(email, { value, expiresAt: Date.now() + API_KEYS_SUMMARY_CACHE_TTL_MS });
+function setApiKeysSummaryCache(cacheKey: string, value: ApiKeysSummary) {
+  apiKeysSummaryCache.set(cacheKey, { value, expiresAt: Date.now() + API_KEYS_SUMMARY_CACHE_TTL_MS });
 }
 
+// Cache keys are `${email}:${limit}`, so drop every entry for this email (all plan-limit variants).
 function invalidateApiKeysSummaryCache(email: string) {
-  apiKeysSummaryCache.delete(email);
+  const prefix = `${email}:`;
+  for (const key of apiKeysSummaryCache.keys()) {
+    if (key === email || key.startsWith(prefix)) apiKeysSummaryCache.delete(key);
+  }
+}
+
+// A key is "revoked" if the API marks its status revoked OR stamps revoked_at. Revoked keys never
+// count toward the plan limit.
+function isRevoked(key: SelfServeKey): boolean {
+  return key.status === "revoked" || Boolean(key.revoked_at);
+}
+
+// Resolve the active-key limit. The plan entitlement (from the read API) is authoritative and is
+// passed in by callers; null means unlimited (enterprise). Only when no plan limit is supplied do we
+// fall back to the self-serve account summary, then to a conservative default. This is the fix for
+// the "Developer button disabled" bug: the limit no longer silently degrades to 3 when the account
+// summary lacks api_keys_limit.
+function resolveKeyLimit(
+  planKeyLimit: number | null | undefined,
+  account: Record<string, unknown>,
+): number | null {
+  if (planKeyLimit !== undefined) return planKeyLimit;
+  if (typeof account.api_keys_limit === "number") return account.api_keys_limit;
+  return DEFAULT_API_KEY_LIMIT;
 }
 
 function toApiKeyItem(key: SelfServeKey): ApiKeyItem {
@@ -60,8 +84,14 @@ function toApiKeyItem(key: SelfServeKey): ApiKeyItem {
   };
 }
 
-export async function getApiKeysSummaryForUser(email: string): Promise<ApiKeysSummary> {
-  const cached = getApiKeysSummaryCache(email);
+export async function getApiKeysSummaryForUser(
+  email: string,
+  options?: { planKeyLimit?: number | null },
+): Promise<ApiKeysSummary> {
+  // Cache key includes the supplied plan limit so a limit-aware caller and a limit-less one don't
+  // clobber each other's result within the TTL window.
+  const cacheKey = `${email}:${options?.planKeyLimit ?? "auto"}`;
+  const cached = getApiKeysSummaryCache(cacheKey);
   if (cached) return cached;
 
   const [keys, account] = await Promise.all([
@@ -69,16 +99,21 @@ export async function getApiKeysSummaryForUser(email: string): Promise<ApiKeysSu
     getSelfServeAccount(email).catch(() => ({}) as Record<string, unknown>),
   ]);
 
-  const activeCount = keys.filter((item) => item.status === "active").length;
-  const limit = typeof account.api_keys_limit === "number" ? account.api_keys_limit : DEFAULT_API_KEY_LIMIT;
+  const activeCount = keys.filter((item) => !isRevoked(item)).length;
+  const limit = resolveKeyLimit(options?.planKeyLimit, account);
+  const canCreate = limit === null || activeCount < limit;
 
   const result: ApiKeysSummary = {
     keys: keys.map(toApiKeyItem),
-    canCreate: activeCount < limit,
+    canCreate,
     canRevoke: true,
     integrationMode: "live",
+    keyLimit: limit,
+    createDisabledReason: canCreate
+      ? null
+      : `已達方案金鑰上限（${limit} 把）。請先撤銷未使用的金鑰，或升級方案以提高上限。`,
   };
-  setApiKeysSummaryCache(email, result);
+  setApiKeysSummaryCache(cacheKey, result);
   return result;
 }
 
