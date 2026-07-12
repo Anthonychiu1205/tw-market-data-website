@@ -150,8 +150,17 @@ export default async function DatasetSlugPage({ params }: PageProps) {
           <p className="max-w-3xl text-base leading-7 text-slate-600">{dataset.shortDescription}</p>
           <div className="flex flex-wrap gap-3 pt-1">
             <Link href={dataset.docsHref} className={buttonClass("primary")}>查看 API 文件</Link>
+            {/* B-4 (FRICTION-01): zero-registration sample CSV via the no-key free symbol 2330. */}
+            <a
+              href={`https://api.twmarketdata.com/v2/datasets/${dataset.slug}?symbol=2330&format=csv&limit=50`}
+              className={buttonClass("secondary")}
+              rel="noopener"
+            >
+              下載樣本 CSV（2330）
+            </a>
             <Link href={dataset.pricingHref} className={buttonClass("secondary")}>查看方案</Link>
           </div>
+          <p className="text-xs text-slate-500">零註冊即可下載：以免 key 五檔之一（2330 台積電）為示範標的的樣本資料。</p>
         </header>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
