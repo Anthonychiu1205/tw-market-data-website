@@ -6,6 +6,7 @@ import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 import { getDatasetBySlug, datasetSeoEntries } from "@/src/content/datasets";
+import { datasetTemporalCoverage } from "@/src/content/coverage-facts";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -80,18 +81,41 @@ export default async function DatasetSlugPage({ params }: PageProps) {
     ],
   };
 
+  // The description folds in this dataset's coverage / freshness / source-policy disclosure.
+  // That honest, dataset-specific metadata is the unique content that makes each of these pages
+  // eligible for (and differentiated in) Google Dataset Search — no competitor can copy it.
+  const datasetDescription = [
+    dataset.jsonLdDescription,
+    `涵蓋範圍：${dataset.coverageNote}`,
+    `更新頻率：${dataset.freshnessNote}`,
+    `資料來源政策：${dataset.sourcePolicyNote}`,
+  ].join(" ");
+
+  const organization = {
+    "@type": "Organization",
+    name: "TW Market Data",
+    url: "https://twmarketdata.com",
+  };
+
+  // temporalCoverage is added only for datasets whose coverage window is DB-verified
+  // (coverage-facts.ts); the rest omit it rather than fabricate a start date. No variableMeasured:
+  // the model has no authoritative per-dataset field list (the old code hardcoded the same
+  // PE/PB/dividend variables onto every dataset), so omitting is correct. Both are optional for
+  // Dataset Search eligibility.
+  const temporalCoverage = datasetTemporalCoverage[dataset.slug];
+
   const datasetLd = {
     "@context": "https://schema.org",
     "@type": "Dataset",
     name: dataset.jsonLdName,
-    description: dataset.jsonLdDescription,
+    description: datasetDescription,
     url: pageUrl,
     isAccessibleForFree: false,
-    creator: {
-      "@type": "Organization",
-      name: "TW Market Data",
-      url: "https://twmarketdata.com",
-    },
+    spatialCoverage: "Taiwan",
+    ...(temporalCoverage ? { temporalCoverage } : {}),
+    license: "https://twmarketdata.com/terms",
+    creator: organization,
+    publisher: organization,
     keywords: dataset.keywords,
     includedInDataCatalog: {
       "@type": "DataCatalog",
@@ -106,7 +130,6 @@ export default async function DatasetSlugPage({ params }: PageProps) {
         encodingFormat: "application/json",
       },
     ],
-    variableMeasured: ["pe_ratio", "pb_ratio", "dividend_yield", "data_gaps"],
   };
 
   return (

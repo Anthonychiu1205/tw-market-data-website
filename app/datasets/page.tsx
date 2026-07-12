@@ -204,9 +204,10 @@ export default function DatasetsPage() {
           <h1 className="mt-3 text-3xl font-semibold leading-tight tracking-tight text-slate-950 sm:text-4xl">
             台股資料集，為 API 與研究流程設計
           </h1>
+          {/* Citable fact sentence (AEO 1.3): subject-led, verifiable scope + honest boundary. */}
           <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600">
-            從價格、財報、月營收到法人買賣超，TW Market Data 將台股資料整理成可追溯、可重跑、可接入 workflow 的 API 產品。
-            目前公開定位為 TWSE-first verified baseline；TPEx 歷史深度與 full-market claim 尚未開放。
+            TW Market Data 將台股價格、財報三表、月營收與三大法人買賣超整理成可追溯、可重跑、可接入 workflow 的 API 產品，
+            每筆回應附來源 lineage 並保留揭露的 data_gaps。目前公開定位為 TWSE-first verified baseline；TPEx 歷史深度與 full-market claim 尚未開放。
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/docs/introduction" className={buttonClass("primary")}>查看 API 文件</Link>

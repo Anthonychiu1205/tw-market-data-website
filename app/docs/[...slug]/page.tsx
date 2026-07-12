@@ -4,10 +4,12 @@ import { notFound, redirect } from "next/navigation";
 
 import { ApiRunPlayground } from "@/src/components/docs/api-run-playground";
 import { ApiSidePanel } from "@/src/components/docs/api-side-panel";
+import { ApiCoverageTable, ApiLimitations } from "@/src/components/docs/api-coverage-and-limits";
 import { CodeBlock } from "@/src/components/docs/code-block";
 import { DocsLandingContent } from "@/src/components/docs/docs-landing-content";
 import { DocsPageShell } from "@/src/components/docs/docs-page-shell";
 import { QuickStartContent } from "@/src/components/docs/quick-start-content";
+import { AuthenticationContent } from "@/src/components/docs/authentication-content";
 import { SectionHeading } from "@/src/components/docs/section-heading";
 import { buttonClass } from "@/src/components/ui/button";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
@@ -89,15 +91,19 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
   if (page.apiReference) {
     const api = page.apiReference;
     const successStatusExample = api.sidePanel.statusExamples.find((example) => example.status === "200");
+    // Dataset slug = last docs path segment (e.g. "twse-daily-price"), used for the coverage table.
+    const datasetSlug = page.slug[page.slug.length - 1];
 
     if (api.layoutVariant === "data-api-standard") {
       const tocSections = normalizeDocsSections([
         { id: "overview", label: "Overview" },
+        { id: "coverage", label: "覆蓋範圍" },
         { id: "request", label: "Request" },
         { id: "query-parameters", label: "Query Parameters" },
         { id: "response-shape", label: "Response Shape" },
         { id: "field-reference", label: "Field 說明" },
         { id: "usage-notes", label: "Usage Notes / 使用建議" },
+        { id: "limitations", label: "限制與注意" },
         ...(api.planRequirement ? [{ id: "plan-requirement", label: api.planRequirement.title ?? "Plan Requirement" }] : []),
       ]).map(({ id, label }) => ({ id, label }));
 
@@ -140,6 +146,8 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               </ul>
             </section>
 
+            <ApiCoverageTable slug={datasetSlug} />
+
             <section className="space-y-3 border-b border-slate-200 pb-8">
               <SectionHeading id="request">Request</SectionHeading>
               {(api.requestDescription ?? []).map((paragraph) => (
@@ -151,9 +159,9 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
             <section className="space-y-3 border-b border-slate-200 pb-8">
               <SectionHeading id="query-parameters">Query Parameters</SectionHeading>
-              <div className="overflow-hidden rounded-lg border border-slate-200">
+              <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                  <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
                       <th className="px-3 py-2 font-medium">欄位</th>
                       <th className="px-3 py-2 font-medium">型別</th>
@@ -161,7 +169,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
                       <th className="px-3 py-2 font-medium">說明</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 bg-white">
+                  <tbody className="divide-y divide-slate-100">
                     {(api.queryParameters ?? []).map((parameter) => (
                       <tr key={parameter.name}>
                         <td className="px-3 py-2 font-mono text-xs text-slate-700">{parameter.name}</td>
@@ -189,16 +197,16 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
             <section className="space-y-3 border-b border-slate-200 pb-8">
               <SectionHeading id="field-reference">Field 說明</SectionHeading>
-              <div className="overflow-hidden rounded-lg border border-slate-200">
+              <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
-                  <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+                  <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
                       <th className="px-3 py-2 font-medium">欄位路徑</th>
                       <th className="px-3 py-2 font-medium">型別</th>
                       <th className="px-3 py-2 font-medium">說明</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 bg-white">
+                  <tbody className="divide-y divide-slate-100">
                     {(api.responseFields ?? []).map((field) => (
                       <tr key={field.path}>
                         <td className="px-3 py-2 font-mono text-xs text-slate-700">{field.path}</td>
@@ -219,6 +227,8 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
                 ))}
               </ul>
             </section>
+
+            <ApiLimitations slug={datasetSlug} />
 
             {api.planRequirement ? (
               <section className="space-y-3">
@@ -246,12 +256,14 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
     const tocSections = normalizeDocsSections([
       { id: "overview", label: "Overview" },
+      { id: "coverage", label: "覆蓋範圍" },
       ...(api.planRequirement ? [{ id: "plan-requirement", label: api.planRequirement.title ?? "適用方案" }] : []),
       { id: "request", label: "Request" },
       { id: "response", label: "Response" },
       { id: "field-reference", label: "Field 說明" },
       { id: "best-practices", label: "使用建議" },
       { id: "error-boundaries", label: "錯誤與邊界情況" },
+      { id: "limitations", label: "限制與注意" },
     ]).map(({ id, label }) => ({ id, label }));
 
     return (
@@ -289,6 +301,8 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               </p>
             ))}
           </section>
+
+          <ApiCoverageTable slug={datasetSlug} />
 
           {api.planRequirement ? (
             <section className="space-y-3 border-b border-slate-200 pb-8">
@@ -401,6 +415,8 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
             </ul>
           </section>
 
+          <ApiLimitations slug={datasetSlug} />
+
           <section className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
             <p className="text-sm text-slate-700">
               此 API 屬於 TW Market Data 資料集目錄。{" "}
@@ -426,6 +442,14 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
     return (
       <DocsPageShell page={pageForShell} pageLabel="Overview">
         <DocsLandingContent />
+      </DocsPageShell>
+    );
+  }
+
+  if (page.slug.join("/") === "authentication") {
+    return (
+      <DocsPageShell page={pageForShell} pageLabel="Overview">
+        <AuthenticationContent />
       </DocsPageShell>
     );
   }

@@ -66,19 +66,27 @@ const COMPARISON_TIERS: { key: ComparisonTier; label: string }[] = [
 ];
 
 type ComparisonRow = { label: string; values: Record<ComparisonTier, string> };
-const COMPARISON_ROWS: ComparisonRow[] = [
+type ComparisonGroup = { title: string; rows: ComparisonRow[] };
+
+// Data-access rows lead the table (financialdatasets.ai-style): what datasets + how much coverage
+// each plan gets. The "可用資料集範圍" row is built at render time from the plan entitlement SSOT
+// (datasetLimit) so it never drifts. Per-dataset coverage numbers are NOT invented here — the
+// catalog link + docs-coverage note carry the honest, verifiable specifics.
+const DATA_ACCESS_ROWS: ComparisonRow[] = [
+  { label: "財報三表（損益／資產負債／現金流）", values: { enterprise: "是", developer: "是", max: "是", pro: "是", starter: "否", free: "否" } },
+  { label: "歷史深度 / 覆蓋度", values: { enterprise: "完整 (raw)", developer: "完整", max: "完整", pro: "5 年", starter: "1 年", free: "1 個月" } },
+  { label: "Webhook", values: { enterprise: "是", developer: "是", max: "reserved", pro: "reserved", starter: "否", free: "否" } },
+];
+
+const QUOTA_ROWS: ComparisonRow[] = [
   { label: "價格 / 月", values: { enterprise: "聯繫我們", developer: "$2,000", max: "$200", pro: "$100", starter: "$20", free: "免費" } },
   { label: "API Keys", values: { enterprise: "Custom", developer: "20", max: "10", pro: "5", starter: "2", free: "1" } },
   { label: "RPM", values: { enterprise: "Custom", developer: "12,000", max: "3,000", pro: "1,200", starter: "300", free: "60" } },
   { label: "每月 included requests", values: { enterprise: "Custom", developer: "3,000,000", max: "300,000", pro: "100,000", starter: "10,000", free: "500" } },
   { label: "商業使用", values: { enterprise: "是", developer: "是", max: "是", pro: "是", starter: "是", free: "否" } },
-  { label: "財報三表", values: { enterprise: "是", developer: "是", max: "是", pro: "是", starter: "否", free: "否" } },
-  { label: "歷史深度", values: { enterprise: "完整 (raw)", developer: "完整", max: "完整", pro: "5 年", starter: "1 年", free: "1 個月" } },
-  { label: "Webhook", values: { enterprise: "是", developer: "是", max: "reserved", pro: "reserved", starter: "否", free: "否" } },
 ];
 
 const CARD_CTA_CLASS = buttonClass("primary", "h-14 w-full rounded-2xl px-5 text-base font-medium leading-none");
-const SECONDARY_CTA_CLASS = buttonClass("secondary", "h-12 rounded-2xl px-5 text-sm font-medium");
 
 export function PricingShell() {
   const planViews = useMemo(() => getPricingPlanViews(), []);
@@ -86,13 +94,26 @@ export function PricingShell() {
     () => planViews.filter((plan) => plan.planCode !== "free" && !plan.isContactOnly),
     [planViews],
   );
-  const freePlan = getPricingPlanView("free");
-  const enterprisePlan = getPricingPlanView("enterprise");
 
   const [pendingPlan, setPendingPlan] = useState<string | null>(null);
   const [errorPlan, setErrorPlan] = useState<string | null>(null);
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const isAnnual = billingCycle === "annual";
+
+  // Lead the comparison with dataset access. The dataset-scope row is derived from the entitlement
+  // SSOT (datasetLimit) so it can't drift from the plan model.
+  const comparisonGroups = useMemo<ComparisonGroup[]>(() => {
+    const datasetScopeRow: ComparisonRow = {
+      label: "可用資料集範圍",
+      values: Object.fromEntries(
+        COMPARISON_TIERS.map((tier) => [tier.key, getPricingPlanView(tier.key).datasetLimit]),
+      ) as Record<ComparisonTier, string>,
+    };
+    return [
+      { title: "資料集存取", rows: [datasetScopeRow, ...DATA_ACCESS_ROWS] },
+      { title: "配額與計費", rows: QUOTA_ROWS },
+    ];
+  }, []);
 
   async function handleUpgrade(planCode: string) {
     if (pendingPlan) return;
@@ -177,11 +198,17 @@ export function PricingShell() {
             >
               <div className="flex h-full flex-col">
                 <div className="flex min-h-[300px] flex-col">
-                  {plan.planCode === "pro" ? (
-                    <span className="mb-3 inline-flex w-fit items-center rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
-                      最受歡迎
-                    </span>
-                  ) : null}
+                  {/* Reserve the badge row height on EVERY card so the "最受歡迎" badge (Pro only)
+                      never pushes Pro's content — and thus its CTA — lower than the other cards.
+                      Non-Pro cards render an equal-height empty placeholder. This keeps the button
+                      tops on one line in both the monthly and annual toggles. */}
+                  <div className="mb-3 h-[26px]">
+                    {plan.planCode === "pro" ? (
+                      <span className="inline-flex w-fit items-center rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
+                        最受歡迎
+                      </span>
+                    ) : null}
+                  </div>
                   <div className="flex items-center justify-between gap-2">
                     <h3 className="text-[1.65rem] font-medium tracking-tight text-slate-900">{plan.displayName}</h3>
                     <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{plan.usageMultiplier}</span>
@@ -197,7 +224,9 @@ export function PricingShell() {
                     ) : null}
                   </div>
 
-                  <p className="mt-6 text-sm font-normal leading-6 text-slate-600">{plan.summary}</p>
+                  {/* Fixed min-height so the CTA (pushed down by mt-auto) sits at the same y across
+                      all cards — otherwise varying summary length misaligns the "年繳即將開放" buttons. */}
+                  <p className="mt-6 min-h-[72px] text-sm font-normal leading-6 text-slate-600">{plan.summary}</p>
 
                   <div className="mt-auto pt-4">
                     <button
@@ -240,38 +269,6 @@ export function PricingShell() {
           ))}
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 sm:flex-row sm:items-center">
-            <div>
-              <p className="text-lg font-medium text-slate-900">{freePlan.displayName}</p>
-              <p className="mt-1 text-sm text-slate-600">{freePlan.summary}</p>
-            </div>
-            <Link href={freePlan.href} className={SECONDARY_CTA_CLASS}>{freePlan.ctaLabel}</Link>
-          </div>
-          <div className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-6 sm:flex-row sm:items-center">
-            <div>
-              <p className="text-lg font-medium text-slate-900">{enterprisePlan.displayName}</p>
-              <p className="mt-1 text-sm text-slate-600">{enterprisePlan.summary}</p>
-            </div>
-            <Link
-              href={enterprisePlan.href}
-              className={SECONDARY_CTA_CLASS}
-              onClick={() => {
-                void trackEvent(
-                  {
-                    event: "pricing_upgrade_clicked",
-                    properties: { planCode: "enterprise", billingCycle: "monthly", contactOnly: true },
-                    context: { source: "client", page: "/pricing" },
-                  },
-                  { dedupeKey: "pricing-upgrade:enterprise", dedupeMs: 2000 },
-                );
-              }}
-            >
-              {enterprisePlan.ctaLabel}
-            </Link>
-          </div>
-        </div>
-
         <p className="text-center text-xs text-slate-500">
           本服務提供資料 API、工具與文件，不提供投資建議、個股推薦或交易訊號。
         </p>
@@ -279,29 +276,45 @@ export function PricingShell() {
 
       <section className="space-y-4 border-t border-slate-200 pt-8">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Comparison Table</h2>
-          <p className="mt-2 text-sm text-slate-600">各層級的價格、配額與存取差異。實際資料集可用範圍請以 docs 的 coverage/status 註記為準。</p>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-900">方案比較：可用資料集與覆蓋度</h2>
+          <p className="mt-2 text-sm text-slate-600">
+            一眼看出各方案的資料集範圍與歷史覆蓋度。完整資料集清單見{" "}
+            <Link href="/datasets" className="font-medium text-slate-900 underline underline-offset-4">資料集目錄</Link>
+            ；各資料集實際 coverage 與更新狀態以{" "}
+            <Link href="/docs/market-coverage" className="font-medium text-slate-900 underline underline-offset-4">docs coverage</Link>
+            {" "}為準（不逐格編造覆蓋數字）。
+          </p>
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
           <table className="w-full min-w-[900px] table-fixed text-sm leading-5">
-            <thead className="bg-slate-50 text-slate-600">
+            <thead className="text-slate-600">
               <tr>
-                <th className="w-[22%] border-b border-slate-200 px-4 py-3 text-left align-middle font-semibold">功能</th>
+                <th className="w-[24%] border-b border-slate-200 px-4 py-3 text-left align-middle font-semibold" aria-label="功能" />
                 {COMPARISON_TIERS.map((tier) => (
-                  <th key={tier.key} className="border-b border-slate-200 px-4 py-3 text-center align-middle font-semibold">{tier.label}</th>
+                  <th key={tier.key} className="border-b border-slate-200 px-4 py-3 text-center align-middle font-semibold text-slate-900">{tier.label}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {COMPARISON_ROWS.map((row) => (
-                <Fragment key={row.label}>
-                  <tr className="text-slate-700">
-                    <td className="border-b border-slate-100 px-4 py-3 text-left align-middle font-medium text-slate-900">{row.label}</td>
-                    {COMPARISON_TIERS.map((tier) => (
-                      <td key={tier.key} className="border-b border-slate-100 px-4 py-3 text-center align-middle">{row.values[tier.key]}</td>
-                    ))}
+              {comparisonGroups.map((group) => (
+                <Fragment key={group.title}>
+                  <tr>
+                    <td
+                      colSpan={COMPARISON_TIERS.length + 1}
+                      className="border-b border-slate-200 px-4 pb-2 pt-6 text-left align-middle text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    >
+                      {group.title}
+                    </td>
                   </tr>
+                  {group.rows.map((row) => (
+                    <tr key={row.label} className="text-slate-700">
+                      <td className="border-b border-slate-100 px-4 py-3 text-left align-middle font-medium text-slate-900">{row.label}</td>
+                      {COMPARISON_TIERS.map((tier) => (
+                        <td key={tier.key} className="border-b border-slate-100 px-4 py-3 text-center align-middle">{row.values[tier.key]}</td>
+                      ))}
+                    </tr>
+                  ))}
                 </Fragment>
               ))}
             </tbody>

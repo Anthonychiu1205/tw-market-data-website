@@ -1,7 +1,9 @@
 import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/src/config/site";
+import { EN_HOMEPAGE_READY } from "@/src/config/i18n";
 import { getAllBlogPosts } from "@/src/content/blog-posts";
+import { getPublishedAnswerPages } from "@/src/content/answer-pages";
 import { docsPages } from "@/src/content/docs-pages";
 
 type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
@@ -54,10 +56,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const blogRoutes = getAllBlogPosts().map((post) => `/blog/${post.slug}`);
 
+  // Only list pages that are actually indexable: the English homepage once content-complete, and
+  // answer-shaped pages once published (drafts are noindex, so they must not appear in the sitemap).
+  const enRoutes = EN_HOMEPAGE_READY ? ["/en"] : [];
+  const publishedAnswerPages = getPublishedAnswerPages();
+  const answerRoutes =
+    publishedAnswerPages.length > 0
+      ? ["/answers", ...publishedAnswerPages.map((page) => `/answers/${page.slug}`)]
+      : [];
+
   const uniqueRoutes = new Set<string>([
     ...staticRoutes.map((route) => route.path),
     ...docsRoutes,
     ...blogRoutes,
+    ...enRoutes,
+    ...answerRoutes,
   ]);
 
   const entries: MetadataRoute.Sitemap = [];
