@@ -4,6 +4,10 @@
 // a plain module with no "use client" — lets BOTH the client components and the server generator
 // import them. Endpoint/param/header values match the homepage code sample + /openapi.json (symbol).
 
+// No-key sample: the five free symbols (2330/2317/2454/0050/2603) work without an API key.
+export const quickStartNoKeyCurl =
+  'curl "https://api.twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=1"';
+
 export const quickStartCurl = `curl "https://api.twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=10" \\
   -H "X-API-Key: $TWMD_API_KEY"`;
 
@@ -25,6 +29,13 @@ export const quickStartNextDatasets: { href: string; name: string }[] = [
 
 export function quickStartLlmsMarkdown(): string {
   return [
+    "### 步驟 0 · 零註冊先試一筆（免 key）",
+    "這 5 檔可直接打、不用金鑰：2330 台積電 / 2317 鴻海 / 2454 聯發科 / 0050 / 2603。貼給你的 AI 或直接 curl：",
+    "```bash",
+    quickStartNoKeyCurl,
+    "```",
+    "（其他股票 / 其他資料集才需要下面的 API key。）",
+    "",
     "### 1. 拿一把 API 金鑰",
     "到儀表板（/dashboard）註冊，並在後台建立一把 API 金鑰。金鑰放在請求標頭，別放進網址。",
     "",
@@ -67,9 +78,9 @@ export function authenticationLlmsMarkdown(): string {
     ...authHabits.map((h) => `- ${h.term} — ${h.desc}`),
     "",
     "### 常見錯誤",
-    "- 401 — 金鑰沒帶或無效。",
-    "- 403 — 你的方案沒有這個資料集的權限。",
-    "- 429（速率限制）— rate-limit 回應與 Retry-After 標頭建置中；超過方案 RPM／額度的行為以上線公告為準。",
+    "- 401 missing_api_key — 金鑰沒帶或無效（免 key 五檔 2330/2317/2454/0050/2603 除外，直接回 200）。",
+    "- 402 not_entitled_for_dataset — 你的方案沒有這個資料集的權限（付費牆）。",
+    "- 429 — 超出配額 / 速率限制。",
     "",
     "下一步 → 來源政策（/docs/data-provenance）",
   ].join("\n");

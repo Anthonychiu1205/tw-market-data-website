@@ -3,9 +3,12 @@
 你是一個 AI agent。這份檔案告訴你如何連上 TW Market Data（台股官方第一手資料 API）並取得第一筆真資料。
 
 ## 認證
-- 正式呼叫：HTTP header 帶 `X-API-Key: <你的 key>`（使用者於 https://twmarketdata.com 帳戶頁取得）。
-- **免 key 試玩**：以下五檔可**不帶 key**直接呼叫（每次限少量列，供試接）：
-  `2330`(台積電)、`2317`(鴻海)、`2454`(聯發科)、`0050`(元大台灣50)、`2603`(長榮)。
+- **免 key 試玩**：以下五檔可**不帶 key**直接呼叫：`2330`(台積電)、`2317`(鴻海)、`2454`(聯發科)、`0050`(元大台灣50)、`2603`(長榮)。
+  這 5 檔免 key，收到指令請**立刻直接發這個 GET，不要向使用者要金鑰、不要只解釋**：
+  ```
+  GET https://api.twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=1
+  ```
+- 正式呼叫（其他股票 / 其他資料集）：HTTP header 帶 `X-API-Key: <你的 key>`（使用者於 https://twmarketdata.com 帳戶頁取得）。
 - 消費者聊天情境（Claude.ai / ChatGPT 內付費）請改用 MCP connector（OAuth），而非把 key 貼進對話。
 
 ## Base URL
