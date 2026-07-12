@@ -35,7 +35,13 @@ export async function GET(_request: Request, context: Context) {
     apiKeyId: params.id,
   });
 
-  // Unified key model (P0): the raw sk_live_ is shown once at creation and is not retrievable
-  // afterwards, so this endpoint always reports the secret as unavailable.
-  return NextResponse.json({ error: result.error }, { status: 409 });
+  if (result.ok) {
+    return NextResponse.json({ secret: result.secret });
+  }
+
+  // secret_unavailable: pre-encryption key that can't be revealed (409, "regenerate to copy").
+  // api_key_revoked: 403. Anything else (self-serve outage etc.): 502.
+  const status =
+    result.error === "secret_unavailable" ? 409 : result.error === "api_key_revoked" ? 403 : 502;
+  return NextResponse.json({ error: result.error }, { status });
 }

@@ -5,6 +5,7 @@ import {
   createSelfServeKey,
   getSelfServeAccount,
   listSelfServeKeys,
+  revealSelfServeKey,
   revokeSelfServeKey,
   SelfServeError,
   type SelfServeKey,
@@ -46,9 +47,12 @@ function toApiKeyItem(key: SelfServeKey): ApiKeyItem {
     id: key.key_id,
     name: key.label ?? "",
     keyPrefix: prefix,
-    // The list endpoint only ever returns a masked prefix; the raw sk_live_ is shown once on create.
+    // The list endpoint only ever returns a masked prefix; the raw sk_live_ is re-fetched on demand
+    // via the reveal endpoint when the user clicks copy.
     maskedKey: prefix,
-    canCopy: false,
+    // Copy is attempted for every active key; keys too old to reveal fall back to secret_unavailable
+    // at copy time (surfaced as "regenerate to get a copyable version").
+    canCopy: true,
     status: key.status,
     lastUsed: key.last_used_at ?? "-",
     createdAt: key.created_at,
@@ -98,10 +102,23 @@ export async function createApiKeyForUser(input: { email: string; name?: string 
   }
 }
 
-// The unified model does not store a retrievable raw key (sk_live_ is shown once at creation), so
-// "copy again later" is no longer possible — always report the secret as unavailable.
-export async function getApiKeySecretForUser(_input: { email: string; apiKeyId: string }) {
-  return { ok: false as const, error: "secret_unavailable" as const };
+// Re-fetch the full sk_live_ via the API's reveal endpoint (encrypted-at-rest keys). Keys created
+// before at-rest encryption can't be revealed — the API returns secret_unavailable / 404, which we
+// pass through so the UI tells the user to regenerate.
+export async function getApiKeySecretForUser(input: { email: string; apiKeyId: string }) {
+  try {
+    const secret = await revealSelfServeKey(input.email, input.apiKeyId);
+    if (!secret) return { ok: false as const, error: "secret_unavailable" as const };
+    return { ok: true as const, secret };
+  } catch (error) {
+    if (error instanceof SelfServeError) {
+      if (error.status === 404 || error.code === "api_key_not_found" || error.code === "secret_unavailable") {
+        return { ok: false as const, error: "secret_unavailable" as const };
+      }
+      return { ok: false as const, error: error.code };
+    }
+    throw error;
+  }
 }
 
 export async function revokeApiKeyForUser(input: { email: string; apiKeyId: string }) {
