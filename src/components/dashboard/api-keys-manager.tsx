@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useRef, useState } from "react";
-import { Check, Copy, Trash2 } from "lucide-react";
+import { Check, Copy, Loader2, Trash2 } from "lucide-react";
 
 import type { ApiKeyItem } from "@/src/lib/backend-adapter";
 import { trackEvent } from "@/src/lib/analytics/client";
@@ -28,6 +28,36 @@ type ToastItem = {
 
 const MAX_ACTIVE_KEYS = 5;
 
+// Robust copy: try the async Clipboard API, then fall back to a hidden textarea + execCommand.
+// The fallback matters because after an `await fetch(...)` some browsers (notably Safari) drop the
+// user-gesture and reject navigator.clipboard.writeText with NotAllowedError.
+async function copyToClipboard(text: string): Promise<boolean> {
+  try {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    // fall through to the legacy path
+  }
+  try {
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.top = "-9999px";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.focus();
+    textarea.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(textarea);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 function formatDateTime(raw: string | null | undefined) {
   if (!raw || raw === "-") return "尚未使用";
   const date = new Date(raw);
@@ -48,6 +78,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
+  const [copyingId, setCopyingId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [createdSecret, setCreatedSecret] = useState<string | null>(null);
   const [secretCopied, setSecretCopied] = useState(false);
@@ -206,9 +237,10 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
   }
 
   async function handleCopy(item: ApiKeyItem) {
-    if (item.status === "revoked") return;
+    if (item.status === "revoked" || copyingId) return;
 
     setErrorMessage(null);
+    setCopyingId(item.id);
 
     try {
       const response = await fetch(`/api/dashboard/api-keys/${encodeURIComponent(item.id)}/secret`, {
@@ -220,7 +252,8 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
 
       if (!response.ok || !payload?.secret) {
         if (payload?.error === "secret_unavailable") {
-          setErrorMessage("此金鑰建立於舊版本，無法再次複製，請重新建立。");
+          // Only hash-only keys (no retrievable raw) can't be re-copied — regenerate to get one.
+          setErrorMessage("此金鑰無法再次複製，請重新產生以取得可複製版本。");
           return;
         }
         if (payload?.error === "api_key_revoked") {
@@ -230,7 +263,11 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
         throw new Error("copy_failed");
       }
 
-      await navigator.clipboard.writeText(payload.secret);
+      const copied = await copyToClipboard(payload.secret);
+      if (!copied) {
+        setErrorMessage("無法寫入剪貼簿，請手動複製或檢查瀏覽器權限。");
+        return;
+      }
       setCopiedKeyId(item.id);
       void trackEvent(
         {
@@ -243,25 +280,27 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
         },
         { dedupeKey: `api-key-copied:${item.id}`, dedupeMs: 2000 },
       );
-      pushToast("API key 已複製");
+      pushToast("API key 已複製到剪貼簿");
       window.setTimeout(() => {
         setCopiedKeyId((prev) => (prev === item.id ? null : prev));
-      }, 1000);
+      }, 1200);
     } catch {
       setErrorMessage("無法複製金鑰，請稍後再試或檢查瀏覽器權限。");
+    } finally {
+      setCopyingId(null);
     }
   }
 
   async function copyCreatedSecret() {
     if (!createdSecret) return;
-    try {
-      await navigator.clipboard.writeText(createdSecret);
-      setSecretCopied(true);
-      pushToast("API key 已複製");
-      window.setTimeout(() => setSecretCopied(false), 1000);
-    } catch {
-      setErrorMessage("無法複製金鑰，請檢查瀏覽器權限。");
+    const copied = await copyToClipboard(createdSecret);
+    if (!copied) {
+      setErrorMessage("無法寫入剪貼簿，請手動複製或檢查瀏覽器權限。");
+      return;
     }
+    setSecretCopied(true);
+    pushToast("API key 已複製到剪貼簿");
+    window.setTimeout(() => setSecretCopied(false), 1200);
   }
 
   return (
@@ -299,6 +338,7 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
             {hasKeys ? (
               visibleKeys.map((item) => {
                 const copied = copiedKeyId === item.id;
+                const isCopying = copyingId === item.id;
                 const copyDisabled = item.status === "revoked" || item.canCopy === false;
                 const rowMuted = item.status === "revoked";
                 return (
@@ -313,23 +353,31 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
                         <button
                           type="button"
                           onClick={() => void handleCopy(item)}
-                          disabled={copyDisabled}
+                          disabled={copyDisabled || isCopying}
                           className={cn(
                             "inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-transparent text-slate-500 transition duration-150 ease-out hover:border-slate-200 hover:bg-slate-100 hover:text-slate-700 active:scale-95 active:opacity-80",
-                            copyDisabled && "cursor-not-allowed text-slate-300 hover:border-transparent hover:bg-transparent hover:text-slate-300",
+                            (copyDisabled || isCopying) && "cursor-not-allowed text-slate-300 hover:border-transparent hover:bg-transparent hover:text-slate-300",
                           )}
                           aria-label="複製 API 金鑰"
                           title={
                             item.status === "revoked"
                               ? "已撤銷金鑰不可複製"
                               : item.canCopy === false
-                                ? "舊版金鑰無法再次複製，請重新建立"
-                                : copied
-                                  ? "已複製"
-                                  : "複製"
+                                ? "此金鑰無法再次複製，請重新產生以取得可複製版本"
+                                : isCopying
+                                  ? "複製中…"
+                                  : copied
+                                    ? "已複製"
+                                    : "複製"
                           }
                         >
-                          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                          {isCopying ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : copied ? (
+                            <Check className="h-4 w-4" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
                     </td>
@@ -435,13 +483,16 @@ export function ApiKeysManager({ initialKeys, canCreate, canRevoke }: ApiKeysMan
           <div
             key={toast.id}
             className={cn(
-              "rounded-xl border border-slate-200 bg-white/95 px-3 py-2 text-xs text-slate-700 shadow-sm transition-all duration-200",
+              "pointer-events-auto flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 shadow-lg transition-all duration-200",
               toast.exiting ? "translate-y-1 opacity-0" : "translate-y-0 opacity-100",
             )}
             role="status"
             aria-live="polite"
           >
-            {toast.message}
+            <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
+              <Check className="h-3.5 w-3.5" />
+            </span>
+            <span className="font-medium">{toast.message}</span>
           </div>
         ))}
       </div>
