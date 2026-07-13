@@ -20,13 +20,13 @@ const datasetFamilies = [
       {
         name: "TPEx 日線價格",
         description: "上櫃股票日線資料目前為 beta / limited，歷史深度覆蓋仍在 deferred 狀態。",
-        href: "/docs/introduction",
+        href: "/docs/api/market-prices/tpex-daily-price",
         note: "目前不宣稱 TPEx 歷史完整覆蓋。",
       },
       {
         name: "技術指標",
         description: "由價格與成交量衍生的研究指標；目前 baseline 以 TWSE 為主。",
-        href: "/docs/introduction",
+        href: "/docs/api/market-prices/technical-indicators",
       },
       {
         name: "市場廣度",
@@ -175,8 +175,8 @@ export default function DatasetsPage() {
     name: "TW Market Data 核心資料集目錄",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "TWSE 日線價格", url: "https://twmarketdata.com/datasets/twse-daily-price" },
-      { "@type": "ListItem", position: 2, name: "TPEx 日線價格", url: "https://twmarketdata.com/docs/introduction" },
-      { "@type": "ListItem", position: 3, name: "技術指標", url: "https://twmarketdata.com/docs/introduction" },
+      { "@type": "ListItem", position: 2, name: "TPEx 日線價格", url: "https://twmarketdata.com/docs/api/market-prices/tpex-daily-price" },
+      { "@type": "ListItem", position: 3, name: "技術指標", url: "https://twmarketdata.com/docs/api/market-prices/technical-indicators" },
       { "@type": "ListItem", position: 4, name: "月營收", url: "https://twmarketdata.com/datasets/monthly-revenue" },
       { "@type": "ListItem", position: 5, name: "損益表", url: "https://twmarketdata.com/datasets/income-statement" },
       { "@type": "ListItem", position: 6, name: "資產負債表", url: "https://twmarketdata.com/datasets/balance-sheet" },
