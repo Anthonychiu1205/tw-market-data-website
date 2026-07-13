@@ -101,7 +101,19 @@ export async function getApiKeysSummaryForUser(
 
   const activeCount = keys.filter((item) => !isRevoked(item)).length;
   const limit = resolveKeyLimit(options?.planKeyLimit, account);
-  const canCreate = limit === null || activeCount < limit;
+  const withinLimit = limit === null || activeCount < limit;
+
+  // The API's create endpoint hard-gates a no-subscription account:
+  //   POST /v2/self-serve/api-keys → 403 {"error":"subscription_required"}
+  // even though the same account object advertises api_keys_limit: 1 on the free plan. Without this
+  // check the UI shows an enabled Create button that always fails — a dead end for every new signup.
+  // Only gate when we POSITIVELY read subscription_status === "none"; if the account lookup failed
+  // (empty object) we do not block, and the create call's 402 is surfaced with a clear message.
+  const subscriptionStatus =
+    typeof account.subscription_status === "string" ? account.subscription_status.toLowerCase() : null;
+  const needsSubscription = subscriptionStatus === "none";
+
+  const canCreate = withinLimit && !needsSubscription;
 
   const result: ApiKeysSummary = {
     keys: keys.map(toApiKeyItem),
@@ -109,9 +121,12 @@ export async function getApiKeysSummaryForUser(
     canRevoke: true,
     integrationMode: "live",
     keyLimit: limit,
-    createDisabledReason: canCreate
-      ? null
-      : `已達方案金鑰上限（${limit} 把）。請先撤銷未使用的金鑰，或升級方案以提高上限。`,
+    needsSubscription,
+    createDisabledReason: needsSubscription
+      ? "免費層不含 API key。你可以直接免金鑰試 5 檔（2330／2317／2454／0050／2603）；要取得 API key 請先選擇方案。"
+      : withinLimit
+        ? null
+        : `已達方案金鑰上限（${limit} 把）。請先撤銷未使用的金鑰，或升級方案以提高上限。`,
   };
   setApiKeysSummaryCache(cacheKey, result);
   return result;

@@ -75,6 +75,7 @@ const FALLBACK_API_KEYS: ApiKeysSummary = {
   integrationMode: "live",
   keyLimit: null,
   createDisabledReason: null,
+  needsSubscription: false,
 };
 
 const FALLBACK_USAGE_SUMMARY: UsageSummary = {
