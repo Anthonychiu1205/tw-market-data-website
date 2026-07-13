@@ -149,6 +149,19 @@ export async function revokeSelfServeKey(email: string, keyId: string): Promise<
   );
 }
 
+// Account deletion. Deletes the API-side account and its keys; the response discloses what is
+// RETAINED (legal/tax records) so we can show it to the user verbatim. Returns the raw payload.
+// Throws SelfServeError(404/405) while the endpoint is not deployed — callers fall back.
+export async function deleteSelfServeAccount(email: string): Promise<Record<string, unknown>> {
+  return withToken(email, (token) =>
+    ssvFetch("/v2/self-serve/account", {
+      method: "DELETE",
+      headers: { "x-self-serve-token": token, "Content-Type": "application/json" },
+      body: JSON.stringify({ confirm: "DELETE" }),
+    }),
+  );
+}
+
 // Account-level info (subscription/plan/limit) for display + accurate canCreate.
 export async function getSelfServeAccount(email: string): Promise<Record<string, unknown>> {
   const json = await withToken(email, (token) =>
