@@ -44,6 +44,7 @@ allowed_dataset_ids:
 
 answer_pages:
 - url=/answers/taiwan-stock-data-api-for-ai-agents; topic=Taiwan stock data API for AI agents (台版 financialdatasets.ai); lang=zh-Hant
+- url=/answers/taiwan-financial-statements-monthly-revenue-api; topic=Taiwan financial statements & monthly revenue API (MOPS-reconciled, as_of); lang=zh-Hant
 - url=/compare/twmarketdata-vs-finmind-vs-tej; topic=TW Market Data vs FinMind vs TEJ — choosing a Taiwan stock data API; lang=zh-Hant
 
 datasets:

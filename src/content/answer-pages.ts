@@ -386,6 +386,66 @@ export const answerPages: readonly AnswerPageEntry[] = [
     aiAgentApiSchema: true,
     status: "published",
   },
+  {
+    // 篇6 (AEO handoff 2026-07-13). Leads with income statement + monthly revenue (self-check 🟢).
+    // Balance sheet / cash flow are NOT claimed in detail (balance self-check 🟡) — only noted as a
+    // transparent rollout, per the honesty guardrail.
+    slug: "taiwan-financial-statements-monthly-revenue-api",
+    locale: "zh-Hant",
+    question: "台股月營收與財報 API —— 官方對帳、跨期可比",
+    metaTitle: "台股財報 API｜月營收、損益表，MOPS 官方對帳、跨期可比",
+    description:
+      "台股月營收（自 2010，YoY/MoM）與財報，來源 MOPS 官方、逐值對帳、欄位標準化跨期可比，每筆帶 knowledge_date。",
+    shortAnswer:
+      "找台股月營收、EPS、財報的程式化來源？TW Market Data 直接接 MOPS 公開資訊觀測站，欄位標準化、逐值對帳、每筆可追溯。",
+    sections: [
+      {
+        heading: "月營收 —— 台股獨有的月頻基本面",
+        body:
+          `台股每月公告營收，是美股沒有的高頻基本面訊號。TW Market Data 的月營收自 ${coverageFacts.monthlyRevenue.earliestPeriod.slice(0, 4)} 年，含 YoY/MoM，對 MOPS 官方對帳。做「營收動能」選股或回測，每筆帶公告 knowledge_date，可對齊 as-of 不偷看未來。`,
+        code:
+          'curl "https://api.twmarketdata.com/v2/datasets/monthly-revenue?symbol=2330" \\\n  -H "X-API-Key: $TWMD_API_KEY"',
+      },
+      {
+        heading: "財報（損益表）—— 標準化、可比較",
+        body:
+          "損益表欄位對到同一套分類，不同公司、不同期間可直接比較；來源 MOPS，source_role=canonical，並保留公司原始申報數字。EPS、毛利、營業利益等核心欄位可查。（資產負債表與現金流量表逐步上線，覆蓋逐集透明標示——見 /datasets。）",
+      },
+      {
+        heading: "為什麼強調「對帳」與「knowledge_date」",
+        body:
+          "財報資料最怕兩件事：數字對不上官方、以及回測時用了「當時還沒公布」的財報。TW Market Data 對每個值做官方對帳（可追溯），並以 knowledge_date 標記知識日戳，兩個問題都處理。",
+      },
+    ],
+    faq: [
+      {
+        question: "台股月營收 API 哪裡有？",
+        answer:
+          `TW Market Data 提供自 ${coverageFacts.monthlyRevenue.earliestPeriod.slice(0, 4)} 年的月營收（YoY/MoM），來源 MOPS 官方、逐值對帳，每筆帶公告 knowledge_date。`,
+      },
+      {
+        question: "台積電 EPS、財報怎麼用程式抓？",
+        answer:
+          "呼叫 /v2/datasets/income-statement?symbol=2330，回傳標準化損益欄位含 EPS，來源 MOPS canonical。要最近四季滾動（TTM）口徑加 &period=ttm——伺服器端加總最近 4 完整季，附 ttm_window；回測可加 &as_of=<date> 做 PIT 過濾。",
+      },
+      {
+        question: "有沒有 TTM（滾動四季）EPS／營收？",
+        answer:
+          "有。?period=ttm 由伺服器端加總最近 4 個完整季（revenue/net_income/eps 等），附加總窗與 knowledge_date；是 PIT-aware（以 report_date 為準、缺則退 period_end_date）。",
+      },
+      {
+        question: "財報資料能對齊 as-of 做回測嗎？",
+        answer:
+          "可以，每筆帶 knowledge_date；月營收有公告日，回測可避免前視偏差。",
+      },
+    ],
+    cta: { label: "月營收資料集", href: "/datasets/monthly-revenue" },
+    relatedLinks: [
+      { label: "損益表資料集", href: "/datasets/income-statement" },
+      { label: "讀 Quick Start", href: "/docs/quick-start" },
+    ],
+    status: "published",
+  },
 ];
 
 export function getAnswerPageBySlug(slug: string): AnswerPageEntry | undefined {
