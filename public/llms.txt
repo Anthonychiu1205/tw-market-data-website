@@ -42,6 +42,10 @@ allowed_dataset_ids:
 - valuation_data
 - warrants_reference
 
+answer_pages:
+- url=/answers/taiwan-stock-data-api-for-ai-agents; topic=Taiwan stock data API for AI agents (台版 financialdatasets.ai); lang=zh-Hant
+- url=/compare/twmarketdata-vs-finmind-vs-tej; topic=TW Market Data vs FinMind vs TEJ — choosing a Taiwan stock data API; lang=zh-Hant
+
 datasets:
 - id=balance_sheet; status=production_baseline; production_ready=false; route=/v2/datasets/balance-sheet
 - id=block_trade_daily; status=private_beta; production_ready=false; route=/v2/datasets/block-trade-daily

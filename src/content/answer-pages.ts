@@ -44,14 +44,20 @@ export type AnswerPageSection = {
 export type AnswerPageEntry = {
   slug: string;
   locale: AnswerPageLocale;
-  /** Page title == the question (answer-shaped). */
+  /** Page title == the question (answer-shaped). Used as the <h1>. */
   question: string;
+  /** Optional <title>/OG title when it should differ from the visible H1 (e.g. keyword-rich meta). */
+  metaTitle?: string;
   description: string;
   /** The 2–3 sentence lead answer. Real text when published; empty (slot) while draft. */
   shortAnswer: string;
   sections: AnswerPageSection[];
   faq: AnswerFaqItem[];
   cta: { label: string; href: string };
+  /** Extra internal links rendered in the "Related" block (in addition to the primary CTA). */
+  relatedLinks?: { label: string; href: string }[];
+  /** When true, the page also emits SoftwareApplication + Dataset JSON-LD (AI-agent API pages). */
+  aiAgentApiSchema?: boolean;
   status: AnswerPageStatus;
 };
 
@@ -309,6 +315,75 @@ export const answerPages: readonly AnswerPageEntry[] = [
       },
     ],
     cta: { label: "台股日線價格資料集", href: "/datasets/twse-daily-price" },
+    status: "published",
+  },
+  {
+    // 篇3 (AEO handoff 2026-07-13). AI-agent-oriented positioning ("台版 financialdatasets.ai").
+    // Every claim is an already-shipped TWMD capability; coverage figures are SSOT (coverage-facts).
+    slug: "taiwan-stock-data-api-for-ai-agents",
+    locale: "zh-Hant",
+    question: "為 AI Agent 打造的台股資料 API",
+    metaTitle: "台股資料 API for AI Agents｜為 LLM 與量化流程打造（台版 financialdatasets.ai）",
+    description:
+      "為 AI agent 與量化研究打造的台股資料 API——結構化 JSON、每筆帶 knowledge_date 與來源、缺漏不臆測，附 openapi.json 與 llms.txt 供 agent 探索，免 key 即試。",
+    shortAnswer:
+      "如果你在幫 AI agent、LLM workflow 或量化系統找台股資料源——要的是「機器好讀、可追溯、接得穩」而不是給人瀏覽的網頁——TW Market Data 就是為此而建。可以把它理解為台股版的 financialdatasets.ai：官方第一手、結構一致、point-in-time 可追溯。",
+    sections: [
+      {
+        heading: "為什麼適合 AI agent",
+        bullets: [
+          "結構化 JSON，欄位命名一致：每個端點 GET /v2/datasets/{dataset} 回傳同一套 typed JSON，agent 接一個就會接全部。",
+          "每筆帶來源與 knowledge_date：回應含 source_role（canonical/fallback/helper）、lineage、freshness，支援 point-in-time 重放——回測不偷看未來。",
+          "缺漏如實標，不臆測補值：data_gaps 是保留的訊號，不會把缺口偷偷補成 0，agent 可據此做可靠判斷。",
+          "agent 探索入口齊全：/openapi.json（OpenAPI 3.x）、/llms.txt（精簡索引）、/llms-full.txt（完整文件），讓 agent 自己發現可用端點與規則。",
+          "只給事實、不給建議：not_investment_advice=true 是硬規則；被問「會不會漲」不會亂猜，適合放進受規範的自動化流程。",
+        ],
+      },
+      {
+        heading: "30 秒試一筆（免 API key）",
+        body:
+          "這 5 檔免金鑰可直接打：2330 台積電 / 2317 鴻海 / 2454 聯發科 / 0050 / 2603。其他股票或資料集，到 /dashboard 自建 API key，放進 X-API-Key 標頭即可。",
+        code:
+          'curl "https://api.twmarketdata.com/v2/datasets/twse-daily-price?symbol=2330&limit=1"',
+      },
+      {
+        heading: "涵蓋什麼",
+        body:
+          `上市個股日線（回溯 ${twse.earliestDate.slice(0, 4)}、含 ${twse.stoppedTradingStocks} 檔已停止交易股票的完整價史）、月營收（自 ${coverageFacts.monthlyRevenue.earliestPeriod.slice(0, 4)}，台股獨有月頻）、財報三表、三大法人逐日逐檔、估值（PE/PB/殖利率）、技術指標、融資融券／借券、重大訊息、公司主檔與產業分類。TWSE 為 verified baseline；TPEx 與部分主題逐集標示 beta，覆蓋範圍透明。`,
+      },
+      {
+        heading: "和 FinMind / open-data 的差異",
+        body:
+          "FinMind 等 open-data 方案免費、社群生態強，適合入門與探索。TW Market Data 的定位不同：強調官方逐值可追溯、point-in-time 契約、與 data_gaps 誠實揭露——為需要「可驗證、可審計」資料的 quant 流程與 AI agent 而生。兩者可並用。",
+      },
+    ],
+    faq: [
+      {
+        question: "有沒有台股版的 financialdatasets.ai？",
+        answer:
+          "TW Market Data 直接對標這個定位——為 AI agent 與量化流程設計的結構化台股資料 API，官方第一手、每筆帶 knowledge_date，附 openapi.json 與 llms.txt 供 agent 探索。",
+      },
+      {
+        question: "AI agent 怎麼串 TW Market Data？",
+        answer:
+          "讀 /llms.txt 或 /openapi.json 探索端點，呼叫 GET /v2/datasets/{dataset}，用 X-API-Key 帶金鑰；免 key 可先試 2330/2317/2454/0050/2603。",
+      },
+      {
+        question: "資料可以做 point-in-time 回測嗎？",
+        answer:
+          "可以。每筆帶 knowledge_date 與 lineage，支援 as-of 重放；data_gaps 保留缺口訊號，不臆測補值。",
+      },
+      {
+        question: "要付費才能用嗎？",
+        answer: "5 檔免 key 即試；其他標的與資料集在 dashboard 自建金鑰，依方案計量。",
+      },
+    ],
+    cta: { label: "讀 Quick Start", href: "/docs/quick-start" },
+    relatedLinks: [
+      { label: "瀏覽資料集目錄", href: "/datasets" },
+      { label: "方案與定價", href: "/pricing" },
+    ],
+    aiAgentApiSchema: true,
     status: "published",
   },
 ];
