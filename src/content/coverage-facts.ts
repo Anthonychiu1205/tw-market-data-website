@@ -36,6 +36,80 @@ export const coverageFacts = {
   },
 } as const;
 
+// ─── Dataset availability status (catalog hygiene, 2026-07-14) ────────────────────────────────────
+// The public catalog must never advertise a dataset as available when its table is empty, frozen, or
+// does not exist. This registry is the SSOT for that: a dataset listed here with publiclyListable
+// false must NOT appear as an available dataset on /datasets, in llms.txt, or under pricing's
+// "全部資料集" claim.
+//
+// Only datasets that need a NON-available status are listed. Anything absent from this registry and
+// present in the published catalog is a normal available dataset.
+export type DatasetAvailabilityStatus =
+  /** Real data, sellable, listed publicly. */
+  | "available"
+  /** Table exists but is empty pending an upstream dataset — not sellable yet. */
+  | "coverage-limited"
+  /** No data and no recorder yet; planned. Not sellable, not listed as available. */
+  | "roadmap"
+  /** Exists but is deliberately withdrawn from the public catalog. Not sellable. */
+  | "frozen"
+  /** We deliberately do NOT provide the full text; only structured metadata is offered. */
+  | "metadata-only";
+
+export type DatasetAvailabilityEntry = {
+  status: DatasetAvailabilityStatus;
+  /** Honest, user-facing reason. Shown when a surface needs to explain the gap. */
+  note: string;
+  /** May this dataset be listed publicly as an available dataset? */
+  publiclyListable: boolean;
+};
+
+export const datasetAvailability: Record<string, DatasetAvailabilityEntry> = {
+  bond_yield_curve: {
+    status: "roadmap",
+    note: "公債殖利率曲線（TPEx，OGDL v1.0 開放可商用）尚未建置 recorder，目前無資料。",
+    publiclyListable: false,
+  },
+  taifex_atm_iv: {
+    status: "coverage-limited",
+    note: "表已建立但尚無資料；待上游 taifex_options 寫入後填充。",
+    publiclyListable: false,
+  },
+  regime_serve: {
+    status: "frozen",
+    note: "已凍結，不對外提供。",
+    publiclyListable: false,
+  },
+  announcements_fulltext: {
+    status: "metadata-only",
+    note: "不提供公告全文（版權考量）；僅提供結構化 metadata。",
+    publiclyListable: false,
+  },
+  filings_fulltext: {
+    status: "metadata-only",
+    note: "不提供申報書全文（版權考量）；僅提供結構化 metadata。",
+    publiclyListable: false,
+  },
+};
+
+/** True when a dataset may be listed publicly as available (i.e. it has real data). */
+export function isPubliclyListable(datasetId: string): boolean {
+  const entry = datasetAvailability[datasetId];
+  // Not in the registry → a normal available dataset.
+  return entry ? entry.publiclyListable : true;
+}
+
+export function getDatasetAvailability(datasetId: string): DatasetAvailabilityEntry | null {
+  return datasetAvailability[datasetId] ?? null;
+}
+
+/** The datasets explicitly held back from the public catalog, for honest disclosure. */
+export function getNonListableDatasets(): Array<{ id: string } & DatasetAvailabilityEntry> {
+  return Object.entries(datasetAvailability)
+    .filter(([, entry]) => !entry.publiclyListable)
+    .map(([id, entry]) => ({ id, ...entry }));
+}
+
 // Dataset-page temporalCoverage (schema.org ISO 8601 interval) for datasets with a DB-verified
 // coverage window. Keyed by dataset slug; only include slugs with a real window from the source doc.
 export const datasetTemporalCoverage: Record<string, string> = {

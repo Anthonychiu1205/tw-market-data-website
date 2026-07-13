@@ -42,6 +42,15 @@ allowed_dataset_ids:
 - valuation_data
 - warrants_reference
 
+not_available:
+# Datasets deliberately NOT offered. They are absent from allowed_dataset_ids above and must not be
+# treated as available. Listed here so agents get an honest answer instead of assuming coverage.
+- id=announcements_fulltext; status=metadata-only; note=公告全文不提供（版權考量）；僅提供結構化 metadata
+- id=filings_fulltext; status=metadata-only; note=申報書全文不提供（版權考量）；僅提供結構化 metadata
+- id=bond_yield_curve; status=roadmap; note=公債殖利率曲線尚未建置，目前無資料
+- id=taifex_atm_iv; status=coverage-limited; note=表已建立但尚無資料，待上游 taifex_options 填充
+- id=regime_serve; status=frozen; note=已凍結，不對外提供
+
 answer_pages:
 - url=/answers/taiwan-stock-data-api-for-ai-agents; topic=Taiwan stock data API for AI agents (台版 financialdatasets.ai); lang=zh-Hant
 - url=/answers/taiwan-financial-statements-monthly-revenue-api; topic=Taiwan financial statements & monthly revenue API (MOPS-reconciled, as_of); lang=zh-Hant
