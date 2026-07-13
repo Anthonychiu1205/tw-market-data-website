@@ -136,7 +136,7 @@ export default async function HomePage() {
             <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
               從行情、財報到公司事件，快速接入台股資料 API。
               <br />
-              目前採邀請制開放，依方案提供資料存取與使用配額。
+              註冊後即可自助選擇方案、自行建立 API key，依方案提供資料存取與使用配額。
             </p>
             <div className="mt-6 flex flex-wrap gap-4">
               <Link href="/login" className={buttonClass("secondary")}>

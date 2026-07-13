@@ -31,7 +31,7 @@ export function MarketCoverageShowcase() {
           <div className="order-1 lg:border-r lg:border-slate-200 lg:pr-4">
             <div className="w-full max-w-[520px] text-left">
               <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-                跨數千檔股票與資產進行查詢
+                跨上市／上櫃股票與 ETF、權證等標的進行查詢
               </h2>
               <p className="mt-5 max-w-lg text-base leading-7 text-slate-600">
                 涵蓋台股市場主要資料主題，包括股價、財報、營運指標與公司事件。支援跨股票、跨時間與多資料集查詢，讓

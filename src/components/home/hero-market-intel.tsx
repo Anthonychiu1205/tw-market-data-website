@@ -24,13 +24,19 @@ export async function HeroMarketIntel() {
     getHomepageMarketSnapshot(),
     getMarketMarqueeSnapshotView(),
   ]);
-  const selectedRows = MARKET_LABELS.map((label) => marketSnapshot.items.find((item) => item.name === label)).filter((item) => item !== undefined);
-  const marketRows = selectedRows.length > 0 ? selectedRows : marketSnapshot.items.slice(0, 5);
+  // Order the live rows by the preferred display order, then append any other live index the API
+  // returns. Nothing is padded with placeholder rows — an index we have no real value for is simply
+  // not shown (this is what removed the stale demo 櫃買/台灣50 numbers).
+  const byLabel = new Map(marketSnapshot.items.map((item) => [item.name, item]));
+  const ordered = MARKET_LABELS.map((label) => byLabel.get(label)).filter((item) => item !== undefined);
+  const rest = marketSnapshot.items.filter((item) => !MARKET_LABELS.includes(item.name as (typeof MARKET_LABELS)[number]));
+  const marketRows = [...ordered, ...rest].slice(0, 5);
   const newsItems = newsSnapshot.news.slice(0, 4);
 
   return (
     <div className="relative hidden lg:block">
       <div className="ml-auto w-full max-w-[520px] space-y-5">
+        {marketRows.length > 0 ? (
         <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_12px_34px_rgba(15,23,42,0.05)]">
           <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
             <p className="text-base font-semibold text-slate-900">市場指標</p>
@@ -38,7 +44,9 @@ export async function HeroMarketIntel() {
               查看全部資料 &gt;
             </Link>
           </div>
-          <p className="mt-2 text-xs text-slate-500">{marketSnapshot.statusLabel}</p>
+          {marketSnapshot.statusLabel ? (
+            <p className="mt-2 text-xs text-slate-500">{marketSnapshot.statusLabel}</p>
+          ) : null}
 
           <div className="pt-2">
             {marketRows.map((item) => (
@@ -50,6 +58,7 @@ export async function HeroMarketIntel() {
             ))}
           </div>
         </div>
+        ) : null}
 
         <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_12px_34px_rgba(15,23,42,0.05)]">
           <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">

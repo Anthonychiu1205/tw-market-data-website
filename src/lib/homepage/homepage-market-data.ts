@@ -1,5 +1,7 @@
 import "server-only";
 
+import { COVERAGE_FACTS_SNAPSHOT_DATE, coverageFacts } from "@/src/content/coverage-facts";
+
 type SourceMode = "live_api" | "fallback_static" | "unavailable";
 type Trend = "up" | "down" | "neutral";
 
@@ -39,93 +41,23 @@ export type HomepageCoverageMetric = {
 
 const REVALIDATE_SECONDS = 86400;
 const FETCH_TIMEOUT_MS = 4500;
-const FALLBACK_AS_OF = "2026-05-28";
 
-const FALLBACK_MARKET_ITEMS: HomepageMarketItem[] = [
-  {
-    id: "twse_taiex",
-    name: "加權指數",
-    metric: "TAIEX",
-    value: "23,481.52",
-    change: "+128.44",
-    percent: "+0.55%",
-    trend: "up",
-    asOf: FALLBACK_AS_OF,
-    sourceMode: "fallback_static",
-  },
-  {
-    id: "tpex_otci",
-    name: "櫃買指數",
-    metric: "TPEx",
-    value: "258.32",
-    change: "-1.14",
-    percent: "-0.44%",
-    trend: "down",
-    asOf: FALLBACK_AS_OF,
-    sourceMode: "fallback_static",
-  },
-  {
-    id: "twii_0050",
-    name: "台灣50",
-    metric: "Index",
-    value: "18,920.10",
-    change: "+92.30",
-    percent: "+0.49%",
-    trend: "up",
-    asOf: FALLBACK_AS_OF,
-    sourceMode: "fallback_static",
-  },
-  {
-    id: "sector_ele",
-    name: "電子類股",
-    metric: "Sector Index",
-    value: "1,284.62",
-    change: "+8.91",
-    percent: "+0.70%",
-    trend: "up",
-    asOf: FALLBACK_AS_OF,
-    sourceMode: "fallback_static",
-  },
-  {
-    id: "sector_fin",
-    name: "金融保險",
-    metric: "Sector Index",
-    value: "2,132.45",
-    change: "-6.18",
-    percent: "-0.29%",
-    trend: "down",
-    asOf: FALLBACK_AS_OF,
-    sourceMode: "fallback_static",
-  },
-];
-
-const FALLBACK_TICKER_ITEMS: HomepageMarketItem[] = [
-  ...FALLBACK_MARKET_ITEMS,
-  {
-    id: "monthly_revenue_yoy",
-    name: "月營收 YoY",
-    metric: "Fundamentals",
-    value: "+34.7%",
-    change: "MOPS 月營收",
-    percent: "",
-    trend: "up",
-    asOf: "2026-04",
-    sourceMode: "fallback_static",
-  },
-];
+// Display metadata only — NO index values are hardcoded here. Every number on the homepage comes from
+// the single live source (/v2/homepage/market-indices → market_index / index_data_items latest close
+// + as_of). The old hardcoded "fallback demo" values are gone: a stale demo 加權指數 (23,481.52) was
+// rendering next to the live one (47,018.99) on the same page, i.e. two different values for the same
+// index. If the source has no data we now render NOTHING rather than a fabricated number.
+// Unknown keys returned by the API still render, using the name the API supplies.
+const INDEX_META: Record<string, { name: string; metric: string }> = {
+  twse_taiex: { name: "加權指數", metric: "TAIEX" },
+  tpex_otci: { name: "櫃買指數", metric: "TPEx" },
+  twii_0050: { name: "台灣50", metric: "Index" },
+  sector_ele: { name: "電子類股", metric: "Sector Index" },
+  sector_fin: { name: "金融保險", metric: "Sector Index" },
+};
 
 function isRecord(v: unknown): v is AnyRecord {
   return !!v && typeof v === "object";
-}
-
-function getRows(payload: unknown): AnyRecord[] {
-  if (!isRecord(payload)) return [];
-  const envelope = isRecord(payload.envelope) ? payload.envelope : null;
-  const candidates = [payload.rows, payload.data, payload.items, payload.results, envelope?.rows, envelope?.data];
-  for (const item of candidates) {
-    if (Array.isArray(item)) return item.filter(isRecord);
-  }
-  return [];
 }
 
 function toNumber(value: unknown): number | null {
@@ -147,13 +79,14 @@ function pickNumber(row: AnyRecord, keys: string[]): number | null {
   return null;
 }
 
+// Returns "" when the row carries no date — there is no fallback date to substitute.
 function pickDate(row: AnyRecord): string {
   const keys = ["trade_date", "date", "as_of_date", "updated_at"];
   for (const key of keys) {
     const value = row[key];
     if (typeof value === "string" && value.length >= 10) return value.slice(0, 10);
   }
-  return FALLBACK_AS_OF;
+  return "";
 }
 
 function formatNumber(value: number, digits = 2): string {
@@ -174,11 +107,6 @@ function inferTrend(change: number): Trend {
   return "neutral";
 }
 
-function isLikelyPlaceholderApiKey(value: string): boolean {
-  const v = value.trim().toLowerCase();
-  return !v || v.includes("your_api_key") || v.includes("placeholder") || v.includes("demo");
-}
-
 export function getTwFeatureEngineBaseUrl(): string | null {
   const base =
     process.env.TW_FEATURE_ENGINE_API_BASE ??
@@ -191,50 +119,7 @@ export function getTwFeatureEngineBaseUrl(): string | null {
   return base ? base.replace(/\/$/, "") : null;
 }
 
-async function safeFetchJson(path: string): Promise<{ ok: boolean; payload: unknown | null }> {
-  const baseUrl = getTwFeatureEngineBaseUrl();
-  if (!baseUrl) return { ok: false, payload: null };
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  const apiKey = process.env.TW_FEATURE_ENGINE_API_KEY ?? process.env.BACKEND_API_TOKEN ?? process.env.BACKEND_API_KEY ?? "";
-  const headers: Record<string, string> = {};
-  if (apiKey && !isLikelyPlaceholderApiKey(apiKey)) headers["x-api-key"] = apiKey;
-
-  try {
-    const res = await fetch(`${baseUrl}${path}`, {
-      method: "GET",
-      headers,
-      signal: controller.signal,
-      next: { revalidate: REVALIDATE_SECONDS },
-    });
-    if (!res.ok) return { ok: false, payload: null };
-    const payload = await res.json();
-    return { ok: true, payload };
-  } catch {
-    return { ok: false, payload: null };
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-function normalizeTaiExRow(row: AnyRecord): HomepageMarketItem | null {
-  const value = pickNumber(row, ["index_value", "close", "value", "last"]);
-  if (value === null) return null;
-  const change = pickNumber(row, ["change", "change_value", "point_change", "delta"]) ?? 0;
-  const changePct = pickNumber(row, ["change_pct", "change_percent", "pct_change", "percent"]);
-  return {
-    id: "twse_taiex",
-    name: "加權指數",
-    metric: "TAIEX",
-    value: formatNumber(value),
-    change: formatSigned(change),
-    percent: changePct === null ? "" : `${formatSigned(changePct)}%`,
-    trend: inferTrend(change),
-    asOf: pickDate(row),
-    sourceMode: "live_api",
-  };
-}
 
 // Service-token call for the curated homepage indices endpoint. Uses BACKEND_API_TOKEN
 // (server-side only) so the homepage does not depend on a data api key.
@@ -261,15 +146,23 @@ async function safeFetchServiceJson(path: string): Promise<{ ok: boolean; payloa
   }
 }
 
-// Overlay a live index row from /v2/homepage/market-indices onto its static placeholder.
-function liveItemFromApiRow(row: AnyRecord, base: HomepageMarketItem): HomepageMarketItem {
-  const value = toNumber(row.value);
-  if (value === null) return base;
+// Build a homepage index row from a live /v2/homepage/market-indices row. Returns null when the row
+// carries no usable value — we never substitute a placeholder number.
+function itemFromApiRow(row: AnyRecord): HomepageMarketItem | null {
+  const key = typeof row.key === "string" ? row.key : "";
+  const value = pickNumber(row, ["value", "index_value", "close", "last"]);
+  if (!key || value === null) return null;
+
+  const meta = INDEX_META[key];
+  const name = meta?.name ?? (typeof row.name === "string" && row.name ? row.name : key);
   const change = toNumber(row.change) ?? 0;
   const changePct = toNumber(row.change_pct);
-  const asOf = typeof row.as_of === "string" && row.as_of.length >= 10 ? row.as_of.slice(0, 10) : base.asOf;
+  const asOf = typeof row.as_of === "string" && row.as_of.length >= 10 ? row.as_of.slice(0, 10) : pickDate(row);
+
   return {
-    ...base,
+    id: key,
+    name,
+    metric: meta?.metric ?? "Index",
     value: formatNumber(value),
     change: formatSigned(change),
     percent: changePct === null ? "" : `${formatSigned(changePct)}%`,
@@ -279,123 +172,69 @@ function liveItemFromApiRow(row: AnyRecord, base: HomepageMarketItem): HomepageM
   };
 }
 
+// THE single index source for the whole homepage. Both the hero panel and the marquee read this, so
+// the same index can never render two different values again.
 export async function getHomepageMarketSnapshot(): Promise<HomepageMarketSnapshot> {
   const result = await safeFetchServiceJson("/v2/homepage/market-indices");
+
   if (result.ok && isRecord(result.payload) && Array.isArray(result.payload.indices)) {
-    // Backend keys (twse_taiex / sector_ele / sector_fin) match the placeholder item ids.
-    const liveByKey = new Map<string, AnyRecord>();
-    for (const row of result.payload.indices) {
-      if (isRecord(row) && typeof row.key === "string") liveByKey.set(row.key, row);
-    }
+    const items = result.payload.indices
+      .filter(isRecord)
+      .map(itemFromApiRow)
+      .filter((item): item is HomepageMarketItem => item !== null);
 
-    let liveCount = 0;
-    const items = FALLBACK_MARKET_ITEMS.map((base) => {
-      const row = liveByKey.get(base.id);
-      if (!row) return base; // 櫃買/台灣50 have no backend data → stay honest demo.
-      const item = liveItemFromApiRow(row, base);
-      if (item.sourceMode === "live_api") liveCount += 1;
-      return item;
-    });
-
-    if (liveCount > 0) {
-      const asOf = typeof result.payload.as_of === "string" ? result.payload.as_of.slice(0, 10) : null;
+    if (items.length > 0) {
+      const asOf =
+        typeof result.payload.as_of === "string" && result.payload.as_of.length >= 10
+          ? result.payload.as_of.slice(0, 10)
+          : items[0].asOf;
       return {
         items,
         sourceMode: "live_api",
-        statusLabel:
-          liveCount >= items.length
-            ? "每日更新 · 資料來源：TW Feature Engine（即時）"
-            : "每日更新 · 加權指數與電子/金融為即時，櫃買/台灣50 為展示資料",
-        updatedAt: asOf ?? FALLBACK_AS_OF,
+        // User-facing status only — no internal terms (no "fallback demo" / "live 跑馬").
+        statusLabel: asOf ? `資料日期 ${asOf}` : "",
+        updatedAt: asOf || null,
       };
     }
   }
 
-  return {
-    items: FALLBACK_MARKET_ITEMS,
-    sourceMode: "fallback_static",
-    statusLabel: "每日更新 · fallback demo（非完整 live 指標）",
-    updatedAt: FALLBACK_AS_OF,
-  };
+  // No live data → render nothing. Showing a stale demo index is worse than showing none.
+  return { items: [], sourceMode: "unavailable", statusLabel: "", updatedAt: null };
 }
 
+// The marquee mirrors the hero's snapshot exactly (same source, same values, same as_of). It used to
+// call a different endpoint and carry its own hardcoded fallback list, which is what produced the
+// second, contradictory 加權指數 on the homepage.
 export async function getHomepageTickerTape(): Promise<HomepageTickerTape> {
-  const [marketRes, chipRes] = await Promise.all([
-    safeFetchJson("/v2/datasets/market-index?index_code=TWSE_TAIEX&market=TWSE&latest=true&limit=1&include_data_gaps=true"),
-    safeFetchJson("/v2/datasets/institutional-flow-market-aggregate?market=TWSE&latest=true&limit=1"),
-  ]);
-
-  const items = [...FALLBACK_TICKER_ITEMS];
-  let sourceMode: SourceMode = "fallback_static";
-  let updatedAt: string | null = FALLBACK_AS_OF;
-
-  if (marketRes.ok) {
-    const rows = getRows(marketRes.payload);
-    const taiex = rows.length > 0 ? normalizeTaiExRow(rows[0]) : null;
-    if (taiex) {
-      const idx = items.findIndex((item) => item.id === taiex.id);
-      if (idx >= 0) items[idx] = taiex;
-      sourceMode = "live_api";
-      updatedAt = taiex.asOf;
-    }
-  }
-
-  if (chipRes.ok) {
-    const rows = getRows(chipRes.payload);
-    if (rows.length > 0) {
-      const netBuySell = pickNumber(rows[0], ["total_institutional_net_buy_sell", "net_buy_sell"]);
-      if (netBuySell !== null) {
-        const tone = inferTrend(netBuySell);
-        items.push({
-          id: "inst_flow_agg",
-          name: "三大法人淨買賣",
-          metric: "Market Aggregate",
-          value: `${formatSigned(netBuySell, 0)} 張`,
-          change: "市場聚合",
-          percent: "",
-          trend: tone,
-          asOf: pickDate(rows[0]),
-          sourceMode: "live_api",
-        });
-        sourceMode = "live_api";
-      }
-    }
-  }
-
+  const snapshot = await getHomepageMarketSnapshot();
   return {
-    items,
-    sourceMode,
-    statusLabel:
-      sourceMode === "live_api"
-        ? "每日更新 · 資料來源：TW Feature Engine（部分欄位 fallback）"
-        : "每日更新 · fallback demo（非完整 live 跑馬）",
-    updatedAt,
+    items: snapshot.items,
+    sourceMode: snapshot.sourceMode,
+    statusLabel: snapshot.statusLabel,
+    updatedAt: snapshot.updatedAt,
   };
 }
 
+// Coverage proof-points. Every number here comes from the coverage-facts SSOT (DB-verified). Slots
+// with no verified fact emit NO number — the caller's non-numeric default renders instead. The old
+// values (1,080 主檔 / 11,870 籌碼 / 37,196 月營收 / 12,268 財報列) were hardcoded and stale: the real
+// monthly-revenue figure is 331,109 rows. Financial-statement row counts and a chip/master count are
+// not in the SSOT yet, so they are intentionally omitted rather than hardcoded — wire them here once
+// A台's stats endpoint (or a coverage-facts update) provides them.
 export async function getHomepageCoverageMetrics(): Promise<HomepageCoverageMetric[]> {
+  const twse = coverageFacts.twseDailyPrice;
+  const revenue = coverageFacts.monthlyRevenue;
+
   return [
     {
       key: "twse_first",
-      value: "1,080 檔主檔（TWSE）",
-      evidence:
-        "/Volumes/DEV_USB/Projects/tw-feature-engine/docs/research/P1_SECURITY_MASTER_TWSE_OFFICIAL_CONTROLLED_WRITE_20260530T172524Z.md",
-    },
-    {
-      key: "low_latency",
-      value: "11,870 列籌碼 closeout",
-      evidence: "/Volumes/DEV_USB/Projects/tw-feature-engine/src/feature_engine/read_api/registry.py",
+      value: `${twse.stocks.toLocaleString("en-US")} 檔上市個股（TWSE）`,
+      evidence: `coverage-facts SSOT (DB-verified ${COVERAGE_FACTS_SNAPSHOT_DATE})`,
     },
     {
       key: "official_first",
-      value: "37,196 筆月營收",
-      evidence: "/Volumes/DEV_USB/Projects/tw-feature-engine/docs/generated/llms-full.txt",
-    },
-    {
-      key: "clear_boundary",
-      value: "12,268 / 12,689 / 12,685 財報列",
-      evidence:
-        "/Volumes/DEV_USB/Projects/tw-feature-engine/docs/research/P1_FUNDAMENTALS_CORE_DAILY_READINESS_AND_AI_ALIGNMENT_20260531T164229Z.md",
+      value: `月營收 ${revenue.rows.toLocaleString("en-US")} 列（自 ${revenue.earliestPeriod.slice(0, 4)}）`,
+      evidence: `coverage-facts SSOT (DB-verified ${COVERAGE_FACTS_SNAPSHOT_DATE})`,
     },
   ];
 }
