@@ -44,6 +44,10 @@ const offersLd = {
     "@type": "Brand",
     name: "TW Market Data",
   },
+  // Absolute image URL clears Google's "商家資訊 / Merchant listings" required-field error for
+  // image. Built from siteConfig so it stays correct per environment. Shipping/return fields are
+  // optional and physical-commerce only — intentionally omitted for a SaaS product.
+  image: getAbsoluteUrl("/og-image.png"),
   url: getAbsoluteUrl("/pricing"),
   offers: pricingOffers,
 };
