@@ -144,9 +144,13 @@ export async function createApiKeyForUser(input: { email: string; name?: string 
     };
   } catch (error) {
     if (error instanceof SelfServeError) {
-      // Surface the API's machine code; the route maps it to a status. api_key_limit_exceeded is
-      // normalized to the existing api_key_limit_reached signal the UI already understands.
-      throw new Error(error.code === "api_key_limit_exceeded" ? "api_key_limit_reached" : error.code);
+      // Keep it a SelfServeError so the API's STATUS survives. Flattening to Error(code) here is what
+      // forced the route to re-derive a status from a hard-coded table — the 403→402 re-map hack. The
+      // API now owns paywall semantics (402 + payment block, owner ruling R2), so the route just
+      // propagates. Only the code is normalized: api_key_limit_exceeded → the api_key_limit_reached
+      // signal the UI already understands.
+      const code = error.code === "api_key_limit_exceeded" ? "api_key_limit_reached" : error.code;
+      throw new SelfServeError(error.status, code, error.message, error.payment);
     }
     throw error;
   }
