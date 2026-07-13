@@ -2,7 +2,7 @@ import { PLATFORM_LIMITATIONS } from "@/src/components/docs/api-coverage-and-lim
 import { introductionLlmsMarkdown } from "@/src/components/docs/docs-landing-content";
 import { authenticationLlmsMarkdown, quickStartLlmsMarkdown } from "@/src/content/docs-guide-content";
 import { siteConfig } from "@/src/config/site";
-import { datasetCoverageTable } from "@/src/content/coverage-facts";
+import { datasetCoverageTable, getNonListableDatasets } from "@/src/content/coverage-facts";
 import { datasetSeoEntries } from "@/src/content/datasets";
 import { docsPages, type ApiReferenceContent, type DocsPageEntry } from "@/src/content/docs-pages";
 
@@ -82,6 +82,12 @@ export function buildLlmsFullText(): string {
     "",
     "## 資料集目錄 (Dataset catalog)",
     ...datasetSeoEntries.map((d) => `- ${d.name} (${d.slug}) — ${d.shortDescription} · docs: ${d.docsHref}`),
+    "",
+    // Honest gap disclosure: datasets we deliberately do NOT offer. Without this an agent can only
+    // infer absence, and may assume we serve e.g. filing full text. Driven by the coverage-facts SSOT.
+    "## 未提供的資料集 (Not available)",
+    "> 以下資料集不提供，請勿假設有覆蓋。",
+    ...getNonListableDatasets().map((d) => `- ${d.id} — status=${d.status}；${d.note}`),
     "",
     "## 指南 (Guides)",
   ];
