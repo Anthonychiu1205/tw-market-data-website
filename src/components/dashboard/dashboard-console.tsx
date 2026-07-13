@@ -19,6 +19,7 @@ import { UsagePageShell } from "@/src/components/dashboard/usage-page-shell";
 import { RequestResponsePlayground } from "@/src/components/dashboard/request-response-playground";
 import { OverviewUsageChart } from "@/src/components/dashboard/overview-usage-chart";
 import { AccountProfileForm } from "@/src/components/dashboard/account-profile-form";
+import { DeleteAccountCard } from "@/src/components/dashboard/delete-account-card";
 import { ResearchTerminalEntryCard } from "@/src/components/dashboard/research-terminal-entry-card";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
 import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
@@ -285,6 +286,7 @@ function OverviewPanel({
             canRevoke={apiKeys.canRevoke}
             keyLimit={apiKeys.keyLimit}
             createDisabledReason={apiKeys.createDisabledReason}
+            needsSubscription={apiKeys.needsSubscription}
           />
         </div>
       </DashboardCard>
@@ -317,6 +319,7 @@ function KeysPanel({ apiKeys }: { apiKeys: ApiKeysSummary }) {
             canRevoke={apiKeys.canRevoke}
             keyLimit={apiKeys.keyLimit}
             createDisabledReason={apiKeys.createDisabledReason}
+            needsSubscription={apiKeys.needsSubscription}
           />
         </div>
       </DashboardCard>
@@ -379,10 +382,7 @@ function SettingsPanel({
                 <button className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>登出</button>
               </form>
             </div>
-            <div className="flex items-center justify-between gap-4 px-5 py-4">
-              <p className="text-sm font-medium text-slate-900">刪除帳號</p>
-              <button className={buttonClass("danger-secondary", "h-9 rounded-lg px-4 text-xs")}>刪除</button>
-            </div>
+            <DeleteAccountCard email={email} />
           </div>
         </DashboardCard>
       </section>

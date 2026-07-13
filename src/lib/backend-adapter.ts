@@ -130,6 +130,10 @@ export type ApiKeysSummary = {
   keyLimit?: number | null;
   // Human-readable reason the Create button is disabled (limit reached / can't create), else null.
   createDisabledReason?: string | null;
+  // True when the account has no subscription: the API's create endpoint hard-gates with
+  // subscription_required, so the UI must route the user to checkout instead of offering a Create
+  // button that is guaranteed to fail.
+  needsSubscription?: boolean;
 };
 
 export type ProductCatalogRow = {

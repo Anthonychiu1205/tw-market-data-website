@@ -16,6 +16,8 @@ type ApiKeysManagerProps = {
   keyLimit?: number | null;
   // Server-provided reason the create action is unavailable (used when it isn't a plain limit hit).
   createDisabledReason?: string | null;
+  // Account has no subscription: the API gates key creation, so route to checkout instead.
+  needsSubscription?: boolean;
 };
 
 type CreateApiKeyResponse = {
@@ -80,6 +82,7 @@ export function ApiKeysManager({
   canRevoke,
   keyLimit,
   createDisabledReason,
+  needsSubscription,
 }: ApiKeysManagerProps) {
   const [keys, setKeys] = useState(initialKeys);
   const [newKeyName, setNewKeyName] = useState("");
@@ -155,6 +158,9 @@ export function ApiKeysManager({
       if (!response.ok || !payload?.apiKey || !payload.secret) {
         if (payload?.error === "invalid_api_key_name") throw new Error("invalid_api_key_name");
         if (payload?.error === "api_key_limit_reached") throw new Error("api_key_limit_reached");
+        // 402 from the API's subscription gate — a permanent state, not a transient failure.
+        if (payload?.error === "subscription_required") throw new Error("subscription_required");
+        if (payload?.error === "entitlement_inactive") throw new Error("entitlement_inactive");
         if (payload?.error === "api_key_encryption_unavailable") throw new Error("api_key_encryption_unavailable");
         throw new Error("create_failed");
       }
@@ -194,6 +200,16 @@ export function ApiKeysManager({
             ? `已達方案金鑰上限（${keyLimit} 把）。請先撤銷未使用的金鑰，或升級方案以提高上限。`
             : "已達方案金鑰上限。請先撤銷未使用的金鑰，或升級方案以提高上限。",
         );
+      } else if (error instanceof Error && error.message === "subscription_required") {
+        // Permanent gate — do NOT say "請稍後再試" (the old message implied a transient error and
+        // left every new signup at a dead end). Close the modal and point at the real path.
+        setIsModalOpen(false);
+        setErrorMessage(
+          "免費層不含 API key。你可以直接免金鑰試 5 檔（2330／2317／2454／0050／2603）；要取得 API key 請先選擇方案。",
+        );
+      } else if (error instanceof Error && error.message === "entitlement_inactive") {
+        setIsModalOpen(false);
+        setErrorMessage("你的方案目前未生效（可能待付款或已到期）。請至方案頁確認後再試。");
       } else if (error instanceof Error && error.message === "api_key_encryption_unavailable") {
         setErrorMessage("目前無法安全建立可複製的金鑰，請稍後再試或聯繫管理員。");
       } else {
@@ -448,21 +464,40 @@ export function ApiKeysManager({
         </div>
       ) : null}
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <button
-          type="button"
-          disabled={!canCreateNow}
-          onClick={() => {
-            setErrorMessage(null);
-            setIsModalOpen(true);
-          }}
-          title={createDisabledHint ?? undefined}
-          className={buttonClass("primary", "h-11 rounded-2xl px-6 text-sm")}
-        >
-          Create
-        </button>
-        {createDisabledHint ? <p className="text-xs text-amber-600">{createDisabledHint}</p> : null}
-      </div>
+      {/* No subscription: the API gates key creation (403 subscription_required), so offer the real
+          path — free no-key trial + choose a plan — instead of a Create button that always fails. */}
+      {needsSubscription ? (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+          <p className="text-sm font-medium text-amber-900">免費層不含 API key</p>
+          <p className="mt-1 text-sm leading-6 text-amber-800">
+            你可以<strong>免金鑰</strong>直接試 5 檔（2330／2317／2454／0050／2603）；要取得 API key 請先選擇方案。
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <a href="/pricing" className={buttonClass("primary", "h-9 rounded-lg px-4 text-xs")}>
+              查看方案
+            </a>
+            <a href="/docs/quick-start" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
+              免金鑰快速試用
+            </a>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <button
+            type="button"
+            disabled={!canCreateNow}
+            onClick={() => {
+              setErrorMessage(null);
+              setIsModalOpen(true);
+            }}
+            title={createDisabledHint ?? undefined}
+            className={buttonClass("primary", "h-11 rounded-2xl px-6 text-sm")}
+          >
+            Create
+          </button>
+          {createDisabledHint ? <p className="text-xs text-amber-600">{createDisabledHint}</p> : null}
+        </div>
+      )}
 
       <p className="text-xs text-slate-500">
         API key 可用於呼叫 /v2 API。請妥善保存，若外洩請立即撤銷並重建。
