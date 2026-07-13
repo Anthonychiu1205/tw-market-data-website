@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getSession } from "@/src/auth/session";
 import { createApiKeyForUser, getApiKeysSummaryForUser } from "@/src/lib/api-keys/service";
+import { SelfServeError } from "@/src/lib/api-keys/self-serve-client";
 import { getDashboardEntitlementForUser } from "@/src/lib/billing/subscription";
 
 export const runtime = "nodejs";
@@ -61,18 +62,28 @@ export async function POST(request: Request) {
     if (code === "invalid_api_key_name") {
       return NextResponse.json({ error: "invalid_api_key_name" }, { status: 400 });
     }
-    if (code === "api_key_limit_reached") {
-      return NextResponse.json({ error: "api_key_limit_reached" }, { status: 409 });
-    }
-    // Self-serve gate errors (need an active subscription + entitlement to mint a key).
-    if (code === "subscription_required") {
-      return NextResponse.json({ error: "subscription_required" }, { status: 402 });
-    }
-    if (code === "entitlement_inactive") {
-      return NextResponse.json({ error: "entitlement_inactive" }, { status: 403 });
-    }
     if (code === "self_serve_unavailable") {
       return NextResponse.json({ error: "api_keys_unavailable" }, { status: 503 });
+    }
+
+    // R2: the API owns the status semantics now (402 = paywall + payment block, 403 = has a plan but
+    // it is inactive, 401 = auth). We propagate rather than re-derive — the old hard-coded table here
+    // was re-mapping the API's 403 subscription_required into a 402, and would have silently drifted
+    // from the API the moment either side changed.
+    if (error instanceof SelfServeError) {
+      // api_key_limit_reached stays 409: it is the signal this UI already understands, and it is a
+      // conflict with existing state rather than a paywall.
+      if (error.code === "api_key_limit_reached") {
+        return NextResponse.json({ error: "api_key_limit_reached", message: error.message }, { status: 409 });
+      }
+      return NextResponse.json(
+        {
+          error: error.code,
+          message: error.message,
+          ...(error.payment ? { payment: error.payment } : {}),
+        },
+        { status: error.status },
+      );
     }
 
     return NextResponse.json({ error: "api_key_create_failed" }, { status: 500 });

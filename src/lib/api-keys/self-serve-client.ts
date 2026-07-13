@@ -17,14 +17,23 @@ const TOKEN_TTL_MS = 5 * 60 * 1000;
 type TokenEntry = { token: string; expiresAt: number };
 const tokenCache = new Map<string, TokenEntry>();
 
+export type PaymentBlock = {
+  price: number | null;
+  credits_url: string;
+  purchase_hint: string;
+};
+
 export class SelfServeError extends Error {
   readonly status: number;
   readonly code: string;
-  constructor(status: number, code: string, message?: string) {
+  /** The API's additive `payment` object. Present on 402 (paywall) only. */
+  readonly payment?: PaymentBlock;
+  constructor(status: number, code: string, message?: string, payment?: PaymentBlock) {
     super(message ?? code);
     this.name = "SelfServeError";
     this.status = status;
     this.code = code;
+    this.payment = payment;
   }
 }
 
@@ -57,7 +66,11 @@ async function ssvFetch(path: string, init: RequestInit): Promise<Record<string,
   if (!res.ok) {
     const code = typeof json.error === "string" ? json.error : "self_serve_error";
     const message = typeof json.message === "string" ? json.message : undefined;
-    throw new SelfServeError(res.status, code, message);
+    // 402 carries an additive `payment` block (price / credits_url / purchase_hint). Keep it on the
+    // error so the route can hand the UI a real purchase CTA instead of a bare status.
+    const payment =
+      json.payment && typeof json.payment === "object" ? (json.payment as PaymentBlock) : undefined;
+    throw new SelfServeError(res.status, code, message, payment);
   }
   return json;
 }
