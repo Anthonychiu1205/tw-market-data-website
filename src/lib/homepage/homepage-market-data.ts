@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getCatalogStats } from "@/src/lib/catalog/catalog-stats";
 import { COVERAGE_FACTS_SNAPSHOT_DATE, coverageFacts } from "@/src/content/coverage-facts";
 
 type SourceMode = "live_api" | "fallback_static" | "unavailable";
@@ -225,16 +226,27 @@ export async function getHomepageCoverageMetrics(): Promise<HomepageCoverageMetr
   const twse = coverageFacts.twseDailyPrice;
   const revenue = coverageFacts.monthlyRevenue;
 
+  // Live counts from A台's /v2/data-catalog/stats, when the flag is on AND the endpoint returns
+  // usable rows. Today it 404s, so this map is always empty and every figure below comes from the
+  // coverage-facts SSOT exactly as before — wiring is in place, switched off. Per-metric fallback:
+  // a live count is used only for the specific metric it covers, never partially applied.
+  const stats = await getCatalogStats();
+  const ssot = `coverage-facts SSOT (DB-verified ${COVERAGE_FACTS_SNAPSHOT_DATE})`;
+  const live = "live /v2/data-catalog/stats";
+
+  const liveTwseStocks = stats.get("twse_daily_price")?.distinctTickers;
+  const liveRevenueRows = stats.get("monthly_revenue")?.rows;
+
   return [
     {
       key: "twse_first",
-      value: `${twse.stocks.toLocaleString("en-US")} 檔上市個股（TWSE）`,
-      evidence: `coverage-facts SSOT (DB-verified ${COVERAGE_FACTS_SNAPSHOT_DATE})`,
+      value: `${(liveTwseStocks ?? twse.stocks).toLocaleString("en-US")} 檔上市個股（TWSE）`,
+      evidence: liveTwseStocks !== undefined ? live : ssot,
     },
     {
       key: "official_first",
-      value: `月營收 ${revenue.rows.toLocaleString("en-US")} 列（自 ${revenue.earliestPeriod.slice(0, 4)}）`,
-      evidence: `coverage-facts SSOT (DB-verified ${COVERAGE_FACTS_SNAPSHOT_DATE})`,
+      value: `月營收 ${(liveRevenueRows ?? revenue.rows).toLocaleString("en-US")} 列（自 ${revenue.earliestPeriod.slice(0, 4)}）`,
+      evidence: liveRevenueRows !== undefined ? live : ssot,
     },
   ];
 }
