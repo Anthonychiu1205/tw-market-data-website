@@ -32,6 +32,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/datasets/institutional-flow", changeFrequency: "weekly", priority: 0.85 },
     { path: "/datasets/securities-lending", changeFrequency: "weekly", priority: 0.85 },
     { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
+    { path: "/compare/twmarketdata-vs-finmind-vs-tej", changeFrequency: "monthly", priority: 0.8 },
     { path: "/connect", changeFrequency: "weekly", priority: 0.85 },
     { path: "/connect/key-safety", changeFrequency: "monthly", priority: 0.5 },
     { path: "/connect/which-tier", changeFrequency: "monthly", priority: 0.5 },

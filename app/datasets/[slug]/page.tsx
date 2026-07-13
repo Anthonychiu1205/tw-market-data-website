@@ -4,9 +4,11 @@ import { notFound } from "next/navigation";
 
 import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
+import { ReconciliationBadge } from "@/src/components/datasets/reconciliation-badge";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 import { getDatasetBySlug, datasetSeoEntries } from "@/src/content/datasets";
 import { datasetTemporalCoverage } from "@/src/content/coverage-facts";
+import { getDatasetReconciliation } from "@/src/lib/reconciliation/dataset-reconciliation";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -15,6 +17,11 @@ type PageProps = {
 export function generateStaticParams() {
   return datasetSeoEntries.map((item) => ({ slug: item.slug }));
 }
+
+// ISR: the reconciliation badge reads a backend record that lands later (persistence job runs with
+// db_write:false today). Revalidating hourly lets the badge light up once the data lands, with no
+// rebuild — the rest of the page is static content from src/content/datasets.ts.
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -58,6 +65,9 @@ export default async function DatasetSlugPage({ params }: PageProps) {
   if (!dataset) {
     notFound();
   }
+
+  // Trust badge state (null until the backend reconciliation record lands → badge hidden).
+  const reconciliation = await getDatasetReconciliation(dataset.slug);
 
   const pageUrl = `https://twmarketdata.com/datasets/${dataset.slug}`;
   const docsUrl = `https://twmarketdata.com${dataset.docsHref}`;
@@ -183,7 +193,10 @@ export default async function DatasetSlugPage({ params }: PageProps) {
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
-          <h2 className="text-xl font-semibold text-slate-950">Coverage / Freshness / Source Policy</h2>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold text-slate-950">Coverage / Freshness / Source Policy</h2>
+            <ReconciliationBadge data={reconciliation} />
+          </div>
           <div className="mt-4 space-y-3 text-base leading-7 text-slate-600">
             <p>{dataset.coverageNote}</p>
             <p>{dataset.freshnessNote}</p>
