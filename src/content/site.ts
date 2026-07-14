@@ -1,10 +1,3 @@
-export const mainNav = [
-  { href: "/product", label: "產品" },
-  { href: "/api", label: "API" },
-  { href: "/docs", label: "文件" },
-  { href: "/pricing", label: "方案" },
-];
-
 export type DatasetProduct = {
   id: string;
   name: string;
@@ -73,18 +66,4 @@ export const platformCapabilities = [
     title: "V2 能力",
     items: ["query / search", "screener / factor", "MCP / agent workflow"],
   },
-];
-
-export const creditsReference = [
-  { endpoint: "/v2/datasets/twse-daily-price", unit: "每 1,000 次", cost: "NT$15" },
-  { endpoint: "/v2/datasets/tpex-daily-price", unit: "每 1,000 次", cost: "NT$15" },
-  { endpoint: "/v2/datasets/monthly-revenue", unit: "每 1,000 次", cost: "NT$18" },
-  { endpoint: "/v2/datasets/income-statement", unit: "每 1,000 次", cost: "NT$20" },
-  { endpoint: "/v2/datasets/balance-sheet", unit: "每 1,000 次", cost: "NT$20" },
-  { endpoint: "/v2/datasets/cash-flow-statement", unit: "每 1,000 次", cost: "NT$20" },
-  { endpoint: "/v2/datasets/valuation-data", unit: "每 1,000 次", cost: "NT$18" },
-  { endpoint: "/v2/datasets/technical-indicators", unit: "每 1,000 次", cost: "NT$18" },
-  { endpoint: "/v2/datasets/institutional-flow", unit: "每 1,000 次", cost: "NT$18" },
-  { endpoint: "/v2/datasets/securities-lending", unit: "每 1,000 次", cost: "NT$18" },
-  { endpoint: "/v2/datasets/market-overview-snapshots", unit: "每 1,000 次", cost: "NT$16" },
 ];
