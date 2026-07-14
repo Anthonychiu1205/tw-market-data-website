@@ -437,6 +437,8 @@ async function DashboardSectionData({
         type: item.type,
         status: item.status,
         amountTwd: item.amountTwd,
+        amountMinor: item.amountMinor,
+        currency: item.currency,
         credits: item.credits,
         balanceAfter: item.balanceAfter,
         provider: item.provider,

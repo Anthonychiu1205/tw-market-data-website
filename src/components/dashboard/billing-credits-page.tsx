@@ -16,7 +16,11 @@ import { Download, RefreshCw } from "lucide-react";
 
 import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
-import { formatCredits, formatTwd, getCreditPackageViews } from "@/src/lib/billing/credits";
+import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
+
+import { formatCredits, formatTwd } from "@/src/lib/billing/credits";
+import { getCreditPackViews, getPricePerCredit, type CreditPackCode } from "@/src/lib/billing/credit-packs";
+import { createCreditPackCheckout } from "@/src/lib/billing/checkout-actions";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
 import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
 
@@ -117,6 +121,8 @@ type BillingCreditsPageProps = {
     type: string;
     status: string;
     amountTwd: number | null;
+    amountMinor: number | null;
+    currency: string | null;
     credits: number;
     balanceAfter: number | null;
     provider: string | null;
@@ -180,6 +186,23 @@ function extractUsageMetadata(transaction: BillingCreditsPageProps["transactions
   return { requestId, datasetSlug };
 }
 
+// Local USD display formatter. P0-B replaces this with the central formatMoney(amountMinor, currency).
+function formatPackPrice(amountMinor: number) {
+  return `$${(amountMinor / 100).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+}
+
+// New rows carry amountMinor + currency; legacy rows only have amountTwd. Render each honestly in
+// its own currency rather than relabelling old TWD rows as USD. P0-B backfills and removes the fallback.
+function formatTransactionAmount(transaction: { amountMinor: number | null; currency: string | null; amountTwd: number | null }) {
+  if (transaction.amountMinor !== null) {
+    const currency = (transaction.currency ?? "USD").toUpperCase();
+    const major = (transaction.amountMinor / 100).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    return currency === "USD" ? `$${major}` : `${major} ${currency}`;
+  }
+  if (transaction.amountTwd !== null) return formatTwd(transaction.amountTwd);
+  return "—";
+}
+
 export function BillingCreditsPage({ creditsModeState, walletBalance, usageReconciliation, transactions }: BillingCreditsPageProps) {
   const router = useRouter();
   const mountedAtRef = useRef<number>(0);
@@ -189,12 +212,44 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
   const [transactionFilter, setTransactionFilter] = useState<"all" | "usage" | "purchase" | "adjustment">("all");
   const activeMonthKey = MONTH_KEYS[activeMonthIndex];
   const spendSeries = SPEND_SERIES[activeMonthKey] ?? [];
-  const packages = useMemo(() => getCreditPackageViews(), []);
+  const packages = useMemo(() => getCreditPackViews(), []);
+  const [pendingPack, setPendingPack] = useState<CreditPackCode | null>(null);
+  const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const latestTransactionAt = transactions.length > 0 ? transactions[0]?.createdAt ?? null : null;
   const filteredTransactions = useMemo(() => {
     if (transactionFilter === "all") return transactions;
     return transactions.filter((item) => item.type === transactionFilter);
   }, [transactionFilter, transactions]);
+  async function handleBuyPack(packCode: CreditPackCode) {
+    if (pendingPack) return;
+    setPendingPack(packCode);
+    setPurchaseError(null);
+
+    try {
+      const result = await createCreditPackCheckout(packCode);
+      if (!result.ok) {
+        setPurchaseError(
+          result.error === "checkout_unavailable"
+            ? "目前無法開啟結帳，請稍後再試。"
+            : result.error === "unauthenticated"
+              ? "請先登入後再購買。"
+              : "此儲值方案暫時無法購買。",
+        );
+        return;
+      }
+      // Inline overlay — the user never leaves the dashboard. Credits are granted by the Polar
+      // webhook once payment settles, so we refresh the wallet after the overlay closes.
+      const checkout = await PolarEmbedCheckout.create(result.url, { theme: "light" });
+      checkout.addEventListener("close", () => {
+        router.refresh();
+      });
+    } catch {
+      setPurchaseError("目前無法開啟結帳，請稍後再試。");
+    } finally {
+      setPendingPack(null);
+    }
+  }
+
   const reconciliationMismatch =
     usageReconciliation &&
     (usageReconciliation.totalChargedCredits !== usageReconciliation.totalTransactionCredits ||
@@ -259,7 +314,6 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
               : getCreditsModeDescription(creditsModeState)}
           </p>
           <p className="mt-1 text-xs font-medium text-slate-600">模式：{getCreditsModeLabel(creditsModeState)}</p>
-          <p className="mt-6 text-xs text-slate-500">Credits 儲值將隨用量計費（Meters）一併開放，敬請期待。</p>
         </DashboardCard>
 
         <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
@@ -369,13 +423,14 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
                 <th className="px-3 py-3 text-left font-medium">方案</th>
                 <th className="px-3 py-3 text-left font-medium">金額</th>
                 <th className="px-3 py-3 text-left font-medium">入帳 credits</th>
-                <th className="px-3 py-3 text-left font-medium">額外加值</th>
+                <th className="px-3 py-3 text-left font-medium">單價 / credit</th>
+                <th className="px-3 py-3 text-right font-medium">購買</th>
               </tr>
             </thead>
             <tbody>
               {packages.map((pkg) => (
                 <tr
-                  key={pkg.packageCode}
+                  key={pkg.code}
                   className="border-t border-slate-200/70 transition hover:bg-white/70"
                 >
                   <td className="px-3 py-3 text-sm font-medium text-slate-700">
@@ -386,16 +441,28 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
                       </span>
                     ) : null}
                   </td>
-                  <td className="px-3 py-3 text-sm text-slate-700">{formatTwd(pkg.priceTwd)}</td>
+                  <td className="px-3 py-3 text-sm text-slate-700">{formatPackPrice(pkg.priceMinor)}</td>
                   <td className="px-3 py-3 text-sm text-slate-700">{formatCredits(pkg.credits)}</td>
-                  <td className="px-3 py-3 text-sm text-slate-700">
-                    {pkg.bonusCredits > 0 ? `${formatCredits(pkg.bonusCredits)} credits` : "標準入帳"}
+                  <td className="px-3 py-3 text-sm text-slate-700">${getPricePerCredit(pkg).toFixed(5)}</td>
+                  <td className="px-3 py-3 text-right">
+                    <button
+                      type="button"
+                      onClick={() => void handleBuyPack(pkg.code)}
+                      disabled={pendingPack !== null}
+                      className={buttonClass("primary", "h-9 rounded-lg px-4 text-xs")}
+                    >
+                      {pendingPack === pkg.code ? "開啟結帳…" : "購買"}
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        {purchaseError ? <p className="mt-3 text-xs text-red-600">{purchaseError}</p> : null}
+        <p className="mt-3 text-xs text-slate-500">
+          付款完成後由 Polar 通知入帳，credits 會自動加進錢包；若尚未顯示，稍候重新整理即可。
+        </p>
       </DashboardCard>
 
       <DashboardCard className="rounded-3xl border-slate-200/70 bg-white px-6 py-5 shadow-none">
@@ -561,7 +628,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
                               : `${formatCredits(transaction.credits)} credits`}
                           </span>
                         </td>
-                        <td className="px-2 py-3 text-sm text-slate-700">{transaction.amountTwd ? formatTwd(transaction.amountTwd) : "—"}</td>
+                        <td className="px-2 py-3 text-sm text-slate-700">{formatTransactionAmount(transaction)}</td>
                         <td className="px-2 py-3 text-sm text-slate-700">
                           {formatTransactionDate(transaction.createdAt)}
                         </td>
