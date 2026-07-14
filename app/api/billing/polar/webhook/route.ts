@@ -36,7 +36,7 @@ export const POST = Webhooks({
     const order = payload.data as unknown as {
       id?: string;
       metadata?: Record<string, unknown>;
-      customer?: { externalId?: string | null } | null;
+      customer?: { externalId?: string | null; email?: string | null } | null;
       totalAmount?: number | null;
       currency?: string | null;
     };
@@ -48,23 +48,31 @@ export const POST = Webhooks({
     // rather than guessing, and ack so Polar stops retrying.
     if (!packCode) return;
 
-    // externalCustomerId is the NextAuth user id we set at checkout. Without it we cannot know whose
-    // wallet to credit, and we must not guess.
-    const userId = readString(order.customer?.externalId) ?? readString(metadata.user_id);
+    // Resolving the buyer, most reliable first:
+    //   1. customer.external_id — the NextAuth user id we pass as externalCustomerId. NOT reliable
+    //      on its own: Polar does not overwrite the external_id of an existing customer matched by
+    //      email, so customers created before we started sending it arrive with external_id = null.
+    //   2. metadata.user_id — we now stamp this at checkout, so it is set for every new order.
+    //   3. customer email — the recovery path. Orders paid BEFORE (2) shipped have neither of the
+    //      above, and would otherwise 500 forever while the customer is out of pocket. User.email is
+    //      unique, and the payload is signature-verified, so this is a deterministic, safe match.
     const orderId = readString(order.id);
+    const userId = readString(order.customer?.externalId) ?? readString(metadata.user_id);
+    const customerEmail = readString(order.customer?.email);
 
-    if (!userId || !orderId) {
-      console.error("[polar-webhook] credit pack order missing user or order id", {
-        hasUser: Boolean(userId),
+    if (!orderId || (!userId && !customerEmail)) {
+      console.error("[polar-webhook] credit pack order cannot be attributed", {
         hasOrder: Boolean(orderId),
+        hasUser: Boolean(userId),
+        hasEmail: Boolean(customerEmail),
       });
-      // Throwing makes Polar retry; a missing id is not something a retry fixes, but silently
-      // dropping a PAID order would lose a customer's money. Surface it loudly instead.
+      // Throw so Polar retries. Silently dropping a PAID order would lose a customer's money.
       throw new Error("credit_pack_order_missing_identifiers");
     }
 
     const result = await fulfilCreditPurchase({
       userId,
+      customerEmail,
       orderId,
       packCode,
       amountMinor: typeof order.totalAmount === "number" ? order.totalAmount : null,

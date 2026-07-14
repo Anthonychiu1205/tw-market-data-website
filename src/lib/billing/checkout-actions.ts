@@ -45,7 +45,11 @@ export async function createCheckoutSession(planCode: string): Promise<CreateChe
       embedOrigin,
       externalCustomerId: userId,
       customerEmail: email,
-      metadata: { plan_id: planCode },
+      // user_id for the same reason as the credit-pack checkout: externalCustomerId is not
+      // applied to a pre-existing Polar customer matched by email, so it can arrive null on the
+      // order. The read API service owns subscription provisioning; sending user_id gives its
+      // webhook a reliable fallback instead of depending on external_id being set.
+      metadata: { plan_id: planCode, user_id: userId },
     });
 
     return { ok: true, url: checkout.url };
@@ -89,7 +93,13 @@ export async function createCreditPackCheckout(packCode: string): Promise<Create
       customerEmail: email,
       // credit_pack is what the webhook keys on. credits is included for observability only —
       // the webhook re-reads it from the SSOT and ignores this value.
-      metadata: { credit_pack: pack.code, credits: String(pack.credits) },
+      //
+      // user_id is REQUIRED, not redundant with externalCustomerId: when Polar matches an
+      // existing customer by email, it does NOT overwrite that customer's existing
+      // external_id — so a customer created before we started sending it keeps external_id
+      // = null, and order.customer.external_id arrives null. Without this the webhook cannot
+      // attribute a PAID order to a user.
+      metadata: { credit_pack: pack.code, credits: String(pack.credits), user_id: userId },
     });
 
     return { ok: true, url: checkout.url };

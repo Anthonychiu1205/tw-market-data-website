@@ -17,8 +17,17 @@ import { getCreditPack, isCreditPackCode } from "@/src/lib/billing/credit-packs"
 // webhook payload. Even if a payload claimed credits: 999999999, we grant what the pack defines.
 
 export type FulfilCreditPurchaseInput = {
-  /** NextAuth user id — passed to Polar as externalCustomerId at checkout. */
-  userId: string;
+  /**
+   * NextAuth user id, from customer.external_id or checkout metadata.user_id. May be absent for
+   * orders paid before we stamped user_id into checkout metadata — hence customerEmail.
+   */
+  userId?: string | null;
+  /**
+   * Fallback identity: the email the customer paid with. User.email is unique, so this resolves
+   * deterministically. Used only when userId is absent, which recovers already-paid orders whose
+   * Polar customer has external_id = null.
+   */
+  customerEmail?: string | null;
   /** Polar order id. The idempotency key. */
   orderId: string;
   /** Pack code from the checkout metadata. */
@@ -48,12 +57,19 @@ export async function fulfilCreditPurchase(
 
   try {
     const result = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.findUnique({ where: { id: input.userId }, select: { id: true } });
+      // Resolve inside the transaction so the wallet cannot be created for a user that vanishes.
+      const user = input.userId
+        ? await tx.user.findUnique({ where: { id: input.userId }, select: { id: true } })
+        : input.customerEmail
+          ? await tx.user.findUnique({ where: { email: input.customerEmail }, select: { id: true } })
+          : null;
       if (!user) return { kind: "unknown_user" as const };
 
+      const userId = user.id;
+
       const wallet = await tx.creditWallet.upsert({
-        where: { userId: input.userId },
-        create: { userId: input.userId, balance: 0 },
+        where: { userId },
+        create: { userId, balance: 0 },
         update: {},
         select: { id: true, balance: true },
       });
@@ -64,7 +80,7 @@ export async function fulfilCreditPurchase(
       // P2002 here and the whole transaction (including the increment below) is rolled back.
       await tx.creditTransaction.create({
         data: {
-          userId: input.userId,
+          userId,
           walletId: wallet.id,
           type: "purchase",
           status: "completed",
@@ -89,7 +105,11 @@ export async function fulfilCreditPurchase(
     });
 
     if (result.kind === "unknown_user") {
-      console.error("[credit-fulfilment] no such user", { orderId: input.orderId });
+      console.error("[credit-fulfilment] could not resolve buyer", {
+        orderId: input.orderId,
+        byUserId: Boolean(input.userId),
+        byEmail: Boolean(input.customerEmail),
+      });
       return { ok: false, error: "unknown_user" };
     }
 
