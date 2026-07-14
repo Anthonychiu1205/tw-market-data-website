@@ -75,64 +75,6 @@ export const platformCapabilities = [
   },
 ];
 
-export const pricingPlans = [
-  {
-    name: "Enterprise",
-    monthly: "聯繫我們",
-    yearly: "聯繫我們",
-    summary: "全量 available-now 能力 + 客製擴充。",
-    features: ["available-now datasets 全開通", "Custom API key / quota / rpm", "SLA / support / custom access"],
-    cta: "聯繫我們",
-  },
-  {
-    name: "Team",
-    monthly: "NT$6,000",
-    yearly: "NT$72,000",
-    summary: "高配額團隊方案。",
-    features: ["多數核心資料集", "API Keys 10 / RPM 600", "完整 usage breakdown 與 billing preview"],
-    cta: "選擇團隊方案",
-  },
-  {
-    name: "Pro",
-    monthly: "NT$1,490",
-    yearly: "NT$17,880",
-    summary: "進階資料與商業使用。",
-    features: ["核心資料集 + 量化查詢", "API Keys 5 / RPM 120", "完整用量總覽與 dataset breakdown"],
-    cta: "選擇專業方案",
-  },
-  {
-    name: "Developer",
-    monthly: "NT$690",
-    yearly: "NT$8,280",
-    summary: "開發驗證與輕量整合。",
-    features: ["核心起步資料集", "API Keys 2 / RPM 30", "基本用量總覽與簡化 breakdown"],
-    cta: "選擇開發者方案",
-  },
-  {
-    name: "Free",
-    monthly: "免費",
-    yearly: "免費",
-    summary: "免金鑰試用與接線測試。",
-    // 免費層不含 API key(後端 R1 裁決:free api_keys_limit = 0)。舊文案寫「API Keys 1」,
-    // 但後端一律以 subscription_required 拒發金鑰 —— 定價頁不能承諾拿不到的東西。
-    features: [
-      "免金鑰試 5 檔(2330 / 2317 / 2454 / 0050 / 2603)",
-      "不含 API key;需 API key 與商業使用請選付費方案",
-      "基本用量顯示",
-    ],
-    cta: "開始使用",
-  },
-];
-
-export const pricingMatrix = [
-  { capability: "可用資料集數量", enterprise: "全量開通", team: "多數", pro: "核心 + 進階", developer: "核心", free: "基礎" },
-  { capability: "API 金鑰", enterprise: "Custom", team: "10", pro: "5", developer: "2", free: "不含(免金鑰試 5 檔)" },
-  { capability: "每日配額", enterprise: "Custom", team: "20,000", pro: "4,000", developer: "800", free: "100" },
-  { capability: "每月配額", enterprise: "Custom", team: "500,000", pro: "100,000", developer: "20,000", free: "2,000" },
-  { capability: "RPM", enterprise: "Custom", team: "600", pro: "120", developer: "30", free: "10" },
-  { capability: "商業使用", enterprise: "是", team: "是", pro: "是", developer: "否", free: "否" },
-];
-
 export const creditsReference = [
   { endpoint: "/v2/datasets/twse-daily-price", unit: "每 1,000 次", cost: "NT$15" },
   { endpoint: "/v2/datasets/tpex-daily-price", unit: "每 1,000 次", cost: "NT$15" },
