@@ -3,7 +3,7 @@ import Link from "next/link";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
 import { buttonClass } from "@/src/components/ui/button";
 import { CancelSubscriptionDialog } from "@/src/components/dashboard/cancel-subscription-dialog";
-import { formatPlanCurrency, getPlanByCode, isPlanCode } from "@/src/lib/billing/plans";
+import { formatPlanPrice, getPlanByCode, isPlanCode } from "@/src/lib/billing/plans";
 import {
   getSubscriptionStatusDescription,
   getSubscriptionStatusLabel,
@@ -36,8 +36,8 @@ function formatPlanName(planCode: string) {
 function formatPlanAmount(planCode: string) {
   if (!isPlanCode(planCode)) return "—";
   const plan = getPlanByCode(planCode);
-  if (plan.monthlyAmount === null) return "聯繫我們";
-  return `${formatPlanCurrency(plan.monthlyAmount)} / 月`;
+  if (plan.monthlyAmountMinor === null) return "聯繫我們";
+  return `${formatPlanPrice(plan.monthlyAmountMinor, plan.currency)} / 月`;
 }
 
 function getToneClass(tone: ReturnType<typeof getSubscriptionStatusTone>) {

@@ -42,10 +42,6 @@ function invalidateWalletCache(userId: string) {
   creditWalletCache.delete(userId);
 }
 
-export function formatTwd(value: number) {
-  return `NT$${new Intl.NumberFormat("en-US").format(value)}`;
-}
-
 export function formatCredits(value: number) {
   return new Intl.NumberFormat("en-US").format(value);
 }
@@ -90,7 +86,6 @@ export async function getCreditTransactionsForUser(userId: string, limit = 10) {
       id: true,
       type: true,
       status: true,
-      amountTwd: true,
       amountMinor: true,
       currency: true,
       credits: true,

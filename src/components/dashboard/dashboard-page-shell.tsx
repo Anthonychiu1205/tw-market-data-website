@@ -13,6 +13,7 @@ import type {
 } from "@/src/lib/backend-adapter";
 import { getBillingSummary } from "@/src/lib/backend-adapter";
 import { getDashboardEntitlementForUser } from "@/src/lib/billing/subscription";
+import { formatMoney } from "@/src/lib/billing/money";
 import { getCreditTransactionsForUser, getCreditWalletForUser } from "@/src/lib/billing/credits";
 import { assertCreditsDeductionRuntimeSafe } from "@/src/lib/billing/credits-mode";
 import { getUsageCreditReconciliationForUser } from "@/src/lib/billing/reconciliation";
@@ -62,7 +63,7 @@ function buildFallbackDailyUsage() {
 const FALLBACK_BILLING: BillingSummary = {
   subscriptionStatus: "trial",
   renewalDate: "-",
-  currentBalance: "NT$0",
+  currentBalance: formatMoney(0, "USD"),
   portalAvailable: false,
   checkoutAvailable: false,
   integrationMode: "fallback",
@@ -436,7 +437,6 @@ async function DashboardSectionData({
         id: item.id,
         type: item.type,
         status: item.status,
-        amountTwd: item.amountTwd,
         amountMinor: item.amountMinor,
         currency: item.currency,
         credits: item.credits,

@@ -25,7 +25,7 @@ import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
 
 import { buttonClass } from "@/src/components/ui/button";
 import {
-  formatPlanCurrency,
+  formatPlanPrice,
   getPricingPlanView,
   getPricingPlanViews,
   type PlanHighlightIcon,
@@ -216,7 +216,7 @@ export function PricingShell() {
 
                   <div className="mt-10 min-h-[64px]">
                     <p className="whitespace-nowrap text-4xl font-medium tracking-tight text-slate-900">
-                      {formatPlanCurrency(isAnnual ? plan.annualAmount : plan.monthlyAmount)}
+                      {formatPlanPrice(isAnnual ? plan.annualAmountMinor : plan.monthlyAmountMinor, plan.currency)}
                       <span className="ml-1.5 inline-block align-baseline text-sm font-normal text-slate-400"> / {isAnnual ? "年" : "月"}</span>
                     </p>
                     {isAnnual ? (

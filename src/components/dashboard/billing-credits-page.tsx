@@ -18,7 +18,8 @@ import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
 import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
 
-import { formatCredits, formatTwd } from "@/src/lib/billing/credits";
+import { formatCredits } from "@/src/lib/billing/credits";
+import { formatMoney, formatMoneyOrFallback } from "@/src/lib/billing/money";
 import { getCreditPackViews, getPricePerCredit, type CreditPackCode } from "@/src/lib/billing/credit-packs";
 import { createCreditPackCheckout } from "@/src/lib/billing/checkout-actions";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
@@ -120,7 +121,6 @@ type BillingCreditsPageProps = {
     id: string;
     type: string;
     status: string;
-    amountTwd: number | null;
     amountMinor: number | null;
     currency: string | null;
     credits: number;
@@ -186,21 +186,11 @@ function extractUsageMetadata(transaction: BillingCreditsPageProps["transactions
   return { requestId, datasetSlug };
 }
 
-// Local USD display formatter. P0-B replaces this with the central formatMoney(amountMinor, currency).
-function formatPackPrice(amountMinor: number) {
-  return `$${(amountMinor / 100).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-}
-
-// New rows carry amountMinor + currency; legacy rows only have amountTwd. Render each honestly in
-// its own currency rather than relabelling old TWD rows as USD. P0-B backfills and removes the fallback.
-function formatTransactionAmount(transaction: { amountMinor: number | null; currency: string | null; amountTwd: number | null }) {
-  if (transaction.amountMinor !== null) {
-    const currency = (transaction.currency ?? "USD").toUpperCase();
-    const major = (transaction.amountMinor / 100).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-    return currency === "USD" ? `$${major}` : `${major} ${currency}`;
-  }
-  if (transaction.amountTwd !== null) return formatTwd(transaction.amountTwd);
-  return "—";
+// Every row now carries amountMinor + currency (legacy TWD rows were backfilled with currency=TWD),
+// so a row renders in the currency it was actually charged in — an old NT$ charge is not relabelled
+// as USD. Rows with no recorded amount show "—" rather than a fabricated $0.
+function formatTransactionAmount(transaction: { amountMinor: number | null; currency: string | null }) {
+  return formatMoneyOrFallback(transaction.amountMinor, transaction.currency, "—");
 }
 
 export function BillingCreditsPage({ creditsModeState, walletBalance, usageReconciliation, transactions }: BillingCreditsPageProps) {
@@ -441,7 +431,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
                       </span>
                     ) : null}
                   </td>
-                  <td className="px-3 py-3 text-sm text-slate-700">{formatPackPrice(pkg.priceMinor)}</td>
+                  <td className="px-3 py-3 text-sm text-slate-700">{formatMoney(pkg.priceMinor, pkg.currency)}</td>
                   <td className="px-3 py-3 text-sm text-slate-700">{formatCredits(pkg.credits)}</td>
                   <td className="px-3 py-3 text-sm text-slate-700">${getPricePerCredit(pkg).toFixed(5)}</td>
                   <td className="px-3 py-3 text-right">
@@ -518,7 +508,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
                   tick={{ fontSize: 11, fill: "#94a3b8" }}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `NT$${value}`}
+                  tickFormatter={(value) => formatMoney(Number(value) * 100, "USD")}
                   ticks={[0, 500, 1000]}
                   domain={[0, 1000]}
                   width={58}
@@ -536,7 +526,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
                     const rawValue = Array.isArray(value) ? value[0] : value;
                     const numericValue = typeof rawValue === "number" ? rawValue : Number(rawValue ?? 0);
                     const safeValue = Number.isFinite(numericValue) ? numericValue : 0;
-                    return [`NT$${safeValue.toLocaleString()}`, "花費"];
+                    return [formatMoney(safeValue * 100, "USD"), "花費"];
                   }}
                   labelFormatter={(label) => `日期 ${label}`}
                 />

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { PricingShell } from "@/src/components/pricing/pricing-shell";
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
+import { toMajor } from "@/src/lib/billing/money";
 import { getPricingPlanViews } from "@/src/lib/billing/plans";
 
 // Offers derived from the local plan SSOT (plans.ts) — monthly, USD. Only tiers that carry a
@@ -12,19 +13,19 @@ import { getPricingPlanViews } from "@/src/lib/billing/plans";
 // (it is still shown on the visible page). Every emitted entry is a fully-specified Offer with
 // a numeric price string + priceCurrency, which is the valid object type GSC expects.
 const pricingOffers = getPricingPlanViews()
-  .filter((plan) => plan.monthlyAmount !== null)
+  .filter((plan) => plan.monthlyAmountMinor !== null)
   .map((plan) => ({
     "@type": "Offer",
     name: `${plan.displayName} plan`,
     category: "SubscriptionService",
     url: getAbsoluteUrl("/pricing"),
-    price: String(plan.monthlyAmount),
-    priceCurrency: "USD",
+    price: String(toMajor(plan.monthlyAmountMinor as number)),
+    priceCurrency: plan.currency,
     availability: "https://schema.org/InStock",
     priceSpecification: {
       "@type": "UnitPriceSpecification",
-      price: String(plan.monthlyAmount),
-      priceCurrency: "USD",
+      price: String(toMajor(plan.monthlyAmountMinor as number)),
+      priceCurrency: plan.currency,
       unitText: "MONTH",
     },
   }));

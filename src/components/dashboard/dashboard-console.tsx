@@ -70,7 +70,6 @@ type DashboardConsoleProps = {
     id: string;
     type: string;
     status: string;
-    amountTwd: number | null;
     amountMinor: number | null;
     currency: string | null;
     credits: number;

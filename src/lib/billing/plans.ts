@@ -9,6 +9,8 @@
 //   max        $200   10 keys RPM 3,000   300,000/mo    all datasets, full history
 //   developer  $2000  20 keys RPM 12,000  3,000,000/mo  all datasets, full history, webhook
 //   enterprise contact custom custom      custom        all datasets, full_raw, dedicated
+import { formatMoneyOrFallback, type CurrencyCode } from "@/src/lib/billing/money";
+
 export type PlanCode = "starter" | "pro" | "max" | "developer" | "enterprise";
 export type PricingPlanCode = PlanCode | "free";
 
@@ -38,11 +40,14 @@ export type PlanHighlight = {
 export type BillingPlan = {
   planCode: PlanCode;
   displayName: string;
-  monthlyAmount: number | null;
-  // Annual price in USD = monthly × 10 (i.e. "2 months free" vs paying monthly ×12).
+  // Money in integer MINOR units (USD cents) — never floats, and never a bare number whose currency
+  // you have to infer from which formatter you called. Render with formatMoney(minor, currency).
+  monthlyAmountMinor: number | null;
+  // Annual price = monthly × 10 (i.e. "2 months free" vs paying monthly ×12).
   // null for contact-only tiers. Display-only for now — yearly Polar checkout is not
   // wired yet (no yearly price id), so the pricing UI treats annual as "coming soon".
-  annualAmount: number | null;
+  annualAmountMinor: number | null;
+  currency: CurrencyCode;
   apiKeyLimit: number | null;
   datasetLimit: string;
   isContactOnly: boolean;
@@ -52,8 +57,9 @@ export type PricingPlanView = {
   planCode: PricingPlanCode;
   displayName: string;
   summary: string;
-  monthlyAmount: number | null;
-  annualAmount: number | null;
+  monthlyAmountMinor: number | null;
+  annualAmountMinor: number | null;
+  currency: CurrencyCode;
   monthlyHint: string;
   usageMultiplier: string;
   highlights: PlanHighlight[];
@@ -69,8 +75,9 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
   starter: {
     planCode: "starter",
     displayName: "Starter",
-    monthlyAmount: 20,
-    annualAmount: 200,
+    monthlyAmountMinor: 2000,
+    annualAmountMinor: 20000,
+    currency: "USD",
     apiKeyLimit: 2,
     datasetLimit: "全部資料集（不含財報三表）",
     isContactOnly: false,
@@ -78,8 +85,9 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
   pro: {
     planCode: "pro",
     displayName: "Pro",
-    monthlyAmount: 100,
-    annualAmount: 1000,
+    monthlyAmountMinor: 10000,
+    annualAmountMinor: 100000,
+    currency: "USD",
     apiKeyLimit: 5,
     datasetLimit: "全部資料集（含財報三表）",
     isContactOnly: false,
@@ -87,8 +95,9 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
   max: {
     planCode: "max",
     displayName: "Max",
-    monthlyAmount: 200,
-    annualAmount: 2000,
+    monthlyAmountMinor: 20000,
+    annualAmountMinor: 200000,
+    currency: "USD",
     apiKeyLimit: 10,
     datasetLimit: "全部資料集（完整歷史）",
     isContactOnly: false,
@@ -96,8 +105,9 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
   developer: {
     planCode: "developer",
     displayName: "Developer",
-    monthlyAmount: 2000,
-    annualAmount: 20000,
+    monthlyAmountMinor: 200000,
+    annualAmountMinor: 2000000,
+    currency: "USD",
     apiKeyLimit: 20,
     datasetLimit: "全部資料集（含 webhook）",
     isContactOnly: false,
@@ -105,15 +115,16 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
   enterprise: {
     planCode: "enterprise",
     displayName: "Enterprise",
-    monthlyAmount: null,
-    annualAmount: null,
+    monthlyAmountMinor: null,
+    annualAmountMinor: null,
+    currency: "USD",
     apiKeyLimit: null,
     datasetLimit: "客製資料範圍",
     isContactOnly: true,
   },
 };
 
-const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "displayName" | "monthlyAmount" | "annualAmount" | "isContactOnly" | "apiKeyLimit" | "datasetLimit">> = {
+const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "displayName" | "monthlyAmountMinor" | "annualAmountMinor" | "currency" | "isContactOnly" | "apiKeyLimit" | "datasetLimit">> = {
   enterprise: {
     summary: "以已驗證資料集為核心，搭配客製化方案。",
     monthlyHint: "客製合約",
@@ -201,8 +212,9 @@ const FREE_PLAN_VIEW: PricingPlanView = {
   planCode: "free",
   displayName: "Free",
   summary: "免費接入與測試，非商業使用。",
-  monthlyAmount: 0,
-  annualAmount: 0,
+  monthlyAmountMinor: 0,
+  annualAmountMinor: 0,
+  currency: "USD",
   monthlyHint: "免費方案",
   usageMultiplier: "1 req/s",
   highlights: [
@@ -234,9 +246,12 @@ export function getPlanByCode(planCode: PlanCode) {
   return BILLING_PLANS[planCode];
 }
 
-export function formatPlanCurrency(amount: number | null) {
-  if (amount === null) return "聯繫我們";
-  return `$${new Intl.NumberFormat("en-US").format(amount)}`;
+/**
+ * Plan price for display. Contact-only tiers have no amount — say so rather than printing "$0".
+ * Delegates to the central currency-aware formatter; this module no longer hardcodes a symbol.
+ */
+export function formatPlanPrice(amountMinor: number | null, currency: CurrencyCode = "USD") {
+  return formatMoneyOrFallback(amountMinor, currency, "聯繫我們");
 }
 
 export function getPricingPlanView(planCode: PricingPlanCode): PricingPlanView {
@@ -250,8 +265,9 @@ export function getPricingPlanView(planCode: PricingPlanCode): PricingPlanView {
   return {
     planCode,
     displayName: plan.displayName,
-    monthlyAmount: plan.monthlyAmount,
-    annualAmount: plan.annualAmount,
+    monthlyAmountMinor: plan.monthlyAmountMinor,
+    annualAmountMinor: plan.annualAmountMinor,
+    currency: plan.currency,
     isContactOnly: plan.isContactOnly,
     apiKeyLimit: plan.apiKeyLimit,
     datasetLimit: plan.datasetLimit,
