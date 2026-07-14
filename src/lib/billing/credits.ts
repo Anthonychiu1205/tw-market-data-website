@@ -119,3 +119,77 @@ export async function getOrCreateCreditWallet(userId: string) {
   setCachedWallet(userId, wallet);
   return wallet;
 }
+
+// ─── Real spend series (replaces the hardcoded SPEND_SERIES demo) ────────────────────────────────
+//
+// "Spend" = money actually paid: purchases, NET of refunds (a refund is a negative amountMinor).
+//
+// Currencies are NOT summed together. Legacy rows are genuinely TWD and new rows are USD; adding
+// 500 TWD to 10 USD would produce a meaningless number. The chart plots USD only and the caller is
+// told whether other-currency rows exist, so it can say so instead of silently dropping them.
+
+export type SpendDay = { date: string; label: string; spend: number };
+export type SpendMonth = { key: string; label: string; points: SpendDay[]; totalMinor: number };
+
+export type CreditSpendSeries = {
+  /** Months that actually have USD transactions — no fabricated month buckets. */
+  months: SpendMonth[];
+  currency: "USD";
+  /** True when the user also has non-USD (legacy TWD) rows that the chart excludes. */
+  hasExcludedCurrencies: boolean;
+};
+
+export async function getCreditSpendSeriesForUser(userId: string): Promise<CreditSpendSeries> {
+  const prisma = await loadPrisma();
+
+  const rows = await prisma.creditTransaction.findMany({
+    where: {
+      userId,
+      type: { in: ["purchase", "refund"] },
+      status: "completed",
+      amountMinor: { not: null },
+    },
+    select: { amountMinor: true, currency: true, createdAt: true },
+    orderBy: { createdAt: "asc" },
+  });
+
+  const usd = rows.filter((row) => (row.currency ?? "USD").toUpperCase() === "USD");
+  const hasExcludedCurrencies = rows.length > usd.length;
+
+  const byMonth = new Map<string, SpendMonth>();
+  for (const row of usd) {
+    const minor = row.amountMinor ?? 0;
+    const iso = row.createdAt.toISOString().slice(0, 10);
+    const monthKey = iso.slice(0, 7);
+
+    let month = byMonth.get(monthKey);
+    if (!month) {
+      month = { key: monthKey, label: monthKey, points: [], totalMinor: 0 };
+      byMonth.set(monthKey, month);
+    }
+    month.totalMinor += minor;
+
+    // One point per DAY that had activity — cumulative within the month, so a refund visibly pulls
+    // the line back down instead of disappearing.
+    const label = `${iso.slice(5, 7)}/${iso.slice(8, 10)}`;
+    const existing = month.points.find((point) => point.date === iso);
+    if (existing) {
+      existing.spend += minor / 100;
+    } else {
+      month.points.push({ date: iso, label, spend: minor / 100 });
+    }
+  }
+
+  const months = [...byMonth.values()].sort((a, b) => a.key.localeCompare(b.key));
+  for (const month of months) {
+    month.points.sort((a, b) => a.date.localeCompare(b.date));
+    // Running total across the month.
+    let running = 0;
+    for (const point of month.points) {
+      running += point.spend;
+      point.spend = Math.round(running * 100) / 100;
+    }
+  }
+
+  return { months, currency: "USD", hasExcludedCurrencies };
+}

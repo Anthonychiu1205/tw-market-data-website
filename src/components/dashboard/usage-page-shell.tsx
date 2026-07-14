@@ -101,6 +101,8 @@ function inferApiLabel(dataset: string, endpoint: string): string {
   return parts.at(-1) ?? "-";
 }
 
+const USAGE_ROWS_LIMIT = 100;
+
 export function UsagePageShell({ usageRequests, usageSummary, creditState, creditsModeState, usageReconciliation }: UsagePageShellProps) {
   const rows = usageRequests.rows;
 
@@ -297,7 +299,7 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
                 </defs>
                 <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 4" vertical={false} />
                 <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} axisLine={false} ticks={[0, 1, 2]} domain={[0, 2]} width={32} />
+                <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} axisLine={false} domain={[0, "auto"]} allowDecimals={false} width={40} />
                 <Tooltip
                   cursor={{ stroke: "#94a3b8", strokeWidth: 1, strokeDasharray: "4 4" }}
                   contentStyle={{
@@ -461,9 +463,12 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
             </table>
           </div>
 
+          {/* Pagination was fabricated: "第 1 頁，共 1 頁 / 顯示 100 筆" was hardcoded regardless of how
+              many rows existed. Rather than fake a pager, state honestly what is shown and that the
+              list is capped — a real server-side pager is a separate change. */}
           <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
-            <span>第 1 頁，共 1 頁</span>
-            <span>顯示 100 筆</span>
+            <span>顯示最近 {usageRequests.rows.length.toLocaleString()} 筆</span>
+            <span>{usageRequests.rows.length >= USAGE_ROWS_LIMIT ? `僅顯示最近 ${USAGE_ROWS_LIMIT} 筆` : "已顯示全部"}</span>
           </div>
         </DashboardCard>
       </div>

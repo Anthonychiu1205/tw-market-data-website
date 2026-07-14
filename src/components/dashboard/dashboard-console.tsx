@@ -21,6 +21,7 @@ import { OverviewUsageChart } from "@/src/components/dashboard/overview-usage-ch
 import { AccountProfileForm } from "@/src/components/dashboard/account-profile-form";
 import { DeleteAccountCard } from "@/src/components/dashboard/delete-account-card";
 import { ResearchTerminalEntryCard } from "@/src/components/dashboard/research-terminal-entry-card";
+import type { CreditSpendSeries } from "@/src/lib/billing/credits";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
 import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
 
@@ -54,6 +55,7 @@ type DashboardConsoleProps = {
     cancelReasonDetail: string | null;
   } | null;
   creditWalletBalance: number;
+  spendSeries: CreditSpendSeries;
   creditsModeState: CreditsDeductionRuntimeState;
   usageReconciliation: {
     windowDays: number;
@@ -510,6 +512,7 @@ export function renderSection(section: DashboardSection, props: DashboardConsole
         <BillingCreditsPage
           creditsModeState={props.creditsModeState}
           walletBalance={props.creditWalletBalance}
+          spendSeries={props.spendSeries}
           transactions={props.creditTransactions}
           usageReconciliation={props.usageReconciliation}
         />
