@@ -1,14 +1,11 @@
 import Link from "next/link";
-import { ArrowRight, LineChart, Sparkles } from "lucide-react";
+import { ArrowRight, LineChart } from "lucide-react";
 
 import { buttonClass } from "@/src/components/ui/button";
 
 // T-05 dashboard entry card for the 投研終端 (research terminal).
-// The terminal front-end (F 線 T-01, terminal.twmarketdata.com) is not live yet, so the
-// card is gated: it only links out when NEXT_PUBLIC_TERMINAL_ENABLED === "true". Until
-// then it renders a non-clickable "即將推出" state — never a link to a 404.
+// 終端已上線 (F 線, terminal.twmarketdata.com) → 正式入口:直接 SSO 直達,不再 gated。
 const TERMINAL_URL = "https://terminal.twmarketdata.com";
-const terminalLive = process.env.NEXT_PUBLIC_TERMINAL_ENABLED === "true";
 
 export function ResearchTerminalEntryCard() {
   return (
@@ -20,12 +17,6 @@ export function ResearchTerminalEntryCard() {
               <LineChart size={18} strokeWidth={1.75} />
             </span>
             <h2 className="text-lg font-semibold tracking-tight text-slate-900">投研終端</h2>
-            {!terminalLive ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-semibold text-amber-700">
-                <Sparkles size={12} strokeWidth={2} />
-                即將推出
-              </span>
-            ) : null}
           </div>
           <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
             以官方台股資料為底的線上投研工作台：因子、資料檢視與研究流程，一站完成。登入後可從此直達，
@@ -33,25 +24,13 @@ export function ResearchTerminalEntryCard() {
           </p>
 
           <div className="mt-5">
-            {terminalLive ? (
-              <Link
-                href={TERMINAL_URL}
-                className={buttonClass("primary", "inline-flex items-center gap-2")}
-              >
-                進入投研終端
-                <ArrowRight size={16} strokeWidth={2} />
-              </Link>
-            ) : (
-              <span
-                aria-disabled="true"
-                className={buttonClass(
-                  "primary",
-                  "pointer-events-none inline-flex cursor-not-allowed items-center gap-2 opacity-60",
-                )}
-              >
-                即將推出
-              </span>
-            )}
+            <Link
+              href={TERMINAL_URL}
+              className={buttonClass("primary", "inline-flex items-center gap-2")}
+            >
+              進入投研終端
+              <ArrowRight size={16} strokeWidth={2} />
+            </Link>
           </div>
         </div>
 
