@@ -2,6 +2,8 @@ import "server-only";
 
 import { Polar } from "@polar-sh/sdk";
 
+import type { CreditPackCode } from "@/src/lib/billing/credit-packs";
+
 /**
  * Paid tiers that map to a Polar subscription product. These keys match the read
  * API canonical plan ladder (starter/pro/max/developer) and the Polar product
@@ -51,4 +53,27 @@ export function getPolarProductId(plan: PolarPaidPlanCode): string {
 
 export function getEmbedOrigin(): string | undefined {
   return process.env.NEXT_PUBLIC_SITE_URL?.trim() || undefined;
+}
+
+const CREDIT_PACK_PRODUCT_ENV: Record<CreditPackCode, string> = {
+  small: "POLAR_CREDIT_PACK_SMALL",
+  builder: "POLAR_CREDIT_PACK_BUILDER",
+  pro: "POLAR_CREDIT_PACK_PRO",
+  scale: "POLAR_CREDIT_PACK_SCALE",
+  bulk: "POLAR_CREDIT_PACK_BULK",
+};
+
+/** Polar product id for a prepaid credit pack. Throws when the pack is not configured. */
+export function getPolarCreditPackProductId(pack: CreditPackCode): string {
+  const envName = CREDIT_PACK_PRODUCT_ENV[pack];
+  const value = process.env[envName]?.trim();
+  if (!value) {
+    throw new Error(`${envName} is not configured`);
+  }
+  return value;
+}
+
+/** A pack can only be offered for sale once its Polar product is configured. */
+export function isCreditPackPurchasable(pack: CreditPackCode): boolean {
+  return Boolean(process.env[CREDIT_PACK_PRODUCT_ENV[pack]]?.trim());
 }

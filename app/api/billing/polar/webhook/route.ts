@@ -1,0 +1,90 @@
+import { Webhooks } from "@polar-sh/nextjs";
+
+import { fulfilCreditPurchase } from "@/src/lib/billing/credit-fulfilment";
+
+export const runtime = "nodejs";
+
+// Polar webhook for CREDIT PACK fulfilment.
+//
+// Scope: this endpoint exists because the credit wallet lives in the website's database. Subscription
+// provisioning is NOT handled here — it is owned by the shared Polar webhook in the read API service
+// (keyed on externalCustomerId + product metadata.plan_id). We deliberately ignore subscription
+// events so the two webhooks cannot fight over the same state.
+//
+// Signature verification is done by Webhooks() using POLAR_WEBHOOK_SECRET; an unsigned or forged
+// delivery never reaches our handler. Without that secret configured, no credits can be minted.
+//
+// We only act on order.paid — i.e. money has actually settled. Credits are never granted at checkout
+// creation, so an abandoned or failed payment grants nothing.
+
+function readMetadata(payload: unknown): Record<string, unknown> {
+  if (!payload || typeof payload !== "object") return {};
+  const data = (payload as { data?: unknown }).data;
+  if (!data || typeof data !== "object") return {};
+  const meta = (data as { metadata?: unknown }).metadata;
+  return meta && typeof meta === "object" ? (meta as Record<string, unknown>) : {};
+}
+
+function readString(value: unknown): string | undefined {
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+export const POST = Webhooks({
+  webhookSecret: process.env.POLAR_WEBHOOK_SECRET ?? "",
+
+  onOrderPaid: async (payload) => {
+    const order = payload.data as unknown as {
+      id?: string;
+      metadata?: Record<string, unknown>;
+      customer?: { externalId?: string | null } | null;
+      totalAmount?: number | null;
+      currency?: string | null;
+    };
+
+    const metadata = { ...readMetadata(payload), ...(order.metadata ?? {}) };
+    const packCode = readString(metadata.credit_pack);
+
+    // Not a credit-pack order (e.g. a subscription) — the read API service owns those. Ignore it
+    // rather than guessing, and ack so Polar stops retrying.
+    if (!packCode) return;
+
+    // externalCustomerId is the NextAuth user id we set at checkout. Without it we cannot know whose
+    // wallet to credit, and we must not guess.
+    const userId = readString(order.customer?.externalId) ?? readString(metadata.user_id);
+    const orderId = readString(order.id);
+
+    if (!userId || !orderId) {
+      console.error("[polar-webhook] credit pack order missing user or order id", {
+        hasUser: Boolean(userId),
+        hasOrder: Boolean(orderId),
+      });
+      // Throwing makes Polar retry; a missing id is not something a retry fixes, but silently
+      // dropping a PAID order would lose a customer's money. Surface it loudly instead.
+      throw new Error("credit_pack_order_missing_identifiers");
+    }
+
+    const result = await fulfilCreditPurchase({
+      userId,
+      orderId,
+      packCode,
+      amountMinor: typeof order.totalAmount === "number" ? order.totalAmount : null,
+      currency: order.currency ?? null,
+    });
+
+    if (!result.ok) {
+      // Throw so Polar retries — the customer has paid, so failing quietly would owe them credits.
+      throw new Error(`credit_fulfilment_failed:${result.error}`);
+    }
+
+    if (result.duplicate) {
+      console.info("[polar-webhook] duplicate delivery ignored", { orderId });
+      return;
+    }
+
+    console.info("[polar-webhook] credited wallet", {
+      orderId,
+      packCode,
+      credits: result.credited,
+    });
+  },
+});
