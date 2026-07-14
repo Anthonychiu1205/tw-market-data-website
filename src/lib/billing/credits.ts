@@ -1,5 +1,5 @@
 export type CreditTransactionStatus = "pending" | "completed" | "failed" | "cancelled" | "simulated";
-export type CreditTransactionType = "purchase" | "usage" | "adjustment";
+export type CreditTransactionType = "purchase" | "refund" | "usage" | "adjustment";
 const CREDIT_WALLET_CACHE_TTL_MS = 8_000;
 
 type CreditWalletCacheValue = {

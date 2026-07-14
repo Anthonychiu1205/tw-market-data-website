@@ -125,3 +125,137 @@ export async function fulfilCreditPurchase(
     return { ok: false, error: "failed" };
   }
 }
+
+// ─── Refunds ──────────────────────────────────────────────────────────────────────────────────────
+//
+// A refund without a clawback is a revenue hole: the customer gets their money back AND keeps the
+// credits. This reverses the grant.
+//
+// Idempotency: same mechanism as the purchase — a UNIQUE merchantTradeNo on the refund row. A
+// replayed delivery fails the INSERT with P2002 inside the transaction, so the balance decrement
+// rolls back with it and cannot apply twice.
+//
+// The balance is allowed to go NEGATIVE, deliberately. If a customer bought 4,000 credits, spent
+// 1,000, then refunded, clamping the balance at 0 would let them keep 1,000 credits' worth of data
+// they already consumed AND have their money back. Going to -1,000 means they must top that back up
+// before calling the API again. credits-deduction gates on `balance >= cost`, so a negative balance
+// simply blocks usage — it does not corrupt anything.
+
+export type RevokeCreditPurchaseInput = {
+  /** Polar order id of the ORIGINAL purchase. Used to find what was granted. */
+  orderId: string;
+  /** Polar refund id, when the payload carries one. Required for partial refunds (dedupe key). */
+  refundId?: string | null;
+  /** Amount refunded, minor units. */
+  refundedAmountMinor?: number | null;
+  /** Original order total, minor units. Used to detect a partial refund. */
+  orderTotalMinor?: number | null;
+  currency?: string | null;
+};
+
+export type RevokeCreditPurchaseResult =
+  | { ok: true; revoked: number; balanceAfter: number; duplicate: false }
+  | { ok: true; revoked: 0; balanceAfter: null; duplicate: true }
+  | { ok: true; revoked: 0; balanceAfter: null; duplicate: false; notFulfilled: true }
+  | { ok: false; error: "partial_refund_unsupported" | "failed" };
+
+export async function revokeCreditPurchase(
+  input: RevokeCreditPurchaseInput,
+): Promise<RevokeCreditPurchaseResult> {
+  const purchaseKey = `polar:order:${input.orderId}`;
+
+  try {
+    // What did this order actually grant? Read it from OUR ledger, never from the refund payload.
+    const purchase = await prisma.creditTransaction.findUnique({
+      where: { merchantTradeNo: purchaseKey },
+      select: { id: true, userId: true, walletId: true, credits: true, packageCode: true },
+    });
+
+    // No purchase row → this order never granted credits here (e.g. a subscription order, or it was
+    // refunded before we ever fulfilled it). Nothing to claw back. Ack rather than retry forever.
+    if (!purchase) {
+      return { ok: true, revoked: 0, balanceAfter: null, duplicate: false, notFulfilled: true };
+    }
+
+    // Decide how much to take back.
+    const total = input.orderTotalMinor ?? null;
+    const refunded = input.refundedAmountMinor ?? null;
+    const isPartial = total !== null && refunded !== null && refunded > 0 && refunded < total;
+
+    let creditsToRevoke = purchase.credits;
+    if (isPartial) {
+      // Partial refunds must be deduped on the REFUND id (an order can be refunded more than once).
+      // Without one we cannot dedupe safely, and silently doing nothing would leak credits — so we
+      // refuse loudly instead of guessing.
+      if (!input.refundId) {
+        console.error("[credit-refund] partial refund with no refund id — refusing to guess", {
+          orderId: input.orderId,
+          refunded,
+          total,
+        });
+        return { ok: false, error: "partial_refund_unsupported" };
+      }
+      // Pro-rata, rounded so we never revoke more than was granted.
+      creditsToRevoke = Math.min(purchase.credits, Math.floor((purchase.credits * refunded) / total));
+    }
+
+    if (creditsToRevoke <= 0) {
+      return { ok: true, revoked: 0, balanceAfter: null, duplicate: false, notFulfilled: true };
+    }
+
+    // Dedupe key: the refund id when we have one (supports several partial refunds per order),
+    // otherwise the order id (a full refund happens once).
+    const refundKey = input.refundId
+      ? `polar:refund:${input.refundId}`
+      : `polar:refund:${input.orderId}`;
+
+    const result = await prisma.$transaction(async (tx) => {
+      const wallet = await tx.creditWallet.findUnique({
+        where: { id: purchase.walletId },
+        select: { id: true, balance: true },
+      });
+      if (!wallet) return { kind: "failed" as const };
+
+      const balanceAfter = wallet.balance - creditsToRevoke;
+
+      // UNIQUE merchantTradeNo — the idempotency barrier (P2002 on replay rolls the whole tx back).
+      await tx.creditTransaction.create({
+        data: {
+          userId: purchase.userId,
+          walletId: wallet.id,
+          type: "refund",
+          status: "completed",
+          // Negative: the ledger must show credits leaving the wallet.
+          credits: -creditsToRevoke,
+          balanceAfter,
+          provider: "polar",
+          merchantTradeNo: refundKey,
+          providerTradeNo: input.refundId ?? input.orderId,
+          packageCode: purchase.packageCode,
+          amountMinor: refunded !== null ? -Math.abs(refunded) : null,
+          currency: (input.currency ?? "USD").toUpperCase(),
+          description: isPartial ? "Refund (partial)" : "Refund",
+        },
+      });
+
+      await tx.creditWallet.update({ where: { id: wallet.id }, data: { balance: balanceAfter } });
+
+      return { kind: "revoked" as const, balanceAfter };
+    });
+
+    if (result.kind === "failed") {
+      console.error("[credit-refund] wallet missing for purchase", { orderId: input.orderId });
+      return { ok: false, error: "failed" };
+    }
+
+    return { ok: true, revoked: creditsToRevoke, balanceAfter: result.balanceAfter, duplicate: false };
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      // Already refunded — the expected outcome of a webhook retry. Success, and NOT a second debit.
+      return { ok: true, revoked: 0, balanceAfter: null, duplicate: true };
+    }
+    const errorName = error instanceof Error ? error.name : "UnknownError";
+    console.error(`[credit-refund] failed to revoke credits (${errorName})`, { orderId: input.orderId });
+    return { ok: false, error: "failed" };
+  }
+}

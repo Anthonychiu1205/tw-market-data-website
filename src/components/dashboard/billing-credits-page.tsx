@@ -135,17 +135,19 @@ type BillingCreditsPageProps = {
 };
 
 const TRANSACTION_FILTER_OPTIONS: Array<{
-  id: "all" | "usage" | "purchase" | "adjustment";
+  id: "all" | "usage" | "purchase" | "refund" | "adjustment";
   label: string;
 }> = [
   { id: "all", label: "全部" },
   { id: "usage", label: "API 使用" },
   { id: "purchase", label: "儲值" },
+  { id: "refund", label: "退款" },
   { id: "adjustment", label: "手動調整" },
 ];
 
 function getTransactionTypeLabel(type: string) {
   if (type === "purchase") return "儲值";
+  if (type === "refund") return "退款";
   if (type === "usage") return "API 使用";
   if (type === "adjustment") return "手動調整";
   return "其他";
@@ -199,7 +201,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
   const lastFocusRefreshAtRef = useRef<number>(0);
   const [activeTab, setActiveTab] = useState<"market" | "fundamentals" | "events">("market");
   const [activeMonthIndex, setActiveMonthIndex] = useState(MONTH_KEYS.length - 1);
-  const [transactionFilter, setTransactionFilter] = useState<"all" | "usage" | "purchase" | "adjustment">("all");
+  const [transactionFilter, setTransactionFilter] = useState<"all" | "usage" | "purchase" | "refund" | "adjustment">("all");
   const activeMonthKey = MONTH_KEYS[activeMonthIndex];
   const spendSeries = SPEND_SERIES[activeMonthKey] ?? [];
   const packages = useMemo(() => getCreditPackViews(), []);
@@ -593,6 +595,12 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
                               <p className="text-xs text-slate-500">
                                 request {usageMeta ? toShortRequestId(usageMeta.requestId) : "—"}
                               </p>
+                            </div>
+                          ) : null}
+                          {transaction.type === "refund" ? (
+                            <div className="space-y-1">
+                              <p>{transaction.packageCode ? `退款：方案 ${transaction.packageCode}` : "退款"}</p>
+                              <p className="text-xs text-slate-500">credits 已扣回</p>
                             </div>
                           ) : null}
                           {transaction.type === "purchase" ? (
