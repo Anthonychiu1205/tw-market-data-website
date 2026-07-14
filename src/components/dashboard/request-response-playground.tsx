@@ -61,6 +61,21 @@ type RequestResponsePlaygroundProps = {
   isEntitled: boolean;
 };
 
+// Turn the proxy's machine codes into something actionable. secret_unavailable is the one a user can
+// actually hit: a key minted before at-rest encryption cannot be revealed, so the server cannot use
+// it to call the API — the fix is to regenerate the key, not to retry.
+function describeError(code: string | undefined, status: number): string {
+  if (code === "secret_unavailable") {
+    return "這把金鑰無法取用（建立時間過早，無法還原完整金鑰）。請重新產生一把金鑰後再試。";
+  }
+  if (code === "missing_api_key") return "請先選擇一把 API 金鑰。";
+  if (code === "missing_symbol") return "此端點需要輸入股票代號。";
+  if (code === "invalid_endpoint") return "此端點無法使用，請重新選擇。";
+  if (code === "backend_base_url_missing") return "資料服務暫時無法連線，請稍後再試。";
+  if (code) return `請求失敗：${code}`;
+  return `請求失敗：HTTP ${status}`;
+}
+
 function normalizePlanCode(planCode: string): PlanCode {
   const normalized = planCode.trim().toLowerCase();
   if (normalized === "enterprise") return "enterprise";
@@ -94,16 +109,21 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const keyOptions = useMemo(
+  // Options are keyed by id, NOT by a plaintext key. The list endpoint deliberately never returns a
+  // raw key (service.ts toApiKeyItem), so the old `value: item.keyValue` was always "" and the
+  // Boolean(value) filter dropped EVERY key — the dropdown was permanently empty and submit stayed
+  // disabled. The playground now sends the key id and the server resolves the secret.
+  const usableKeyOptions = useMemo(
     () =>
-      localKeys.map((item) => ({
-        id: item.id,
-        label: `${item.name} (${item.maskedKey})`,
-        value: item.keyValue ?? "",
-      })),
+      localKeys
+        // A revoked key cannot authenticate, so it must not be selectable.
+        .filter((item) => item.status !== "revoked")
+        .map((item) => ({
+          id: item.id,
+          label: `${item.name} (${item.maskedKey})`,
+        })),
     [localKeys],
   );
-  const usableKeyOptions = keyOptions.filter((item) => Boolean(item.value));
 
   const hasAvailableEndpoints = availableEndpoints.length > 0;
   const hasKeyOptions = usableKeyOptions.length > 0;
@@ -161,7 +181,6 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
     setResult(null);
 
     try {
-      const selectedKey = usableKeyOptions.find((item) => item.id === selectedKeyId);
       const response = await fetch("/api/dashboard/playground", {
         method: "POST",
         headers: {
@@ -169,7 +188,8 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
         },
         body: JSON.stringify({
           endpoint,
-          apiKey: selectedKey?.value ?? "",
+          // Only the key id crosses the wire; the raw sk_live_ never reaches the browser.
+          keyId: selectedKeyId,
           symbol: symbol.trim(),
           limit: Number(limit) || 5,
           period: endpointConfig.endpointSupportsPeriod ? period.trim() || undefined : undefined,
@@ -182,7 +202,7 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
       setResult(payload);
 
       if (!response.ok || payload.error) {
-        setErrorMessage(payload.error ? `請求失敗：${payload.error}` : `請求失敗：HTTP ${response.status}`);
+        setErrorMessage(describeError(payload.error, response.status));
       }
     } catch {
       setErrorMessage("目前無法送出 request，請稍後再試。");

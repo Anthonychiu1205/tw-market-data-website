@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getSession } from "@/src/auth/session";
+import { getApiKeySecretForUser } from "@/src/lib/api-keys/service";
 
 type EndpointOption = { path: string; requiresSymbol: boolean; backendPath?: string };
 
@@ -38,7 +39,9 @@ function getBackendBaseUrl() {
 
 type PlaygroundPayload = {
   endpoint?: string;
-  apiKey?: string;
+  // The client sends the key ID only. The raw sk_live_ is resolved server-side and never leaves the
+  // server — the browser must never hold a plaintext key.
+  keyId?: string;
   symbol?: string;
   limit?: number;
   period?: string;
@@ -77,10 +80,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "invalid_endpoint" }, { status: 400 });
   }
 
-  const apiKey = typeof payload.apiKey === "string" ? payload.apiKey.trim() : "";
-  if (!apiKey) {
+  const keyId = typeof payload.keyId === "string" ? payload.keyId.trim() : "";
+  if (!keyId) {
     return NextResponse.json({ error: "missing_api_key" }, { status: 400 });
   }
+
+  // Resolve the raw key server-side, via the same reveal path the copy button uses. This also
+  // enforces ownership: the reveal is scoped to THIS session's account, so a caller cannot play a
+  // key id belonging to somebody else.
+  const secretResult = await getApiKeySecretForUser({ email: session.email, apiKeyId: keyId });
+  if (!secretResult.ok) {
+    // Keys created before at-rest encryption cannot be revealed, so they cannot be used here.
+    const status = secretResult.error === "secret_unavailable" ? 409 : 502;
+    return NextResponse.json({ error: secretResult.error }, { status });
+  }
+  const apiKey = secretResult.secret;
 
   const symbol = typeof payload.symbol === "string" ? payload.symbol.trim() : "";
   if (endpointConfig.requiresSymbol && !symbol) {
