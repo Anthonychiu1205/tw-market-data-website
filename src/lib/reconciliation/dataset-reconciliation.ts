@@ -94,7 +94,10 @@ export async function getAllDatasetReconciliations(): Promise<Map<string, Datase
     if (!json) return result;
 
     // Accept either an array of rows or an object keyed by dataset.
-    const container = (json.data ?? json.reconciliations ?? json) as unknown;
+    // Live shape (verified against the API): {"count":0,"reconciliation":[...],"meta":{...}}.
+    // `reconciliation` is SINGULAR — reading only `reconciliations`/`data` fell through to the
+    // envelope itself and produced junk keys (count/meta) instead of dataset rows.
+    const container = (json.reconciliation ?? json.reconciliations ?? json.data ?? json) as unknown;
     const rows: Record<string, unknown>[] = Array.isArray(container)
       ? (container as Record<string, unknown>[])
       : Object.entries(container as Record<string, unknown>).map(([key, value]) =>
