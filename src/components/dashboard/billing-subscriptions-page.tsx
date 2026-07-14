@@ -18,7 +18,7 @@ import {
 
 import { cn } from "@/src/lib/cn";
 import {
-  formatPlanCurrency,
+  formatPlanPrice,
   getBillingSubscriptionPlanViews,
   type PlanCode,
   type PlanHighlightIcon,
@@ -141,7 +141,7 @@ export function BillingSubscriptionsPage({ currentPlanId, subscription }: Billin
 
                 <div className="pt-1">
                   <p className="whitespace-nowrap text-4xl font-medium tracking-tight text-slate-900">
-                    {formatPlanCurrency(plan.monthlyAmount)}
+                    {formatPlanPrice(plan.monthlyAmountMinor, plan.currency)}
                     <span className="ml-1.5 inline-block align-baseline text-sm font-normal text-slate-400"> / 月</span>
                   </p>
                 </div>

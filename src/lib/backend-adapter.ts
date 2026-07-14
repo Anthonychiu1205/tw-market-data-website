@@ -1,4 +1,5 @@
 import { datasetProducts } from "@/src/content/site";
+import { formatMoney } from "@/src/lib/billing/money";
 
 type IntegrationMode = "live" | "fallback";
 class BackendFetchTimeoutError extends Error {
@@ -448,7 +449,7 @@ export async function getBillingSummary(email: string): Promise<BillingSummary> 
   return {
     subscriptionStatus: "trial",
     renewalDate: "2026-05-01",
-    currentBalance: "NT$0",
+    currentBalance: formatMoney(0, "USD"),
     portalAvailable: false,
     checkoutAvailable: false,
     integrationMode: "fallback",

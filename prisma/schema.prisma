@@ -115,10 +115,8 @@ model CreditTransaction {
   walletId        String
   type            String
   status          String   @default("pending")
-  // Legacy TWD column. Kept for existing rows until the P0-B currency cutover backfills and drops it.
-  // New writes use amountMinor + currency; do not write amountTwd.
-  amountTwd       Int?
   // Money in MINOR units (e.g. USD cents) + ISO currency. Integers only — never floats for money.
+  // The legacy amountTwd column was backfilled into these and dropped (P0-B currency cutover).
   amountMinor     Int?
   currency        String?
   credits         Int

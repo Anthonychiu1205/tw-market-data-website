@@ -124,7 +124,6 @@ export async function deductCreditsForApiUsage(input: {
           walletId: wallet.id,
           type: "usage",
           status: "completed",
-          amountTwd: null,
           credits: -credits,
           balanceAfter: updatedWallet.balance,
           provider: "gateway",

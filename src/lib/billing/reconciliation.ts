@@ -81,7 +81,6 @@ export async function getUsageTransactionByRequestId(requestId: string) {
       type: true,
       status: true,
       credits: true,
-      amountTwd: true,
       balanceAfter: true,
       description: true,
       merchantTradeNo: true,
