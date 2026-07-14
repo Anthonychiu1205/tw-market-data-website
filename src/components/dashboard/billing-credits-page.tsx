@@ -18,7 +18,8 @@ import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
 import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
 
-import { formatCredits } from "@/src/lib/billing/credits";
+import { formatCredits, type CreditSpendSeries } from "@/src/lib/billing/credits";
+import { DATASET_CREDIT_COSTS } from "@/src/lib/gateway/dataset-policies";
 import { formatMoney, formatMoneyOrFallback } from "@/src/lib/billing/money";
 import { getCreditPackViews, getPricePerCredit, type CreditPackCode } from "@/src/lib/billing/credit-packs";
 import { createCreditPackCheckout } from "@/src/lib/billing/checkout-actions";
@@ -28,26 +29,25 @@ import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billin
 type EndpointRow = {
   resource: string;
   path: string;
-  usageCost: string;
   docLabel: string;
   docHref: string;
 };
 
 const ENDPOINT_ROWS: Record<"market" | "fundamentals" | "events", EndpointRow[]> = {
   market: [
-    { resource: "TWSE Daily Price", path: "/v2/datasets/twse-daily-price", usageCost: "1 credit", docLabel: "查看文件", docHref: "/docs/api/twse-daily-price" },
-    { resource: "TPEx Daily Price", path: "/v2/datasets/tpex-daily-price", usageCost: "1 credit", docLabel: "查看文件", docHref: "/docs/api/tpex-daily-price" },
-    { resource: "Market Prices", path: "/v2/datasets/market-prices", usageCost: "1 credit", docLabel: "查看文件", docHref: "/docs/api/market-prices/market-prices" },
+    { resource: "TWSE Daily Price", path: "/v2/datasets/twse-daily-price", docLabel: "查看文件", docHref: "/docs/api/twse-daily-price" },
+    { resource: "TPEx Daily Price", path: "/v2/datasets/tpex-daily-price", docLabel: "查看文件", docHref: "/docs/api/tpex-daily-price" },
+    { resource: "Market Prices", path: "/v2/datasets/market-prices", docLabel: "查看文件", docHref: "/docs/api/market-prices/market-prices" },
   ],
   fundamentals: [
-    { resource: "Monthly Revenue", path: "/v2/datasets/monthly-revenue", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/financial-growth/monthly-revenue" },
-    { resource: "Income Statement", path: "/v2/datasets/income-statement", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/financial-growth/income-statement" },
-    { resource: "Balance Sheet", path: "/v2/datasets/balance-sheet", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/financial-growth/balance-sheet" },
-    { resource: "Cash Flow Statement", path: "/v2/datasets/cash-flow-statement", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/financial-growth/cash-flow-statement" },
-    { resource: "Valuation Data", path: "/v2/datasets/valuation-data", usageCost: "2 credits", docLabel: "查看文件", docHref: "/docs/api/financial-growth/valuation-data" },
+    { resource: "Monthly Revenue", path: "/v2/datasets/monthly-revenue", docLabel: "查看文件", docHref: "/docs/api/financial-growth/monthly-revenue" },
+    { resource: "Income Statement", path: "/v2/datasets/income-statement", docLabel: "查看文件", docHref: "/docs/api/financial-growth/income-statement" },
+    { resource: "Balance Sheet", path: "/v2/datasets/balance-sheet", docLabel: "查看文件", docHref: "/docs/api/financial-growth/balance-sheet" },
+    { resource: "Cash Flow Statement", path: "/v2/datasets/cash-flow-statement", docLabel: "查看文件", docHref: "/docs/api/financial-growth/cash-flow-statement" },
+    { resource: "Valuation Data", path: "/v2/datasets/valuation-data", docLabel: "查看文件", docHref: "/docs/api/financial-growth/valuation-data" },
   ],
   events: [
-    { resource: "Issuer Profile", path: "/v2/datasets/issuer-profile", usageCost: "1 credit", docLabel: "查看文件", docHref: "/docs/api/company/issuer-profile" },
+    { resource: "Issuer Profile", path: "/v2/datasets/issuer-profile", docLabel: "查看文件", docHref: "/docs/api/company/issuer-profile" },
   ],
 };
 
@@ -63,40 +63,6 @@ type SpendPoint = {
   spend: number;
 };
 
-const SPEND_SERIES: Record<string, SpendPoint[]> = {
-  "2026-03": [
-    { date: "2026-03-01", label: "03/01", spend: 120 },
-    { date: "2026-03-05", label: "03/05", spend: 260 },
-    { date: "2026-03-09", label: "03/09", spend: 340 },
-    { date: "2026-03-13", label: "03/13", spend: 510 },
-    { date: "2026-03-17", label: "03/17", spend: 460 },
-    { date: "2026-03-21", label: "03/21", spend: 620 },
-    { date: "2026-03-25", label: "03/25", spend: 730 },
-    { date: "2026-03-29", label: "03/29", spend: 680 },
-  ],
-  "2026-04": [
-    { date: "2026-04-01", label: "04/01", spend: 180 },
-    { date: "2026-04-05", label: "04/05", spend: 230 },
-    { date: "2026-04-09", label: "04/09", spend: 420 },
-    { date: "2026-04-13", label: "04/13", spend: 480 },
-    { date: "2026-04-17", label: "04/17", spend: 560 },
-    { date: "2026-04-21", label: "04/21", spend: 690 },
-    { date: "2026-04-25", label: "04/25", spend: 820 },
-    { date: "2026-04-29", label: "04/29", spend: 760 },
-  ],
-  "2026-05": [
-    { date: "2026-05-01", label: "05/01", spend: 210 },
-    { date: "2026-05-05", label: "05/05", spend: 300 },
-    { date: "2026-05-09", label: "05/09", spend: 390 },
-    { date: "2026-05-13", label: "05/13", spend: 520 },
-    { date: "2026-05-17", label: "05/17", spend: 640 },
-    { date: "2026-05-21", label: "05/21", spend: 780 },
-    { date: "2026-05-25", label: "05/25", spend: 920 },
-    { date: "2026-05-29", label: "05/29", spend: 860 },
-  ],
-};
-
-const MONTH_KEYS = Object.keys(SPEND_SERIES).sort();
 
 function monthLabel(key: string) {
   const [year, month] = key.split("-");
@@ -104,6 +70,7 @@ function monthLabel(key: string) {
 }
 
 type BillingCreditsPageProps = {
+  spendSeries: CreditSpendSeries;
   creditsModeState: CreditsDeductionRuntimeState;
   walletBalance: number;
   usageReconciliation: {
@@ -145,6 +112,56 @@ const TRANSACTION_FILTER_OPTIONS: Array<{
   { id: "adjustment", label: "手動調整" },
 ];
 
+// Credit cost for an endpoint, straight from the gateway SSOT. The page used to hand-maintain these
+// numbers and had already drifted (monthly revenue showed 2 credits; the gateway charges 3).
+// An endpoint with no policy entry is not billable through the gateway — say so, do not guess.
+function getEndpointCreditCost(path: string): string {
+  const slug = path.split("/").filter(Boolean).pop() ?? "";
+  const cost = DATASET_CREDIT_COSTS[slug];
+  if (typeof cost !== "number") return "—";
+  return cost === 1 ? "1 credit" : `${cost} credits`;
+}
+
+// Export the transactions currently in view (i.e. the active filter). Values are quoted and inner
+// quotes doubled so a description containing a comma cannot shift columns.
+function toCsvValue(value: string | number | null | undefined): string {
+  if (value === null || value === undefined) return "";
+  return `"${String(value).replace(/"/g, '""')}"`;
+}
+
+function downloadTransactionsCsv(rows: BillingCreditsPageProps["transactions"], filterId: string) {
+  const header = [
+    "created_at", "type", "status", "credits", "balance_after",
+    "amount_minor", "currency", "provider", "package_code", "reference", "description",
+  ];
+  const lines = [header.join(",")];
+  for (const row of rows) {
+    lines.push([
+      toCsvValue(row.createdAt),
+      toCsvValue(row.type),
+      toCsvValue(row.status),
+      toCsvValue(row.credits),
+      toCsvValue(row.balanceAfter),
+      toCsvValue(row.amountMinor),
+      toCsvValue(row.currency),
+      toCsvValue(row.provider),
+      toCsvValue(row.packageCode),
+      toCsvValue(row.providerTradeNo ?? row.merchantTradeNo),
+      toCsvValue(row.description),
+    ].join(","));
+  }
+  // BOM so Excel opens UTF-8 (Chinese descriptions) without mojibake.
+  const blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `credit-transactions-${filterId}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 function getTransactionTypeLabel(type: string) {
   if (type === "purchase") return "儲值";
   if (type === "refund") return "退款";
@@ -183,7 +200,7 @@ function extractUsageMetadata(transaction: BillingCreditsPageProps["transactions
   const merchantTradeNo = transaction.merchantTradeNo ?? "";
   if (!merchantTradeNo.startsWith("usage:")) return null;
   const requestId = merchantTradeNo.slice("usage:".length);
-  const matched = (transaction.description ?? "").match(/API usage\\s+([^·]+)\\s+·/);
+  const matched = (transaction.description ?? "").match(/API usage\s+([^·]+)\s+·/);
   const datasetSlug = matched?.[1]?.trim() || "unknown";
   return { requestId, datasetSlug };
 }
@@ -195,15 +212,19 @@ function formatTransactionAmount(transaction: { amountMinor: number | null; curr
   return formatMoneyOrFallback(transaction.amountMinor, transaction.currency, "—");
 }
 
-export function BillingCreditsPage({ creditsModeState, walletBalance, usageReconciliation, transactions }: BillingCreditsPageProps) {
+export function BillingCreditsPage({ creditsModeState, walletBalance, spendSeries: spendSeriesData, usageReconciliation, transactions }: BillingCreditsPageProps) {
   const router = useRouter();
   const mountedAtRef = useRef<number>(0);
   const lastFocusRefreshAtRef = useRef<number>(0);
   const [activeTab, setActiveTab] = useState<"market" | "fundamentals" | "events">("market");
-  const [activeMonthIndex, setActiveMonthIndex] = useState(MONTH_KEYS.length - 1);
+  // Month selector is driven by months that ACTUALLY have transactions — no fabricated buckets.
+  const spendMonths = spendSeriesData.months;
+  const [activeMonthIndex, setActiveMonthIndex] = useState(Math.max(0, spendMonths.length - 1));
   const [transactionFilter, setTransactionFilter] = useState<"all" | "usage" | "purchase" | "refund" | "adjustment">("all");
-  const activeMonthKey = MONTH_KEYS[activeMonthIndex];
-  const spendSeries = SPEND_SERIES[activeMonthKey] ?? [];
+  const activeMonth = spendMonths[activeMonthIndex] ?? null;
+  const activeMonthKey = activeMonth?.key ?? "";
+  const spendSeries = activeMonth?.points ?? [];
+  const hasSpendData = spendSeries.length > 0;
   const packages = useMemo(() => getCreditPackViews(), []);
   const [pendingPack, setPendingPack] = useState<CreditPackCode | null>(null);
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
@@ -349,7 +370,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
                         {row.path}
                       </span>
                     </td>
-                    <td className="px-3 py-3 text-sm text-slate-700">{row.usageCost}</td>
+                    <td className="px-3 py-3 text-sm text-slate-700">{getEndpointCreditCost(row.path)}</td>
                     <td className="px-3 py-3">
                       <Link
                         href={row.docHref}
@@ -487,15 +508,23 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
               <button
                 type="button"
                 className="border-0 bg-transparent p-0 text-slate-400 shadow-none hover:text-slate-700 disabled:cursor-not-allowed disabled:text-slate-300"
-                onClick={() => setActiveMonthIndex((prev) => Math.min(MONTH_KEYS.length - 1, prev + 1))}
-                disabled={activeMonthIndex === MONTH_KEYS.length - 1}
+                onClick={() => setActiveMonthIndex((prev) => Math.min(spendMonths.length - 1, prev + 1))}
+                disabled={spendMonths.length === 0 || activeMonthIndex >= spendMonths.length - 1}
                 aria-label="下個月"
               >
                 <span className="inline-block h-4 w-4">›</span>
               </button>
             </div>
           </div>
-          <div className="mt-6 h-[260px]">
+          {!hasSpendData ? (
+            <p className="mt-6 text-sm text-slate-500">目前沒有花費紀錄。儲值或訂閱後,這裡會顯示實際交易。</p>
+          ) : null}
+          {spendSeriesData.hasExcludedCurrencies ? (
+            <p className="mt-2 text-xs text-amber-600">
+              圖表僅計 USD。你有以新台幣計價的歷史交易,未併入此圖(不同幣別不可直接相加)。
+            </p>
+          ) : null}
+          <div className="mt-6 h-[260px]" hidden={!hasSpendData}>
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={spendSeries} margin={{ top: 8, right: 6, left: -10, bottom: 0 }}>
                 <defs>
@@ -543,7 +572,9 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, usageRecon
             <p className="text-[15px] font-medium text-slate-900">交易記錄</p>
             <button
               type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              onClick={() => downloadTransactionsCsv(filteredTransactions, transactionFilter)}
+              disabled={filteredTransactions.length === 0}
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-300"
             >
               <Download className="h-4 w-4" />
               匯出 CSV

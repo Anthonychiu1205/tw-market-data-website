@@ -49,6 +49,12 @@ export type BillingPlan = {
   annualAmountMinor: number | null;
   currency: CurrencyCode;
   apiKeyLimit: number | null;
+  // Included requests per month, and the per-key rate limit. These were previously only in the
+  // header comment and in hand-written label strings, while the dashboard hardcoded 250,000/60 for
+  // EVERY plan — so "月度剩餘" was wrong for every tier. Numbers are the SSOT; labels derive from them.
+  // null = custom (enterprise).
+  monthlyRequestQuota: number | null;
+  rateLimitPerMin: number | null;
   datasetLimit: string;
   isContactOnly: boolean;
 };
@@ -79,6 +85,8 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     annualAmountMinor: 20000,
     currency: "USD",
     apiKeyLimit: 2,
+    monthlyRequestQuota: 10_000,
+    rateLimitPerMin: 300,
     datasetLimit: "全部資料集（不含財報三表）",
     isContactOnly: false,
   },
@@ -89,6 +97,8 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     annualAmountMinor: 100000,
     currency: "USD",
     apiKeyLimit: 5,
+    monthlyRequestQuota: 100_000,
+    rateLimitPerMin: 1_200,
     datasetLimit: "全部資料集（含財報三表）",
     isContactOnly: false,
   },
@@ -99,6 +109,8 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     annualAmountMinor: 200000,
     currency: "USD",
     apiKeyLimit: 10,
+    monthlyRequestQuota: 300_000,
+    rateLimitPerMin: 3_000,
     datasetLimit: "全部資料集（完整歷史）",
     isContactOnly: false,
   },
@@ -109,6 +121,8 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     annualAmountMinor: 2000000,
     currency: "USD",
     apiKeyLimit: 20,
+    monthlyRequestQuota: 3_000_000,
+    rateLimitPerMin: 12_000,
     datasetLimit: "全部資料集（含 webhook）",
     isContactOnly: false,
   },
@@ -119,6 +133,8 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     annualAmountMinor: null,
     currency: "USD",
     apiKeyLimit: null,
+    monthlyRequestQuota: null,
+    rateLimitPerMin: null,
     datasetLimit: "客製資料範圍",
     isContactOnly: true,
   },
@@ -281,4 +297,27 @@ export function getPricingPlanViews() {
 
 export function getBillingSubscriptionPlanViews() {
   return BILLING_SUBSCRIPTION_PLAN_ORDER.map((planCode) => getPricingPlanView(planCode));
+}
+
+// Included quota / rate limit for EVERY plan code, including free (which is not a BILLING_PLAN).
+// This is the number the dashboard must use — it previously hardcoded 250,000/60 for all tiers.
+export const PLAN_REQUEST_LIMITS: Record<PlanCode | "free", { monthlyRequestQuota: number | null; rateLimitPerMin: number | null }> = {
+  free: { monthlyRequestQuota: 500, rateLimitPerMin: 60 },
+  starter: { monthlyRequestQuota: 10_000, rateLimitPerMin: 300 },
+  pro: { monthlyRequestQuota: 100_000, rateLimitPerMin: 1_200 },
+  max: { monthlyRequestQuota: 300_000, rateLimitPerMin: 3_000 },
+  developer: { monthlyRequestQuota: 3_000_000, rateLimitPerMin: 12_000 },
+  enterprise: { monthlyRequestQuota: null, rateLimitPerMin: null },
+};
+
+export function getPlanRequestLimits(planCode: string) {
+  const key = planCode.trim().toLowerCase();
+  return PLAN_REQUEST_LIMITS[key as keyof typeof PLAN_REQUEST_LIMITS] ?? PLAN_REQUEST_LIMITS.free;
+}
+
+/** Human label, DERIVED from the numbers above so the two can never drift apart. */
+export function getRequestLimitLabel(planCode: string): string {
+  const limits = getPlanRequestLimits(planCode);
+  if (limits.monthlyRequestQuota === null || limits.rateLimitPerMin === null) return "客製配額";
+  return `每月 included ${limits.monthlyRequestQuota.toLocaleString("en-US")} requests / RPM ${limits.rateLimitPerMin.toLocaleString("en-US")}`;
 }

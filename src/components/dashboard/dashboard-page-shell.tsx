@@ -14,9 +14,10 @@ import type {
 import { getBillingSummary } from "@/src/lib/backend-adapter";
 import { getDashboardEntitlementForUser } from "@/src/lib/billing/subscription";
 import { formatMoney } from "@/src/lib/billing/money";
-import { getCreditTransactionsForUser, getCreditWalletForUser } from "@/src/lib/billing/credits";
+import { getCreditSpendSeriesForUser, getCreditTransactionsForUser, getCreditWalletForUser } from "@/src/lib/billing/credits";
 import { assertCreditsDeductionRuntimeSafe } from "@/src/lib/billing/credits-mode";
 import { getUsageCreditReconciliationForUser } from "@/src/lib/billing/reconciliation";
+import { getPlanRequestLimits, PLAN_REQUEST_LIMITS } from "@/src/lib/billing/plans";
 import { getApiKeysSummaryForUser } from "@/src/lib/api-keys/service";
 import { getRecentApiUsageForUser, getUsageSummaryForUser } from "@/src/lib/gateway/usage";
 
@@ -79,10 +80,12 @@ const FALLBACK_API_KEYS: ApiKeysSummary = {
   needsSubscription: false,
 };
 
+// Fallback used only when the usage lookup fails. Uses the FREE plan's real limits rather than a
+// made-up 250,000/60 — an unknown state must not invent a generous quota.
 const FALLBACK_USAGE_SUMMARY: UsageSummary = {
   monthlyUsed: 0,
-  monthlyQuota: 250000,
-  rateLimitPerMin: 60,
+  monthlyQuota: PLAN_REQUEST_LIMITS.free.monthlyRequestQuota ?? 500,
+  rateLimitPerMin: PLAN_REQUEST_LIMITS.free.rateLimitPerMin ?? 60,
   topEndpoints: [],
   dailyUsage: buildFallbackDailyUsage(),
   integrationMode: "fallback",
@@ -101,11 +104,17 @@ const FALLBACK_USAGE_REQUESTS: UsageRequestsSummary = {
 function toDashboardUsageSummary(
   localSummary: Awaited<ReturnType<typeof getUsageSummaryForUser>>,
   isDryRun: boolean,
+  planCode: string,
 ): UsageSummary {
+  // Quota + rate limit come from the plan SSOT. They used to be hardcoded 250,000/60 for EVERY
+  // plan, so "月度剩餘" was wrong for every tier (Starter really gets 10,000; Developer 3,000,000).
+  // enterprise = custom (null) → fall back to the user's actual usage so the bar never shows a
+  // fabricated denominator.
+  const limits = getPlanRequestLimits(planCode);
   return {
     monthlyUsed: localSummary.requests30d,
-    monthlyQuota: 250000,
-    rateLimitPerMin: 60,
+    monthlyQuota: limits.monthlyRequestQuota ?? Math.max(localSummary.requests30d, 1),
+    rateLimitPerMin: limits.rateLimitPerMin ?? 0,
     topEndpoints: localSummary.topDatasets.map((item) => item.dataset),
     dailyUsage: localSummary.dailyUsage,
     integrationMode: "live",
@@ -319,12 +328,21 @@ async function DashboardSectionData({
       : Promise.resolve(null);
 
     const creditTransactionsPromise = needsCreditTransactions
-      ? timedStage("creditTransactions", () => getCreditTransactionsForUser(session.id, 10)).catch((error) => {
+      ? timedStage("creditTransactions", () => getCreditTransactionsForUser(session.id, 50)).catch((error) => {
           const errorName = error instanceof Error ? error.name : "UnknownError";
           console.warn(`[dashboard] failed to fetch credit transactions (${errorName})`);
           return [];
         })
       : Promise.resolve([]);
+
+    // Real spend series for the credits chart (replaces the hardcoded demo).
+    const spendSeriesPromise = needsCreditTransactions
+      ? timedStage("creditSpendSeries", () => getCreditSpendSeriesForUser(session.id)).catch((error) => {
+          const errorName = error instanceof Error ? error.name : "UnknownError";
+          console.warn(`[dashboard] failed to fetch credit spend series (${errorName})`);
+          return { months: [], currency: "USD" as const, hasExcludedCurrencies: false };
+        })
+      : Promise.resolve({ months: [], currency: "USD" as const, hasExcludedCurrencies: false });
 
     const reconciliationPromise = needsReconciliation
       ? timedStage("creditsReconciliation", () => getUsageCreditReconciliationForUser(session.id, 30)).catch((error) => {
@@ -341,6 +359,7 @@ async function DashboardSectionData({
       billingSummary,
       creditWallet,
       creditTransactions,
+      spendSeries,
       reconciliation,
     ] = await Promise.all([
       apiKeysPromise,
@@ -349,6 +368,7 @@ async function DashboardSectionData({
       billingSummaryPromise,
       creditWalletPromise,
       creditTransactionsPromise,
+      spendSeriesPromise,
       reconciliationPromise,
     ]);
 
@@ -381,7 +401,7 @@ async function DashboardSectionData({
     }
 
     const resolvedUsage = localUsageSummary
-      ? toDashboardUsageSummary(localUsageSummary, usageIsDryRun)
+      ? toDashboardUsageSummary(localUsageSummary, usageIsDryRun, entitlement.planCode)
       : {
           ...FALLBACK_USAGE_SUMMARY,
           isDryRun: usageIsDryRun,
@@ -419,6 +439,7 @@ async function DashboardSectionData({
           }
         : null,
       creditWalletBalance: creditWallet?.balance ?? 0,
+      spendSeries,
       creditsModeState,
       usageReconciliation: reconciliation
         ? {
