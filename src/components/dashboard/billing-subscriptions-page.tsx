@@ -146,7 +146,7 @@ export function BillingSubscriptionsPage({ currentPlanId, subscription }: Billin
                   </p>
                 </div>
 
-                <p className="text-sm font-normal leading-6 text-slate-600">{plan.summary}</p>
+                <p className="min-h-[3rem] text-sm font-normal leading-6 text-slate-600">{plan.summary}</p>
 
                 <div className="pt-2">
                   {plan.planCode === currentPlanId ? (
