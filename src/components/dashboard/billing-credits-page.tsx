@@ -158,6 +158,7 @@ function getTransactionStatusLabel(status: string) {
   if (status === "pending") return "確認中";
   if (status === "failed") return "失敗";
   if (status === "cancelled") return "已取消";
+  if (status === "expired") return "已逾時";
   if (status === "simulated") return "模擬";
   return "待確認";
 }
@@ -208,14 +209,27 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
   const activeMonthKey = activeMonth?.key ?? "";
   const spendSeries = activeMonth?.points ?? [];
   const hasSpendData = spendSeries.length > 0;
+  const spendAxisMax = useMemo(() => {
+    const max = spendSeries.reduce((acc, point) => Math.max(acc, point.spend), 0);
+    if (max <= 0) return 2;
+    return Math.max(2, Math.ceil((max * 1.15) / 2) * 2);
+  }, [spendSeries]);
   const packages = useMemo(() => getCreditPackViews(), []);
   const [pendingPack, setPendingPack] = useState<CreditPackCode | null>(null);
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
-  const latestTransactionAt = transactions.length > 0 ? transactions[0]?.createdAt ?? null : null;
+  // Revenue-integrity display rule (④/③): a top-up only appears once payment is confirmed. A
+  // purchase that is pending / failed / expired was never added to the wallet, so showing it — as a
+  // green "+N credits" row — would imply credits the customer does not have. Hide it from the list
+  // (usage/refund/adjustment are only ever written as completed, so they are unaffected).
+  const visibleTransactions = useMemo(
+    () => transactions.filter((item) => item.type !== "purchase" || item.status === "completed"),
+    [transactions],
+  );
+  const latestTransactionAt = visibleTransactions.length > 0 ? visibleTransactions[0]?.createdAt ?? null : null;
   const filteredTransactions = useMemo(() => {
-    if (transactionFilter === "all") return transactions;
-    return transactions.filter((item) => item.type === transactionFilter);
-  }, [transactionFilter, transactions]);
+    if (transactionFilter === "all") return visibleTransactions;
+    return visibleTransactions.filter((item) => item.type === transactionFilter);
+  }, [transactionFilter, visibleTransactions]);
   async function handleBuyPack(packCode: CreditPackCode) {
     if (pendingPack) return;
     setPendingPack(packCode);
@@ -246,11 +260,16 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
     }
   }
 
+  // A mismatch is a REAL problem only: a linked event whose credits differ from its deduction, a
+  // duplicate deduction, or a deduction with no usage event. The old code also flagged
+  // totalChargedCredits !== totalTransactionCredits, but that difference is EXPECTED whenever dry_run
+  // usage events exist (they record an estimated cost but never deduct), so it produced a permanent
+  // false "未對帳". Estimate ≠ deducted is not, by itself, a fault.
   const reconciliationMismatch =
     usageReconciliation &&
-    (usageReconciliation.totalChargedCredits !== usageReconciliation.totalTransactionCredits ||
-      usageReconciliation.mismatchedRequestIds.length > 0 ||
-      usageReconciliation.duplicateUsageTransactions.length > 0);
+    (usageReconciliation.mismatchedRequestIds.length > 0 ||
+      usageReconciliation.duplicateUsageTransactions.length > 0 ||
+      usageReconciliation.orphanUsageTransactions.length > 0);
 
   useEffect(() => {
     if (mountedAtRef.current === 0) {
@@ -370,8 +389,8 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
             <p className="text-[15px] font-medium text-slate-900">使用量 / Credits 對帳（近 {usageReconciliation?.windowDays ?? 30} 天）</p>
             <p className="mt-1 text-sm text-slate-600">
               使用事件：{(usageReconciliation?.totalUsageEvents ?? 0).toLocaleString()} ·
-              已計價 credits：{(usageReconciliation?.totalChargedCredits ?? 0).toLocaleString()} ·
-              扣點交易 credits：{(usageReconciliation?.totalTransactionCredits ?? 0).toLocaleString()} ·
+              預估用量成本（含試算）：{(usageReconciliation?.totalChargedCredits ?? 0).toLocaleString()} ·
+              實際扣點 credits：{(usageReconciliation?.totalTransactionCredits ?? 0).toLocaleString()} ·
               錢包餘額：{formatCredits(usageReconciliation?.walletBalance ?? walletBalance)}
             </p>
             {creditsModeState.mode === "dry_run" ? (
@@ -514,8 +533,8 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(value) => formatMoney(Number(value) * 100, "USD")}
-                  ticks={[0, 500, 1000]}
-                  domain={[0, 1000]}
+                  ticks={[0, spendAxisMax / 2, spendAxisMax]}
+                  domain={[0, spendAxisMax]}
                   width={58}
                 />
                 <Tooltip

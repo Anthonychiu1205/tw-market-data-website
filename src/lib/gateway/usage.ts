@@ -130,7 +130,12 @@ export async function getRecentApiUsageForUser(userId: string, limit = 100): Pro
 export type ApiUsageSummary = {
   requestsToday: number;
   requests30d: number;
+  // Sum of ApiUsageEvent.creditsCharged in the window — an ESTIMATE that includes dry_run calls,
+  // which recorded a cost but never touched the wallet. Use for the dry_run "試算" display only.
   estimatedCreditsUsage30d: number;
+  // Credits ACTUALLY deducted from the wallet in the window (Σ real usage-type CreditTransaction).
+  // This is what the wallet lost — the honest "已扣 credits" number in charged mode.
+  chargedCreditsUsage30d: number;
   topDatasets: Array<{ dataset: string; count: number }>;
   recentErrors: Array<{ code: string; count: number }>;
   dailyUsage: Array<{ date: string; count: number }>;
@@ -147,7 +152,7 @@ export async function getUsageSummaryForUser(userId: string): Promise<ApiUsageSu
   const startOfWindow = new Date(startOfToday);
   startOfWindow.setDate(startOfWindow.getDate() - 34);
 
-  const [events, requestsToday] = await Promise.all([
+  const [events, requestsToday, chargedAgg] = await Promise.all([
     prisma.apiUsageEvent.findMany({
       where: {
         userId,
@@ -168,7 +173,15 @@ export async function getUsageSummaryForUser(userId: string): Promise<ApiUsageSu
         createdAt: { gte: startOfToday },
       },
     }),
+    // Real deductions only: usage-type transactions actually written against the wallet. Their
+    // credits are negative, so we sum -credits. Dry_run calls create no such row, so they are excluded.
+    prisma.creditTransaction.aggregate({
+      _sum: { credits: true },
+      where: { userId, type: "usage", status: "completed", createdAt: { gte: startOfWindow } },
+    }),
   ]);
+
+  const chargedCreditsUsage30d = Math.max(0, -(chargedAgg._sum.credits ?? 0));
 
   const datasetCount = new Map<string, number>();
   const errorCount = new Map<string, number>();
@@ -202,6 +215,7 @@ export async function getUsageSummaryForUser(userId: string): Promise<ApiUsageSu
     requestsToday,
     requests30d: events.length,
     estimatedCreditsUsage30d: creditsTotal,
+    chargedCreditsUsage30d,
     topDatasets: Array.from(datasetCount.entries())
       .map(([dataset, count]) => ({ dataset, count }))
       .sort((a, b) => b.count - a.count)
