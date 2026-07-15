@@ -197,7 +197,12 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
           </div>
           <div>
             <p className="text-xs text-slate-500">{`30 天${getCreditsModeLabel(creditsModeState)}`}</p>
-            <p className="mt-1 text-lg font-semibold text-slate-900">{(usageSummary.estimatedCreditsUsage30d ?? 0).toLocaleString()}</p>
+            <p className="mt-1 text-lg font-semibold text-slate-900">
+              {(creditsModeState.mode === "charged"
+                ? usageSummary.chargedCreditsUsage30d ?? 0
+                : usageSummary.estimatedCreditsUsage30d ?? 0
+              ).toLocaleString()}
+            </p>
           </div>
           <div>
             <p className="text-xs text-slate-500">Top datasets</p>
@@ -210,7 +215,8 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
         {usageReconciliation ? (
           <p className="mt-1 text-xs text-slate-500">
             對帳（近 {usageReconciliation.windowDays} 天）：usage={usageReconciliation.totalUsageEvents.toLocaleString()} ·
-            credits={usageReconciliation.totalChargedCredits.toLocaleString()} · tx={usageReconciliation.totalTransactionCredits.toLocaleString()}
+            預估（含試算）={usageReconciliation.totalChargedCredits.toLocaleString()} ·
+            實扣 credits={usageReconciliation.totalTransactionCredits.toLocaleString()}
             {usageReconciliation.mismatchedRequestIds.length > 0 ? " · 含待對帳項目" : ""}
           </p>
         ) : null}
