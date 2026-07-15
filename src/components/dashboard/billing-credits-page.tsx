@@ -24,7 +24,7 @@ import { formatMoney, formatMoneyOrFallback } from "@/src/lib/billing/money";
 import { getCreditPackViews, getPricePerCredit, type CreditPackCode } from "@/src/lib/billing/credit-packs";
 import { createCreditPackCheckout } from "@/src/lib/billing/checkout-actions";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
-import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
+import { getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
 
 // Credit-cost table, DERIVED from the pricing SSOT (DATASET_ACCESS_POLICIES). Every billable dataset
 // appears here with the exact cost the meter charges — there is no hand-maintained row list to drift.
@@ -320,15 +320,12 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
           <p className="mt-2 text-xs text-slate-500">
             {latestTransactionAt ? `最近異動：${formatTransactionDate(latestTransactionAt)}` : "最近異動：尚無紀錄"}
           </p>
-          <p className="mt-1 text-xs text-slate-500">
-            {walletBalance === 0 ? "目前尚未啟用可用 credits，餘額為 0 屬正常狀態。" : "尚未建立 wallet 時，餘額預設顯示為 0。"}
-          </p>
-          <p className="mt-2 text-xs text-slate-600">
-            {creditsModeState.mode === "dry_run"
-              ? "目前為試算模式，尚未正式扣點。"
-              : getCreditsModeDescription(creditsModeState)}
-          </p>
-          <p className="mt-1 text-xs font-medium text-slate-600">模式：{getCreditsModeLabel(creditsModeState)}</p>
+          {/* Empty-state hint only. The old block had three internal status lines, one with inverted
+              logic (a non-zero balance showed "wallet 未建立、餘額預設 0"). Customers do not need the
+              mode/description internals — show only the "0 is normal" note, and only when it is 0. */}
+          {walletBalance === 0 ? (
+            <p className="mt-1 text-xs text-slate-500">目前尚無可用 credits，餘額為 0 屬正常狀態；儲值或訂閱後即會顯示。</p>
+          ) : null}
         </DashboardCard>
 
         <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">

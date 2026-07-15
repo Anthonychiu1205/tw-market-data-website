@@ -139,6 +139,17 @@ export type CreditSpendSeries = {
   hasExcludedCurrencies: boolean;
 };
 
+// The Taipei (UTC+8) calendar date of an instant, as YYYY-MM-DD. Used so the spend chart buckets by
+// the Taiwan day rather than the UTC day.
+function taipeiIsoDate(date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
 export async function getCreditSpendSeriesForUser(userId: string): Promise<CreditSpendSeries> {
   const prisma = await loadPrisma();
 
@@ -159,7 +170,11 @@ export async function getCreditSpendSeriesForUser(userId: string): Promise<Credi
   const byMonth = new Map<string, SpendMonth>();
   for (const row of usd) {
     const minor = row.amountMinor ?? 0;
-    const iso = row.createdAt.toISOString().slice(0, 10);
+    // Bucket by the Taipei calendar date, NOT UTC. createdAt.toISOString() is UTC, so a purchase made
+    // early on 2026-07-15 Taiwan time (UTC+8) lands on 2026-07-14 in UTC — an off-by-one that put the
+    // $10 top-up on the wrong day. These are Taiwan users on Taiwan market data, so the day shown must
+    // be the Taiwan day. en-CA formats as YYYY-MM-DD.
+    const iso = taipeiIsoDate(row.createdAt);
     const monthKey = iso.slice(0, 7);
 
     let month = byMonth.get(monthKey);
