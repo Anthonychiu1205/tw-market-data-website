@@ -109,7 +109,12 @@ export async function POST(request: Request) {
     if (existing) return;
     await createApiUsageEvent({
       userId: user!.id,
-      apiKeyId: payload.apiKeyId ?? null,
+      // NOT payload.apiKeyId. ApiUsageEvent.apiKeyId is a FK to the website's local ApiKey table
+      // (legacy twmd_live_ keys). The read API's sk_live_ keys live in read_api_api_keys and their
+      // ids are NOT in that table, so persisting the caller's key id would violate the FK — and
+      // createApiUsageEvent swallows write errors, so the usage event would silently vanish. Store
+      // null; per-key attribution belongs to the read API updating read_api_api_keys.last_used_at.
+      apiKeyId: null,
       datasetSlug: dataset,
       endpoint: str(payload.endpoint) || `/v2/datasets/${dataset}`,
       method: str(payload.method) || "GET",

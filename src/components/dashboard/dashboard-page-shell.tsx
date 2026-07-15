@@ -92,6 +92,7 @@ const FALLBACK_USAGE_SUMMARY: UsageSummary = {
   requestsToday: 0,
   requests30d: 0,
   estimatedCreditsUsage30d: 0,
+  chargedCreditsUsage30d: 0,
   recentErrors: [],
 };
 
@@ -121,6 +122,7 @@ function toDashboardUsageSummary(
     requestsToday: localSummary.requestsToday,
     requests30d: localSummary.requests30d,
     estimatedCreditsUsage30d: localSummary.estimatedCreditsUsage30d,
+    chargedCreditsUsage30d: localSummary.chargedCreditsUsage30d,
     recentErrors: localSummary.recentErrors,
     isDryRun,
   };

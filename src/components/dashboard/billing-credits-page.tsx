@@ -260,11 +260,16 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
     }
   }
 
+  // A mismatch is a REAL problem only: a linked event whose credits differ from its deduction, a
+  // duplicate deduction, or a deduction with no usage event. The old code also flagged
+  // totalChargedCredits !== totalTransactionCredits, but that difference is EXPECTED whenever dry_run
+  // usage events exist (they record an estimated cost but never deduct), so it produced a permanent
+  // false "未對帳". Estimate ≠ deducted is not, by itself, a fault.
   const reconciliationMismatch =
     usageReconciliation &&
-    (usageReconciliation.totalChargedCredits !== usageReconciliation.totalTransactionCredits ||
-      usageReconciliation.mismatchedRequestIds.length > 0 ||
-      usageReconciliation.duplicateUsageTransactions.length > 0);
+    (usageReconciliation.mismatchedRequestIds.length > 0 ||
+      usageReconciliation.duplicateUsageTransactions.length > 0 ||
+      usageReconciliation.orphanUsageTransactions.length > 0);
 
   useEffect(() => {
     if (mountedAtRef.current === 0) {
@@ -384,8 +389,8 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
             <p className="text-[15px] font-medium text-slate-900">使用量 / Credits 對帳（近 {usageReconciliation?.windowDays ?? 30} 天）</p>
             <p className="mt-1 text-sm text-slate-600">
               使用事件：{(usageReconciliation?.totalUsageEvents ?? 0).toLocaleString()} ·
-              已計價 credits：{(usageReconciliation?.totalChargedCredits ?? 0).toLocaleString()} ·
-              扣點交易 credits：{(usageReconciliation?.totalTransactionCredits ?? 0).toLocaleString()} ·
+              預估用量成本（含試算）：{(usageReconciliation?.totalChargedCredits ?? 0).toLocaleString()} ·
+              實際扣點 credits：{(usageReconciliation?.totalTransactionCredits ?? 0).toLocaleString()} ·
               錢包餘額：{formatCredits(usageReconciliation?.walletBalance ?? walletBalance)}
             </p>
             {creditsModeState.mode === "dry_run" ? (

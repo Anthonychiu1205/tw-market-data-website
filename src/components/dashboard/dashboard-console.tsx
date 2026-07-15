@@ -159,6 +159,10 @@ function UsageActivityCard({
   const requestsToday = usage.requestsToday ?? 0;
   const requests30d = usage.requests30d ?? monthlyUsed;
   const estimatedCreditsUsage30d = usage.estimatedCreditsUsage30d ?? 0;
+  const chargedCreditsUsage30d = usage.chargedCreditsUsage30d ?? 0;
+  // In charged mode show what actually left the wallet; in 試算/blocked show the estimate. The old
+  // code always showed the estimate, so '30天已扣 credits' counted dry_run calls that never charged.
+  const creditsUsage30dDisplay = creditsModeState.mode === "charged" ? chargedCreditsUsage30d : estimatedCreditsUsage30d;
   const recentErrors = usage.recentErrors ?? [];
 
   return (
@@ -187,7 +191,7 @@ function UsageActivityCard({
       <div className="mt-4 grid gap-3 text-xs text-slate-600 sm:grid-cols-3">
         <p>今日請求：{requestsToday.toLocaleString()}</p>
         <p>30 天請求：{requests30d.toLocaleString()}</p>
-        <p>{`30 天${getCreditsModeLabel(creditsModeState)}：${estimatedCreditsUsage30d.toLocaleString()}`}</p>
+        <p>{`30 天${getCreditsModeLabel(creditsModeState)}：${creditsUsage30dDisplay.toLocaleString()}`}</p>
       </div>
 
       {recentErrors.length > 0 ? (

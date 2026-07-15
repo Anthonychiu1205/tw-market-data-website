@@ -80,6 +80,7 @@ export type UsageSummary = {
   requestsToday?: number;
   requests30d?: number;
   estimatedCreditsUsage30d?: number;
+  chargedCreditsUsage30d?: number;
   recentErrors?: Array<{ code: string; count: number }>;
   isDryRun?: boolean;
 };
