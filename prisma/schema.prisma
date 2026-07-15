@@ -35,6 +35,7 @@ model User {
   creditTransactions  CreditTransaction[]
   apiKeys             ApiKey[]
   apiUsageEvents      ApiUsageEvent[]
+  webhookDestinations WebhookDestination[]
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
 }
@@ -191,6 +192,113 @@ model ApiUsageEvent {
   @@index([datasetSlug])
   @@index([createdAt])
   @@index([requestId])
+}
+
+// WEBHOOK-01 Phase A — delivery side (webhook台). The events_outbox itself lives in the read API's DB
+// (A台 owns it, append-only); the worker POLLS it. Everything below is website-side delivery state:
+// where to deliver (destinations/subscriptions), and the per-attempt delivery ledger.
+
+model WebhookDestination {
+  id     String @id @default(cuid())
+  // The owning account. Consistent with ApiKey/CreditWallet, we key off the local User (email is the
+  // account identity). This is the interface's `account_id`.
+  userId String
+  url    String
+  // https | discord | slack | email. Only `https` is deliverable in Phase A (Standard-Webhooks HMAC
+  // push); the others are placeholders for a later transport and are treated as https-shaped.
+  type   String @default("https")
+
+  // signing_secret goes through the EXISTING key-reveal chain (src/lib/security/secret-encryption.ts):
+  // AES-256-GCM at rest, revealed only through the throttled reveal endpoint, rotatable. The raw
+  // whsec_ is never stored in plaintext and never leaves the server except through that endpoint.
+  encryptedSigningSecret String
+  // Encryption envelope version (mirrors ApiKey.encryptionVersion). Bumps when the crypto scheme rotates.
+  signingSecretVersion   String  @default("v1")
+  // Bumps on every secret rotation so clients can tell a rotation happened. The secret value itself
+  // still lives (encrypted) in encryptedSigningSecret.
+  secretRotatedAt        DateTime?
+
+  // active | paused | disabled. `disabled` is terminal-until-manual: the worker sets it after the
+  // retry budget is exhausted (§A3) and emails the account.
+  status         String    @default("active")
+  disabledReason String?
+  disabledAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user          User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptions WebhookSubscription[]
+  deliveries    WebhookDelivery[]
+
+  @@index([userId])
+  @@index([userId, status])
+  @@index([status])
+}
+
+model WebhookSubscription {
+  id            String @id @default(cuid())
+  destinationId String
+  // Which event types this destination wants, e.g. ["revenue.announced","filing.announced"].
+  eventTypes    String[]
+  // Optional ticker allow-list. Empty/null = all symbols. A symbol-less event (catalog.dataset_listed)
+  // matches only a subscription with no symbol filter.
+  symbolFilter  String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  destination WebhookDestination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  @@index([destinationId])
+}
+
+model WebhookDelivery {
+  id            String @id @default(cuid())
+  // From the outbox row. Idempotency + the Standard-Webhooks `webhook-id` header both key off this.
+  eventId       String
+  destinationId String
+
+  // Event snapshot, taken at fan-out. We deliver the outbox payload VERBATIM (push == pull, §A0), so
+  // the body is frozen here and a later retry never reconstructs or mutates it — even if the outbox
+  // is unreachable at retry time. This is delivery state, not a second source of truth for the number.
+  eventType  String
+  payload    Json
+  schemaVer  Int    @default(1)
+
+  // active | delivered | retrying | dead. `dead` = retry budget exhausted (the destination is disabled
+  // in the same transaction).
+  status String @default("active")
+
+  attempt          Int       @default(0)
+  statusCode       Int?
+  latencyMs        Int?
+  error            String?
+  // When this delivery becomes due. The worker picks up rows with nextAttemptAt <= now.
+  nextAttemptAt    DateTime  @default(now())
+  firstAttemptedAt DateTime?
+  lastAttemptedAt  DateTime?
+  deliveredAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  destination WebhookDestination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+
+  // At-least-once, not ordered: one delivery per (event, destination). Re-polling the same outbox row
+  // after a crash re-inserts conflict-free, which is what makes restarts zero-drop.
+  @@unique([eventId, destinationId])
+  @@index([status, nextAttemptAt])
+  @@index([destinationId])
+  @@index([eventId])
+}
+
+// The outbox poll cursor (last delivered created_at). Kept website-side per the interface (§3): the
+// worker advances by created_at and NEVER writes back to events_outbox. Single row per source.
+model WebhookOutboxCursor {
+  source        String   @id
+  lastCreatedAt String   @default("")
+  updatedAt     DateTime @updatedAt
 }
 
 model AuthAttempt {
