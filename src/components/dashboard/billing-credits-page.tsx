@@ -19,43 +19,36 @@ import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
 import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
 
 import { formatCredits, type CreditSpendSeries } from "@/src/lib/billing/credits";
-import { DATASET_CREDIT_COSTS } from "@/src/lib/gateway/dataset-policies";
+import { DATASET_ACCESS_POLICIES } from "@/src/lib/gateway/dataset-policies";
 import { formatMoney, formatMoneyOrFallback } from "@/src/lib/billing/money";
 import { getCreditPackViews, getPricePerCredit, type CreditPackCode } from "@/src/lib/billing/credit-packs";
 import { createCreditPackCheckout } from "@/src/lib/billing/checkout-actions";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
 import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
 
-type EndpointRow = {
-  resource: string;
-  path: string;
-  docLabel: string;
-  docHref: string;
-};
-
-const ENDPOINT_ROWS: Record<"market" | "fundamentals" | "events", EndpointRow[]> = {
-  market: [
-    { resource: "TWSE Daily Price", path: "/v2/datasets/twse-daily-price", docLabel: "查看文件", docHref: "/docs/api/twse-daily-price" },
-    { resource: "TPEx Daily Price", path: "/v2/datasets/tpex-daily-price", docLabel: "查看文件", docHref: "/docs/api/tpex-daily-price" },
-    { resource: "Market Prices", path: "/v2/datasets/market-prices", docLabel: "查看文件", docHref: "/docs/api/market-prices/market-prices" },
-  ],
-  fundamentals: [
-    { resource: "Monthly Revenue", path: "/v2/datasets/monthly-revenue", docLabel: "查看文件", docHref: "/docs/api/financial-growth/monthly-revenue" },
-    { resource: "Income Statement", path: "/v2/datasets/income-statement", docLabel: "查看文件", docHref: "/docs/api/financial-growth/income-statement" },
-    { resource: "Balance Sheet", path: "/v2/datasets/balance-sheet", docLabel: "查看文件", docHref: "/docs/api/financial-growth/balance-sheet" },
-    { resource: "Cash Flow Statement", path: "/v2/datasets/cash-flow-statement", docLabel: "查看文件", docHref: "/docs/api/financial-growth/cash-flow-statement" },
-    { resource: "Valuation Data", path: "/v2/datasets/valuation-data", docLabel: "查看文件", docHref: "/docs/api/financial-growth/valuation-data" },
-  ],
-  events: [
-    { resource: "Issuer Profile", path: "/v2/datasets/issuer-profile", docLabel: "查看文件", docHref: "/docs/api/company/issuer-profile" },
-  ],
-};
-
-const TAB_LABELS: Array<{ id: "market" | "fundamentals" | "events"; label: string }> = [
-  { id: "market", label: "市場資料" },
-  { id: "fundamentals", label: "基本面" },
-  { id: "events", label: "事件" },
+// Credit-cost table, DERIVED from the pricing SSOT (DATASET_ACCESS_POLICIES). Every billable dataset
+// appears here with the exact cost the meter charges — there is no hand-maintained row list to drift.
+// Grouped by the plan tier that unlocks the dataset. Analysis-line tools (features/time-alignment)
+// are absent from the SSOT, so they never appear.
+const COST_TABLE_TIERS: Array<{ id: string; label: string }> = [
+  { id: "free", label: "Free" },
+  { id: "starter", label: "Starter" },
+  { id: "pro", label: "Pro" },
+  { id: "max", label: "Max" },
 ];
+
+type CostRow = { slug: string; cost: number };
+
+const COST_ROWS_BY_TIER: Record<string, CostRow[]> = Object.values(DATASET_ACCESS_POLICIES).reduce(
+  (acc, policy) => {
+    (acc[policy.requiredPlan] ??= []).push({ slug: policy.datasetSlug, cost: policy.creditsCost });
+    return acc;
+  },
+  {} as Record<string, CostRow[]>,
+);
+for (const rows of Object.values(COST_ROWS_BY_TIER)) {
+  rows.sort((a, b) => a.cost - b.cost || a.slug.localeCompare(b.slug));
+}
 
 type SpendPoint = {
   date: string;
@@ -111,16 +104,6 @@ const TRANSACTION_FILTER_OPTIONS: Array<{
   { id: "refund", label: "退款" },
   { id: "adjustment", label: "手動調整" },
 ];
-
-// Credit cost for an endpoint, straight from the gateway SSOT. The page used to hand-maintain these
-// numbers and had already drifted (monthly revenue showed 2 credits; the gateway charges 3).
-// An endpoint with no policy entry is not billable through the gateway — say so, do not guess.
-function getEndpointCreditCost(path: string): string {
-  const slug = path.split("/").filter(Boolean).pop() ?? "";
-  const cost = DATASET_CREDIT_COSTS[slug];
-  if (typeof cost !== "number") return "—";
-  return cost === 1 ? "1 credit" : `${cost} credits`;
-}
 
 // Export the transactions currently in view (i.e. the active filter). Values are quoted and inner
 // quotes doubled so a description containing a comma cannot shift columns.
@@ -216,7 +199,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
   const router = useRouter();
   const mountedAtRef = useRef<number>(0);
   const lastFocusRefreshAtRef = useRef<number>(0);
-  const [activeTab, setActiveTab] = useState<"market" | "fundamentals" | "events">("market");
+  const [activeTab, setActiveTab] = useState<string>("free");
   // Month selector is driven by months that ACTUALLY have transactions — no fabricated buckets.
   const spendMonths = spendSeriesData.months;
   const [activeMonthIndex, setActiveMonthIndex] = useState(Math.max(0, spendMonths.length - 1));
@@ -335,7 +318,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
 
           <div className="-mx-1 mt-5 overflow-x-auto px-1">
             <div className="inline-flex min-w-max rounded-xl bg-slate-100 p-1">
-              {TAB_LABELS.map((tab) => (
+              {COST_TABLE_TIERS.map((tab) => (
                 <button
                   key={tab.id}
                   type="button"
@@ -352,33 +335,24 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
             <table className="min-w-full text-sm">
               <thead className="text-sm font-medium text-slate-500">
                 <tr>
-                  <th className="px-3 py-3 text-left font-medium">資源</th>
-                  <th className="px-3 py-3 text-left font-medium">Path</th>
+                  <th className="px-3 py-3 text-left font-medium">資料集</th>
+                  <th className="px-3 py-3 text-left font-medium">端點</th>
                   <th className="px-3 py-3 text-left font-medium">使用成本</th>
-                  <th className="px-3 py-3 text-left font-medium">文件</th>
                 </tr>
               </thead>
               <tbody>
-                {ENDPOINT_ROWS[activeTab].map((row) => (
+                {(COST_ROWS_BY_TIER[activeTab] ?? []).map((row) => (
                   <tr
-                    key={`${row.resource}-${row.path}`}
+                    key={row.slug}
                     className="border-t border-slate-200/70 transition hover:bg-white/70"
                   >
-                    <td className="px-3 py-3 text-sm text-slate-700">{row.resource}</td>
+                    <td className="px-3 py-3 text-sm text-slate-700">{row.slug}</td>
                     <td className="px-3 py-3">
                       <span className="inline-flex rounded-md bg-slate-100/70 px-2 py-1 font-mono text-xs text-slate-500 ring-1 ring-slate-200/70">
-                        {row.path}
+                        /v2/datasets/{row.slug}
                       </span>
                     </td>
-                    <td className="px-3 py-3 text-sm text-slate-700">{getEndpointCreditCost(row.path)}</td>
-                    <td className="px-3 py-3">
-                      <Link
-                        href={row.docHref}
-                        className="text-sm font-medium text-slate-700 underline-offset-4 transition hover:text-black hover:underline"
-                      >
-                        {row.docLabel}
-                      </Link>
-                    </td>
+                    <td className="px-3 py-3 text-sm text-slate-700">{row.cost === 1 ? "1 credit" : `${row.cost} credits`}</td>
                   </tr>
                 ))}
               </tbody>
