@@ -5,7 +5,14 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // Runtime queries go through the Neon POOLED (pgbouncer) endpoint — that is what serverless wants.
+  url       = env("DATABASE_URL")
+  // Migrations must NOT go through the pooler. `prisma migrate deploy` takes a pg_advisory_lock, and
+  // an advisory lock cannot be held across a transaction-mode pooler — the connection it was taken on
+  // is not the one it is released on. That is why production deploys failed with P1002 (lock timeout).
+  // directUrl is used ONLY by migrate/introspect and must point at the Neon DIRECT (non "-pooler")
+  // host. Runtime is unaffected.
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 model User {
