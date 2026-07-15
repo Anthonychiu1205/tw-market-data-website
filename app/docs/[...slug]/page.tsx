@@ -10,6 +10,7 @@ import { DocsLandingContent } from "@/src/components/docs/docs-landing-content";
 import { DocsPageShell } from "@/src/components/docs/docs-page-shell";
 import { QuickStartContent } from "@/src/components/docs/quick-start-content";
 import { AuthenticationContent } from "@/src/components/docs/authentication-content";
+import { ToolsMcpContent } from "@/src/components/docs/tools-mcp-content";
 import { SectionHeading } from "@/src/components/docs/section-heading";
 import { buttonClass } from "@/src/components/ui/button";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
@@ -434,6 +435,14 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
     return (
       <DocsPageShell page={pageForShell} pageLabel="Overview">
         <QuickStartContent />
+      </DocsPageShell>
+    );
+  }
+
+  if (page.slug.join("/") === "tools-and-mcp") {
+    return (
+      <DocsPageShell page={pageForShell} pageLabel="Overview">
+        <ToolsMcpContent />
       </DocsPageShell>
     );
   }

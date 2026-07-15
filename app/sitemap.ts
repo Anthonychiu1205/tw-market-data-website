@@ -45,7 +45,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/refund", changeFrequency: "yearly", priority: 0.3 },
     { path: "/docs/data-provenance", changeFrequency: "weekly", priority: 0.75 },
     { path: "/docs/market-coverage", changeFrequency: "weekly", priority: 0.75 },
-    { path: "/docs/tools-mcp", changeFrequency: "weekly", priority: 0.75 },
+    { path: "/docs/tools-and-mcp", changeFrequency: "weekly", priority: 0.75 },
     { path: "/docs/openapi-spec", changeFrequency: "weekly", priority: 0.75 },
     { path: "/openapi.json", changeFrequency: "weekly", priority: 0.7 },
     { path: "/llms.txt", changeFrequency: "monthly", priority: 0.55 },
