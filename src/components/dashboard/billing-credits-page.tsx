@@ -158,6 +158,7 @@ function getTransactionStatusLabel(status: string) {
   if (status === "pending") return "確認中";
   if (status === "failed") return "失敗";
   if (status === "cancelled") return "已取消";
+  if (status === "expired") return "已逾時";
   if (status === "simulated") return "模擬";
   return "待確認";
 }
@@ -208,14 +209,27 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
   const activeMonthKey = activeMonth?.key ?? "";
   const spendSeries = activeMonth?.points ?? [];
   const hasSpendData = spendSeries.length > 0;
+  const spendAxisMax = useMemo(() => {
+    const max = spendSeries.reduce((acc, point) => Math.max(acc, point.spend), 0);
+    if (max <= 0) return 2;
+    return Math.max(2, Math.ceil((max * 1.15) / 2) * 2);
+  }, [spendSeries]);
   const packages = useMemo(() => getCreditPackViews(), []);
   const [pendingPack, setPendingPack] = useState<CreditPackCode | null>(null);
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
-  const latestTransactionAt = transactions.length > 0 ? transactions[0]?.createdAt ?? null : null;
+  // Revenue-integrity display rule (④/③): a top-up only appears once payment is confirmed. A
+  // purchase that is pending / failed / expired was never added to the wallet, so showing it — as a
+  // green "+N credits" row — would imply credits the customer does not have. Hide it from the list
+  // (usage/refund/adjustment are only ever written as completed, so they are unaffected).
+  const visibleTransactions = useMemo(
+    () => transactions.filter((item) => item.type !== "purchase" || item.status === "completed"),
+    [transactions],
+  );
+  const latestTransactionAt = visibleTransactions.length > 0 ? visibleTransactions[0]?.createdAt ?? null : null;
   const filteredTransactions = useMemo(() => {
-    if (transactionFilter === "all") return transactions;
-    return transactions.filter((item) => item.type === transactionFilter);
-  }, [transactionFilter, transactions]);
+    if (transactionFilter === "all") return visibleTransactions;
+    return visibleTransactions.filter((item) => item.type === transactionFilter);
+  }, [transactionFilter, visibleTransactions]);
   async function handleBuyPack(packCode: CreditPackCode) {
     if (pendingPack) return;
     setPendingPack(packCode);
@@ -514,8 +528,8 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(value) => formatMoney(Number(value) * 100, "USD")}
-                  ticks={[0, 500, 1000]}
-                  domain={[0, 1000]}
+                  ticks={[0, spendAxisMax / 2, spendAxisMax]}
+                  domain={[0, spendAxisMax]}
                   width={58}
                 />
                 <Tooltip
