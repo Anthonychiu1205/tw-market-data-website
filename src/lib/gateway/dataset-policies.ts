@@ -24,7 +24,7 @@ export const PLAN_LEVEL: Record<GatewayPlanCode, number> = {
   enterprise: 5,
 };
 
-// Billable dataset pricing — the pricing SSOT (owner-authorized 2026-07-15, 63 datasets).
+// Billable dataset pricing — the pricing SSOT (owner-authorized 2026-07-15, 64 datasets).
 //
 // Pricing philosophy (1 credit ≈ $0.0025, since $10 = 4,000 credits):
 //   free 1cr   基礎價量 / 指數 / 參考(獲客);  free 2cr  還原價
@@ -34,11 +34,12 @@ export const PLAN_LEVEL: Record<GatewayPlanCode, number> = {
 //
 // Anti-arbitrage: endpoints serving the same data cost the same (market-prices == twse/tpex 1cr).
 //
-// TRIMMED 2026-07-15 (B台 sellability sweep): 9 empty/stub datasets removed so we do not charge for
-// shells before charged mode. They now fall through the meter as NO-PRICE (fail-open, free) until
-// they have real data and are re-added: derivatives-market, factor-data, structured-events,
+// TRIMMED 2026-07-15 (B台 sellability sweep): empty/stub datasets removed so we do not charge for
+// shells before charged mode. They fall through the meter as NO-PRICE (fail-open, free) until they
+// have real data and are re-added. Still trimmed: factor-data, structured-events,
 // issuer-announcements, market-news, capital-formation-events, cb-institutional,
 // convertible-bond-institutional-flow, company-news.
+// Re-added: derivatives-market (A台 fix/three-mispointed-serves — now serves TAIFEX futures ~5.9M).
 //
 // EXCLUDED on purpose (do NOT add): `features`, `time-alignment` — analysis-line tooling, not sold.
 // They must be gated off on the read API too; a slug absent from this table has no price and the
@@ -89,6 +90,7 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "balance-sheet": { datasetSlug: "balance-sheet", backendPath: "/v2/datasets/balance-sheet", requiredPlan: "pro", creditsCost: 2 },
   "cash-flow-statement": { datasetSlug: "cash-flow-statement", backendPath: "/v2/datasets/cash-flow-statement", requiredPlan: "pro", creditsCost: 2 },
   "convertible-bonds": { datasetSlug: "convertible-bonds", backendPath: "/v2/datasets/convertible-bonds", requiredPlan: "pro", creditsCost: 2 },
+  "derivatives-market": { datasetSlug: "derivatives-market", backendPath: "/v2/datasets/derivatives-market", requiredPlan: "pro", creditsCost: 2 },
   "etf-flow": { datasetSlug: "etf-flow", backendPath: "/v2/datasets/etf-flow", requiredPlan: "pro", creditsCost: 2 },
   "etf-holdings": { datasetSlug: "etf-holdings", backendPath: "/v2/datasets/etf-holdings", requiredPlan: "pro", creditsCost: 2 },
   "events": { datasetSlug: "events", backendPath: "/v2/datasets/events", requiredPlan: "pro", creditsCost: 2 },
