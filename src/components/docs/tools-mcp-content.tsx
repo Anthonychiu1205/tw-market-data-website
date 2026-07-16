@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { AlertTriangle, Check } from "lucide-react";
 
 import { CodeBlock } from "@/src/components/docs/code-block";
 import { SectionHeading } from "@/src/components/docs/section-heading";
@@ -45,12 +46,18 @@ export function ToolsMcpContent() {
         <p className="text-sm leading-7 text-slate-600">
           用一把 API key,就能查台股<strong>官方</strong>資料:行情與還原價、月營收、財報三表、估值、技術指標、籌碼與三大法人、公司事件與公告。
         </p>
-        <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700 marker:text-slate-500">
-          <li>
-            <strong>✅ REST API</strong>(<code className="font-mono text-slate-700">api.twmarketdata.com</code>)—— 任何語言、任何能打 HTTP 的程式或 AI agent 都能接。
+        <ul className="space-y-2 text-sm leading-7 text-slate-700">
+          <li className="flex items-start gap-2">
+            <Check className="mt-1.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+            <span>
+              <strong>REST API</strong>(<code className="font-mono text-slate-700">api.twmarketdata.com</code>)—— 任何語言、任何能打 HTTP 的程式或 AI agent 都能接。
+            </span>
           </li>
-          <li>
-            <strong>✅ MCP</strong>(<code className="font-mono text-slate-700">mcp.twmarketdata.com</code>)—— 讓 Claude、Cursor 等 AI 助理<strong>一鍵連上</strong>、用自然語言問,它自己選工具查。
+          <li className="flex items-start gap-2">
+            <Check className="mt-1.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+            <span>
+              <strong>MCP</strong>(<code className="font-mono text-slate-700">mcp.twmarketdata.com</code>)—— 讓 Claude、Cursor 等 AI 助理<strong>一鍵連上</strong>、用自然語言問,它自己選工具查。
+            </span>
           </li>
         </ul>
         <blockquote className="border-l-2 border-slate-300 pl-4 text-sm leading-7 text-slate-600">
@@ -219,9 +226,10 @@ http_headers = { "X-API-Key" = "sk_live_你的key" }`}
         </div>
 
         {/* OAuth-only clients: NOT supported yet. */}
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-7 text-amber-800">
+        <div className="flex gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-7 text-amber-800">
+          <AlertTriangle className="mt-1 h-4 w-4 shrink-0 text-amber-600" aria-hidden />
           <p>
-            <strong>⚠️ 目前尚未支援:ChatGPT、Claude Desktop / Claude.ai 網頁版。</strong> 這些客戶端的連線走 <strong>OAuth</strong>,尚不接受本服務的 API key 連線方式。<strong>OAuth 一鍵連線正在開發中</strong>,屆時這些客戶端也能連 —— 敬請關注。在此之前,請用上方的開發者工具連線,或直接用 REST。
+            <strong>目前尚未支援:ChatGPT、Claude Desktop / Claude.ai 網頁版。</strong> 這些客戶端的連線走 <strong>OAuth</strong>,尚不接受本服務的 API key 連線方式。<strong>OAuth 一鍵連線正在開發中</strong>,屆時這些客戶端也能連 —— 敬請關注。在此之前,請用上方的開發者工具連線,或直接用 REST。
           </p>
         </div>
 

@@ -387,8 +387,8 @@ export const answerPages: readonly AnswerPageEntry[] = [
     status: "published",
   },
   {
-    // 篇6 (AEO handoff 2026-07-13). Leads with income statement + monthly revenue (self-check 🟢).
-    // Balance sheet / cash flow are NOT claimed in detail (balance self-check 🟡) — only noted as a
+    // 篇6 (AEO handoff 2026-07-13). Leads with income statement + monthly revenue (self-check green).
+    // Balance sheet / cash flow are NOT claimed in detail (balance self-check amber) — only noted as a
     // transparent rollout, per the honesty guardrail.
     slug: "taiwan-financial-statements-monthly-revenue-api",
     locale: "zh-Hant",
