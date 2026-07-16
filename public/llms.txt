@@ -56,6 +56,17 @@ answer_pages:
 - url=/answers/taiwan-financial-statements-monthly-revenue-api; topic=Taiwan financial statements & monthly revenue API (MOPS-reconciled, as_of); lang=zh-Hant
 - url=/compare/twmarketdata-vs-finmind-vs-tej; topic=TW Market Data vs FinMind vs TEJ — choosing a Taiwan stock data API; lang=zh-Hant
 
+webhooks:
+# Phase A: signed HTTPS push for data events. Signature scheme = Standard Webhooks (standardwebhooks.com):
+# headers webhook-id / webhook-timestamp / webhook-signature, HMAC-SHA256, 5-minute tolerance. Verify
+# with the OFFICIAL library (do not hand-roll). Delivery is AT-LEAST-ONCE and NOT ORDERED — dedupe on
+# webhook-id. Pushed payload == what /freshness exposes (push == pull, no double truth).
+- transport=https_push; signing=standard_webhooks; semantics=at_least_once_not_ordered; dedupe_on=webhook-id
+- event=revenue.announced; schema_ver=1; payload={symbol,revenue_month,revenue,unit,data_as_of}
+- event=filing.announced; schema_ver=1; payload={symbol,statement,fiscal_period,report_date,data_as_of}
+- event=catalog.dataset_listed; schema_ver=1; payload={dataset,exposure_status,reconciliation_badge}
+- doc=docs/WEBHOOKS.md; verify_examples=examples/webhooks/verify_signature.mjs,examples/webhooks/verify_signature.py
+
 datasets:
 - id=balance_sheet; status=production_baseline; production_ready=false; route=/v2/datasets/balance-sheet
 - id=block_trade_daily; status=private_beta; production_ready=false; route=/v2/datasets/block-trade-daily
