@@ -1,12 +1,7 @@
-import Link from "next/link";
-import { ArrowRight, LineChart } from "lucide-react";
-
-import { buttonClass } from "@/src/components/ui/button";
+import { LineChart } from "lucide-react";
 
 // T-05 dashboard entry card for the 投研終端 (research terminal).
-// 終端已上線 (F 線, terminal.twmarketdata.com) → 正式入口:直接 SSO 直達,不再 gated。
-const TERMINAL_URL = "https://terminal.twmarketdata.com";
-
+// 暫未開放 — 顯示「即將推出」，入口連結關閉（owner request 2026-07-16，尚未對外開放）。
 export function ResearchTerminalEntryCard() {
   return (
     <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
@@ -17,20 +12,21 @@ export function ResearchTerminalEntryCard() {
               <LineChart size={18} strokeWidth={1.75} />
             </span>
             <h2 className="text-lg font-semibold tracking-tight text-slate-900">投研終端</h2>
+            <span className="ml-1 inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">
+              即將推出
+            </span>
           </div>
           <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
-            以官方台股資料為底的線上投研工作台：因子、資料檢視與研究流程，一站完成。登入後可從此直達，
-            無需重新登入。
+            以官方台股資料為底的線上投研工作台：因子、資料檢視與研究流程，一站完成。敬請期待。
           </p>
 
           <div className="mt-5">
-            <Link
-              href={TERMINAL_URL}
-              className={buttonClass("primary", "inline-flex items-center gap-2")}
+            <span
+              aria-disabled="true"
+              className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-400"
             >
-              進入投研終端
-              <ArrowRight size={16} strokeWidth={2} />
-            </Link>
+              即將推出
+            </span>
           </div>
         </div>
 
