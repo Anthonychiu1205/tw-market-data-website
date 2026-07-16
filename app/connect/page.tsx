@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { AlertTriangle, Lightbulb } from "lucide-react";
+
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 
@@ -61,10 +63,13 @@ export default function ConnectPage() {
             Claude Code / Cursor / 自建 agent：於帳戶頁取 API key，走 REST，按用量計費。
           </p>
           <CodeLine>{curlLine}</CodeLine>
-          <p className="mt-3 text-sm leading-7 text-slate-600">
-            ⚠️ 請為每個 agent 開<strong className="font-semibold text-slate-900">專用 key</strong>（見{" "}
-            <Link href="/connect/key-safety" className="font-medium text-slate-900 underline underline-offset-4 hover:text-slate-700">key 安全</Link>
-            ），別把主 key 貼進對話。
+          <p className="mt-3 flex items-start gap-2 text-sm leading-7 text-slate-600">
+            <AlertTriangle className="mt-1 h-4 w-4 shrink-0 text-amber-600" aria-hidden />
+            <span>
+              請為每個 agent 開<strong className="font-semibold text-slate-900">專用 key</strong>（見{" "}
+              <Link href="/connect/key-safety" className="font-medium text-slate-900 underline underline-offset-4 hover:text-slate-700">key 安全</Link>
+              ），別把主 key 貼進對話。
+            </span>
           </p>
         </section>
 
@@ -75,8 +80,11 @@ export default function ConnectPage() {
           <p className="mt-3 text-sm leading-7 text-slate-700">
             在 Claude.ai / ChatGPT 裡付費使用的<strong className="font-semibold text-slate-900">唯一正道</strong>、也是工具呼叫最穩的方式：加入 TW Market Data connector 授權即用。
           </p>
-          <p className="mt-3 rounded-lg bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-600">
-            💡 若你在 Claude.ai 裡貼「一句話」卻拿不到付費資料，<strong className="font-semibold text-slate-900">不是產品壞掉</strong>——消費者聊天請走這層 connector。
+          <p className="mt-3 flex items-start gap-2 rounded-lg bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-600">
+            <Lightbulb className="mt-1 h-4 w-4 shrink-0 text-slate-500" aria-hidden />
+            <span>
+              若你在 Claude.ai 裡貼「一句話」卻拿不到付費資料，<strong className="font-semibold text-slate-900">不是產品壞掉</strong>——消費者聊天請走這層 connector。
+            </span>
           </p>
         </section>
 

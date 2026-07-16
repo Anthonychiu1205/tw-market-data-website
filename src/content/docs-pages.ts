@@ -645,6 +645,26 @@ const baseDocsPages: DocsPageEntry[] = [
     ],
   },
   {
+    // Bespoke content lives in src/components/docs/tools-mcp-content.tsx; [...slug] special-cases it.
+    // sections here drive the right-hand TOC (ids must match the SectionHeading ids in that component).
+    slug: ["tools-and-mcp"],
+    href: "/docs/tools-and-mcp",
+    navLabel: "Tools / MCP",
+    category: "overview",
+    icon: "advanced",
+    title: "Tools / MCP",
+    subtitle: "把台股官方資料接上你的程式與 AI 助理——REST API 與 MCP 皆已上線,五分鐘上手。",
+    tier: "complete",
+    sections: [
+      { id: "get-key", label: "先拿一把 API key" },
+      { id: "mcp", label: "A. 用 MCP(最簡單)" },
+      { id: "rest", label: "B. 用 REST" },
+      { id: "auth", label: "認證" },
+      { id: "datasets", label: "資料集一覽" },
+      { id: "semantics", label: "語義與注意" },
+    ],
+  },
+  {
     slug: ["quick-start"],
     href: "/docs/quick-start",
     navLabel: "快速開始",

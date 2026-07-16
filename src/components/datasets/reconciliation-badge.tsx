@@ -1,3 +1,5 @@
+import { Check } from "lucide-react";
+
 import type { DatasetReconciliation } from "@/src/lib/reconciliation/dataset-reconciliation";
 
 // Trust badge for dataset (coverage) pages. Renders the reconciliation state resolved server-side.
@@ -12,7 +14,7 @@ export function ReconciliationBadge({ data }: { data: DatasetReconciliation | nu
         title="每個值逐值對官方來源可追溯；此日期為最後一次對帳通過的日期。"
       >
         最後對官方對帳通過：{data.lastReconciledDate}
-        <span aria-hidden>✓</span>
+        <Check className="h-3.5 w-3.5" aria-hidden />
       </span>
     );
   }
