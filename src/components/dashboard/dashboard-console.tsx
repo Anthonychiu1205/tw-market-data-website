@@ -16,6 +16,7 @@ import { BillingLandingPage } from "@/src/components/dashboard/billing-landing-p
 import { BillingSubscriptionsPage } from "@/src/components/dashboard/billing-subscriptions-page";
 import { BillingCreditsPage } from "@/src/components/dashboard/billing-credits-page";
 import { UsagePageShell } from "@/src/components/dashboard/usage-page-shell";
+import { WebhooksManager } from "@/src/components/dashboard/webhooks-manager";
 import { RequestResponsePlayground } from "@/src/components/dashboard/request-response-playground";
 import { OverviewUsageChart } from "@/src/components/dashboard/overview-usage-chart";
 import { AccountProfileForm } from "@/src/components/dashboard/account-profile-form";
@@ -534,6 +535,7 @@ export function renderSection(section: DashboardSection, props: DashboardConsole
         usageReconciliation={props.usageReconciliation}
       />
     );
+  if (section === "webhooks") return <WebhooksManager />;
   if (section === "keys") return <KeysPanel apiKeys={props.apiKeys} />;
   if (section === "settings") return <SettingsPanel email={props.email} entitlement={props.entitlement} />;
   if (section === "docs") return <DocsPanel />;

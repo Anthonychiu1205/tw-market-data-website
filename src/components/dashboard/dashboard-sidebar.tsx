@@ -66,6 +66,14 @@ function DashboardIconGlyph({ icon, className }: { icon: DashboardIcon; classNam
           <path d="M4 20V10M10 20V4M16 20V13M22 20V7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
       );
+    case "webhooks":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" className={cn(common, className)}>
+          <path d="M8.5 9.5A3.5 3.5 0 1 1 13 12.9L10.5 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M15.5 14.5A3.5 3.5 0 1 1 12 18H7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M6.5 15A3.5 3.5 0 1 1 9 9.1L11.5 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      );
     case "keys":
       return (
         <svg viewBox="0 0 24 24" fill="none" className={cn(common, className)}>

@@ -2,6 +2,7 @@ export type DashboardSection =
   | "overview"
   | "billing"
   | "usage"
+  | "webhooks"
   | "keys"
   | "settings"
   | "docs"
@@ -13,6 +14,7 @@ export type DashboardIcon =
   | "subscriptions"
   | "credits"
   | "usage"
+  | "webhooks"
   | "keys"
   | "settings"
   | "docs"
@@ -82,6 +84,15 @@ export const dashboardNav: DashboardNavItem[] = [
     href: "/usage",
     section: "usage",
     activeMode: "section",
+  },
+  {
+    type: "item",
+    id: "webhooks",
+    label: "Webhooks",
+    icon: "webhooks",
+    href: "/dashboard/webhooks",
+    section: "webhooks",
+    activeMode: "path",
   },
   {
     type: "item",
