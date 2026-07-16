@@ -4,7 +4,8 @@ import { timingSafeEqual } from "node:crypto";
 import { prisma } from "@/src/lib/auth/prisma";
 import { assertCreditsDeductionRuntimeSafe } from "@/src/lib/billing/credits-mode";
 import { DATASET_CREDIT_COSTS } from "@/src/lib/gateway/dataset-policies";
-import { deductCreditsForApiUsage } from "@/src/lib/gateway/credits-deduction";
+import { resolveUserPlanCode } from "@/src/lib/gateway/entitlement";
+import { settleBillableRequest } from "@/src/lib/billing/included-quota";
 import { createApiUsageEvent } from "@/src/lib/gateway/usage";
 
 export const runtime = "nodejs";
@@ -132,46 +133,54 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, mode: runtimeState.mode, deducted: 0, cost });
   }
 
-  // charged: atomic, idempotent deduction (usage:<requestId>).
-  const result = await deductCreditsForApiUsage({
+  // charged: INCLUDED-QUOTA-FIRST then wallet overage. The plan (and thus the monthly included
+  // allowance) is resolved from the SAME source the gateway uses — the read API via resolveUserPlanCode
+  // (Polar SSOT) — so the s2s meter and the in-process gateway settle identically. `cost` is still OUR
+  // SSOT dataset price; the caller never sets it.
+  const { planCode } = await resolveUserPlanCode(user.id, requestId);
+  const settle = await settleBillableRequest({
     userId: user.id,
-    apiKeyId: payload.apiKeyId ?? null,
+    planCode,
     datasetSlug: dataset,
     requestId,
     credits: cost,
     statusCode,
+    apiKeyId: payload.apiKeyId ?? null,
   });
 
-  if (!result.ok) {
-    if (result.code === "insufficient_credits") {
-      const wallet = await prisma.creditWallet.findUnique({
-        where: { userId: user.id },
-        select: { balance: true },
-      });
-      // No usage event: the call is NOT served (the read API returns 402), so it is not a billable
-      // event.
-      return NextResponse.json(
-        { ok: false, insufficient: true, balance: wallet?.balance ?? 0, cost },
-        { status: 200 },
-      );
-    }
+  if (settle.outcome === "insufficient") {
+    const wallet = await prisma.creditWallet.findUnique({
+      where: { userId: user.id },
+      select: { balance: true },
+    });
+    // Included allowance is spent AND the wallet cannot cover overage. No usage event: the call is NOT
+    // served (the read API returns 402 / upgrade prompt), so it is not a billable event.
+    return NextResponse.json(
+      { ok: false, insufficient: true, balance: wallet?.balance ?? 0, cost },
+      { status: 200 },
+    );
+  }
+  if (settle.outcome === "error") {
     // Deduction genuinely failed. Fail the meter so the read API does not serve a call it could not
     // bill — better to 5xx than to give data away for free.
     return NextResponse.json({ ok: false, error: "deduction_failed" }, { status: 502 });
   }
 
-  // Deducted (or a replay that was already deducted). Record the usage event only on a fresh charge,
-  // so a retry does not double-count the ledger — the deduction itself is already idempotent.
-  if (!result.alreadyProcessed && isServed) {
-    await recordUsageOnce(result.chargedCredits);
+  // included / charged / not_billable. Record the usage event once with the credits ACTUALLY charged
+  // (0 when covered by included quota) — a replay must not double-count the ledger, and the wallet
+  // deduction (overage) is already idempotent on usage:<requestId>.
+  if (!settle.alreadyProcessed && isServed) {
+    await recordUsageOnce(settle.chargedCredits);
   }
 
   return NextResponse.json({
     ok: true,
     mode: "charged",
-    deducted: result.chargedCredits,
-    alreadyProcessed: result.alreadyProcessed,
-    balance: result.balanceAfter,
+    deducted: settle.chargedCredits,
+    included: settle.outcome === "included",
+    includedRemaining: settle.includedRemaining ?? null,
+    alreadyProcessed: settle.alreadyProcessed ?? false,
+    balance: settle.balanceAfter ?? null,
     cost,
   });
 }

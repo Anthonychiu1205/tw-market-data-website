@@ -8,10 +8,8 @@ import {
   logGatewayIssue,
   type GatewayErrorCode,
 } from "@/src/lib/gateway/errors";
-import {
-  checkCreditsAvailabilityForApiUsage,
-  deductCreditsForApiUsage,
-} from "@/src/lib/gateway/credits-deduction";
+import { checkCreditsAvailabilityForApiUsage } from "@/src/lib/gateway/credits-deduction";
+import { previewIncludedQuota, settleBillableRequest } from "@/src/lib/billing/included-quota";
 import { isCreditsDeductionEnabled } from "@/src/lib/billing/credits-mode";
 import { trackApiEvent } from "@/src/lib/analytics/server";
 import { prisma } from "@/src/lib/auth/prisma";
@@ -246,21 +244,27 @@ export async function GET(request: Request, context: Context) {
         credits: creditsCost,
       });
       if (!availability.sufficient) {
-        statusCodeForLog = 402;
-        errorCodeForLog = "insufficient_credits";
-        creditsForUsageEvent = 0;
-        return gatewayJsonResponse(createGatewayErrorBody({
-          code: "insufficient_credits",
-          requestId,
-          stage,
-        }), {
-          status: 402,
-          requestId,
-          planCode,
-          creditsCost,
-          creditsCharged: 0,
-          dryRun,
-        });
+        // The wallet cannot cover overage — but the monthly INCLUDED allowance may still cover this
+        // request (included quota is spent before credits). Only 402 when included quota is ALSO out.
+        // The count runs solely on this cold path, so paying users pay no extra query.
+        const included = await previewIncludedQuota({ userId: authUserId, planCode: planCode ?? "free" });
+        if (!included.hasRoom) {
+          statusCodeForLog = 402;
+          errorCodeForLog = "insufficient_credits";
+          creditsForUsageEvent = 0;
+          return gatewayJsonResponse(createGatewayErrorBody({
+            code: "insufficient_credits",
+            requestId,
+            stage,
+          }), {
+            status: 402,
+            requestId,
+            planCode,
+            creditsCost,
+            creditsCharged: 0,
+            dryRun,
+          });
+        }
       }
     }
 
@@ -292,37 +296,40 @@ export async function GET(request: Request, context: Context) {
 
     if (deductionEnabled && authUserId && upstream.status >= 200 && upstream.status < 300 && (creditsCost ?? 0) > 0) {
       stage = "credits_deduction";
-      const deduction = await deductCreditsForApiUsage({
+      // Included-quota-first: consume the monthly allowance before charging the wallet. Same settlement
+      // the s2s meter route uses, so both entry points bill identically.
+      const settle = await settleBillableRequest({
         userId: authUserId,
-        apiKeyId: authApiKeyId,
+        planCode: planCode ?? "free",
         datasetSlug,
         requestId,
         credits: creditsCost ?? 0,
         statusCode: upstream.status,
+        apiKeyId: authApiKeyId,
       });
-      if (!deduction.ok) {
-        if (deduction.code === "insufficient_credits") {
-          statusCodeForLog = 402;
-          errorCodeForLog = "insufficient_credits";
-          creditsForUsageEvent = 0;
-          return gatewayJsonResponse(createGatewayErrorBody({
-            code: "insufficient_credits",
-            requestId,
-            stage,
-          }), {
-            status: 402,
-            requestId,
-            planCode,
-            creditsCost,
-            creditsCharged: 0,
-            dryRun,
-          });
-        }
-
+      if (settle.outcome === "insufficient") {
+        statusCodeForLog = 402;
+        errorCodeForLog = "insufficient_credits";
+        creditsForUsageEvent = 0;
+        return gatewayJsonResponse(createGatewayErrorBody({
+          code: "insufficient_credits",
+          requestId,
+          stage,
+        }), {
+          status: 402,
+          requestId,
+          planCode,
+          creditsCost,
+          creditsCharged: 0,
+          dryRun,
+        });
+      }
+      if (settle.outcome === "error") {
         throw new GatewayHttpError(500, "internal_error", "Credits deduction failed.", { stage });
       }
-      creditsCharged = deduction.chargedCredits;
-      creditsForUsageEvent = deduction.chargedCredits;
+      // included ⇒ 0 charged; charged ⇒ overage credits. Both record the real charged amount.
+      creditsCharged = settle.chargedCredits;
+      creditsForUsageEvent = settle.chargedCredits;
     } else if (deductionEnabled) {
       creditsForUsageEvent = 0;
     }
