@@ -59,7 +59,28 @@ export type AccountSummary = {
   accessStatus: string;
   enabledDatasets: number;
   integrationMode: IntegrationMode;
+  // Subscription current billing-period start, ISO-8601, when the read API exposes it (mirror of the
+  // existing current_period_END → renewalDate). null when absent → callers fall back to the UTC month.
+  // Drives the included-quota counting window so the monthly allowance aligns with the billing cycle.
+  currentPeriodStart: string | null;
 };
+
+// The read API may send the period start as an ISO string or an epoch (seconds or millis). Normalise to
+// ISO, or null when missing/unparseable — never guess a window boundary.
+function coercePeriodStartIso(raw: unknown): string | null {
+  if (typeof raw === "string") {
+    const trimmed = raw.trim();
+    if (!trimmed) return null;
+    const parsed = new Date(trimmed);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  }
+  if (typeof raw === "number" && Number.isFinite(raw)) {
+    const ms = raw < 1e12 ? raw * 1000 : raw; // epoch seconds vs milliseconds
+    const parsed = new Date(ms);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  }
+  return null;
+}
 
 export type BillingSummary = {
   subscriptionStatus: string;
@@ -404,6 +425,7 @@ export async function getAccountSummary(email: string): Promise<AccountSummary> 
       accessStatus: getString(payload.accessStatus || payload.access_status, "Active"),
       enabledDatasets: enabledFromAccount ?? getNumber(payload.enabledDatasets || payload.enabled_datasets, datasetProducts.length),
       integrationMode: "live",
+      currentPeriodStart: coercePeriodStartIso(account?.current_period_start ?? payload.current_period_start),
     };
     setBackendCacheValue(cacheKey, result);
     return result;
@@ -417,6 +439,7 @@ export async function getAccountSummary(email: string): Promise<AccountSummary> 
     accessStatus: "Active",
     enabledDatasets: datasetProducts.length,
     integrationMode: "fallback",
+    currentPeriodStart: null,
   };
   setBackendCacheValue(cacheKey, fallbackResult);
   return fallbackResult;

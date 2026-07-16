@@ -1,16 +1,24 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { settleBillableRequest, monthStartUtc, FREE_DATASET_SLUGS } from "../src/lib/billing/included-quota.ts";
+import {
+  settleBillableRequest,
+  previewIncludedQuota,
+  monthStartUtc,
+  billingWindowStart,
+  FREE_DATASET_SLUGS,
+} from "../src/lib/billing/included-quota.ts";
 
-// A fake dependency set so the settlement logic is exercised with no DB. Records whether deduct ran.
-function fakeDeps({ used = 0, priorCharge = null, priorUsage = null, deduct } = {}) {
-  const calls = { deduct: 0, count: 0 };
+// A fake dependency set so the settlement logic is exercised with no DB. Records whether deduct ran and
+// which window start the count was asked for (to prove period-anchor vs UTC-month fallback).
+function fakeDeps({ used = 0, priorCharge = null, priorUsage = null, deduct, now } = {}) {
+  const calls = { deduct: 0, count: 0, since: null };
   return {
     calls,
     deps: {
-      async countBillableThisMonth() {
+      async countBillableSince(_userId, since) {
         calls.count += 1;
+        calls.since = since;
         return used;
       },
       async deduct(input) {
@@ -26,7 +34,7 @@ function fakeDeps({ used = 0, priorCharge = null, priorUsage = null, deduct } = 
       async findPriorUsage() {
         return priorUsage;
       },
-      now: () => new Date("2026-07-16T04:00:00.000Z"),
+      now: () => (now ? new Date(now) : new Date("2026-07-16T04:00:00.000Z")),
     },
   };
 }
@@ -117,4 +125,37 @@ test("monthStartUtc is the UTC first-of-month", () => {
 
 test("FREE_DATASET_SLUGS is empty today (every dataset costs >= 1)", () => {
   assert.deepEqual(FREE_DATASET_SLUGS, []);
+});
+
+// ---- BILLING-02: subscription billing-period window ----
+
+test("billingWindowStart uses a valid past period start, else the UTC month", () => {
+  const now = new Date("2026-07-16T04:00:00Z");
+  // valid past period start ⇒ used verbatim
+  assert.equal(billingWindowStart("2026-06-20T00:00:00Z", now).toISOString(), "2026-06-20T00:00:00.000Z");
+  // null ⇒ UTC month
+  assert.equal(billingWindowStart(null, now).toISOString(), "2026-07-01T00:00:00.000Z");
+  // unparseable ⇒ UTC month
+  assert.equal(billingWindowStart("not-a-date", now).toISOString(), "2026-07-01T00:00:00.000Z");
+  // FUTURE period start ⇒ fall back to month (never over-grant on a bad boundary)
+  assert.equal(billingWindowStart("2026-08-01T00:00:00Z", now).toISOString(), "2026-07-01T00:00:00.000Z");
+});
+
+test("settle counts usage since the subscription period start when provided", async () => {
+  const { deps, calls } = fakeDeps({ used: 10, now: "2026-07-16T04:00:00Z" });
+  await settleBillableRequest({ ...base, periodStart: "2026-06-20T00:00:00Z" }, deps);
+  assert.equal(calls.since.toISOString(), "2026-06-20T00:00:00.000Z", "window anchored on period start");
+});
+
+test("settle falls back to the UTC month when period start is absent", async () => {
+  const { deps, calls } = fakeDeps({ used: 10, now: "2026-07-16T04:00:00Z" });
+  await settleBillableRequest({ ...base, periodStart: null }, deps);
+  assert.equal(calls.since.toISOString(), "2026-07-01T00:00:00.000Z", "window falls back to UTC month");
+});
+
+test("previewIncludedQuota honours the period-start window too", async () => {
+  const { deps, calls } = fakeDeps({ used: 5, now: "2026-07-16T04:00:00Z" });
+  const r = await previewIncludedQuota({ userId: "u1", planCode: "developer", periodStart: "2026-07-03T00:00:00Z" }, deps);
+  assert.equal(r.hasRoom, true);
+  assert.equal(calls.since.toISOString(), "2026-07-03T00:00:00.000Z");
 });

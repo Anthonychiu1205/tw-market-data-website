@@ -137,7 +137,7 @@ export async function POST(request: Request) {
   // allowance) is resolved from the SAME source the gateway uses — the read API via resolveUserPlanCode
   // (Polar SSOT) — so the s2s meter and the in-process gateway settle identically. `cost` is still OUR
   // SSOT dataset price; the caller never sets it.
-  const { planCode } = await resolveUserPlanCode(user.id, requestId);
+  const { planCode, periodStart } = await resolveUserPlanCode(user.id, requestId);
   const settle = await settleBillableRequest({
     userId: user.id,
     planCode,
@@ -146,6 +146,7 @@ export async function POST(request: Request) {
     credits: cost,
     statusCode,
     apiKeyId: payload.apiKeyId ?? null,
+    periodStart,
   });
 
   if (settle.outcome === "insufficient") {

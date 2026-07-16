@@ -10,6 +10,8 @@ export type GatewayEntitlementResult = {
   isEntitled: boolean;
   datasetAllowed: boolean;
   source: "subscription" | "fallback";
+  // Subscription billing-period start (ISO) when known; null → included-quota falls back to UTC month.
+  periodStart: string | null;
 };
 
 function isPublicApiFreeTierEnabled() {
@@ -23,7 +25,7 @@ function isPublicApiFreeTierEnabled() {
 export async function resolveUserPlanCode(
   userId: string,
   requestId = "n/a",
-): Promise<{ planCode: GatewayPlanCode; source: "subscription" | "fallback" }> {
+): Promise<{ planCode: GatewayPlanCode; source: "subscription" | "fallback"; periodStart: string | null }> {
   try {
     // Single source of truth = the shared read API (fed by the Polar webhook). Resolve
     // the user's email, then read the backend plan; no local subscription is stored.
@@ -32,7 +34,8 @@ export async function resolveUserPlanCode(
       const summary = await getAccountSummary(user.email);
       const planCode = normalizePlanCode(summary.plan);
       if (planCode !== "free") {
-        return { planCode, source: "subscription" };
+        // periodStart aligns the included-quota window with the billing cycle (null → UTC month).
+        return { planCode, source: "subscription", periodStart: summary.currentPeriodStart };
       }
     }
   } catch (error) {
@@ -47,9 +50,11 @@ export async function resolveUserPlanCode(
     // Fail-open to free tier for gateway reads; avoids internal errors when the backend is unavailable.
   }
 
+  // Free tier (or backend unavailable) has no billing period → the UTC calendar month is the window.
   return {
     planCode: "free",
     source: "fallback",
+    periodStart: null,
   };
 }
 
@@ -74,5 +79,6 @@ export async function assertDatasetEntitlement(input: {
     isEntitled: resolved.planCode !== "free",
     datasetAllowed: true,
     source: resolved.source,
+    periodStart: resolved.periodStart,
   };
 }

@@ -28,21 +28,30 @@ export const FREE_DATASET_SLUGS: string[] = Object.entries(DATASET_CREDIT_COSTS)
   .filter(([, cost]) => !(typeof cost === "number" && cost > 0))
   .map(([slug]) => slug);
 
-// UTC calendar-month start — the window the monthly included allowance is counted over.
-//
-// KNOWN LIMITATION (v1, tracked follow-up): the window SHOULD be the subscription's current billing
-// period (current_period_start … current_period_end), not the UTC calendar month. Anchoring on the
-// calendar month means the allowance resets on the 1st regardless of when the cycle actually renews,
-// so a user whose period starts late in a month gets a fresh full allowance on the 1st — a
-// "month-end double reset" that hands out more included requests than one billing cycle should.
-//
-// Why UTC month for now: the plan is resolved from the read API's /v2/account/summary (AccountSummary),
-// which today exposes current_period_END (→ renewalDate) but NOT current_period_START, and nothing in
-// the website code carries a period start. Fixing this needs A台 to confirm /v2/account/summary returns
-// current_period_start, then plumbing it through AccountSummary → resolveUserPlanCode → here (swap this
-// function for the period-start anchor). Until then the calendar month is the safe, deterministic v1.
+// UTC calendar-month start — the FALLBACK counting window, used only when the subscription's billing
+// period is unknown (see billingWindowStart). Kept as a deterministic, timezone-stable default (Vercel
+// runs UTC) for free users and when the read API has not provided current_period_start.
 export function monthStartUtc(now: Date): Date {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+}
+
+// The window the monthly included allowance is counted over. Prefer the subscription's billing-period
+// start (BILLING-02) so the allowance aligns with the cycle the customer actually paid for; fall back
+// to the UTC calendar month when the read API does not (yet) expose current_period_start.
+//
+// A period start that is missing, unparseable, or in the FUTURE falls back to the month — never trust a
+// window boundary that would under-count usage and over-grant included requests.
+// (Note: included quota is a MONTHLY figure and paid plans bill monthly today — annual Polar checkout is
+// not wired — so current_period_start is a ~monthly boundary. If annual billing ships, the monthly quota
+// vs annual period relationship must be revisited.)
+export function billingWindowStart(periodStart: string | Date | null | undefined, now: Date): Date {
+  if (periodStart != null) {
+    const start = periodStart instanceof Date ? periodStart : new Date(periodStart);
+    if (!Number.isNaN(start.getTime()) && start.getTime() <= now.getTime()) {
+      return start;
+    }
+  }
+  return monthStartUtc(now);
 }
 
 export type SettleOutcome = "not_billable" | "included" | "charged" | "insufficient" | "error";
@@ -66,11 +75,14 @@ export type SettleInput = {
   credits: number;
   statusCode: number;
   apiKeyId?: string | null;
+  // Subscription billing-period start (ISO / Date) when known; null/undefined → UTC calendar month.
+  periodStart?: string | Date | null;
 };
 
 // Injectable so the settlement logic is unit-tested with no DB (mirrors the webhook worker's design).
 export type SettleDeps = {
-  countBillableThisMonth: (userId: string, since: Date) => Promise<number>;
+  // Count of billable (served, cost>0) requests since the window start (period start or UTC month).
+  countBillableSince: (userId: string, since: Date) => Promise<number>;
   deduct: typeof deductCreditsForApiUsage;
   // idempotency lookups: a prior wallet transaction (overage replay) / a prior usage row (included replay).
   findPriorCharge: (requestId: string) => Promise<{ credits: number; balanceAfter: number | null } | null>;
@@ -80,7 +92,7 @@ export type SettleDeps = {
 
 function defaultDeps(): SettleDeps {
   return {
-    async countBillableThisMonth(userId, since) {
+    async countBillableSince(userId, since) {
       return prisma.apiUsageEvent.count({
         where: {
           userId,
@@ -113,14 +125,14 @@ function defaultDeps(): SettleDeps {
 // whether a request can be SERVED without wallet credits (included quota still has room). It never
 // charges. `hasRoom` true = this request would be covered by included quota.
 export async function previewIncludedQuota(
-  input: { userId: string; planCode: string },
-  deps: Pick<SettleDeps, "countBillableThisMonth" | "now"> = defaultDeps(),
+  input: { userId: string; planCode: string; periodStart?: string | Date | null },
+  deps: Pick<SettleDeps, "countBillableSince" | "now"> = defaultDeps(),
 ): Promise<{ remaining: number | null; hasRoom: boolean }> {
   const { monthlyRequestQuota: quota } = getPlanRequestLimits(input.planCode);
   if (quota === null) {
     return { remaining: null, hasRoom: true };
   }
-  const used = await deps.countBillableThisMonth(input.userId, monthStartUtc(deps.now()));
+  const used = await deps.countBillableSince(input.userId, billingWindowStart(input.periodStart, deps.now()));
   return { remaining: Math.max(0, quota - used), hasRoom: used < quota };
 }
 
@@ -161,10 +173,10 @@ export async function settleBillableRequest(
     return { outcome: "included", chargedCredits: 0, includedRemaining: null };
   }
 
-  const usedThisMonth = await deps.countBillableThisMonth(input.userId, monthStartUtc(deps.now()));
-  if (usedThisMonth < quota) {
+  const usedThisPeriod = await deps.countBillableSince(input.userId, billingWindowStart(input.periodStart, deps.now()));
+  if (usedThisPeriod < quota) {
     // Covered by the monthly included allowance — wallet untouched.
-    return { outcome: "included", chargedCredits: 0, includedRemaining: Math.max(0, quota - usedThisMonth - 1) };
+    return { outcome: "included", chargedCredits: 0, includedRemaining: Math.max(0, quota - usedThisPeriod - 1) };
   }
 
   // Included exhausted ⇒ overage against the prepaid wallet, at the dataset's credit cost.
