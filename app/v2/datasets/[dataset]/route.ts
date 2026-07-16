@@ -247,7 +247,11 @@ export async function GET(request: Request, context: Context) {
         // The wallet cannot cover overage — but the monthly INCLUDED allowance may still cover this
         // request (included quota is spent before credits). Only 402 when included quota is ALSO out.
         // The count runs solely on this cold path, so paying users pay no extra query.
-        const included = await previewIncludedQuota({ userId: authUserId, planCode: planCode ?? "free" });
+        const included = await previewIncludedQuota({
+          userId: authUserId,
+          planCode: planCode ?? "free",
+          periodStart: entitlement.periodStart,
+        });
         if (!included.hasRoom) {
           statusCodeForLog = 402;
           errorCodeForLog = "insufficient_credits";
@@ -306,6 +310,7 @@ export async function GET(request: Request, context: Context) {
         credits: creditsCost ?? 0,
         statusCode: upstream.status,
         apiKeyId: authApiKeyId,
+        periodStart: entitlement.periodStart,
       });
       if (settle.outcome === "insufficient") {
         statusCodeForLog = 402;
