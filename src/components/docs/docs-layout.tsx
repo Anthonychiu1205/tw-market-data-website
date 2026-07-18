@@ -38,14 +38,16 @@ export async function DocsLayout({ title, description, sections, children }: Doc
           </div>
         </aside>
 
-        <main className="min-w-0 space-y-6">
+        {/* <div>, not <main>: SiteShell already provides the page's single <main> landmark (avoids a
+            nested main on /about and /api which render this layout). */}
+        <div className="min-w-0 space-y-6">
           <section className="rounded-xl border border-slate-200 bg-white p-6">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("docLabel")}</p>
             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">{title}</h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">{description}</p>
           </section>
           {children}
-        </main>
+        </div>
 
         <aside className="hidden lg:block">
           <div className="sticky top-24 rounded-xl border border-slate-200 bg-white p-4">

@@ -183,10 +183,10 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
                 <table className="min-w-full text-left text-sm">
                   <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
-                      <th className="px-3 py-2 font-medium">欄位</th>
-                      <th className="px-3 py-2 font-medium">型別</th>
-                      <th className="px-3 py-2 font-medium">Required</th>
-                      <th className="px-3 py-2 font-medium">說明</th>
+                      <th scope="col" className="px-3 py-2 font-medium">欄位</th>
+                      <th scope="col" className="px-3 py-2 font-medium">型別</th>
+                      <th scope="col" className="px-3 py-2 font-medium">Required</th>
+                      <th scope="col" className="px-3 py-2 font-medium">說明</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -221,9 +221,9 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
                 <table className="min-w-full text-left text-sm">
                   <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
                     <tr>
-                      <th className="px-3 py-2 font-medium">欄位路徑</th>
-                      <th className="px-3 py-2 font-medium">型別</th>
-                      <th className="px-3 py-2 font-medium">說明</th>
+                      <th scope="col" className="px-3 py-2 font-medium">欄位路徑</th>
+                      <th scope="col" className="px-3 py-2 font-medium">型別</th>
+                      <th scope="col" className="px-3 py-2 font-medium">說明</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -356,10 +356,10 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               <table className="min-w-full text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
-                    <th className="px-3 py-2 font-medium">欄位</th>
-                    <th className="px-3 py-2 font-medium">型別</th>
-                    <th className="px-3 py-2 font-medium">Required</th>
-                    <th className="px-3 py-2 font-medium">說明</th>
+                    <th scope="col" className="px-3 py-2 font-medium">欄位</th>
+                    <th scope="col" className="px-3 py-2 font-medium">型別</th>
+                    <th scope="col" className="px-3 py-2 font-medium">Required</th>
+                    <th scope="col" className="px-3 py-2 font-medium">說明</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 bg-white">
@@ -394,9 +394,9 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               <table className="min-w-full text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
-                    <th className="px-3 py-2 font-medium">欄位路徑</th>
-                    <th className="px-3 py-2 font-medium">型別</th>
-                    <th className="px-3 py-2 font-medium">說明</th>
+                    <th scope="col" className="px-3 py-2 font-medium">欄位路徑</th>
+                    <th scope="col" className="px-3 py-2 font-medium">型別</th>
+                    <th scope="col" className="px-3 py-2 font-medium">說明</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 bg-white">
@@ -534,10 +534,10 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
               <table className="min-w-full text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                   <tr>
-                    <th className="px-3 py-2 font-medium">Component</th>
-                    <th className="px-3 py-2 font-medium">Status</th>
-                    <th className="px-3 py-2 font-medium">Intended Use</th>
-                    <th className="px-3 py-2 font-medium">Not Yet</th>
+                    <th scope="col" className="px-3 py-2 font-medium">Component</th>
+                    <th scope="col" className="px-3 py-2 font-medium">Status</th>
+                    <th scope="col" className="px-3 py-2 font-medium">Intended Use</th>
+                    <th scope="col" className="px-3 py-2 font-medium">Not Yet</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 bg-white">

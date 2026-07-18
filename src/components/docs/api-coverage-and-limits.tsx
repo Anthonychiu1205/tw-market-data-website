@@ -23,10 +23,10 @@ export async function ApiCoverageTable({ slug }: { slug: string }) {
         <table className="min-w-full text-left text-sm">
           <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
             <tr>
-              <th className="px-3 py-2 font-medium">{t("coverage.instruments")}</th>
-              <th className="px-3 py-2 font-medium">{t("coverage.startYear")}</th>
-              <th className="px-3 py-2 font-medium">{t("coverage.updateTiming")}</th>
-              <th className="px-3 py-2 font-medium">{t("coverage.includesDelisted")}</th>
+              <th scope="col" className="px-3 py-2 font-medium">{t("coverage.instruments")}</th>
+              <th scope="col" className="px-3 py-2 font-medium">{t("coverage.startYear")}</th>
+              <th scope="col" className="px-3 py-2 font-medium">{t("coverage.updateTiming")}</th>
+              <th scope="col" className="px-3 py-2 font-medium">{t("coverage.includesDelisted")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
