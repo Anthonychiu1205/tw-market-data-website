@@ -3,7 +3,16 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/src/config/site";
 
 // Non-public areas kept out of every crawler's index (auth-gated app, raw API, login wall).
-const DISALLOW_PATHS = ["/dashboard", "/dashboard/", "/api/", "/api/*", "/login", "/login*"];
+// Routes are now locale-prefixed (/en/dashboard, /zh-TW/dashboard), so each protected/auth area is
+// disallowed in both its bare (root-redirect) and /*/-prefixed forms. /api stays unprefixed.
+const PROTECTED_AREAS = ["dashboard", "billing", "usage", "settings", "account"];
+const AUTH_PAGES = ["login", "register", "verify-email", "forgot-password", "reset-password"];
+const DISALLOW_PATHS = [
+  "/api/",
+  "/api/*",
+  ...PROTECTED_AREAS.flatMap((area) => [`/${area}`, `/${area}/`, `/*/${area}`, `/*/${area}/`]),
+  ...AUTH_PAGES.flatMap((page) => [`/${page}`, `/*/${page}`]),
+];
 
 // AI / answer-engine crawlers we explicitly welcome. Naming them (rather than relying only on
 // the "*" rule) makes the allowlist auditable and, more importantly, keeps them allowed even if
