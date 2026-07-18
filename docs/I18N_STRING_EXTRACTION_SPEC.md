@@ -157,21 +157,26 @@ API field names, ticker symbols (e.g. `2330`).
 - Chrome: header, footer, contact-modal, cookie-banner; legal disclaimer EN selector.
 - Home: homepage body + hero + all `home/*` sections + all `home/*` demos (chrome only) + mega-menu content data.
 - Pricing: page + shell + comparison table (plan-card copy deferred — see §5.1).
-- Public pages: contact, about, product, refund, terms, privacy, compare, connect.
+- Public pages: contact, about, product, refund, terms, privacy, compare, connect,
+  connect/which-tier, connect/key-safety.
   (legal EN for terms/privacy/refund + disclaimer EN → pending owner legal sign-off.)
   (connect `pasteLine` copy command still zh — minor, localize later.)
+- Auth cluster: login, register, verify-email, forgot-password, reset-password (5 pages + 6 form components).
+- Help cluster: help-center.ts (FAQ data → `*_en` + `getHelpCategories(locale)` selectors), help-center-shell,
+  help-center page. faq/help are redirect pages (only their metadata remains, SEO PR4).
+- Message catalog: **512 keys, full en/zh parity**. Multiple full production builds green.
 
 **Remaining content-data files (need `*_en` fields + locale selector, spec §1.6):**
-- `src/content/site.ts` — `platformCapabilities` (product page).
-- about-page content data (`aboutSections`, `sourcePolicy`).
-- `src/content/help-center.ts` (349) — faq / help / help-center cluster (+ `help-center-shell`).
+- `src/content/site.ts` — `platformCapabilities` + `sourcePolicy` (product/about) + `datasetProducts` (28 rows, datasets).
+- about-page content data (`aboutSections`).
 - `src/content/datasets.ts` (337) — dataset catalog EN prose (~18 fields × 10 datasets) — dedicated phase.
 - `src/content/answer-pages.ts` (458), `src/content/blog-posts.tsx` (220), `src/content/docs-*` (esp. `docs-pages.ts` **12,149 lines**), `src/content/dashboard.ts` (146, PR3).
 - Landmine demo files (home-source-of-truth.ts etc.) — blocked on owner decision (§5).
+- DONE: `mega-menu-links.ts`, `help-center.ts`.
 
-**Remaining component clusters:** docs/* (12), auth/* (6), blog/* (3), datasets/* (2), help/* (1), dashboard/* (20, PR3).
+**Remaining component clusters:** docs/* (12), blog/* (3), datasets/* (2), dashboard/* (20, PR3). (auth/*, help/* DONE.)
 
-**Remaining page bodies:** connect/which-tier, connect/key-safety, answers (+[slug]), blog (+[slug]), login/register/verify-email/forgot/reset (auth), datasets (+[slug]), docs (+[...slug]), faq/help/help-center.
+**Remaining page bodies:** answers (+[slug]), blog (+[slug]), datasets (+[slug]), docs (+[...slug]).
 
 **Remaining cross-cutting:** page `metadata`/`generateMetadata` + hreflang/canonical/JSON-LD/`sitemap.ts`/`robots.ts` (PR4 SEO); missing-page fallback + missing-key telemetry (PR4).
 
