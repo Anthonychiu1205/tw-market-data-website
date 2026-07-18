@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
+import { getTranslations } from "next-intl/server";
+
+import { Link } from "@/src/i18n/navigation";
 import { Container } from "@/src/components/ui/container";
 
 // FRICTION-01 B-0c / §C-4 — "哪一層適合我" routing guide (public).
@@ -10,36 +12,34 @@ export const metadata: Metadata = {
   alternates: { canonical: "/connect/which-tier" },
 };
 
-const ROWS: { who: string; tier: string; how: string }[] = [
-  { who: "只想試看看 / 給 AI 貼一句", tier: "第一層 · 免 key", how: "貼 /skill.md 那句，用五檔試" },
-  { who: "開發者 / 自建 agent / 量化", tier: "第二層 · API key", how: "帳戶頁取 key，走 REST 計費" },
-  { who: "在 Claude.ai / ChatGPT 裡要付費用", tier: "第三層 · MCP connector", how: "加 connector、OAuth 授權" },
-];
+const ROW_KEYS = ["try", "developer", "consumer"] as const;
 
-export default function WhichTierPage() {
+export default async function WhichTierPage() {
+  const t = await getTranslations("connectWhichTier");
+
   return (
     <Container className="py-12 sm:py-14">
       <div className="mx-auto max-w-3xl space-y-8">
         <header className="space-y-3 border-b border-slate-200 pb-8">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Connect</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">哪一層適合我</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{t("h1")}</h1>
         </header>
 
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
               <tr>
-                <th className="px-3 py-2 font-medium">你是…</th>
-                <th className="px-3 py-2 font-medium">走哪層</th>
-                <th className="px-3 py-2 font-medium">怎麼開始</th>
+                <th className="px-3 py-2 font-medium">{t("colWho")}</th>
+                <th className="px-3 py-2 font-medium">{t("colTier")}</th>
+                <th className="px-3 py-2 font-medium">{t("colHow")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {ROWS.map((r) => (
-                <tr key={r.who} className="text-slate-700">
-                  <td className="px-3 py-3 align-top">{r.who}</td>
-                  <td className="px-3 py-3 align-top font-medium text-slate-900">{r.tier}</td>
-                  <td className="px-3 py-3 align-top">{r.how}</td>
+              {ROW_KEYS.map((key) => (
+                <tr key={key} className="text-slate-700">
+                  <td className="px-3 py-3 align-top">{t(`rows.${key}.who`)}</td>
+                  <td className="px-3 py-3 align-top font-medium text-slate-900">{t(`rows.${key}.tier`)}</td>
+                  <td className="px-3 py-3 align-top">{t(`rows.${key}.how`)}</td>
                 </tr>
               ))}
             </tbody>
@@ -47,12 +47,14 @@ export default function WhichTierPage() {
         </div>
 
         <p className="rounded-lg bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-700">
-          一句話總結：<strong className="font-semibold text-slate-900">免費試玩走一句話，開發整合走 API key，消費者聊天付費走 connector。</strong>
+          {t.rich("summary", {
+            b: (chunks) => <strong className="font-semibold text-slate-900">{chunks}</strong>,
+          })}
         </p>
 
         <p className="border-t border-slate-200 pt-6 text-sm">
           ←{" "}
-          <Link href="/connect" className="font-medium text-slate-900 underline underline-offset-4 hover:text-slate-700">回接入你的 AI</Link>
+          <Link href="/connect" className="font-medium text-slate-900 underline underline-offset-4 hover:text-slate-700">{t("backLink")}</Link>
         </p>
       </div>
     </Container>

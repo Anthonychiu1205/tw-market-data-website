@@ -672,6 +672,66 @@
     "backTo": "Back to",
     "login": "Sign in"
   },
+  "connectWhichTier": {
+    "h1": "Which tier fits me",
+    "colWho": "You are…",
+    "colTier": "Which tier",
+    "colHow": "How to start",
+    "rows": {
+      "try": {
+        "who": "Just want to try it / paste one line to an AI",
+        "tier": "Tier 1 · No key",
+        "how": "Paste the /skill.md line, try it with a few quotes"
+      },
+      "developer": {
+        "who": "Developer / building an agent / quant",
+        "tier": "Tier 2 · API key",
+        "how": "Get a key from your account page, call the REST API with metered billing"
+      },
+      "consumer": {
+        "who": "Want to pay for use inside Claude.ai / ChatGPT",
+        "tier": "Tier 3 · MCP connector",
+        "how": "Add the connector, authorize with OAuth"
+      }
+    },
+    "summary": "In one line: <b>free trial runs on one line, dev integration runs on an API key, consumer chat billing runs on the connector.</b>",
+    "backLink": "Back to Connect your AI"
+  },
+  "connectKeySafety": {
+    "title": "Build a dedicated key for your AI",
+    "points": {
+      "oneKeyPerAgent": {
+        "term": "One key per agent",
+        "desc": "Add a new key under \"API Keys\" in your account page and name it (e.g. claude-desktop, research-bot) so it's easy to identify later."
+      },
+      "independentRevoke": {
+        "term": "Revoke independently",
+        "desc": "If a key leaks or is no longer used, revoke that key directly — it won't affect other agents and you never need to rotate your main key."
+      },
+      "neverPasteMainKey": {
+        "term": "Never paste your main key into a conversation",
+        "desc": "Conversation logs may be retained; give agents a dedicated sub-key only."
+      },
+      "rotate": {
+        "term": "Rotate regularly",
+        "desc": "For high-frequency or public-facing scenarios, rotate the key on a regular schedule."
+      }
+    },
+    "capabilityNote": "Capability check: the system already supports multiple named, independently revocable keys per account (<keyLabel></keyLabel> / <revokedAt></revokedAt> / <createdByCustomer></createdByCustomer>). If your account page hasn't yet enabled \"add multiple keys\", that's a small remaining prerequisite.",
+    "backToConnect": "Back to Connect your AI"
+  },
+  "helpCenter": {
+    "statusBadge": "Self-serve support",
+    "searchLabel": "Search the FAQ",
+    "searchPlaceholder": "Search questions, API, SDK, billing, error codes…",
+    "searchHint": "Search directly for keywords like 401, 502, requestId, credits, SDK, or MCP",
+    "faqSectionTitle": "FAQ categories",
+    "allCategories": "All categories",
+    "topicSectionTitle": "Questions",
+    "resultsCount": "{count} results",
+    "topicsCount": "{count} questions",
+    "emptyState": "No matching results. Try a different keyword or contact us."
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }

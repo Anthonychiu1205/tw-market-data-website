@@ -1,24 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import { Search } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 
+import { Link } from "@/src/i18n/navigation";
+import type { AppLocale } from "@/src/i18n/locales";
 import {
-  faqPageMeta,
+  getFaqPageMeta,
   getFaqTopicCount,
-  helpCategories,
-  helpCenterEntryCards,
-  helpCenterFooterCtas,
-  helpCenterPageMeta,
-  helpCenterQuickLinks,
-  helpCenterStatusItems,
-  helpEmptyStateMessage,
-  helpFaqSectionTitle,
-  helpSearchHint,
-  helpSearchPlaceholder,
-  helpStatusBadgeLabel,
-  helpTopicSectionTitle,
+  getHelpCategories,
+  getHelpCenterEntryCards,
+  getHelpCenterFooterCtas,
+  getHelpCenterPageMeta,
+  getHelpCenterQuickLinks,
+  getHelpCenterStatusItems,
   searchHelpTopics,
 } from "@/src/content/help-center";
 
@@ -31,15 +27,25 @@ function normalize(text: string) {
 }
 
 export function HelpCenterShell({ mode }: HelpCenterShellProps) {
+  const t = useTranslations("helpCenter");
+  const locale = useLocale();
+  const appLocale: AppLocale = locale === "en" ? "en" : "zh-TW";
+
+  const categories = useMemo(() => getHelpCategories(appLocale), [appLocale]);
+  const quickLinks = useMemo(() => getHelpCenterQuickLinks(appLocale), [appLocale]);
+  const entryCards = useMemo(() => getHelpCenterEntryCards(appLocale), [appLocale]);
+  const statusItems = useMemo(() => getHelpCenterStatusItems(appLocale), [appLocale]);
+  const footerCtas = useMemo(() => getHelpCenterFooterCtas(appLocale), [appLocale]);
+
   const [query, setQuery] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("all");
-  const [activeSectionId, setActiveSectionId] = useState(helpCenterQuickLinks[0]?.href.replace("#", "") ?? "");
+  const [activeSectionId, setActiveSectionId] = useState(quickLinks[0]?.href.replace("#", "") ?? "");
   const normalizedQuery = normalize(query);
   const isSearching = normalizedQuery.length > 0;
 
   const filteredCategories = useMemo(() => {
     const baseCategories =
-      selectedCategoryId === "all" ? helpCategories : helpCategories.filter((category) => category.id === selectedCategoryId);
+      selectedCategoryId === "all" ? categories : categories.filter((category) => category.id === selectedCategoryId);
 
     if (!isSearching) {
       return baseCategories;
@@ -54,14 +60,14 @@ export function HelpCenterShell({ mode }: HelpCenterShellProps) {
         }),
       }))
       .filter((category) => category.topics.length > 0);
-  }, [isSearching, normalizedQuery, selectedCategoryId]);
+  }, [categories, isSearching, normalizedQuery, selectedCategoryId]);
 
   const searchResults = useMemo(() => {
     if (!isSearching) return [];
-    return searchHelpTopics(normalizedQuery);
-  }, [isSearching, normalizedQuery]);
+    return searchHelpTopics(normalizedQuery, appLocale);
+  }, [appLocale, isSearching, normalizedQuery]);
 
-  const pageMeta = mode === "help" ? helpCenterPageMeta : faqPageMeta;
+  const pageMeta = mode === "help" ? getHelpCenterPageMeta(appLocale) : getFaqPageMeta(appLocale);
 
   const visibleSectionIds = useMemo(() => new Set(filteredCategories.map((category) => category.id)), [filteredCategories]);
   const activeDisplaySectionId = useMemo(() => {
@@ -105,29 +111,29 @@ export function HelpCenterShell({ mode }: HelpCenterShellProps) {
       <section className="mx-auto w-full max-w-6xl px-4 pb-14 pt-10 sm:px-6 lg:px-8">
         <div className="rounded-3xl border border-slate-200 bg-white px-5 py-8 shadow-sm sm:px-8">
           <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-600">
-            {helpStatusBadgeLabel}
+            {t("statusBadge")}
           </span>
           <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">{pageMeta.title}</h1>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">{pageMeta.subtitle}</p>
 
           <label className="mt-6 block">
-            <span className="sr-only">搜尋常見問題</span>
+            <span className="sr-only">{t("searchLabel")}</span>
             <div className="flex h-12 items-center gap-3 rounded-2xl border border-slate-300 bg-white px-4 text-slate-500 shadow-sm transition focus-within:border-slate-500">
               <Search className="h-4 w-4" aria-hidden="true" />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 className="h-full w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                placeholder={helpSearchPlaceholder}
+                placeholder={t("searchPlaceholder")}
                 autoComplete="off"
               />
             </div>
           </label>
-          <p className="mt-2 text-xs text-slate-500">{helpSearchHint}</p>
+          <p className="mt-2 text-xs text-slate-500">{t("searchHint")}</p>
 
           {mode === "help" ? (
             <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              {helpCenterEntryCards.map((card) => (
+              {entryCards.map((card) => (
                 <Link
                   key={card.id}
                   href={card.href}
@@ -144,7 +150,7 @@ export function HelpCenterShell({ mode }: HelpCenterShellProps) {
 
         <div className="mt-8 rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-slate-900">{helpFaqSectionTitle}</h2>
+            <h2 className="text-sm font-semibold text-slate-900">{t("faqSectionTitle")}</h2>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -155,9 +161,9 @@ export function HelpCenterShell({ mode }: HelpCenterShellProps) {
                     : "border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:bg-white hover:text-slate-900"
                 }`}
               >
-                全部分類
+                {t("allCategories")}
               </button>
-              {helpCategories.map((category) => (
+              {categories.map((category) => (
                 <button
                   key={category.id}
                   type="button"
@@ -174,7 +180,7 @@ export function HelpCenterShell({ mode }: HelpCenterShellProps) {
             </div>
           </div>
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-            {helpCenterQuickLinks.map((item) => (
+            {quickLinks.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
@@ -193,17 +199,17 @@ export function HelpCenterShell({ mode }: HelpCenterShellProps) {
 
         <section className="mt-8 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-lg font-semibold text-slate-900">{helpTopicSectionTitle}</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{t("topicSectionTitle")}</h2>
             <p className="text-xs text-slate-500">
               {isSearching
-                ? `找到 ${searchResults.length.toLocaleString()} 筆結果`
-                : `共 ${getFaqTopicCount().toLocaleString()} 個問題`}
+                ? t("resultsCount", { count: searchResults.length })
+                : t("topicsCount", { count: getFaqTopicCount() })}
             </p>
           </div>
 
           {filteredCategories.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-10 text-center text-sm text-slate-600">
-              {helpEmptyStateMessage}
+              {t("emptyState")}
             </div>
           ) : (
             filteredCategories.map((category) => (
@@ -237,7 +243,7 @@ export function HelpCenterShell({ mode }: HelpCenterShellProps) {
         </section>
 
         <section className="mt-8 grid gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-4 sm:grid-cols-3 sm:px-6">
-          {helpCenterStatusItems.map((item) => (
+          {statusItems.map((item) => (
             <p key={item} className="text-xs leading-6 text-slate-600">
               {item}
             </p>
@@ -245,7 +251,7 @@ export function HelpCenterShell({ mode }: HelpCenterShellProps) {
         </section>
 
         <section className="mt-6 flex flex-wrap gap-2">
-          {helpCenterFooterCtas.map((cta) => (
+          {footerCtas.map((cta) => (
             <Link
               key={cta.label}
               href={cta.href}

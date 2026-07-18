@@ -672,6 +672,66 @@
     "backTo": "回到",
     "login": "登入"
   },
+  "connectWhichTier": {
+    "h1": "哪一層適合我",
+    "colWho": "你是…",
+    "colTier": "走哪層",
+    "colHow": "怎麼開始",
+    "rows": {
+      "try": {
+        "who": "只想試看看 / 給 AI 貼一句",
+        "tier": "第一層 · 免 key",
+        "how": "貼 /skill.md 那句，用五檔試"
+      },
+      "developer": {
+        "who": "開發者 / 自建 agent / 量化",
+        "tier": "第二層 · API key",
+        "how": "帳戶頁取 key，走 REST 計費"
+      },
+      "consumer": {
+        "who": "在 Claude.ai / ChatGPT 裡要付費用",
+        "tier": "第三層 · MCP connector",
+        "how": "加 connector、OAuth 授權"
+      }
+    },
+    "summary": "一句話總結：<b>免費試玩走一句話，開發整合走 API key，消費者聊天付費走 connector。</b>",
+    "backLink": "回接入你的 AI"
+  },
+  "connectKeySafety": {
+    "title": "為你的 AI 建一把專用 key",
+    "points": {
+      "oneKeyPerAgent": {
+        "term": "一個 agent 一把 key",
+        "desc": "到帳戶頁「API Keys」新增一把，命名（如 claude-desktop、research-bot）方便日後辨識。"
+      },
+      "independentRevoke": {
+        "term": "可獨立撤銷",
+        "desc": "某把 key 外洩或不再用，直接撤銷該把，不影響其他 agent、不必換主 key。"
+      },
+      "neverPasteMainKey": {
+        "term": "絕不貼主 key 進對話",
+        "desc": "對話紀錄可能被保存；只給 agent 專用副 key。"
+      },
+      "rotate": {
+        "term": "定期輪換",
+        "desc": "高頻或公開場景的 key 建議定期換發。"
+      }
+    },
+    "capabilityNote": "能力對照：系統已支援一帳號多把可命名、可獨立撤銷的 key（<keyLabel></keyLabel> / <revokedAt></revokedAt> / <createdByCustomer></createdByCustomer>）。若帳戶頁尚未開放「新增多把」，此為待補的小前置。",
+    "backToConnect": "回接入你的 AI"
+  },
+  "helpCenter": {
+    "statusBadge": "Self-serve support",
+    "searchLabel": "搜尋常見問題",
+    "searchPlaceholder": "搜尋問題、API、SDK、帳單、錯誤碼…",
+    "searchHint": "可直接搜尋 401、502、requestId、credits、SDK、MCP 等關鍵字",
+    "faqSectionTitle": "常見問題分類",
+    "allCategories": "全部分類",
+    "topicSectionTitle": "問題清單",
+    "resultsCount": "找到 {count} 筆結果",
+    "topicsCount": "共 {count} 個問題",
+    "emptyState": "找不到相符結果，請換個關鍵字或直接聯繫我們。"
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }
