@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type OutlineSection = {
   id: string;
@@ -12,6 +13,7 @@ type ArticleOutlineProps = {
 };
 
 export function ArticleOutline({ sections }: ArticleOutlineProps) {
+  const t = useTranslations("blog");
   const validSections = useMemo(() => sections.filter((section) => section.id && section.title), [sections]);
   const [activeId, setActiveId] = useState(validSections[0]?.id ?? "");
 
@@ -45,7 +47,7 @@ export function ArticleOutline({ sections }: ArticleOutlineProps) {
   return (
     <aside className="hidden lg:block">
       <div className="sticky top-28 border-l border-slate-200 pl-5">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">本文目錄</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("tableOfContents")}</h2>
         <nav className="mt-3">
           {validSections.map((section) => {
             const active = section.id === activeId;

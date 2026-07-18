@@ -164,7 +164,12 @@ API field names, ticker symbols (e.g. `2330`).
 - Auth cluster: login, register, verify-email, forgot-password, reset-password (5 pages + 6 form components).
 - Help cluster: help-center.ts (FAQ data → `*_en` + `getHelpCategories(locale)` selectors), help-center-shell,
   help-center page. faq/help are redirect pages (only their metadata remains, SEO PR4).
-- Message catalog: **512 keys, full en/zh parity**. Multiple full production builds green.
+- Datasets cluster: datasets.ts (10-dataset catalog → `*_en` prose + `getDatasetSeoEntries`/`getDatasetSeoEntry`
+  selectors, all facts/numbers/dates/tickers mirrored, no fabrication), datasets page + [slug] + 2 components.
+- Answers cluster: answer-pages.ts already per-locale (5 en + 3 zh-Hant entries, distinct slugs) → `getPublishedAnswerPages(locale)`,
+  page + [slug] chrome.
+- Blog cluster: chrome + category-label map + §2.5 "English coming soon" fallback (article bodies stay zh for human EN copywriting — flag below).
+- Message catalog: **564 keys, full en/zh parity**. Multiple full production builds green.
 
 **Remaining content-data files (need `*_en` fields + locale selector, spec §1.6):**
 - `src/content/site.ts` — `platformCapabilities` + `sourcePolicy` (product/about) + `datasetProducts` (28 rows, datasets).
@@ -174,9 +179,9 @@ API field names, ticker symbols (e.g. `2330`).
 - Landmine demo files (home-source-of-truth.ts etc.) — blocked on owner decision (§5).
 - DONE: `mega-menu-links.ts`, `help-center.ts`.
 
-**Remaining component clusters:** docs/* (12), blog/* (3), datasets/* (2), dashboard/* (20, PR3). (auth/*, help/* DONE.)
+**Remaining component clusters:** docs/* (12), dashboard/* (20, PR3). (auth/*, help/*, blog/*, datasets/* DONE.)
 
-**Remaining page bodies:** answers (+[slug]), blog (+[slug]), datasets (+[slug]), docs (+[...slug]).
+**Remaining page bodies:** docs (+[...slug]). **Blog article bodies** (blog-posts.tsx) stay zh with §2.5 fallback — need human EN copywriting (not mechanical).
 
 **Remaining cross-cutting:** page `metadata`/`generateMetadata` + hreflang/canonical/JSON-LD/`sitemap.ts`/`robots.ts` (PR4 SEO); missing-page fallback + missing-key telemetry (PR4).
 

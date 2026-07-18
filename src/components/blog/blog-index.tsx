@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
 import { BlogCard } from "@/src/components/blog/blog-card";
 import { Container } from "@/src/components/ui/container";
@@ -10,7 +11,21 @@ type BlogIndexProps = {
   posts: BlogPost[];
 };
 
+// Category values stay zh (they are matched against post.category); only the DISPLAY label is
+// localized via this key map → blog.categories.* messages.
+const CATEGORY_KEY: Record<string, string> = {
+  全部: "all",
+  產品更新: "productUpdates",
+  資料工程: "dataEngineering",
+  "API 教學": "apiTutorials",
+  量化研究: "quantResearch",
+  "AI Agent": "aiAgent",
+  產品化: "productization",
+};
+
 export function BlogIndex({ posts }: BlogIndexProps) {
+  const t = useTranslations("blog");
+  const locale = useLocale();
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<BlogCategory | "全部">("全部");
 
@@ -33,22 +48,27 @@ export function BlogIndex({ posts }: BlogIndexProps) {
     <Container className="py-12 sm:py-14">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <header className="space-y-4">
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">觀點文章</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">{t("title")}</h1>
           <p className="max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
-            台股資料 API、資料工程、量化研究與 AI agent workflow 的產品筆記。
+            {t("subtitle")}
           </p>
+          {locale === "en" ? (
+            <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+              {t("englishNotice")}
+            </p>
+          ) : null}
         </header>
 
         <div className="mt-7 space-y-4">
           <label htmlFor="blog-search" className="sr-only">
-            搜尋文章
+            {t("searchLabel")}
           </label>
           <input
             id="blog-search"
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="搜尋文章"
+            placeholder={t("searchLabel")}
             className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
           />
 
@@ -67,7 +87,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
                       : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:text-slate-900",
                   ].join(" ")}
                 >
-                  {category}
+                  {t(`categories.${CATEGORY_KEY[category]}`)}
                 </button>
               );
             })}
@@ -82,7 +102,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
           </section>
         ) : (
           <section className="mt-8 rounded-xl border border-slate-200 bg-white p-6">
-            <p className="text-sm leading-7 text-slate-600">找不到符合條件的文章，請調整分類或關鍵字。</p>
+            <p className="text-sm leading-7 text-slate-600">{t("emptyState")}</p>
           </section>
         )}
 

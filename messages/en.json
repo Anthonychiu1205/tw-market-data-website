@@ -732,6 +732,66 @@
     "topicsCount": "{count} questions",
     "emptyState": "No matching results. Try a different keyword or contact us."
   },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Product notes on the Taiwan market data API, data engineering, quant research, and AI agent workflows.",
+    "searchLabel": "Search articles",
+    "emptyState": "No matching articles. Try a different category or keyword.",
+    "categories": {
+      "all": "All",
+      "productUpdates": "Product updates",
+      "dataEngineering": "Data engineering",
+      "apiTutorials": "API tutorials",
+      "quantResearch": "Quant research",
+      "aiAgent": "AI Agent",
+      "productization": "Productization"
+    },
+    "tableOfContents": "On this page",
+    "keyTakeaways": "Key takeaways",
+    "backToBlog": "Back to the blog",
+    "backToList": "Back to all articles",
+    "englishNotice": "This article is currently available in Chinese only; English versions are coming soon."
+  },
+  "answers": {
+    "eyebrow": "Answer",
+    "title": "Answers",
+    "subtitle": "Direct answers to common questions about Taiwan stock market data and APIs.",
+    "empty": "Answer pages are being prepared.",
+    "related": "Related",
+    "apiDocs": "API docs"
+  },
+  "datasets": {
+    "listEyebrow": "Datasets",
+    "datasetEyebrow": "Dataset",
+    "heroTitle": "Taiwan stock datasets, built for APIs and research workflows",
+    "heroBody": "TW Market Data organizes Taiwan-stock prices, the three financial statements, monthly revenue, and institutional net buy/sell into traceable, re-runnable, workflow-ready API products, with source lineage on every response and disclosed data_gaps preserved. The current public positioning is a TWSE-first verified baseline; TPEx historical depth and full-market claims are not yet available.",
+    "viewApiDocs": "View API docs",
+    "viewPricing": "View pricing",
+    "usageTitle": "How stock analysis uses this data",
+    "catalogTitle": "Dataset catalog",
+    "familyTablistLabel": "Dataset families",
+    "datasetOverview": "Dataset overview",
+    "apiDocs": "API docs",
+    "breadcrumbRoot": "Datasets",
+    "downloadSampleCsv": "Download sample CSV (2330)",
+    "sampleCaption": "Download without registration: sample data using one of the five no-key symbols (2330 TSMC) as the example.",
+    "whatItIsTitle": "What this data is",
+    "useCasesTitle": "Use cases",
+    "whyItMattersTitle": "Why it matters for stock analysis",
+    "coverageTitle": "Coverage / Freshness / Source Policy",
+    "developerTitle": "Developer entry points",
+    "developerApiDocsLabel": "API docs: ",
+    "developerOpenApiLabel": "OpenAPI: ",
+    "relatedLinksTitle": "Related links",
+    "catalogOverview": "All datasets",
+    "coveragePrefix": "Coverage: ",
+    "freshnessPrefix": "Update cadence: ",
+    "sourcePolicyPrefix": "Source policy: ",
+    "badgeGreenTitle": "Every value is traceable value-by-value to the official source; this is the date of the last reconciliation that passed.",
+    "badgeGreenLabel": "Last reconciled to official source: ",
+    "badgePendingTitle": "Reconciliation is in progress; a passing date has not been produced yet.",
+    "badgePending": "Reconciliation in progress"
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }

@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
+import { Link } from "@/src/i18n/navigation";
 import { cn } from "@/src/lib/cn";
 
 type DatasetItem = {
@@ -25,6 +26,7 @@ type DatasetFamilyTabsProps = {
 };
 
 export function DatasetFamilyTabs({ families }: DatasetFamilyTabsProps) {
+  const t = useTranslations("datasets");
   const defaultFamilyId = families[0]?.id ?? "";
   const [activeFamilyId, setActiveFamilyId] = useState(defaultFamilyId);
 
@@ -36,12 +38,12 @@ export function DatasetFamilyTabs({ families }: DatasetFamilyTabsProps) {
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
-      <h2 className="text-2xl font-semibold tracking-tight text-slate-950">資料集目錄</h2>
+      <h2 className="text-2xl font-semibold tracking-tight text-slate-950">{t("catalogTitle")}</h2>
 
       <div
         className="mt-5 flex items-end gap-1 overflow-x-auto overflow-y-hidden pb-0"
         role="tablist"
-        aria-label="資料集家族"
+        aria-label={t("familyTablistLabel")}
       >
         {families.map((family) => {
           const isActive = family.id === activeFamily.id;
@@ -113,14 +115,14 @@ export function DatasetFamilyTabs({ families }: DatasetFamilyTabsProps) {
                           href={dataset.overviewHref}
                           className="inline-block text-xs font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
                         >
-                          資料集介紹
+                          {t("datasetOverview")}
                         </Link>
                       ) : null}
                       <Link
                         href={dataset.href}
                         className="inline-block text-xs font-medium text-slate-700 underline-offset-4 hover:text-slate-950 hover:underline"
                       >
-                        API 文件
+                        {t("apiDocs")}
                       </Link>
                     </div>
                   </div>

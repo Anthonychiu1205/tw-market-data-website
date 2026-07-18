@@ -732,6 +732,66 @@
     "topicsCount": "共 {count} 個問題",
     "emptyState": "找不到相符結果，請換個關鍵字或直接聯繫我們。"
   },
+  "blog": {
+    "title": "觀點文章",
+    "subtitle": "台股資料 API、資料工程、量化研究與 AI agent workflow 的產品筆記。",
+    "searchLabel": "搜尋文章",
+    "emptyState": "找不到符合條件的文章，請調整分類或關鍵字。",
+    "categories": {
+      "all": "全部",
+      "productUpdates": "產品更新",
+      "dataEngineering": "資料工程",
+      "apiTutorials": "API 教學",
+      "quantResearch": "量化研究",
+      "aiAgent": "AI Agent",
+      "productization": "產品化"
+    },
+    "tableOfContents": "本文目錄",
+    "keyTakeaways": "重點摘要",
+    "backToBlog": "返回觀點文章",
+    "backToList": "返回觀點文章列表",
+    "englishNotice": "本文目前僅提供中文版，英文版將陸續推出。"
+  },
+  "answers": {
+    "eyebrow": "解答",
+    "title": "問答",
+    "subtitle": "關於台股市場資料與 API 常見問題的直接解答。",
+    "empty": "問答頁面準備中。",
+    "related": "相關連結",
+    "apiDocs": "API 文件"
+  },
+  "datasets": {
+    "listEyebrow": "Datasets",
+    "datasetEyebrow": "Dataset",
+    "heroTitle": "台股資料集，為 API 與研究流程設計",
+    "heroBody": "TW Market Data 將台股價格、財報三表、月營收與三大法人買賣超整理成可追溯、可重跑、可接入 workflow 的 API 產品，每筆回應附來源 lineage 並保留揭露的 data_gaps。目前公開定位為 TWSE-first verified baseline；TPEx 歷史深度與 full-market claim 尚未開放。",
+    "viewApiDocs": "查看 API 文件",
+    "viewPricing": "查看方案",
+    "usageTitle": "股票分析如何使用這些資料",
+    "catalogTitle": "資料集目錄",
+    "familyTablistLabel": "資料集家族",
+    "datasetOverview": "資料集介紹",
+    "apiDocs": "API 文件",
+    "breadcrumbRoot": "資料集",
+    "downloadSampleCsv": "下載樣本 CSV（2330）",
+    "sampleCaption": "零註冊即可下載：以免 key 五檔之一（2330 台積電）為示範標的的樣本資料。",
+    "whatItIsTitle": "這是什麼資料",
+    "useCasesTitle": "資料用途",
+    "whyItMattersTitle": "為什麼對股票分析重要",
+    "coverageTitle": "Coverage / Freshness / Source Policy",
+    "developerTitle": "Developer 入口",
+    "developerApiDocsLabel": "API 文件：",
+    "developerOpenApiLabel": "OpenAPI：",
+    "relatedLinksTitle": "相關連結",
+    "catalogOverview": "資料集總覽",
+    "coveragePrefix": "涵蓋範圍：",
+    "freshnessPrefix": "更新頻率：",
+    "sourcePolicyPrefix": "資料來源政策：",
+    "badgeGreenTitle": "每個值逐值對官方來源可追溯；此日期為最後一次對帳通過的日期。",
+    "badgeGreenLabel": "最後對官方對帳通過：",
+    "badgePendingTitle": "對帳流程進行中，通過日期尚未產生。",
+    "badgePending": "對帳校驗中"
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }

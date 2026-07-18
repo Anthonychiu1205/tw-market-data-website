@@ -1,6 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 
+import { Link } from "@/src/i18n/navigation";
 import { ArticleOutline } from "@/src/components/blog/article-outline";
 import { Container } from "@/src/components/ui/container";
 import type { BlogBodyBlock, BlogPost } from "@/src/content/blog-posts";
@@ -68,9 +69,11 @@ function renderBlock(block: BlogBodyBlock, index: number) {
   );
 }
 
-export function BlogArticle({ post }: BlogArticleProps) {
+export async function BlogArticle({ post }: BlogArticleProps) {
+  const t = await getTranslations("blog");
+  const locale = await getLocale();
   const outlineSections = [
-    ...(post.keyTakeaways?.length ? [{ id: "key-takeaways", title: "重點摘要" }] : []),
+    ...(post.keyTakeaways?.length ? [{ id: "key-takeaways", title: t("keyTakeaways") }] : []),
     ...post.body
       .filter((block): block is Extract<BlogBodyBlock, { type: "heading" }> => block.type === "heading" && block.level === 2)
       .map((block, idx) => ({
@@ -84,18 +87,23 @@ export function BlogArticle({ post }: BlogArticleProps) {
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,820px)_240px]">
         <article className="max-w-[820px] space-y-8">
           <Link href="/blog" className="inline-flex text-sm text-slate-600 hover:text-slate-900">
-            ← 返回觀點文章
+            ← {t("backToBlog")}
           </Link>
 
           <header className="space-y-4">
             <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">{post.title}</h1>
             <p className="text-base leading-8 text-slate-700">{post.excerpt}</p>
             <div className="text-sm text-slate-500">{post.publishedAt}</div>
+            {locale === "en" ? (
+              <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+                {t("englishNotice")}
+              </p>
+            ) : null}
           </header>
 
           {post.keyTakeaways?.length ? (
             <section id="key-takeaways" className="scroll-mt-28 rounded-xl border border-slate-200 bg-slate-50/70 px-5 py-4">
-              <h2 className="text-lg font-semibold text-slate-900">重點摘要</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{t("keyTakeaways")}</h2>
               <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-7 text-slate-700">
                 {post.keyTakeaways.map((item) => (
                   <li key={item}>{item}</li>
@@ -115,7 +123,7 @@ export function BlogArticle({ post }: BlogArticleProps) {
           <footer className="space-y-4 border-t border-slate-200 pt-6">
             <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-700">{post.disclaimer}</p>
             <Link href="/blog" className="inline-flex text-sm text-slate-600 hover:text-slate-900">
-              ← 返回觀點文章列表
+              ← {t("backToList")}
             </Link>
           </footer>
         </article>

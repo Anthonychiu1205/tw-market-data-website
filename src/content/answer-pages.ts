@@ -9,6 +9,7 @@
 //   - FAQPage schema is emitted only from populated `faq` entries (real Q&A) — never placeholder.
 
 import { coverageFacts } from "@/src/content/coverage-facts";
+import type { AppLocale } from "@/src/i18n/locales";
 
 const twse = coverageFacts.twseDailyPrice;
 const twseStocks = twse.stocks.toLocaleString("en-US");
@@ -452,7 +453,19 @@ export function getAnswerPageBySlug(slug: string): AnswerPageEntry | undefined {
   return answerPages.find((page) => page.slug === slug);
 }
 
-/** Only pages with real content should be indexed / listed in the sitemap. */
-export function getPublishedAnswerPages(): AnswerPageEntry[] {
-  return answerPages.filter((page) => page.status === "published");
+/** Map the app locale (en / zh-TW) to the content locale used by answer entries. */
+function toAnswerPageLocale(locale: AppLocale): AnswerPageLocale {
+  return locale === "en" ? "en" : "zh-Hant";
+}
+
+/**
+ * Only pages with real content should be indexed / listed. Pass a locale to return just the entries
+ * authored for that locale (each entry is already per-locale content); omit it (e.g. sitemap) to get
+ * every published entry across locales.
+ */
+export function getPublishedAnswerPages(locale?: AppLocale): AnswerPageEntry[] {
+  const published = answerPages.filter((page) => page.status === "published");
+  if (!locale) return published;
+  const answerLocale = toAnswerPageLocale(locale);
+  return published.filter((page) => page.locale === answerLocale);
 }
