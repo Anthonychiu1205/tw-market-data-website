@@ -8,6 +8,10 @@ import { getMarketMarqueeSnapshotView } from "@/src/lib/market-marquee-snapshot"
 // display strings — they must stay zh or the market-row lookup breaks. Do not translate.
 const MARKET_LABELS = ["加權指數", "櫃買指數", "台灣50", "電子類股", "金融保險"] as const;
 
+// Index ids (item.id) that have a localized display name in home.marketPanel.names. Any other live
+// index falls back to its API-provided name (item.name).
+const LOCALIZED_INDEX_IDS = new Set(["twse_taiex", "tpex_otci", "twii_0050", "sector_ele", "sector_fin"]);
+
 function toneClass(trend: "up" | "down" | "neutral") {
   // Taiwan convention: 紅漲綠跌 (red = up, green = down), aligned with market-marquee-track.
   if (trend === "up") return "text-rose-500";
@@ -24,6 +28,7 @@ function isPublicNewsHref(href: string): boolean {
 
 export async function HeroMarketIntel() {
   const t = await getTranslations("home.marketPanel");
+  const tc = await getTranslations("common");
   const [marketSnapshot, newsSnapshot] = await Promise.all([
     getHomepageMarketSnapshot(),
     getMarketMarqueeSnapshotView(),
@@ -43,19 +48,24 @@ export async function HeroMarketIntel() {
         {marketRows.length > 0 ? (
         <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_12px_34px_rgba(15,23,42,0.05)]">
           <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
-            <p className="text-base font-semibold text-slate-900">{t("indicators")}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-base font-semibold text-slate-900">{t("indicators")}</p>
+              <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-amber-200">
+                {tc("illustrativeData")}
+              </span>
+            </div>
             <Link href="/datasets" className="text-sm font-medium text-slate-400 transition hover:text-slate-700">
               {t("viewAll")} &gt;
             </Link>
           </div>
-          {marketSnapshot.statusLabel ? (
-            <p className="mt-2 text-xs text-slate-500">{marketSnapshot.statusLabel}</p>
+          {marketSnapshot.updatedAt ? (
+            <p className="mt-2 text-xs text-slate-500">{t("asOf", { date: marketSnapshot.updatedAt })}</p>
           ) : null}
 
           <div className="pt-2">
             {marketRows.map((item) => (
               <div key={item.id} className="grid h-10 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 border-b border-slate-100 text-sm last:border-b-0">
-                <p className="truncate font-medium text-slate-800">{item.name}</p>
+                <p className="truncate font-medium text-slate-800">{LOCALIZED_INDEX_IDS.has(item.id) ? t(`names.${item.id}`) : item.name}</p>
                 <p className="font-medium tabular-nums text-slate-700">{item.value}</p>
                 <p className={`font-semibold tabular-nums ${toneClass(item.trend)}`}>{item.percent || item.change}</p>
               </div>

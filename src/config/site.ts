@@ -1,3 +1,8 @@
+// siteConfig.url is the CANONICAL origin — it drives `<link rel="canonical">` + hreflang on every
+// page (src/i18n/seo.ts). It MUST match the single served/primary domain, or canonical points at a
+// URL different from where the page is served (the www vs non-www split flagged in I18N-FIX-01 §5).
+// Unify at the Vercel domain level: pick ONE primary (apex `twmarketdata.com` here) and 301-redirect
+// the other (www → apex). To override the canonical origin, set NEXT_PUBLIC_SITE_URL (wins below).
 const PROD_FALLBACK_SITE_URL = "https://twmarketdata.com";
 const DEV_FALLBACK_SITE_URL = "http://localhost:3000";
 

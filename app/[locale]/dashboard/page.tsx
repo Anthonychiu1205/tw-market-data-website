@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
+
+import { privatePageMetadata } from "@/src/i18n/seo";
 import { redirect } from "next/navigation";
 
 import { DashboardPageShell } from "@/src/components/dashboard/dashboard-page-shell";
 import { toDashboardSection } from "@/src/content/dashboard";
 
-export const metadata: Metadata = {
-  title: "控制台",
-  description: "台股資料平台控制台。",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return privatePageMetadata(
+    locale,
+    { en: "Console", zh: "控制台" },
+    { en: "Console for the Taiwan market data platform.", zh: "台股資料平台控制台。" },
+  );
+}
 
 type DashboardPageProps = {
   searchParams: Promise<{ section?: string }>;

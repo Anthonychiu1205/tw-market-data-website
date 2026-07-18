@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/src/i18n/navigation";
 import { investmentDisclaimer } from "@/src/lib/legal/disclaimer";
 
+import { LanguageSwitcher } from "./language-switcher";
 import { Container } from "../ui/container";
 
 const policyLinks = [
@@ -52,6 +53,8 @@ export function SiteFooter({ onContactClick }: SiteFooterProps) {
           >
             {t("contact")}
           </button>
+          <span className="px-2 text-slate-600">|</span>
+          <LanguageSwitcher className="text-sm text-slate-600 transition hover:text-slate-900" />
           <span className="px-2 text-slate-600">|</span>
           <Link href="/" className="text-sm text-slate-600 hover:text-slate-900">
             TW Market Data © 2026
