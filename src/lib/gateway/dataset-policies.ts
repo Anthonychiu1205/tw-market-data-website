@@ -69,11 +69,14 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "twse-daily-price": { datasetSlug: "twse-daily-price", backendPath: "/v2/datasets/twse-daily-price", requiredPlan: "free", creditsCost: 1 },
   "warrants-reference": { datasetSlug: "warrants-reference", backendPath: "/v2/datasets/warrants-reference", requiredPlan: "free", creditsCost: 1 },
   "adjusted-prices": { datasetSlug: "adjusted-prices", backendPath: "/v2/datasets/adjusted-prices", requiredPlan: "free", creditsCost: 2 },
-  "business-indicator-monthly": { datasetSlug: "business-indicator-monthly", backendPath: "/v2/datasets/business-indicator-monthly", requiredPlan: "starter", creditsCost: 2 },
+  // tier aligned to read API required_plan_for_dataset (business_indicator = max, explicit)
+  "business-indicator-monthly": { datasetSlug: "business-indicator-monthly", backendPath: "/v2/datasets/business-indicator-monthly", requiredPlan: "max", creditsCost: 2 },
   "corporate-actions-enhanced": { datasetSlug: "corporate-actions-enhanced", backendPath: "/v2/datasets/corporate-actions-enhanced", requiredPlan: "starter", creditsCost: 2 },
   "day-trading-suspension": { datasetSlug: "day-trading-suspension", backendPath: "/v2/datasets/day-trading-suspension", requiredPlan: "starter", creditsCost: 2 },
-  "disposition-securities-period": { datasetSlug: "disposition-securities-period", backendPath: "/v2/datasets/disposition-securities-period", requiredPlan: "starter", creditsCost: 2 },
-  "dividends": { datasetSlug: "dividends", backendPath: "/v2/datasets/dividends", requiredPlan: "starter", creditsCost: 2 },
+  // tier aligned to read API (attention_disposal→disposition-securities-period = pro, explicit)
+  "disposition-securities-period": { datasetSlug: "disposition-securities-period", backendPath: "/v2/datasets/disposition-securities-period", requiredPlan: "pro", creditsCost: 2 },
+  // tier aligned to read API (dividend_policy→dividends = pro, explicit)
+  "dividends": { datasetSlug: "dividends", backendPath: "/v2/datasets/dividends", requiredPlan: "pro", creditsCost: 2 },
   "index-constituents": { datasetSlug: "index-constituents", backendPath: "/v2/datasets/index-constituents", requiredPlan: "starter", creditsCost: 2 },
   "macro-global": { datasetSlug: "macro-global", backendPath: "/v2/datasets/macro-global", requiredPlan: "starter", creditsCost: 2 },
   "macro-worldbank": { datasetSlug: "macro-worldbank", backendPath: "/v2/datasets/macro-worldbank", requiredPlan: "starter", creditsCost: 2 },
@@ -83,10 +86,13 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "stock-price-limit-daily": { datasetSlug: "stock-price-limit-daily", backendPath: "/v2/datasets/stock-price-limit-daily", requiredPlan: "starter", creditsCost: 2 },
   "taifex-options-settlement-price": { datasetSlug: "taifex-options-settlement-price", backendPath: "/v2/datasets/taifex-options-settlement-price", requiredPlan: "starter", creditsCost: 2 },
   "valuation-core-daily": { datasetSlug: "valuation-core-daily", backendPath: "/v2/datasets/valuation-core-daily", requiredPlan: "starter", creditsCost: 2 },
-  "valuation-data": { datasetSlug: "valuation-data", backendPath: "/v2/datasets/valuation-data", requiredPlan: "starter", creditsCost: 2 },
-  "monthly-revenue": { datasetSlug: "monthly-revenue", backendPath: "/v2/datasets/monthly-revenue", requiredPlan: "starter", creditsCost: 3 },
+  // tier aligned to read API (valuation→valuation-data = pro, explicit)
+  "valuation-data": { datasetSlug: "valuation-data", backendPath: "/v2/datasets/valuation-data", requiredPlan: "pro", creditsCost: 2 },
+  // tier aligned to read API (monthly_revenue = pro, explicit)
+  "monthly-revenue": { datasetSlug: "monthly-revenue", backendPath: "/v2/datasets/monthly-revenue", requiredPlan: "pro", creditsCost: 3 },
   "monthly-revenue-enhanced": { datasetSlug: "monthly-revenue-enhanced", backendPath: "/v2/datasets/monthly-revenue-enhanced", requiredPlan: "starter", creditsCost: 3 },
-  "technical-indicators": { datasetSlug: "technical-indicators", backendPath: "/v2/datasets/technical-indicators", requiredPlan: "starter", creditsCost: 3 },
+  // tier aligned to read API (technical_indicators = max, explicit)
+  "technical-indicators": { datasetSlug: "technical-indicators", backendPath: "/v2/datasets/technical-indicators", requiredPlan: "max", creditsCost: 3 },
   "balance-sheet": { datasetSlug: "balance-sheet", backendPath: "/v2/datasets/balance-sheet", requiredPlan: "pro", creditsCost: 2 },
   "cash-flow-statement": { datasetSlug: "cash-flow-statement", backendPath: "/v2/datasets/cash-flow-statement", requiredPlan: "pro", creditsCost: 2 },
   "convertible-bonds": { datasetSlug: "convertible-bonds", backendPath: "/v2/datasets/convertible-bonds", requiredPlan: "pro", creditsCost: 2 },
@@ -95,16 +101,19 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "etf-holdings": { datasetSlug: "etf-holdings", backendPath: "/v2/datasets/etf-holdings", requiredPlan: "pro", creditsCost: 2 },
   "events": { datasetSlug: "events", backendPath: "/v2/datasets/events", requiredPlan: "pro", creditsCost: 2 },
   "income-statement": { datasetSlug: "income-statement", backendPath: "/v2/datasets/income-statement", requiredPlan: "pro", creditsCost: 2 },
-  "institutional-flow": { datasetSlug: "institutional-flow", backendPath: "/v2/datasets/institutional-flow", requiredPlan: "pro", creditsCost: 2 },
+  // tier aligned to read API (institutional_flow = starter, explicit)
+  "institutional-flow": { datasetSlug: "institutional-flow", backendPath: "/v2/datasets/institutional-flow", requiredPlan: "starter", creditsCost: 2 },
   "institutional-flow-market-aggregate": { datasetSlug: "institutional-flow-market-aggregate", backendPath: "/v2/datasets/institutional-flow-market-aggregate", requiredPlan: "pro", creditsCost: 2 },
   "institutional-ownership": { datasetSlug: "institutional-ownership", backendPath: "/v2/datasets/institutional-ownership", requiredPlan: "pro", creditsCost: 2 },
-  "margin-short": { datasetSlug: "margin-short", backendPath: "/v2/datasets/margin-short", requiredPlan: "pro", creditsCost: 2 },
+  // tier aligned to read API (margin_short = starter, explicit)
+  "margin-short": { datasetSlug: "margin-short", backendPath: "/v2/datasets/margin-short", requiredPlan: "starter", creditsCost: 2 },
   // securities-lending: backendPath intentionally kept at the legacy chip-deep path — the retiring
   // /v2 proxy still routes through backendPath, and only the slug→cost mapping matters to the meter.
   "securities-lending": { datasetSlug: "securities-lending", backendPath: "/v2/datasets/chip-deep-securities-lending-daily", requiredPlan: "pro", creditsCost: 2 },
   "total-margin-short": { datasetSlug: "total-margin-short", backendPath: "/v2/datasets/total-margin-short", requiredPlan: "pro", creditsCost: 2 },
   "chip-flows": { datasetSlug: "chip-flows", backendPath: "/v2/datasets/chip-flows", requiredPlan: "pro", creditsCost: 3 },
-  "company-risk-events": { datasetSlug: "company-risk-events", backendPath: "/v2/datasets/company-risk-events", requiredPlan: "pro", creditsCost: 3 },
+  // tier aligned to read API (company_risk→company-risk-events = max, explicit)
+  "company-risk-events": { datasetSlug: "company-risk-events", backendPath: "/v2/datasets/company-risk-events", requiredPlan: "max", creditsCost: 3 },
   "esg-tesg": { datasetSlug: "esg-tesg", backendPath: "/v2/datasets/esg-tesg", requiredPlan: "pro", creditsCost: 3 },
   "financial-metrics": { datasetSlug: "financial-metrics", backendPath: "/v2/datasets/financial-metrics", requiredPlan: "pro", creditsCost: 3 },
   "insider-director-holdings": { datasetSlug: "insider-director-holdings", backendPath: "/v2/datasets/insider-director-holdings", requiredPlan: "pro", creditsCost: 3 },
@@ -112,7 +121,8 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "options-daily-taifex": { datasetSlug: "options-daily-taifex", backendPath: "/v2/datasets/options-daily-taifex", requiredPlan: "pro", creditsCost: 3 },
   "ownership-distribution": { datasetSlug: "ownership-distribution", backendPath: "/v2/datasets/ownership-distribution", requiredPlan: "pro", creditsCost: 3 },
   "screener": { datasetSlug: "screener", backendPath: "/v2/datasets/screener", requiredPlan: "pro", creditsCost: 3 },
-  "taifex-institutional-flow": { datasetSlug: "taifex-institutional-flow", backendPath: "/v2/datasets/taifex-institutional-flow", requiredPlan: "pro", creditsCost: 3 },
+  // tier aligned to read API (taifex_inst_oi→taifex-institutional-flow = max, explicit)
+  "taifex-institutional-flow": { datasetSlug: "taifex-institutional-flow", backendPath: "/v2/datasets/taifex-institutional-flow", requiredPlan: "max", creditsCost: 3 },
   "financials": { datasetSlug: "financials", backendPath: "/v2/datasets/financials", requiredPlan: "pro", creditsCost: 4 },
   "broker-branch-reference": { datasetSlug: "broker-branch-reference", backendPath: "/v2/datasets/broker-branch-reference", requiredPlan: "max", creditsCost: 4 },
 }
