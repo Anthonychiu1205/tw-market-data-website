@@ -23,7 +23,7 @@ import { DeleteAccountCard } from "@/src/components/dashboard/delete-account-car
 import { ResearchTerminalEntryCard } from "@/src/components/dashboard/research-terminal-entry-card";
 import type { CreditSpendSeries } from "@/src/lib/billing/credits";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
-import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
+import { getCreditsAmountLabel, getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
 
 type DashboardConsoleProps = {
   email: string;
@@ -191,7 +191,7 @@ function UsageActivityCard({
       <div className="mt-4 grid gap-3 text-xs text-slate-600 sm:grid-cols-3">
         <p>今日請求：{requestsToday.toLocaleString()}</p>
         <p>30 天請求：{requests30d.toLocaleString()}</p>
-        <p>{`30 天${getCreditsModeLabel(creditsModeState)}：${creditsUsage30dDisplay.toLocaleString()}`}</p>
+        <p>{`30 天 ${getCreditsAmountLabel(creditsModeState)}：${creditsUsage30dDisplay.toLocaleString()}`}</p>
       </div>
 
       {recentErrors.length > 0 ? (

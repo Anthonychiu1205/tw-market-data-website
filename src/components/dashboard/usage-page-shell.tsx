@@ -18,7 +18,7 @@ import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
 import type { UsageRequestsSummary, UsageSummary } from "@/src/lib/backend-adapter";
 import { trackEvent } from "@/src/lib/analytics/client";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
-import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
+import { getCreditsAmountLabel, getCreditsModeDescription } from "@/src/lib/billing/credits-mode";
 
 type UsagePageShellProps = {
   usageRequests: UsageRequestsSummary;
@@ -196,7 +196,7 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
             <p className="mt-1 text-lg font-semibold text-slate-900">{(usageSummary.requests30d ?? usageSummary.monthlyUsed).toLocaleString()}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500">{`30 天${getCreditsModeLabel(creditsModeState)}`}</p>
+            <p className="text-xs text-slate-500">{`30 天${getCreditsAmountLabel(creditsModeState)}`}</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">
               {(creditsModeState.mode === "charged"
                 ? usageSummary.chargedCreditsUsage30d ?? 0
@@ -374,7 +374,7 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
                   <th className="whitespace-nowrap px-2 py-3 text-left font-medium">Symbol</th>
                   <th className="whitespace-nowrap px-2 py-3 text-left font-medium">端點</th>
                   <th className="whitespace-nowrap px-2 py-3 text-left font-medium">狀態</th>
-                  <th className="whitespace-nowrap px-2 py-3 text-left font-medium">{getCreditsModeLabel(creditsModeState)}</th>
+                  <th className="whitespace-nowrap px-2 py-3 text-left font-medium">{getCreditsAmountLabel(creditsModeState)}</th>
                   <th className="whitespace-nowrap px-2 py-3 text-left font-medium">Latency</th>
                   <th className="whitespace-nowrap px-2 py-3 text-left font-medium">Request ID</th>
                   <th className="whitespace-nowrap px-2 py-3 text-left font-medium">對帳</th>
@@ -446,7 +446,7 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
                                 <p>dataset：{row.api}</p>
                                 <p>status：{getStatusLabel(row.status)}</p>
                                 <p>latency：{typeof row.latencyMs === "number" ? `${row.latencyMs} ms` : "—"}</p>
-                                <p>{`${getCreditsModeLabel(creditsModeState)}：${row.credits.toLocaleString()}`}</p>
+                                <p>{`${getCreditsAmountLabel(creditsModeState)}：${row.credits.toLocaleString()}`}</p>
                                 <p>
                                   transaction：
                                   {row.transactionLinked

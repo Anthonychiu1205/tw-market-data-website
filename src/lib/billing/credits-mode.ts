@@ -61,9 +61,22 @@ function normalizeModeInput(input: boolean | CreditsDeductionRuntimeState) {
 
 export function getCreditsModeLabel(input: boolean | CreditsDeductionRuntimeState) {
   const mode = normalizeModeInput(input);
-  if (mode === "charged") return "已扣 credits";
+  if (mode === "charged") return "已扣點";
   if (mode === "blocked") return "扣點未啟用";
   return "試算模式";
+}
+
+/**
+ * Label for a credits AMOUNT/column (usage table header, expanded detail, overview total).
+ * It must make explicit whether the numbers are a real wallet charge or an estimate —
+ * in dry_run they are the ESTIMATED cost, no wallet deduction (audit P0-2: an estimate
+ * shown as a bare "credits" number was misread — even by the owner — as a real charge).
+ */
+export function getCreditsAmountLabel(input: boolean | CreditsDeductionRuntimeState) {
+  const mode = normalizeModeInput(input);
+  if (mode === "charged") return "已實扣 credits";
+  if (mode === "blocked") return "credits（未啟用）";
+  return "credits（試算・未實扣）";
 }
 
 export function getCreditsModeDescription(input: boolean | CreditsDeductionRuntimeState) {
