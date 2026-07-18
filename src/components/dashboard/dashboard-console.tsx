@@ -1,5 +1,6 @@
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 
+import { Link } from "@/src/i18n/navigation";
 import type {
   ApiKeysSummary,
   BillingSummary,
@@ -91,11 +92,8 @@ type DashboardConsoleProps = {
 
 type CreditState = "normal" | "low" | "exhausted";
 
-function modeLabel(mode: "live" | "fallback") {
-  return mode === "live" ? "已連接" : "簡化模式";
-}
-
 function PanelTitle({ title, description, mode }: { title: string; description: string; mode: "live" | "fallback" }) {
+  const t = useTranslations("dashboard");
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -106,7 +104,7 @@ function PanelTitle({ title, description, mode }: { title: string; description: 
             mode === "live" ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600",
           )}
         >
-          {modeLabel(mode)}
+          {t(mode === "live" ? "mode.live" : "mode.fallback")}
         </span>
       </div>
       <p className="mt-2 text-sm text-slate-600">{description}</p>
@@ -132,6 +130,9 @@ function UsageActivityCard({
   usage: UsageSummary;
   creditsModeState: CreditsDeductionRuntimeState;
 }) {
+  const t = useTranslations("dashboard");
+  const locale = useLocale();
+  const creditsLocale = locale === "en" ? "en" : "zh-TW";
   const hasEvents = usageHasEvents(usage);
   const latestActive = getLatestActiveUsage(usage);
 
@@ -171,17 +172,26 @@ function UsageActivityCard({
 
   return (
     <DashboardCard className="rounded-3xl border border-slate-200/70 bg-white p-6 shadow-none">
-      <h2 className="text-base font-semibold text-slate-900">活動與用量</h2>
+      <h2 className="text-base font-semibold text-slate-900">{t("usageActivity.title")}</h2>
       <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
         <div className="space-y-1">
           <p className="text-sm text-slate-600">
-            月度剩餘 {monthlyRemaining.toLocaleString()} / {monthlyQuota.toLocaleString()}
+            {t("usageActivity.monthlyRemaining", {
+              remaining: monthlyRemaining.toLocaleString(),
+              quota: monthlyQuota.toLocaleString(),
+            })}
           </p>
           <p className="text-xs text-slate-500">
-            已使用 {monthlyUsed.toLocaleString()}（{monthlyUsedPct.toFixed(1)}%）・重置於 {monthlyResetLabel}
+            {t("usageActivity.usedLine", {
+              used: monthlyUsed.toLocaleString(),
+              pct: monthlyUsedPct.toFixed(1),
+              reset: monthlyResetLabel,
+            })}
           </p>
         </div>
-        <p className="text-xs text-slate-500">速率限制 {usage.rateLimitPerMin} / 分鐘 ・日視窗參考重置於 {dailyResetLabel}</p>
+        <p className="text-xs text-slate-500">
+          {t("usageActivity.rateLimitLine", { rate: String(usage.rateLimitPerMin), reset: dailyResetLabel })}
+        </p>
       </div>
 
       <div className="mt-4 h-2 rounded-full bg-slate-200">
@@ -193,21 +203,25 @@ function UsageActivityCard({
       </div>
 
       <div className="mt-4 grid gap-3 text-xs text-slate-600 sm:grid-cols-3">
-        <p>今日請求：{requestsToday.toLocaleString()}</p>
-        <p>30 天請求：{requests30d.toLocaleString()}</p>
-        <p>{`30 天 ${getCreditsAmountLabel(creditsModeState)}：${creditsUsage30dDisplay.toLocaleString()}`}</p>
+        <p>{t("usageActivity.requestsTodayLine", { count: requestsToday.toLocaleString() })}</p>
+        <p>{t("usageActivity.requests30dLine", { count: requests30d.toLocaleString() })}</p>
+        <p>{t("usageActivity.credits30dLine", { label: getCreditsAmountLabel(creditsModeState, creditsLocale), value: creditsUsage30dDisplay.toLocaleString() })}</p>
       </div>
 
       {recentErrors.length > 0 ? (
         <p className="mt-2 text-xs text-slate-500">
-          最近錯誤：{recentErrors.slice(0, 3).map((item) => `${item.code} (${item.count})`).join("、")}
+          {t("usageActivity.recentErrors", {
+            list: recentErrors.slice(0, 3).map((item) => `${item.code} (${item.count})`).join("、"),
+          })}
         </p>
       ) : null}
 
       <p className="mt-3 text-xs text-slate-500">
-        {hasEvents ? `最近活躍：${latestActive?.date} · ${latestActive?.count.toLocaleString()} 次` : "目前尚無足夠活動資料。"}
+        {hasEvents
+          ? t("usageActivity.latestActive", { date: latestActive?.date ?? "", count: (latestActive?.count ?? 0).toLocaleString() })
+          : t("usageActivity.noActivity")}
       </p>
-      <p className="mt-1 text-xs text-slate-500">{getCreditsModeDescription(creditsModeState)}</p>
+      <p className="mt-1 text-xs text-slate-500">{getCreditsModeDescription(creditsModeState, creditsLocale)}</p>
     </DashboardCard>
   );
 }
@@ -227,23 +241,26 @@ function OverviewPanel({
   creditWalletBalance: number;
   creditsModeState: CreditsDeductionRuntimeState;
 }) {
+  const t = useTranslations("dashboard");
+  const locale = useLocale();
+  const creditsLocale = locale === "en" ? "en" : "zh-TW";
   const activeKeysCount = apiKeys.keys.filter((item) => item.status !== "revoked").length;
   const requestsToday = usage.requestsToday ?? 0;
   const requests30d = usage.requests30d ?? usage.monthlyUsed;
   const entitlementSourceCopy =
     entitlement.source === "subscription"
-      ? "方案資料已同步"
+      ? t("overview.source.subscription")
       : entitlement.source === "backend"
-        ? "方案資料暫以帳戶摘要顯示"
-        : "目前尚未啟用付費方案";
+        ? t("overview.source.backend")
+        : t("overview.source.fallback");
 
   return (
     <div className="space-y-3">
       <DashboardCard className="border-slate-200/80 bg-slate-50/60">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm font-medium text-slate-900">
-            目前方案：{entitlement.planName}
-            {entitlement.isEntitled ? "（使用中）" : ""}
+            {t("overview.currentPlan", { plan: entitlement.planName })}
+            {entitlement.isEntitled ? t("overview.inUseSuffix") : ""}
           </p>
           <p className="text-xs text-slate-500">{entitlementSourceCopy}</p>
         </div>
@@ -252,34 +269,34 @@ function OverviewPanel({
       <DashboardCard className="border-slate-200/80 bg-slate-50/60">
         <div className="grid gap-3 text-sm text-slate-700 sm:grid-cols-4">
           <p>
-            API keys
+            {t("overview.apiKeysStat")}
             <span className="ml-2 font-semibold text-slate-900">{activeKeysCount}</span>
           </p>
           <p>
-            今日請求
+            {t("overview.requestsToday")}
             <span className="ml-2 font-semibold text-slate-900">{requestsToday.toLocaleString()}</span>
           </p>
           <p>
-            30 天請求
+            {t("overview.requests30d")}
             <span className="ml-2 font-semibold text-slate-900">{requests30d.toLocaleString()}</span>
           </p>
           <p>
-            可用 credits
+            {t("overview.availableCredits")}
             <span className="ml-2 font-semibold text-slate-900">{creditWalletBalance.toLocaleString()}</span>
           </p>
         </div>
-        <p className="mt-2 text-xs text-slate-500">目前模式：{getCreditsModeLabel(creditsModeState)}</p>
+        <p className="mt-2 text-xs text-slate-500">{t("overview.currentMode", { mode: getCreditsModeLabel(creditsModeState, creditsLocale) })}</p>
       </DashboardCard>
 
       {creditState === "exhausted" ? (
         <DashboardCard className="border-amber-200 bg-amber-50">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-amber-900">您的使用額度已用完</p>
-              <p className="mt-1 text-sm text-amber-800">請升級方案或購買 credits，恢復資料查詢。</p>
+              <p className="text-sm font-semibold text-amber-900">{t("overview.quotaExhaustedTitle")}</p>
+              <p className="mt-1 text-sm text-amber-800">{t("overview.quotaExhaustedBody")}</p>
             </div>
             <Link href="/billing/subscriptions" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
-              升級方案
+              {t("overview.upgradeCta")}
             </Link>
           </div>
         </DashboardCard>
@@ -287,8 +304,8 @@ function OverviewPanel({
 
       <DashboardCard>
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-base font-semibold text-slate-900">API 金鑰</h2>
-        <p className="text-xs text-slate-500">啟用中 {activeKeysCount} 把</p>
+          <h2 className="text-base font-semibold text-slate-900">{t("overview.apiKeysHeading")}</h2>
+        <p className="text-xs text-slate-500">{t("overview.activeKeys", { count: activeKeysCount })}</p>
         </div>
         <div className="mt-3">
           <ApiKeysManager
@@ -315,13 +332,14 @@ function OverviewPanel({
 }
 
 function KeysPanel({ apiKeys }: { apiKeys: ApiKeysSummary }) {
+  const t = useTranslations("dashboard");
   return (
     <div className="space-y-4">
-      <PanelTitle title="API 金鑰" description="管理金鑰與最近使用時間。" mode={apiKeys.integrationMode} />
+      <PanelTitle title={t("keys.title")} description={t("keys.description")} mode={apiKeys.integrationMode} />
 
       <DashboardCard>
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-base font-semibold text-slate-900">金鑰清單</h2>
+          <h2 className="text-base font-semibold text-slate-900">{t("keys.listTitle")}</h2>
         </div>
         <div className="mt-3">
           <ApiKeysManager
@@ -345,29 +363,30 @@ function SettingsPanel({
   email: string;
   entitlement: DashboardConsoleProps["entitlement"];
 }) {
+  const t = useTranslations("dashboard");
   return (
     <div className="space-y-5">
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold tracking-wide text-slate-900">方案</h2>
+        <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("settings.planSection")}</h2>
         <DashboardCard className="border-slate-200/80 bg-slate-50/70 p-0 shadow-none">
           <div className="space-y-2 px-5 py-3">
             <div>
               <p className="text-sm font-medium text-slate-900">
-                目前方案：{entitlement.planName}
-                {entitlement.isEntitled ? "（使用中）" : ""}
+                {t("overview.currentPlan", { plan: entitlement.planName })}
+                {entitlement.isEntitled ? t("overview.inUseSuffix") : ""}
               </p>
               <p className="text-xs text-slate-500">
                 {entitlement.source === "subscription"
-                  ? "方案資料已同步"
+                  ? t("overview.source.subscription")
                   : entitlement.source === "backend"
-                    ? "方案資料暫以帳戶摘要顯示"
-                    : "目前尚未啟用付費方案"}
+                    ? t("overview.source.backend")
+                    : t("overview.source.fallback")}
               </p>
             </div>
             <div>
               <Link href="/billing/subscriptions" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
-                管理方案
+                {t("settings.managePlan")}
               </Link>
             </div>
           </div>
@@ -375,7 +394,7 @@ function SettingsPanel({
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold tracking-wide text-slate-900">帳戶資料</h2>
+        <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("settings.accountSection")}</h2>
         <DashboardCard className="border-slate-200/80 bg-slate-50/70 p-0 shadow-none">
           <div className="px-5 py-4">
             <AccountProfileForm email={email} />
@@ -384,13 +403,13 @@ function SettingsPanel({
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold tracking-wide text-slate-900">其他</h2>
+        <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("settings.otherSection")}</h2>
         <DashboardCard className="border-slate-200/80 bg-slate-50/70 p-0 shadow-none">
           <div className="divide-y divide-slate-200">
             <div className="flex items-center justify-between gap-4 px-5 py-4">
-              <p className="text-sm font-medium text-slate-900">登出</p>
+              <p className="text-sm font-medium text-slate-900">{t("settings.logout")}</p>
               <form action="/api/auth/logout" method="post">
-                <button className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>登出</button>
+                <button className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>{t("settings.logout")}</button>
               </form>
             </div>
             <DeleteAccountCard email={email} />
@@ -402,23 +421,25 @@ function SettingsPanel({
 }
 
 function DocsPanel() {
+  const t = useTranslations("dashboard");
+  const docsLinks = [
+    { labelKey: "docs.links.quickStart", href: "/docs" },
+    { labelKey: "docs.links.apiReference", href: "/api" },
+    { labelKey: "docs.links.datasetCatalog", href: "/datasets" },
+    { labelKey: "docs.links.sourcePolicy", href: "/about" },
+  ] as const;
   return (
     <div className="space-y-4">
-      <PanelTitle title="文件" description="快速進入導入文件與 API 參考。" mode="fallback" />
+      <PanelTitle title={t("docs.title")} description={t("docs.description")} mode="fallback" />
       <DashboardCard>
         <div className="grid gap-3 md:grid-cols-2">
-          {[
-            ["快速上手", "/docs"],
-            ["API 參考", "/api"],
-            ["資料集目錄", "/datasets"],
-            ["來源政策", "/about"],
-          ].map(([label, href]) => (
+          {docsLinks.map((item) => (
             <Link
-              key={String(label)}
-              href={String(href)}
+              key={item.href}
+              href={item.href}
               className={buttonClass("secondary")}
             >
-              {String(label)}
+              {t(item.labelKey)}
             </Link>
           ))}
         </div>
@@ -428,25 +449,27 @@ function DocsPanel() {
 }
 
 function SupportPanel() {
+  const t = useTranslations("dashboard");
+  const supportItems = [
+    { titleKey: "support.items.sales.title", textKey: "support.items.sales.text" },
+    { titleKey: "support.items.data.title", textKey: "support.items.data.text" },
+    { titleKey: "support.items.integration.title", textKey: "support.items.integration.text" },
+  ] as const;
   return (
     <div className="space-y-4">
-      <PanelTitle title="支援" description="商務洽詢、資料需求與整合協助。" mode="fallback" />
+      <PanelTitle title={t("support.title")} description={t("support.description")} mode="fallback" />
 
       <DashboardCard>
         <div className="grid gap-3 md:grid-cols-3">
-          {[
-            ["商務洽詢", "方案與採購流程"],
-            ["資料需求", "欄位或覆蓋範圍"],
-            ["整合支援", "API 導入與用量問題"],
-          ].map(([title, text]) => (
-            <div key={String(title)} className="rounded-md border border-slate-200 bg-slate-50 px-3 py-3">
-              <p className="text-sm font-medium text-slate-900">{title}</p>
-              <p className="mt-1 text-sm text-slate-600">{text}</p>
+          {supportItems.map((item) => (
+            <div key={item.titleKey} className="rounded-md border border-slate-200 bg-slate-50 px-3 py-3">
+              <p className="text-sm font-medium text-slate-900">{t(item.titleKey)}</p>
+              <p className="mt-1 text-sm text-slate-600">{t(item.textKey)}</p>
             </div>
           ))}
         </div>
         <Link href="/contact" className={buttonClass("secondary", "mt-4")}>
-          前往聯絡頁
+          {t("support.contactCta")}
         </Link>
       </DashboardCard>
     </div>

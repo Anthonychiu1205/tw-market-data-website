@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import {
   Area,
@@ -14,6 +14,8 @@ import {
 } from "recharts";
 import { Download, RefreshCw } from "lucide-react";
 
+import { Link } from "@/src/i18n/navigation";
+import type { AppLocale } from "@/src/i18n/locales";
 import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
 import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
@@ -57,8 +59,13 @@ type SpendPoint = {
 };
 
 
-function monthLabel(key: string) {
+function monthLabel(key: string, locale: AppLocale) {
   const [year, month] = key.split("-");
+  if (locale === "en") {
+    return new Intl.DateTimeFormat("en", { year: "numeric", month: "long" }).format(
+      new Date(Number(year), Number(month) - 1, 1),
+    );
+  }
   return `${year}年${Number(month)}月`;
 }
 
@@ -96,13 +103,13 @@ type BillingCreditsPageProps = {
 
 const TRANSACTION_FILTER_OPTIONS: Array<{
   id: "all" | "usage" | "purchase" | "refund" | "adjustment";
-  label: string;
+  labelKey: string;
 }> = [
-  { id: "all", label: "全部" },
-  { id: "usage", label: "API 使用" },
-  { id: "purchase", label: "儲值" },
-  { id: "refund", label: "退款" },
-  { id: "adjustment", label: "手動調整" },
+  { id: "all", labelKey: "transactions.filter.all" },
+  { id: "usage", labelKey: "transactions.filter.usage" },
+  { id: "purchase", labelKey: "transactions.filter.purchase" },
+  { id: "refund", labelKey: "transactions.filter.refund" },
+  { id: "adjustment", labelKey: "transactions.filter.adjustment" },
 ];
 
 // Export the transactions currently in view (i.e. the active filter). Values are quoted and inner
@@ -145,28 +152,26 @@ function downloadTransactionsCsv(rows: BillingCreditsPageProps["transactions"], 
   URL.revokeObjectURL(url);
 }
 
-function getTransactionTypeLabel(type: string) {
-  if (type === "purchase") return "儲值";
-  if (type === "refund") return "退款";
-  if (type === "usage") return "API 使用";
-  if (type === "adjustment") return "手動調整";
-  return "其他";
-}
+const TRANSACTION_TYPE_KEY: Record<string, string> = {
+  purchase: "purchase",
+  refund: "refund",
+  usage: "usage",
+  adjustment: "adjustment",
+};
 
-function getTransactionStatusLabel(status: string) {
-  if (status === "completed") return "已完成";
-  if (status === "pending") return "確認中";
-  if (status === "failed") return "失敗";
-  if (status === "cancelled") return "已取消";
-  if (status === "expired") return "已逾時";
-  if (status === "simulated") return "模擬";
-  return "待確認";
-}
+const TRANSACTION_STATUS_KEY: Record<string, string> = {
+  completed: "completed",
+  pending: "pending",
+  failed: "failed",
+  cancelled: "cancelled",
+  expired: "expired",
+  simulated: "simulated",
+};
 
-function formatTransactionDate(value: string) {
+function formatTransactionDate(value: string, locale: AppLocale) {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return "—";
-  return new Intl.DateTimeFormat("zh-TW", {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-CA" : "zh-TW", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -197,6 +202,8 @@ function formatTransactionAmount(transaction: { amountMinor: number | null; curr
 }
 
 export function BillingCreditsPage({ creditsModeState, walletBalance, spendSeries: spendSeriesData, usageReconciliation, transactions }: BillingCreditsPageProps) {
+  const t = useTranslations("billing");
+  const locale = useLocale() as AppLocale;
   const router = useRouter();
   const mountedAtRef = useRef<number>(0);
   const lastFocusRefreshAtRef = useRef<number>(0);
@@ -240,10 +247,10 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
       if (!result.ok) {
         setPurchaseError(
           result.error === "checkout_unavailable"
-            ? "目前無法開啟結帳，請稍後再試。"
+            ? t("credits.topup.errors.checkoutUnavailable")
             : result.error === "unauthenticated"
-              ? "請先登入後再購買。"
-              : "此儲值方案暫時無法購買。",
+              ? t("credits.topup.errors.unauthenticated")
+              : t("credits.topup.errors.default"),
         );
         return;
       }
@@ -254,7 +261,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
         router.refresh();
       });
     } catch {
-      setPurchaseError("目前無法開啟結帳，請稍後再試。");
+      setPurchaseError(t("credits.topup.errors.checkoutUnavailable"));
     } finally {
       setPendingPack(null);
     }
@@ -303,34 +310,36 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
         <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-[15px] font-medium text-slate-900">餘額</p>
-              <p className="mt-1 text-sm text-slate-600">可用 credits 餘額</p>
+              <p className="text-[15px] font-medium text-slate-900">{t("credits.balance.title")}</p>
+              <p className="mt-1 text-sm text-slate-600">{t("credits.balance.subtitle")}</p>
             </div>
             <button
               type="button"
               onClick={() => router.refresh()}
               className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
-              title="刷新餘額"
-              aria-label="刷新餘額"
+              title={t("credits.balance.refresh")}
+              aria-label={t("credits.balance.refresh")}
             >
               <RefreshCw className="h-4 w-4" />
             </button>
           </div>
           <p className="mt-5 text-5xl font-semibold tracking-tight text-slate-900">{formatCredits(walletBalance)}</p>
           <p className="mt-2 text-xs text-slate-500">
-            {latestTransactionAt ? `最近異動：${formatTransactionDate(latestTransactionAt)}` : "最近異動：尚無紀錄"}
+            {latestTransactionAt
+              ? t("credits.balance.lastActivity", { date: formatTransactionDate(latestTransactionAt, locale) })
+              : t("credits.balance.lastActivityNone")}
           </p>
           {/* Empty-state hint only. The old block had three internal status lines, one with inverted
               logic (a non-zero balance showed "wallet 未建立、餘額預設 0"). Customers do not need the
               mode/description internals — show only the "0 is normal" note, and only when it is 0. */}
           {walletBalance === 0 ? (
-            <p className="mt-1 text-xs text-slate-500">目前尚無可用 credits，餘額為 0 屬正常狀態；儲值或訂閱後即會顯示。</p>
+            <p className="mt-1 text-xs text-slate-500">{t("credits.balance.zeroNote")}</p>
           ) : null}
         </DashboardCard>
 
         <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
-          <p className="text-[15px] font-medium text-slate-900">API 端點</p>
-          <p className="mt-1 text-sm text-slate-600">每次 API 呼叫的 credits 成本</p>
+          <p className="text-[15px] font-medium text-slate-900">{t("credits.costTable.title")}</p>
+          <p className="mt-1 text-sm text-slate-600">{t("credits.costTable.subtitle")}</p>
 
           <div className="-mx-1 mt-5 overflow-x-auto px-1">
             <div className="inline-flex min-w-max rounded-xl bg-slate-100 p-1">
@@ -351,9 +360,9 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
             <table className="min-w-full text-sm">
               <thead className="text-sm font-medium text-slate-500">
                 <tr>
-                  <th className="px-3 py-3 text-left font-medium">資料集</th>
-                  <th className="px-3 py-3 text-left font-medium">端點</th>
-                  <th className="px-3 py-3 text-left font-medium">使用成本</th>
+                  <th className="px-3 py-3 text-left font-medium">{t("credits.costTable.dataset")}</th>
+                  <th className="px-3 py-3 text-left font-medium">{t("credits.costTable.endpoint")}</th>
+                  <th className="px-3 py-3 text-left font-medium">{t("credits.costTable.cost")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -375,40 +384,42 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
             </table>
           </div>
           <p className="mt-4 text-xs text-slate-500">
-            credits 使用量取決於端點成本與請求量（目前顯示：{getCreditsModeLabel(creditsModeState)}）。
+            {t("credits.costTable.note", { mode: getCreditsModeLabel(creditsModeState, locale) })}
           </p>
         </DashboardCard>
       </section>
 
       <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
-        <p className="text-[15px] font-medium text-slate-900">計費方式</p>
+        <p className="text-[15px] font-medium text-slate-900">{t("credits.billingMethod.title")}</p>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600">
-          <li>訂閱方案每月含 included 請求額度；API 請求優先扣此額度，credits 錢包不受影響。</li>
-          <li>included 額度用盡後，超額請求才依上方端點成本從 credits 錢包扣點（overage）。</li>
-          <li>included 已用盡且錢包餘額不足時，請求會被拒絕（需儲值或升級方案）。</li>
-          <li>RPM（每分鐘請求上限）為速率保護，與月額度／credits 分開計算。</li>
+          <li>{t("credits.billingMethod.b1")}</li>
+          <li>{t("credits.billingMethod.b2")}</li>
+          <li>{t("credits.billingMethod.b3")}</li>
+          <li>{t("credits.billingMethod.b4")}</li>
         </ul>
         {creditsModeState.mode === "dry_run" ? (
           <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-            目前為計費試算模式：請求會記錄估算成本，但尚未實際扣點或扣款。
+            {t("credits.billingMethod.dryRunNote")}
           </p>
         ) : (
-          <p className="mt-3 text-xs text-slate-500">計費已啟用：超出 included 額度的請求會依端點成本實際扣點。</p>
+          <p className="mt-3 text-xs text-slate-500">{t("credits.billingMethod.enabledNote")}</p>
         )}
       </DashboardCard>
 
       <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-[15px] font-medium text-slate-900">使用量 / Credits 對帳（近 {usageReconciliation?.windowDays ?? 30} 天）</p>
+            <p className="text-[15px] font-medium text-slate-900">{t("credits.reconciliation.title", { days: usageReconciliation?.windowDays ?? 30 })}</p>
             <p className="mt-1 text-sm text-slate-600">
-              使用事件：{(usageReconciliation?.totalUsageEvents ?? 0).toLocaleString()} ·
-              預估用量成本（含試算）：{(usageReconciliation?.totalChargedCredits ?? 0).toLocaleString()} ·
-              實際扣點 credits：{(usageReconciliation?.totalTransactionCredits ?? 0).toLocaleString()} ·
-              錢包餘額：{formatCredits(usageReconciliation?.walletBalance ?? walletBalance)}
+              {t("credits.reconciliation.detail", {
+                events: (usageReconciliation?.totalUsageEvents ?? 0).toLocaleString(),
+                estimated: (usageReconciliation?.totalChargedCredits ?? 0).toLocaleString(),
+                charged: (usageReconciliation?.totalTransactionCredits ?? 0).toLocaleString(),
+                balance: formatCredits(usageReconciliation?.walletBalance ?? walletBalance),
+              })}
             </p>
             {creditsModeState.mode === "dry_run" ? (
-              <p className="mt-1 text-xs text-slate-500">目前為試算模式，部分請求尚未進入正式扣點流程。</p>
+              <p className="mt-1 text-xs text-slate-500">{t("credits.reconciliation.dryRunHint")}</p>
             ) : null}
           </div>
           <span
@@ -420,30 +431,36 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
                   : "bg-emerald-100 text-emerald-700"
             }`}
           >
-            {!usageReconciliation ? "尚無對帳資料" : reconciliationMismatch ? "部分 request 尚未完成對帳" : "對帳正常"}
+            {!usageReconciliation
+              ? t("credits.reconciliation.noData")
+              : reconciliationMismatch
+                ? t("credits.reconciliation.partial")
+                : t("credits.reconciliation.ok")}
           </span>
         </div>
         {usageReconciliation && reconciliationMismatch ? (
           <p className="mt-3 text-xs text-slate-500">
-            需人工確認：金額不一致 {usageReconciliation.mismatchedRequestIds.length.toLocaleString()} 筆 ·
-            重複扣點 {usageReconciliation.duplicateUsageTransactions.length.toLocaleString()} 筆 ·
-            扣點無對應請求 {usageReconciliation.orphanUsageTransactions.length.toLocaleString()} 筆
+            {t("credits.reconciliation.mismatch", {
+              mismatched: usageReconciliation.mismatchedRequestIds.length.toLocaleString(),
+              duplicate: usageReconciliation.duplicateUsageTransactions.length.toLocaleString(),
+              orphan: usageReconciliation.orphanUsageTransactions.length.toLocaleString(),
+            })}
           </p>
         ) : null}
       </DashboardCard>
 
       <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
-        <p className="text-[15px] font-medium text-slate-900">儲值方案</p>
-        <p className="mt-1 text-sm text-slate-600">彈性補充用量，價格高於訂閱 included credits，適合短期尖峰需求。</p>
+        <p className="text-[15px] font-medium text-slate-900">{t("credits.topup.title")}</p>
+        <p className="mt-1 text-sm text-slate-600">{t("credits.topup.subtitle")}</p>
         <div className="mt-4 overflow-x-auto rounded-2xl bg-slate-50/70">
           <table className="min-w-full text-sm">
             <thead className="text-sm font-medium text-slate-500">
               <tr>
-                <th className="px-3 py-3 text-left font-medium">方案</th>
-                <th className="px-3 py-3 text-left font-medium">金額</th>
-                <th className="px-3 py-3 text-left font-medium">入帳 credits</th>
-                <th className="px-3 py-3 text-left font-medium">單價 / credit</th>
-                <th className="px-3 py-3 text-right font-medium">購買</th>
+                <th className="px-3 py-3 text-left font-medium">{t("credits.topup.plan")}</th>
+                <th className="px-3 py-3 text-left font-medium">{t("credits.topup.amount")}</th>
+                <th className="px-3 py-3 text-left font-medium">{t("credits.topup.creditsGranted")}</th>
+                <th className="px-3 py-3 text-left font-medium">{t("credits.topup.unitPrice")}</th>
+                <th className="px-3 py-3 text-right font-medium">{t("credits.topup.buy")}</th>
               </tr>
             </thead>
             <tbody>
@@ -456,7 +473,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
                     {pkg.label}
                     {pkg.highlight === "best_value" ? (
                       <span className="ml-2 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-700">
-                        最划算
+                        {t("credits.topup.bestValue")}
                       </span>
                     ) : null}
                   </td>
@@ -470,7 +487,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
                       disabled={pendingPack !== null}
                       className={buttonClass("primary", "h-9 rounded-lg px-4 text-xs")}
                     >
-                      {pendingPack === pkg.code ? "開啟結帳…" : "購買"}
+                      {pendingPack === pkg.code ? t("credits.topup.openingCheckout") : t("credits.topup.buy")}
                     </button>
                   </td>
                 </tr>
@@ -479,19 +496,17 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
           </table>
         </div>
         {purchaseError ? <p className="mt-3 text-xs text-red-600">{purchaseError}</p> : null}
-        <p className="mt-3 text-xs text-slate-500">
-          付款完成後由 Polar 通知入帳，credits 會自動加進錢包；若尚未顯示，稍候重新整理即可。
-        </p>
+        <p className="mt-3 text-xs text-slate-500">{t("credits.topup.note")}</p>
       </DashboardCard>
 
       <DashboardCard className="rounded-3xl border-slate-200/70 bg-white px-6 py-5 shadow-none">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-[15px] font-medium text-slate-900">使用訂閱方案節省成本</p>
-            <p className="mt-1 text-sm text-slate-600">改用訂閱方案可降低單次呼叫成本，並取得更高穩定性與配額。</p>
+            <p className="text-[15px] font-medium text-slate-900">{t("credits.saveCard.title")}</p>
+            <p className="mt-1 text-sm text-slate-600">{t("credits.saveCard.body")}</p>
           </div>
           <Link href="/billing/subscriptions" className={buttonClass("secondary", "h-10 rounded-xl px-5 text-sm")}>
-            查看方案
+            {t("credits.saveCard.cta")}
           </Link>
         </div>
       </DashboardCard>
@@ -499,36 +514,34 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
       <section className="flex flex-col gap-6">
         <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-2xl font-semibold text-slate-900">花費</p>
+            <p className="text-2xl font-semibold text-slate-900">{t("credits.spend.title")}</p>
             <div className="flex items-center gap-4 text-sm text-slate-700">
               <button
                 type="button"
                 className="border-0 bg-transparent p-0 text-slate-400 shadow-none hover:text-slate-700 disabled:cursor-not-allowed disabled:text-slate-300"
                 onClick={() => setActiveMonthIndex((prev) => Math.max(0, prev - 1))}
                 disabled={activeMonthIndex === 0}
-                aria-label="上個月"
+                aria-label={t("credits.spend.prevMonth")}
               >
                 <span className="inline-block h-4 w-4">‹</span>
               </button>
-              <span className="text-lg font-medium text-slate-700">{monthLabel(activeMonthKey)}</span>
+              <span className="text-lg font-medium text-slate-700">{monthLabel(activeMonthKey, locale)}</span>
               <button
                 type="button"
                 className="border-0 bg-transparent p-0 text-slate-400 shadow-none hover:text-slate-700 disabled:cursor-not-allowed disabled:text-slate-300"
                 onClick={() => setActiveMonthIndex((prev) => Math.min(spendMonths.length - 1, prev + 1))}
                 disabled={spendMonths.length === 0 || activeMonthIndex >= spendMonths.length - 1}
-                aria-label="下個月"
+                aria-label={t("credits.spend.nextMonth")}
               >
                 <span className="inline-block h-4 w-4">›</span>
               </button>
             </div>
           </div>
           {!hasSpendData ? (
-            <p className="mt-6 text-sm text-slate-500">目前沒有花費紀錄。儲值或訂閱後,這裡會顯示實際交易。</p>
+            <p className="mt-6 text-sm text-slate-500">{t("credits.spend.empty")}</p>
           ) : null}
           {spendSeriesData.hasExcludedCurrencies ? (
-            <p className="mt-2 text-xs text-amber-600">
-              圖表僅計 USD。你有以新台幣計價的歷史交易,未併入此圖(不同幣別不可直接相加)。
-            </p>
+            <p className="mt-2 text-xs text-amber-600">{t("credits.spend.usdOnly")}</p>
           ) : null}
           <div className="mt-6 h-[260px]" hidden={!hasSpendData}>
             <ResponsiveContainer width="100%" height="100%">
@@ -563,9 +576,9 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
                     const rawValue = Array.isArray(value) ? value[0] : value;
                     const numericValue = typeof rawValue === "number" ? rawValue : Number(rawValue ?? 0);
                     const safeValue = Number.isFinite(numericValue) ? numericValue : 0;
-                    return [formatMoney(safeValue * 100, "USD"), "花費"];
+                    return [formatMoney(safeValue * 100, "USD"), t("credits.spend.title")];
                   }}
-                  labelFormatter={(label) => `日期 ${label}`}
+                  labelFormatter={(label) => t("credits.spend.tooltipDate", { date: String(label) })}
                 />
                 <Area type="monotone" dataKey="spend" stroke="#1f2937" strokeWidth={1.8} fill="url(#spendFill)" />
               </AreaChart>
@@ -575,7 +588,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
 
         <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[15px] font-medium text-slate-900">交易記錄</p>
+            <p className="text-[15px] font-medium text-slate-900">{t("credits.transactions.title")}</p>
             <button
               type="button"
               onClick={() => downloadTransactionsCsv(filteredTransactions, transactionFilter)}
@@ -583,7 +596,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
               className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:text-slate-300"
             >
               <Download className="h-4 w-4" />
-              匯出 CSV
+              {t("credits.transactions.exportCsv")}
             </button>
           </div>
           <div className="mt-4 inline-flex rounded-xl bg-slate-100 p-1">
@@ -598,7 +611,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
-                {option.label}
+                {t(`credits.${option.labelKey}`)}
               </button>
             ))}
           </div>
@@ -606,11 +619,11 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
             <table className="min-w-full text-sm">
               <thead className="text-sm font-medium text-slate-500">
                 <tr>
-                  <th className="px-2 py-3 text-left font-medium">類型</th>
-                  <th className="px-2 py-3 text-left font-medium">說明</th>
-                  <th className="px-2 py-3 text-left font-medium">credits 變化</th>
-                  <th className="px-2 py-3 text-left font-medium">金額</th>
-                  <th className="px-2 py-3 text-left font-medium">日期</th>
+                  <th className="px-2 py-3 text-left font-medium">{t("credits.transactions.type")}</th>
+                  <th className="px-2 py-3 text-left font-medium">{t("credits.transactions.description")}</th>
+                  <th className="px-2 py-3 text-left font-medium">{t("credits.transactions.creditsChange")}</th>
+                  <th className="px-2 py-3 text-left font-medium">{t("credits.transactions.amount")}</th>
+                  <th className="px-2 py-3 text-left font-medium">{t("credits.transactions.date")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -620,9 +633,9 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
                       return (
                       <tr key={transaction.id} className="border-t border-slate-100">
                         <td className="px-2 py-3 text-sm text-slate-700">
-                          {getTransactionTypeLabel(transaction.type)}
+                          {t(`credits.transactions.typeLabel.${TRANSACTION_TYPE_KEY[transaction.type] ?? "other"}`)}
                           <span className="ml-2 rounded-md bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600">
-                            {getTransactionStatusLabel(transaction.status)}
+                            {t(`credits.transactions.statusLabel.${TRANSACTION_STATUS_KEY[transaction.status] ?? "unconfirmed"}`)}
                           </span>
                         </td>
                         <td className="px-2 py-3 text-sm text-slate-700">
@@ -630,24 +643,24 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
                             <div className="space-y-1">
                               <p>{usageMeta ? usageMeta.datasetSlug : "API usage"}</p>
                               <p className="text-xs text-slate-500">
-                                request {usageMeta ? toShortRequestId(usageMeta.requestId) : "—"}
+                                {t("credits.transactions.request", { id: usageMeta ? toShortRequestId(usageMeta.requestId) : "—" })}
                               </p>
                             </div>
                           ) : null}
                           {transaction.type === "refund" ? (
                             <div className="space-y-1">
-                              <p>{transaction.packageCode ? `退款：方案 ${transaction.packageCode}` : "退款"}</p>
-                              <p className="text-xs text-slate-500">credits 已扣回</p>
+                              <p>{transaction.packageCode ? t("credits.transactions.refundWithPackage", { code: transaction.packageCode }) : t("credits.transactions.refund")}</p>
+                              <p className="text-xs text-slate-500">{t("credits.transactions.creditsReturned")}</p>
                             </div>
                           ) : null}
                           {transaction.type === "purchase" ? (
                             <div className="space-y-1">
-                              <p>{transaction.packageCode ? `方案 ${transaction.packageCode}` : "儲值"}</p>
-                              <p className="text-xs text-slate-500">provider：{transaction.provider ?? "—"}</p>
+                              <p>{transaction.packageCode ? t("credits.transactions.packageLabel", { code: transaction.packageCode }) : t("credits.transactions.topup")}</p>
+                              <p className="text-xs text-slate-500">{t("credits.transactions.provider", { provider: transaction.provider ?? "—" })}</p>
                             </div>
                           ) : null}
                           {transaction.type === "adjustment" ? (
-                            <p>{transaction.description || "manual adjustment"}</p>
+                            <p>{transaction.description || t("credits.transactions.manualAdjustment")}</p>
                           ) : null}
                           {transaction.type !== "usage" && transaction.type !== "purchase" && transaction.type !== "adjustment" ? (
                             <p>{transaction.description || "—"}</p>
@@ -665,7 +678,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
                         </td>
                         <td className="px-2 py-3 text-sm text-slate-700">{formatTransactionAmount(transaction)}</td>
                         <td className="px-2 py-3 text-sm text-slate-700">
-                          {formatTransactionDate(transaction.createdAt)}
+                          {formatTransactionDate(transaction.createdAt, locale)}
                         </td>
                       </tr>
                     );
@@ -674,7 +687,7 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
                 {filteredTransactions.length === 0 ? (
                   <tr className="border-t border-slate-100">
                     <td colSpan={5} className="px-2 py-6 text-center text-slate-500">
-                      尚無交易紀錄。
+                      {t("credits.transactions.empty")}
                     </td>
                   </tr>
                 ) : null}

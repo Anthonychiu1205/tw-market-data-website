@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AlertTriangle, X } from "lucide-react";
 
 import { buttonClass } from "@/src/components/ui/button";
@@ -16,22 +17,22 @@ type CancelSubscriptionButtonProps = {
   apiKeyWarning: string;
 };
 
-function errorMessage(error: Exclude<SubscriptionActionResult, { ok: true }>["error"]): string {
-  switch (error) {
-    case "unauthenticated":
-      return "登入狀態已失效，請重新登入後再試。";
-    case "no_subscription":
-      return "找不到有效訂閱，請重新整理頁面。";
-    default:
-      return "操作未完成，請稍後再試或聯繫我們。";
-  }
-}
-
 export function CancelSubscriptionButton({
   periodEndLabel,
   effectiveClause,
   apiKeyWarning,
 }: CancelSubscriptionButtonProps) {
+  const t = useTranslations("billing");
+  const errorMessage = (error: Exclude<SubscriptionActionResult, { ok: true }>["error"]): string => {
+    switch (error) {
+      case "unauthenticated":
+        return t("cancel.errors.unauthenticated");
+      case "no_subscription":
+        return t("cancel.errors.noSubscription");
+      default:
+        return t("cancel.errors.default");
+    }
+  };
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -110,7 +111,7 @@ export function CancelSubscriptionButton({
   return (
     <>
       <button type="button" className={buttonClass("danger")} onClick={() => setIsOpen(true)}>
-        取消訂閱
+        {t("cancel.trigger")}
       </button>
 
       {isOpen ? (
@@ -129,7 +130,7 @@ export function CancelSubscriptionButton({
               <button
                 type="button"
                 onClick={closeIfIdle}
-                aria-label="關閉"
+                aria-label={t("cancel.close")}
                 disabled={isPending}
                 className="absolute right-5 top-5 rounded-full p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50"
               >
@@ -139,12 +140,12 @@ export function CancelSubscriptionButton({
               <div className="flex items-center gap-2 text-red-600">
                 <AlertTriangle size={20} strokeWidth={1.9} />
                 <h2 id="cancel-subscription-title" className="text-xl font-semibold text-slate-950">
-                  確認取消訂閱
+                  {t("cancel.title")}
                 </h2>
               </div>
 
               <div id="cancel-subscription-description" className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
-                <p>取消採期末生效：服務可使用至 {periodEndLabel}，之後不再自動扣款。</p>
+                <p>{t("cancel.periodLine", { date: periodEndLabel })}</p>
                 <p>{effectiveClause}</p>
                 <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800">{apiKeyWarning}</p>
               </div>
@@ -158,10 +159,10 @@ export function CancelSubscriptionButton({
                   disabled={isPending}
                   className={buttonClass("secondary")}
                 >
-                  保留訂閱
+                  {t("cancel.keep")}
                 </button>
                 <button type="button" onClick={handleConfirm} disabled={isPending} className={buttonClass("danger")}>
-                  {isPending ? "處理中…" : "確認取消"}
+                  {isPending ? t("processing") : t("cancel.confirm")}
                 </button>
               </div>
             </div>

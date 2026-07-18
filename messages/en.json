@@ -945,6 +945,691 @@
       "next": "Next → <link>Source policy</link>"
     }
   },
+  "dashboard": {
+    "shell": {
+      "title": "Console",
+      "serviceStatus": "Service status",
+      "authUnavailableTitle": "Sign-in is temporarily unavailable. Please try again shortly.",
+      "authUnavailableBody": "If the problem persists, contact us for help.",
+      "fallbackDatasetLimit": "Core datasets (excludes the three financial statements)",
+      "fallbackRequestLimit": "500 included requests/month / RPM 60"
+    },
+    "nav": {
+      "overview": "Overview",
+      "billing": "Billing",
+      "billing-subscriptions": "Subscription",
+      "billing-credits": "Credits",
+      "usage": "Usage",
+      "settings": "Settings",
+      "docs": "Docs",
+      "tools": "Tools & MCP",
+      "support": "Support",
+      "upgrade": "Upgrade plan"
+    },
+    "mode": {
+      "live": "Connected",
+      "fallback": "Simplified mode"
+    },
+    "usageActivity": {
+      "title": "Activity & usage",
+      "monthlyRemaining": "Monthly remaining {remaining} / {quota}",
+      "usedLine": "Used {used} ({pct}%) · resets {reset}",
+      "rateLimitLine": "Rate limit {rate}/min · daily window resets around {reset}",
+      "requestsTodayLine": "Requests today: {count}",
+      "requests30dLine": "30-day requests: {count}",
+      "credits30dLine": "30-day {label}: {value}",
+      "recentErrors": "Recent errors: {list}",
+      "latestActive": "Last active: {date} · {count} requests",
+      "noActivity": "Not enough activity data yet."
+    },
+    "overview": {
+      "currentPlan": "Current plan: {plan}",
+      "inUseSuffix": " (active)",
+      "source": {
+        "subscription": "Plan data synced",
+        "backend": "Showing plan data from account summary for now",
+        "fallback": "No paid plan active yet"
+      },
+      "apiKeysStat": "API keys",
+      "requestsToday": "Requests today",
+      "requests30d": "30-day requests",
+      "availableCredits": "Available credits",
+      "currentMode": "Current mode: {mode}",
+      "quotaExhaustedTitle": "You’ve used up your quota",
+      "quotaExhaustedBody": "Upgrade your plan or buy credits to resume data queries.",
+      "upgradeCta": "Upgrade plan",
+      "apiKeysHeading": "API keys",
+      "activeKeys": "{count} active"
+    },
+    "keys": {
+      "title": "API keys",
+      "description": "Manage keys and last-used times.",
+      "listTitle": "Key list"
+    },
+    "settings": {
+      "planSection": "Plan",
+      "managePlan": "Manage plan",
+      "accountSection": "Account details",
+      "otherSection": "Other",
+      "logout": "Log out"
+    },
+    "docs": {
+      "title": "Docs",
+      "description": "Jump to onboarding docs and the API reference.",
+      "links": {
+        "quickStart": "Quick start",
+        "apiReference": "API reference",
+        "datasetCatalog": "Dataset catalog",
+        "sourcePolicy": "Source policy"
+      }
+    },
+    "support": {
+      "title": "Support",
+      "description": "Sales inquiries, data requests, and integration help.",
+      "contactCta": "Go to contact page",
+      "items": {
+        "sales": {
+          "title": "Sales inquiries",
+          "text": "Plans and procurement"
+        },
+        "data": {
+          "title": "Data requests",
+          "text": "Fields or coverage"
+        },
+        "integration": {
+          "title": "Integration support",
+          "text": "API onboarding and usage questions"
+        }
+      }
+    },
+    "chart": {
+      "requests": "Requests",
+      "dateLabel": "Date {label}"
+    },
+    "usagePage": {
+      "status": {
+        "success": "Success",
+        "unauthorized": "Unauthorized",
+        "insufficientCredits": "Insufficient credits",
+        "upstreamError": "Upstream error",
+        "pending": "Pending"
+      },
+      "requestsToday": "Requests today",
+      "requests30d": "30-day requests",
+      "credits30d": "30-day {label}",
+      "noData": "No data yet",
+      "reconcileLine": "Last {days} days: {events} requests · estimated cost {charged} credits · actual charged {actual} credits",
+      "reconcilePending": " · reconciliation pending",
+      "exhaustedTitle": "You’ve used up your quota",
+      "exhaustedBody": "Upgrade your plan or buy credits.",
+      "lowTitle": "Your quota is almost used up",
+      "lowBody": "Consider upgrading your plan or buying credits to avoid request interruptions.",
+      "upgradeCta": "Upgrade plan",
+      "dailyRequests": "Daily requests",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "endpointUsage": "Endpoint usage",
+      "noEndpointData": "No endpoint usage data yet",
+      "requestLog": "Request log",
+      "exportCsv": "Export CSV",
+      "col": {
+        "date": "Date",
+        "endpoint": "Endpoint",
+        "status": "Status",
+        "reconcile": "Reconciliation"
+      },
+      "copyRequestIdTitle": "Copy full requestId",
+      "collapse": "Collapse",
+      "expand": "Details",
+      "copied": "Copied",
+      "linked": "Linked",
+      "notCharged": "Not charged",
+      "notChargedDetail": "Not charged (dry-run or failed request)",
+      "noUsage": "No API request usage yet.",
+      "showingRecent": "Showing the {count} most recent",
+      "cappedNote": "Showing only the {limit} most recent",
+      "showingAll": "Showing all"
+    }
+  },
+  "account": {
+    "profile": {
+      "email": {
+        "label": "Email"
+      },
+      "accountStatus": "Account status",
+      "google": "Google: {status}",
+      "password": "Email/password: {status}",
+      "linked": "Linked",
+      "notLinked": "Not linked",
+      "configured": "Set",
+      "notConfigured": "Not set",
+      "displayName": {
+        "label": "Display name",
+        "placeholder": "e.g. Ant Wang"
+      },
+      "company": {
+        "label": "Company name",
+        "placeholder": "Company name (optional)"
+      },
+      "role": {
+        "label": "Role"
+      },
+      "useCase": {
+        "label": "Primary use case"
+      },
+      "selectPlaceholder": "Select…",
+      "save": "Save",
+      "saving": "Saving…",
+      "saveSuccess": "Account details updated.",
+      "loadError": "Unable to load your account details right now. Please try again later.",
+      "saveError": "Unable to save your account details right now. Please try again later.",
+      "roles": {
+        "developer": "AI agent development",
+        "quant_researcher": "Quantitative trading",
+        "data_team": "Enterprise team",
+        "founder": "SaaS / platform",
+        "other": "Other"
+      },
+      "useCases": {
+        "ai_agent": "AI agent",
+        "quantitative_research": "Market research / backtesting",
+        "internal_data_tool": "Internal data platform",
+        "trading_workflow": "Automated trading",
+        "product_integration": "Dashboard / app",
+        "other": "Other"
+      }
+    },
+    "delete": {
+      "title": "Delete account",
+      "subtitle": "Deleting your account revokes your API keys and cannot be undone.",
+      "button": "Delete",
+      "mailSubject": "Account deletion request",
+      "mailBody": "I'd like to delete my TW Market Data account.\n\nAccount email: {email}\n",
+      "error": "Unable to delete your account right now. Please try again later, or contact us for help.",
+      "done": {
+        "title": "Account deleted",
+        "body": "Your account and API keys have been deleted; the keys are now invalid.",
+        "retainedTitle": "Data retained by law",
+        "localNotDeleted": "Your API account was deleted, but your website login could not be removed at the same time. Contact {email} and we'll clear it manually.",
+        "close": "Done"
+      },
+      "confirm": {
+        "body": "This action <strong>cannot be undone</strong>. Your account and API keys will be deleted; the keys stop working immediately and can no longer call the API.",
+        "account": "Account: {email}",
+        "retentionNote": "Transaction and invoice records that tax and accounting rules require us to keep will be listed for you after deletion.",
+        "fallback": "Self-service deletion isn't available yet. Tap the button below to submit a deletion request; we'll process it manually and confirm by email.",
+        "cancel": "Cancel",
+        "submitRequest": "Submit deletion request",
+        "deleting": "Deleting…",
+        "confirm": "Confirm deletion"
+      }
+    },
+    "apiKeys": {
+      "neverUsed": "Never used",
+      "revokedBadge": "Revoked",
+      "table": {
+        "name": "Name",
+        "apiKey": "API Key",
+        "lastUsed": "Last used",
+        "actions": "Actions"
+      },
+      "created": {
+        "title": "New API key created",
+        "copyFull": "Copy full key",
+        "copied": "Copied",
+        "note": "Copy and store it now. If you don't, you can copy a new version from the table later."
+      },
+      "empty": "You have no active API keys.",
+      "showRevoked": "Show revoked keys ({count})",
+      "hideRevoked": "Hide revoked keys",
+      "copy": {
+        "aria": "Copy API key",
+        "revoked": "Revoked keys can't be copied",
+        "cannotCopy": "This key can't be copied again. Regenerate it to get a copyable version.",
+        "copying": "Copying…",
+        "copied": "Copied",
+        "label": "Copy"
+      },
+      "revoke": {
+        "aria": "Delete {name}",
+        "revokedTitle": "Revoked",
+        "revokeTitle": "Delete (revoke)",
+        "confirm": "Delete (revoke) API key “{name}”?"
+      },
+      "create": "Create",
+      "createModal": {
+        "title": "Create API key",
+        "nameLabel": "Name",
+        "namePlaceholder": "e.g. ai-hedge-fund",
+        "nameHint": "Name the key so you can recognize it later (1–40 characters, required).",
+        "cancel": "Cancel",
+        "creating": "Creating…",
+        "submit": "Create"
+      },
+      "toast": {
+        "copied": "API key copied to clipboard"
+      },
+      "footer": {
+        "hint": "API keys authenticate calls to the /v2 API. Keep them safe; if a key leaks, revoke it and create a new one immediately.",
+        "limit": " Your current plan can keep {limit} active keys."
+      },
+      "hints": {
+        "cannotCreate": "Your current plan can't create API keys. Upgrade your plan or contact us."
+      },
+      "errors": {
+        "invalidName": "Enter a key name between 1 and 40 characters.",
+        "limitReached": "You've reached your plan's key limit ({limit}). Revoke an unused key, or upgrade your plan to raise the limit.",
+        "limitReachedNoCount": "You've reached your plan's key limit. Revoke an unused key, or upgrade your plan to raise the limit.",
+        "subscriptionRequired": "The free tier doesn't include an API key. You can try 5 tickers (2330／2317／2454／0050／2603) with no key; to get an API key, choose a plan first.",
+        "entitlementInactive": "Your plan isn't active right now (payment may be pending, or it may have expired). Check the plan page and try again.",
+        "encryptionUnavailable": "We can't securely create a copyable key right now. Please try again later or contact an administrator.",
+        "createFailed": "Unable to create a key right now. Please try again later.",
+        "revokeFailed": "Unable to revoke the key right now. Please try again later.",
+        "secretUnavailable": "This key can't be copied again. Regenerate it to get a copyable version.",
+        "revoked": "Revoked keys can't be copied.",
+        "clipboardWriteFailed": "Couldn't write to the clipboard. Copy manually, or check your browser permissions.",
+        "copyFailed": "Couldn't copy the key. Try again later, or check your browser permissions."
+      },
+      "noKey": {
+        "title": "The free tier doesn't include an API key",
+        "body": "You can try 5 tickers (2330／2317／2454／0050／2603) <strong>without a key</strong>; to get an API key, choose a plan first.",
+        "viewPlans": "View plans",
+        "quickTrial": "No-key quick start"
+      }
+    },
+    "grantPlan": {
+      "emailLabel": "User email",
+      "planLabel": "Plan",
+      "submit": "Upgrade this account for free",
+      "processing": "Processing…",
+      "error": "Submission failed. Please try again later.",
+      "success": "Provisioned successfully",
+      "failed": "Provisioning failed"
+    }
+  },
+  "billing": {
+    "processing": "Processing…",
+    "contactUs": "Contact us",
+    "perMonth": "mo",
+    "resume": {
+      "button": "Resume subscription",
+      "error": "We couldn’t resume the subscription. Please try again shortly or contact us."
+    },
+    "portal": {
+      "manage": "Manage / cancel subscription",
+      "hint": "Cancel your subscription, update your payment method, or download invoices in the Polar Customer Portal."
+    },
+    "cancel": {
+      "trigger": "Cancel subscription",
+      "close": "Close",
+      "title": "Confirm cancellation",
+      "periodLine": "Cancellation takes effect at period end: service remains available until {date}, after which automatic billing stops.",
+      "keep": "Keep subscription",
+      "confirm": "Confirm cancellation",
+      "errors": {
+        "unauthenticated": "Your session has expired. Please sign in again and retry.",
+        "noSubscription": "No active subscription found. Please refresh the page.",
+        "default": "The action didn’t complete. Please try again shortly or contact us."
+      }
+    },
+    "landing": {
+      "title": "Billing",
+      "subtitle": "Manage your subscription plan, credits, and payment details.",
+      "currentPlanHeading": "Current plan",
+      "planLine": "Plan: {plan}",
+      "planPriceLine": "Plan price: {price}",
+      "statusLine": "Status: {status}",
+      "cycleLine": "Cycle: {cycle}",
+      "cycleYearly": "Yearly",
+      "cycleMonthly": "Monthly",
+      "periodEndLine": "Current period ends: {date}",
+      "cancelAtPeriodEndLine": "Cancel at period end: {state}",
+      "scheduled": "Scheduled",
+      "notScheduled": "Not scheduled",
+      "backToPricing": "Back to pricing",
+      "chooseAgain": "Choose a plan again",
+      "noPaidPlan": "No paid subscription is active yet.",
+      "subscriptionsCardTitle": "Subscription plans",
+      "subscriptionsCardBody": "Compare plans, switch between monthly and yearly, and choose the tier that fits you best.",
+      "subscriptionsCardCta": "Go to subscription plans",
+      "creditsCardTitle": "Credits",
+      "creditsCardBody": "View your credit balance, endpoint pricing, and transaction history.",
+      "creditsCardCta": "Go to Credits"
+    },
+    "subscriptions": {
+      "free": {
+        "summary": "{quota} requests/month · RPM {rpm} · 1 API key",
+        "tier": "Free tier",
+        "current": "Current: Free tier",
+        "upgradePrompt": "{summary}. Upgrade for higher quotas, more datasets, and more API keys."
+      },
+      "cancelSection": {
+        "title": "Cancel plan",
+        "body": "Cancellation takes effect at period end — service stays available until the end of the current period, with no immediate interruption and no refund."
+      },
+      "cancelPending": {
+        "title": "Cancellation scheduled",
+        "body": "Service remains available until {date}, after which automatic billing stops."
+      },
+      "current": {
+        "eyebrow": "Current plan",
+        "quota": "{quota} requests/month · RPM {rpm} · {keys} API keys",
+        "customQuota": "Custom quota",
+        "overageNote": "Once the included quota is used up, excess requests are billed from the credits wallet (overage); RPM is the per-minute rate limit, counted separately from quota and credits.",
+        "billingUnavailable": "Billing details are temporarily unavailable",
+        "serviceUntil": "Service available until {date}",
+        "nextCharge": "Next charge {date}",
+        "nextChargeAmount": "Next charge {date} ({amount})",
+        "adjustPlan": "Change plan"
+      },
+      "paymentMethod": {
+        "title": "Payment method",
+        "unavailable": "Payment method is temporarily unavailable. Please try again shortly.",
+        "none": "No payment method on file yet.",
+        "expires": "Expires {value}",
+        "default": "Default",
+        "change": "Update payment method",
+        "set": "Add payment method"
+      },
+      "invoices": {
+        "title": "Billing history",
+        "unavailable": "Billing history is temporarily unavailable. Please try again shortly.",
+        "none": "No billing history yet.",
+        "number": "Invoice {number}",
+        "invoiceLink": "Invoice"
+      },
+      "invoiceStatus": {
+        "paid": "Paid",
+        "pending": "Pending",
+        "refunded": "Refunded",
+        "partiallyRefunded": "Partially refunded",
+        "void": "Void",
+        "draft": "Draft"
+      }
+    },
+    "credits": {
+      "balance": {
+        "title": "Balance",
+        "subtitle": "Available credits balance",
+        "refresh": "Refresh balance",
+        "lastActivity": "Last activity: {date}",
+        "lastActivityNone": "Last activity: none yet",
+        "zeroNote": "You have no credits available yet — a balance of 0 is normal; it will appear after you top up or subscribe."
+      },
+      "costTable": {
+        "title": "API endpoints",
+        "subtitle": "Credit cost per API call",
+        "dataset": "Dataset",
+        "endpoint": "Endpoint",
+        "cost": "Usage cost",
+        "note": "Credit usage depends on endpoint cost and request volume (currently showing: {mode})."
+      },
+      "billingMethod": {
+        "title": "How billing works",
+        "b1": "Subscription plans include a monthly request quota; API requests draw from this quota first, leaving the credits wallet untouched.",
+        "b2": "Once the included quota is used up, excess requests are charged from the credits wallet at the endpoint costs above (overage).",
+        "b3": "When the included quota is exhausted and the wallet balance is insufficient, requests are rejected (top up or upgrade your plan).",
+        "b4": "RPM (requests per minute) is a rate safeguard, counted separately from the monthly quota and credits.",
+        "dryRunNote": "Billing is in dry-run mode: requests record an estimated cost but are not yet charged to credits or your card.",
+        "enabledNote": "Billing is active: requests beyond the included quota are charged at the endpoint costs."
+      },
+      "reconciliation": {
+        "title": "Usage / credits reconciliation (last {days} days)",
+        "detail": "Usage events: {events} · Estimated usage cost (incl. dry-run): {estimated} · Credits actually charged: {charged} · Wallet balance: {balance}",
+        "dryRunHint": "Currently in dry-run mode; some requests have not yet entered the live charging flow.",
+        "noData": "No reconciliation data yet",
+        "partial": "Some requests are not yet reconciled",
+        "ok": "Reconciled",
+        "mismatch": "Needs manual review: {mismatched} amount mismatches · {duplicate} duplicate charges · {orphan} charges with no matching request"
+      },
+      "topup": {
+        "title": "Top-up packs",
+        "subtitle": "Flexibly replenish usage — priced above subscription included credits, ideal for short-term spikes.",
+        "plan": "Pack",
+        "amount": "Amount",
+        "creditsGranted": "Credits granted",
+        "unitPrice": "Price / credit",
+        "buy": "Buy",
+        "bestValue": "Best value",
+        "openingCheckout": "Opening checkout…",
+        "note": "After payment, Polar notifies us and credits are added to your wallet automatically; if they don’t appear yet, refresh in a moment.",
+        "errors": {
+          "checkoutUnavailable": "Checkout can’t open right now. Please try again shortly.",
+          "unauthenticated": "Please sign in before purchasing.",
+          "default": "This top-up pack is temporarily unavailable."
+        }
+      },
+      "saveCard": {
+        "title": "Save with a subscription plan",
+        "body": "Switching to a subscription lowers your per-call cost and gives you more stability and quota.",
+        "cta": "View plans"
+      },
+      "spend": {
+        "title": "Spending",
+        "prevMonth": "Previous month",
+        "nextMonth": "Next month",
+        "empty": "No spending recorded yet. Once you top up or subscribe, actual transactions appear here.",
+        "usdOnly": "The chart counts USD only. You have historical transactions priced in NT dollars that are not merged into this chart (different currencies can’t be added directly).",
+        "tooltipDate": "Date {date}"
+      },
+      "transactions": {
+        "title": "Transaction history",
+        "exportCsv": "Export CSV",
+        "type": "Type",
+        "description": "Description",
+        "creditsChange": "Credits change",
+        "amount": "Amount",
+        "date": "Date",
+        "filter": {
+          "all": "All",
+          "usage": "API usage",
+          "purchase": "Top-up",
+          "refund": "Refund",
+          "adjustment": "Manual adjustment"
+        },
+        "typeLabel": {
+          "purchase": "Top-up",
+          "refund": "Refund",
+          "usage": "API usage",
+          "adjustment": "Manual adjustment",
+          "other": "Other"
+        },
+        "statusLabel": {
+          "completed": "Completed",
+          "pending": "Confirming",
+          "failed": "Failed",
+          "cancelled": "Cancelled",
+          "expired": "Expired",
+          "simulated": "Simulated",
+          "unconfirmed": "Unconfirmed"
+        },
+        "request": "request {id}",
+        "refundWithPackage": "Refund: pack {code}",
+        "refund": "Refund",
+        "creditsReturned": "Credits returned",
+        "packageLabel": "Pack {code}",
+        "topup": "Top-up",
+        "provider": "provider: {provider}",
+        "manualAdjustment": "manual adjustment",
+        "empty": "No transactions yet."
+      }
+    }
+  },
+  "aiResearch": {
+    "title": "AI Research",
+    "badge": {
+      "proPlus": "Pro+ feature",
+      "simulationOnly": "Simulation only",
+      "notInvestmentAdvice": "Not investment advice"
+    },
+    "intro": "Generate auditable research conclusions, risk checks, and simulated decisions from a Taiwan-stock data workflow.",
+    "planAvailability": "Available on the Pro, Team, and Enterprise plans; Developer provides mock preview only.",
+    "form": {
+      "ticker": "Ticker",
+      "asOfDate": "As-of date",
+      "previewPlan": "Preview plan (local mock)",
+      "mode": "Mode",
+      "runLabel": "Run",
+      "run": "Run research",
+      "running": "Running...",
+      "planLocked": "Plan not available"
+    },
+    "meta": {
+      "currentPlan": "Current plan: {plan}",
+      "status": "AI Research: {status}",
+      "monthlyRuns": "Monthly research runs: {quota}",
+      "mode": "Mode: {mode}"
+    },
+    "dataSource": {
+      "title": "Data source status",
+      "local": {
+        "label": "Local mock",
+        "description": "Uses the browser's built-in deterministic mock response; the backend is not called."
+      },
+      "proxy": {
+        "label": "tw-ai mock proxy",
+        "description": "Calls the tw-ai mock endpoint through the local internal proxy."
+      },
+      "fallback": {
+        "label": "Proxy unavailable; reverted to local mock",
+        "description": "The backend mock proxy is temporarily unavailable; the page has fallen back to the local deterministic mock."
+      }
+    },
+    "noCredits": "This is a local mock entitlement; no credits are deducted.",
+    "englishNotice": "The research output below is currently available in Chinese only; English versions are coming soon.",
+    "summary": {
+      "actionCandidate": "Candidate action",
+      "confidence": "Confidence score",
+      "riskDecision": "Risk decision",
+      "portfolioAction": "Portfolio action",
+      "simulationStatus": "Simulation status"
+    },
+    "coverage": {
+      "title": "Data coverage status"
+    },
+    "availabilityHint": {
+      "ready": "TWSE price data for the past 6 months is available, allowing the Market Data Analyst to enter mock-real.",
+      "unavailable": "No price data found for this ticker; the Market Data Analyst will be marked as missing.",
+      "betaLimited": "TPEx historical depth is not yet complete, so the research workflow can only fall back conservatively.",
+      "degraded": "A data-coverage limitation was detected; the research workflow degrades conservatively and stays at no_action."
+    },
+    "technicalFixtureNote": "The technical view is currently a deterministic fixture, shown only for the mock research workflow; it does not represent full live technical analysis.",
+    "timeline": {
+      "title": "Research workflow"
+    },
+    "analysts": {
+      "title": "Analyst overview",
+      "planStatus": "Current plan: {plan} · {status}",
+      "table": {
+        "analyst": "Analyst",
+        "stance": "Stance",
+        "confidence": "Confidence",
+        "status": "Status",
+        "keyData": "Key data",
+        "dataGaps": "Data gaps"
+      }
+    },
+    "bullCase": "Bull case",
+    "bearCase": "Bear case",
+    "charts": {
+      "title": "Chart analysis",
+      "confidenceTitle": "Analyst confidence scores",
+      "coverageTitle": "Research coverage status"
+    },
+    "risk": {
+      "title": "Risk review",
+      "decision": "Risk decision",
+      "maxAllocation": "Max allocation",
+      "requiredConfirmation": "Requires user confirmation"
+    },
+    "order": {
+      "title": "Simulated order",
+      "status": "Order status",
+      "simulationOnly": "Simulation only",
+      "brokerExecution": "Broker execution",
+      "reason": "Reason: {reason}",
+      "note": "This is simulated research output; no broker order is ever created."
+    },
+    "dataGaps": {
+      "title": "Data gaps"
+    },
+    "warnings": {
+      "title": "Risk notes"
+    },
+    "entitlementStatus": {
+      "free": "Not available",
+      "starter": "Preview",
+      "pro": "Enabled",
+      "max": "Full",
+      "developer": "Full",
+      "enterprise": "Custom"
+    },
+    "entitlementQuota": {
+      "free": "0 / mo",
+      "starter": "5 previews / mo",
+      "pro": "100 research runs / mo",
+      "max": "1000 research runs / mo",
+      "developer": "High-frequency research quota",
+      "enterprise": "Custom"
+    },
+    "entitlementHelper": {
+      "free": "AI Research is not available on this plan.",
+      "starter": "Mock preview only — suitable for development and validation workflows.",
+      "pro": "Provides a single-ticker basic research workflow with a decision log.",
+      "max": "Includes batch research and simulated portfolio (this round shows UI only, no functional implementation).",
+      "developer": "Highest self-serve research quota, including batch and simulated portfolio (this round shows UI only).",
+      "enterprise": "Supports planning custom workflows and custom quotas (this round shows UI only, no functional implementation)."
+    },
+    "entitlementUpgrade": {
+      "free": "AI Research is a paid feature. Upgrade to Starter or above to use it."
+    },
+    "terminal": {
+      "title": "Research Terminal",
+      "comingSoon": "Coming soon",
+      "description": "An online research workbench built on official Taiwan-stock data: factors, data review, and research workflows in one place.",
+      "descriptionEnabled": " Once signed in, you can jump straight here without signing in again.",
+      "descriptionDisabled": " Stay tuned.",
+      "enter": "Open Research Terminal"
+    }
+  },
+  "requestPlayground": {
+    "requestHeading": "Request",
+    "currentPlan": "Current plan: {planName}",
+    "responseHeading": "Response",
+    "fields": {
+      "endpoint": "Endpoint",
+      "apiKey": "API key",
+      "symbol": "Symbol",
+      "period": "Period",
+      "limit": "Limit",
+      "startDate": "Start date",
+      "endDate": "End date"
+    },
+    "actions": {
+      "submit": "Send",
+      "submitting": "Sending…",
+      "copyResponse": "Copy response",
+      "downloadResponse": "Download response"
+    },
+    "status": {
+      "createKeyFirst": "Create an API key first.",
+      "planInactive": "Your plan isn't active yet — choose a plan.",
+      "noEndpoints": "No playground endpoints are available on your current plan.",
+      "copied": "Copied",
+      "emptyResponse": "No request sent yet"
+    },
+    "errors": {
+      "secretUnavailable": "This key can't be used (created too early to recover the full key). Regenerate a key and try again.",
+      "missingApiKey": "Select an API key first.",
+      "missingSymbol": "This endpoint requires a symbol.",
+      "invalidEndpoint": "This endpoint is unavailable — choose another.",
+      "backendUnavailable": "The data service is temporarily unavailable — try again later.",
+      "requestFailedCode": "Request failed: {code}",
+      "requestFailedStatus": "Request failed: HTTP {status}",
+      "sendFailed": "Couldn't send the request — try again later.",
+      "copyFailed": "Couldn't copy the response — check browser permissions."
+    }
+  },
   "common": {
     "englishComingSoon": "English version coming soon.",
     "illustrativeData": "Illustrative data — not real-time quotes",

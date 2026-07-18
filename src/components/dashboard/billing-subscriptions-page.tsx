@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { Suspense, type ComponentType } from "react";
+import type { ComponentType } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Activity,
   AlertTriangle,
@@ -20,6 +20,8 @@ import {
   Zap,
 } from "lucide-react";
 
+import { Link } from "@/src/i18n/navigation";
+import type { AppLocale } from "@/src/i18n/locales";
 import { cn } from "@/src/lib/cn";
 import { formatMoney } from "@/src/lib/billing/money";
 import {
@@ -36,12 +38,11 @@ import {
   type SubscriptionStatusTone,
 } from "@/src/lib/billing/status";
 import {
-  CANCELLATION_API_KEY_DOWNGRADE_WARNING,
-  CANCELLATION_EFFECTIVE_AT_PERIOD_END,
+  getCancellationApiKeyDowngradeWarning,
+  getCancellationEffectiveAtPeriodEnd,
 } from "@/src/lib/legal/cancellation-copy";
 import { CancelSubscriptionButton } from "@/src/components/dashboard/cancel-subscription-button";
 import { ResumeSubscriptionButton } from "@/src/components/dashboard/resume-subscription-button";
-import { BillingPortalNotice } from "@/src/components/dashboard/billing-portal-notice";
 import type {
   PolarBillingSnapshot,
   PolarInvoice,
@@ -100,14 +101,10 @@ function formatDateYmd(date: Date | null): string {
 }
 
 export function BillingSubscriptionsPage({ currentPlanId, polar }: BillingSubscriptionsPageProps) {
-  return (
-    <>
-      <Suspense fallback={null}>
-        <BillingPortalNotice />
-      </Suspense>
-      {!currentPlanId ? <FreeUpgradeView /> : <PaidBillingView planId={currentPlanId} polar={polar} />}
-    </>
-  );
+  if (!currentPlanId) {
+    return <FreeUpgradeView />;
+  }
+  return <PaidBillingView planId={currentPlanId} polar={polar} />;
 }
 
 // ---------------------------------------------------------------------------
@@ -115,18 +112,23 @@ export function BillingSubscriptionsPage({ currentPlanId, polar }: BillingSubscr
 // ---------------------------------------------------------------------------
 
 function FreeUpgradeView() {
-  const plans = getBillingSubscriptionPlanViews();
+  const t = useTranslations("billing");
+  const locale = useLocale() as AppLocale;
+  const plans = getBillingSubscriptionPlanViews(locale);
   const freeLimits = getPlanRequestLimits("free");
   const freeSummary =
     freeLimits.monthlyRequestQuota !== null && freeLimits.rateLimitPerMin !== null
-      ? `每月 ${freeLimits.monthlyRequestQuota.toLocaleString("en-US")} 次・RPM ${freeLimits.rateLimitPerMin}・1 把 API 金鑰`
-      : "免費層";
+      ? t("subscriptions.free.summary", {
+          quota: freeLimits.monthlyRequestQuota.toLocaleString("en-US"),
+          rpm: freeLimits.rateLimitPerMin,
+        })
+      : t("subscriptions.free.tier");
 
   return (
     <div className="py-8">
       <section className="mx-auto mb-5 max-w-6xl rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-        <p className="text-sm font-medium text-slate-900">目前：免費層</p>
-        <p className="mt-1 text-sm text-slate-600">{freeSummary}。升級以取得更高配額、更多資料集與 API 金鑰。</p>
+        <p className="text-sm font-medium text-slate-900">{t("subscriptions.free.current")}</p>
+        <p className="mt-1 text-sm text-slate-600">{t("subscriptions.free.upgradePrompt", { summary: freeSummary })}</p>
       </section>
 
       <section className="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -149,8 +151,8 @@ function FreeUpgradeView() {
 
                 <div className="pt-1">
                   <p className="whitespace-nowrap text-4xl font-medium tracking-tight text-slate-900">
-                    {formatPlanPrice(plan.monthlyAmountMinor, plan.currency)}
-                    <span className="ml-1.5 inline-block align-baseline text-sm font-normal text-slate-400"> / 月</span>
+                    {formatPlanPrice(plan.monthlyAmountMinor, plan.currency, locale)}
+                    <span className="ml-1.5 inline-block align-baseline text-sm font-normal text-slate-400"> / {t("perMonth")}</span>
                   </p>
                 </div>
 
@@ -190,6 +192,8 @@ function FreeUpgradeView() {
 // ---------------------------------------------------------------------------
 
 function PaidBillingView({ planId, polar }: { planId: PaidPlanCode; polar: PolarBillingSnapshot | null }) {
+  const t = useTranslations("billing");
+  const locale = useLocale() as AppLocale;
   const subResult = polar?.subscription ?? null;
   const sub = subResult?.ok ? subResult.data : null;
   const subError = subResult !== null && !subResult.ok;
@@ -207,15 +211,13 @@ function PaidBillingView({ planId, polar }: { planId: PaidPlanCode; polar: Polar
 
       {sub && !cancelPending ? (
         <section className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h3 className="text-sm font-semibold text-slate-900">取消方案</h3>
-          <p className="mt-1 text-sm text-slate-600">
-            取消採期末生效，服務可使用至目前週期結束，不立即中斷、不退款。
-          </p>
+          <h3 className="text-sm font-semibold text-slate-900">{t("subscriptions.cancelSection.title")}</h3>
+          <p className="mt-1 text-sm text-slate-600">{t("subscriptions.cancelSection.body")}</p>
           <div className="mt-4">
             <CancelSubscriptionButton
               periodEndLabel={formatDateYmd(sub.currentPeriodEnd ?? sub.endsAt)}
-              effectiveClause={CANCELLATION_EFFECTIVE_AT_PERIOD_END}
-              apiKeyWarning={CANCELLATION_API_KEY_DOWNGRADE_WARNING}
+              effectiveClause={getCancellationEffectiveAtPeriodEnd(locale)}
+              apiKeyWarning={getCancellationApiKeyDowngradeWarning(locale)}
             />
           </div>
         </section>
@@ -225,14 +227,15 @@ function PaidBillingView({ planId, polar }: { planId: PaidPlanCode; polar: Polar
 }
 
 function CancelPendingBanner({ sub }: { sub: PolarSubscriptionDetail }) {
+  const t = useTranslations("billing");
   const untilDate = formatDateYmd(sub.endsAt ?? sub.currentPeriodEnd);
   return (
     <section className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800">
       <div className="flex items-start gap-3">
         <AlertTriangle size={18} strokeWidth={1.8} className="mt-0.5 shrink-0" />
         <div>
-          <p className="text-sm font-medium">已排定取消</p>
-          <p className="mt-1 text-sm">服務可使用至 {untilDate}，之後不再自動扣款。</p>
+          <p className="text-sm font-medium">{t("subscriptions.cancelPending.title")}</p>
+          <p className="mt-1 text-sm">{t("subscriptions.cancelPending.body", { date: untilDate })}</p>
           <ResumeSubscriptionButton />
         </div>
       </div>
@@ -251,32 +254,36 @@ function CurrentPlanCard({
   subError: boolean;
   cancelPending: boolean;
 }) {
+  const t = useTranslations("billing");
+  const locale = useLocale() as AppLocale;
   const plan = BILLING_PLANS[planId];
   const limits = getPlanRequestLimits(planId);
   const quotaSummary =
     limits.monthlyRequestQuota !== null && limits.rateLimitPerMin !== null
-      ? `每月 ${limits.monthlyRequestQuota.toLocaleString("en-US")} 次・RPM ${limits.rateLimitPerMin.toLocaleString("en-US")}・${plan.apiKeyLimit ?? "—"} 把 API 金鑰`
-      : "客製配額";
+      ? t("subscriptions.current.quota", {
+          quota: limits.monthlyRequestQuota.toLocaleString("en-US"),
+          rpm: limits.rateLimitPerMin.toLocaleString("en-US"),
+          keys: plan.apiKeyLimit ?? "—",
+        })
+      : t("subscriptions.current.customQuota");
   const periodEnd = sub?.currentPeriodEnd ?? sub?.endsAt ?? null;
   const statusValue = sub?.status ?? "active";
-  const badgeLabel = getSubscriptionStatusLabel(statusValue, cancelPending);
+  const badgeLabel = getSubscriptionStatusLabel(statusValue, cancelPending, locale);
   const badgeTone = getSubscriptionStatusTone(statusValue, cancelPending);
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">目前方案</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-400">{t("subscriptions.current.eyebrow")}</p>
           <div className="mt-1 flex items-baseline gap-2">
             <h2 className="text-2xl font-semibold tracking-tight text-slate-900">{plan.displayName}</h2>
             <span className="text-sm text-slate-500">
-              {formatPlanPrice(plan.monthlyAmountMinor, plan.currency)} / 月
+              {formatPlanPrice(plan.monthlyAmountMinor, plan.currency, locale)} / {t("perMonth")}
             </span>
           </div>
           <p className="mt-2 text-sm text-slate-600">{quotaSummary}</p>
-          <p className="mt-1 text-xs text-slate-500">
-            included 額度用盡後，超額請求以 credits 錢包計費（overage）；RPM 為每分鐘速率上限，與額度／credits 分開計算。
-          </p>
+          <p className="mt-1 text-xs text-slate-500">{t("subscriptions.current.overageNote")}</p>
         </div>
         <span className={cn("shrink-0 rounded-full border px-3 py-1 text-xs font-medium", BADGE_TONE_CLASS[badgeTone])}>
           {badgeLabel}
@@ -287,14 +294,18 @@ function CurrentPlanCard({
         <span className="inline-flex items-center gap-2">
           <CalendarClock size={15} strokeWidth={1.8} className="text-slate-400" />
           {subError ? (
-            <span className="text-slate-400">扣款資訊暫時無法讀取</span>
+            <span className="text-slate-400">{t("subscriptions.current.billingUnavailable")}</span>
           ) : cancelPending ? (
-            <span>服務可用至 {formatDateYmd(periodEnd)}</span>
-          ) : (
+            <span>{t("subscriptions.current.serviceUntil", { date: formatDateYmd(periodEnd) })}</span>
+          ) : sub?.amountMinor != null ? (
             <span>
-              下次扣款日 {formatDateYmd(periodEnd)}
-              {sub?.amountMinor != null ? `（${formatMoney(sub.amountMinor, sub.currency)}）` : ""}
+              {t("subscriptions.current.nextChargeAmount", {
+                date: formatDateYmd(periodEnd),
+                amount: formatMoney(sub.amountMinor, sub.currency),
+              })}
             </span>
+          ) : (
+            <span>{t("subscriptions.current.nextCharge", { date: formatDateYmd(periodEnd) })}</span>
           )}
         </span>
 
@@ -302,7 +313,7 @@ function CurrentPlanCard({
           href="/pricing"
           className="ml-auto inline-flex h-9 items-center rounded-lg border border-slate-200 px-3 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
         >
-          調整方案
+          {t("subscriptions.current.adjustPlan")}
         </Link>
       </div>
     </section>
@@ -310,27 +321,30 @@ function CurrentPlanCard({
 }
 
 function PaymentMethodCard({ result }: { result: PolarReadResult<PolarPaymentMethod | null> | null }) {
+  const t = useTranslations("billing");
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6">
       <div className="flex items-center gap-2">
         <CreditCard size={16} strokeWidth={1.8} className="text-slate-400" />
-        <h3 className="text-sm font-semibold text-slate-900">付款方式</h3>
+        <h3 className="text-sm font-semibold text-slate-900">{t("subscriptions.paymentMethod.title")}</h3>
       </div>
       <div className="mt-3 text-sm">
         {result === null || !result.ok ? (
-          <p className="text-slate-400">付款方式暫時無法讀取，請稍後再試。</p>
+          <p className="text-slate-400">{t("subscriptions.paymentMethod.unavailable")}</p>
         ) : result.data === null ? (
-          <p className="text-slate-500">尚未綁定付款方式。</p>
+          <p className="text-slate-500">{t("subscriptions.paymentMethod.none")}</p>
         ) : (
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-slate-700">
             <span className="font-medium capitalize">{result.data.brand}</span>
             <span className="tracking-widest text-slate-500">•••• {result.data.last4}</span>
             <span className="text-slate-400">
-              到期 {String(result.data.expMonth).padStart(2, "0")}/{result.data.expYear}
+              {t("subscriptions.paymentMethod.expires", {
+                value: `${String(result.data.expMonth).padStart(2, "0")}/${result.data.expYear}`,
+              })}
             </span>
             {result.data.isDefault ? (
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] text-slate-500">
-                預設
+                {t("subscriptions.paymentMethod.default")}
               </span>
             ) : null}
           </div>
@@ -342,7 +356,7 @@ function PaymentMethodCard({ result }: { result: PolarReadResult<PolarPaymentMet
             href="/api/billing/portal"
             className="inline-flex h-8 items-center rounded-lg border border-slate-200 px-3 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
           >
-            {result.data ? "更換付款方式" : "設定付款方式"}
+            {result.data ? t("subscriptions.paymentMethod.change") : t("subscriptions.paymentMethod.set")}
           </a>
         </div>
       ) : null}
@@ -350,51 +364,55 @@ function PaymentMethodCard({ result }: { result: PolarReadResult<PolarPaymentMet
   );
 }
 
-const INVOICE_STATUS_LABEL: Record<string, string> = {
-  paid: "已付款",
-  pending: "處理中",
-  refunded: "已退款",
-  partially_refunded: "部分退款",
-  void: "已作廢",
-  draft: "草稿",
+const INVOICE_STATUS_KEY: Record<string, string> = {
+  paid: "paid",
+  pending: "pending",
+  refunded: "refunded",
+  partially_refunded: "partiallyRefunded",
+  void: "void",
+  draft: "draft",
 };
 
 function InvoicesCard({ result }: { result: PolarReadResult<PolarInvoice[]> | null }) {
+  const t = useTranslations("billing");
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6">
       <div className="flex items-center gap-2">
         <ReceiptText size={16} strokeWidth={1.8} className="text-slate-400" />
-        <h3 className="text-sm font-semibold text-slate-900">扣款紀錄</h3>
+        <h3 className="text-sm font-semibold text-slate-900">{t("subscriptions.invoices.title")}</h3>
       </div>
       <div className="mt-3 text-sm">
         {result === null || !result.ok ? (
-          <p className="text-slate-400">扣款紀錄暫時無法讀取，請稍後再試。</p>
+          <p className="text-slate-400">{t("subscriptions.invoices.unavailable")}</p>
         ) : result.data.length === 0 ? (
-          <p className="text-slate-500">尚無扣款紀錄。</p>
+          <p className="text-slate-500">{t("subscriptions.invoices.none")}</p>
         ) : (
           <ul className="divide-y divide-slate-100">
-            {result.data.map((invoice) => (
-              <li key={invoice.id} className="flex items-center justify-between gap-4 py-2.5">
-                <div className="min-w-0">
-                  <p className="text-slate-800">{formatDateYmd(invoice.createdAt)}</p>
-                  {invoice.invoiceNumber ? (
-                    <p className="truncate text-xs text-slate-400">發票 {invoice.invoiceNumber}</p>
-                  ) : null}
-                </div>
-                <div className="flex items-center gap-3 whitespace-nowrap">
-                  <span className="text-slate-700">{formatMoney(invoice.amountMinor, invoice.currency)}</span>
-                  <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] text-slate-500">
-                    {INVOICE_STATUS_LABEL[invoice.status.toLowerCase()] ?? invoice.status}
-                  </span>
-                  <a
-                    href={`/api/billing/invoice/${invoice.id}`}
-                    className="text-xs font-medium text-slate-500 underline underline-offset-2 transition hover:text-slate-800"
-                  >
-                    發票
-                  </a>
-                </div>
-              </li>
-            ))}
+            {result.data.map((invoice) => {
+              const statusKey = INVOICE_STATUS_KEY[invoice.status.toLowerCase()];
+              return (
+                <li key={invoice.id} className="flex items-center justify-between gap-4 py-2.5">
+                  <div className="min-w-0">
+                    <p className="text-slate-800">{formatDateYmd(invoice.createdAt)}</p>
+                    {invoice.invoiceNumber ? (
+                      <p className="truncate text-xs text-slate-400">{t("subscriptions.invoices.number", { number: invoice.invoiceNumber })}</p>
+                    ) : null}
+                  </div>
+                  <div className="flex items-center gap-3 whitespace-nowrap">
+                    <span className="text-slate-700">{formatMoney(invoice.amountMinor, invoice.currency)}</span>
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] text-slate-500">
+                      {statusKey ? t(`subscriptions.invoiceStatus.${statusKey}`) : invoice.status}
+                    </span>
+                    <a
+                      href={`/api/billing/invoice/${invoice.id}`}
+                      className="text-xs font-medium text-slate-500 underline underline-offset-2 transition hover:text-slate-800"
+                    >
+                      {t("subscriptions.invoices.invoiceLink")}
+                    </a>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>

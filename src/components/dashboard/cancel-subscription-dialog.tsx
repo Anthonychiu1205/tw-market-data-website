@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import { buttonClass } from "@/src/components/ui/button";
 
 type SubscriptionInfo = {
@@ -19,6 +21,7 @@ function isManageableStatus(status: string) {
  * external id (= NextAuth user id) and redirects to Polar.
  */
 export function CancelSubscriptionDialog({ subscription }: CancelSubscriptionDialogProps) {
+  const t = useTranslations("billing");
   if (!isManageableStatus(subscription.status)) {
     return null;
   }
@@ -26,9 +29,9 @@ export function CancelSubscriptionDialog({ subscription }: CancelSubscriptionDia
   return (
     <div className="mt-5 space-y-2">
       <a href="/api/billing/portal" className={buttonClass("secondary", "h-10 rounded-lg px-4 text-xs")}>
-        管理 / 取消訂閱
+        {t("portal.manage")}
       </a>
-      <p className="text-xs text-slate-500">於 Polar Customer Portal 取消訂閱、更新付款方式或下載發票。</p>
+      <p className="text-xs text-slate-500">{t("portal.hint")}</p>
     </div>
   );
 }

@@ -945,6 +945,691 @@
       "next": "下一步 → <link>來源政策</link>"
     }
   },
+  "dashboard": {
+    "shell": {
+      "title": "控制台",
+      "serviceStatus": "服務狀態",
+      "authUnavailableTitle": "登入服務暫時不可用，請稍後再試。",
+      "authUnavailableBody": "如果問題持續發生，請聯繫我們協助排查。",
+      "fallbackDatasetLimit": "基礎資料集（不含財報三表）",
+      "fallbackRequestLimit": "每月 included 500 requests / RPM 60"
+    },
+    "nav": {
+      "overview": "總覽",
+      "billing": "帳務",
+      "billing-subscriptions": "訂閱方案",
+      "billing-credits": "Credits 點數",
+      "usage": "用量",
+      "settings": "設定",
+      "docs": "文件",
+      "tools": "Tools & MCP",
+      "support": "支援",
+      "upgrade": "升級方案"
+    },
+    "mode": {
+      "live": "已連接",
+      "fallback": "簡化模式"
+    },
+    "usageActivity": {
+      "title": "活動與用量",
+      "monthlyRemaining": "月度剩餘 {remaining} / {quota}",
+      "usedLine": "已使用 {used}（{pct}%）・重置於 {reset}",
+      "rateLimitLine": "速率限制 {rate} / 分鐘 ・日視窗參考重置於 {reset}",
+      "requestsTodayLine": "今日請求：{count}",
+      "requests30dLine": "30 天請求：{count}",
+      "credits30dLine": "30 天 {label}：{value}",
+      "recentErrors": "最近錯誤：{list}",
+      "latestActive": "最近活躍：{date} · {count} 次",
+      "noActivity": "目前尚無足夠活動資料。"
+    },
+    "overview": {
+      "currentPlan": "目前方案：{plan}",
+      "inUseSuffix": "（使用中）",
+      "source": {
+        "subscription": "方案資料已同步",
+        "backend": "方案資料暫以帳戶摘要顯示",
+        "fallback": "目前尚未啟用付費方案"
+      },
+      "apiKeysStat": "API keys",
+      "requestsToday": "今日請求",
+      "requests30d": "30 天請求",
+      "availableCredits": "可用 credits",
+      "currentMode": "目前模式：{mode}",
+      "quotaExhaustedTitle": "您的使用額度已用完",
+      "quotaExhaustedBody": "請升級方案或購買 credits，恢復資料查詢。",
+      "upgradeCta": "升級方案",
+      "apiKeysHeading": "API 金鑰",
+      "activeKeys": "啟用中 {count} 把"
+    },
+    "keys": {
+      "title": "API 金鑰",
+      "description": "管理金鑰與最近使用時間。",
+      "listTitle": "金鑰清單"
+    },
+    "settings": {
+      "planSection": "方案",
+      "managePlan": "管理方案",
+      "accountSection": "帳戶資料",
+      "otherSection": "其他",
+      "logout": "登出"
+    },
+    "docs": {
+      "title": "文件",
+      "description": "快速進入導入文件與 API 參考。",
+      "links": {
+        "quickStart": "快速上手",
+        "apiReference": "API 參考",
+        "datasetCatalog": "資料集目錄",
+        "sourcePolicy": "來源政策"
+      }
+    },
+    "support": {
+      "title": "支援",
+      "description": "商務洽詢、資料需求與整合協助。",
+      "contactCta": "前往聯絡頁",
+      "items": {
+        "sales": {
+          "title": "商務洽詢",
+          "text": "方案與採購流程"
+        },
+        "data": {
+          "title": "資料需求",
+          "text": "欄位或覆蓋範圍"
+        },
+        "integration": {
+          "title": "整合支援",
+          "text": "API 導入與用量問題"
+        }
+      }
+    },
+    "chart": {
+      "requests": "請求數",
+      "dateLabel": "日期 {label}"
+    },
+    "usagePage": {
+      "status": {
+        "success": "成功",
+        "unauthorized": "未授權",
+        "insufficientCredits": "credits 不足",
+        "upstreamError": "上游錯誤",
+        "pending": "待確認"
+      },
+      "requestsToday": "今日請求",
+      "requests30d": "30 天請求",
+      "credits30d": "30 天{label}",
+      "noData": "尚無資料",
+      "reconcileLine": "近 {days} 天：{events} 筆請求 · 估算成本 {charged} credits · 實際扣點 {actual} credits",
+      "reconcilePending": " · 有待對帳項目",
+      "exhaustedTitle": "您的使用額度已用完",
+      "exhaustedBody": "請升級方案或購買 credits。",
+      "lowTitle": "您的使用額度即將用完",
+      "lowBody": "建議先升級方案或購買 credits，避免請求中斷。",
+      "upgradeCta": "升級方案",
+      "dailyRequests": "每日請求",
+      "prevMonth": "上個月",
+      "nextMonth": "下個月",
+      "endpointUsage": "端點使用",
+      "noEndpointData": "尚無端點使用資料",
+      "requestLog": "請求記錄",
+      "exportCsv": "匯出 CSV",
+      "col": {
+        "date": "日期",
+        "endpoint": "端點",
+        "status": "狀態",
+        "reconcile": "對帳"
+      },
+      "copyRequestIdTitle": "複製完整 requestId",
+      "collapse": "收合",
+      "expand": "詳細",
+      "copied": "已複製",
+      "linked": "已連結",
+      "notCharged": "未扣點",
+      "notChargedDetail": "未扣點（dry-run 或失敗請求）",
+      "noUsage": "尚無 API request usage。",
+      "showingRecent": "顯示最近 {count} 筆",
+      "cappedNote": "僅顯示最近 {limit} 筆",
+      "showingAll": "已顯示全部"
+    }
+  },
+  "account": {
+    "profile": {
+      "email": {
+        "label": "電子郵件"
+      },
+      "accountStatus": "帳號狀態",
+      "google": "Google：{status}",
+      "password": "Email/password：{status}",
+      "linked": "已連結",
+      "notLinked": "未連結",
+      "configured": "已設定",
+      "notConfigured": "未設定",
+      "displayName": {
+        "label": "顯示名稱",
+        "placeholder": "例如：Ant Wang"
+      },
+      "company": {
+        "label": "公司名稱",
+        "placeholder": "公司名稱（可選）"
+      },
+      "role": {
+        "label": "角色類型"
+      },
+      "useCase": {
+        "label": "主要使用情境"
+      },
+      "selectPlaceholder": "請選擇",
+      "save": "儲存",
+      "saving": "儲存中...",
+      "saveSuccess": "帳戶資料已更新。",
+      "loadError": "目前無法讀取帳戶資料，請稍後再試。",
+      "saveError": "目前無法儲存帳戶資料，請稍後再試。",
+      "roles": {
+        "developer": "AI Agent 開發",
+        "quant_researcher": "量化交易",
+        "data_team": "企業團隊",
+        "founder": "SaaS / 平台",
+        "other": "其他"
+      },
+      "useCases": {
+        "ai_agent": "AI Agent",
+        "quantitative_research": "市場研究 / 回測",
+        "internal_data_tool": "內部資料平台",
+        "trading_workflow": "自動化交易",
+        "product_integration": "Dashboard / App",
+        "other": "其他"
+      }
+    },
+    "delete": {
+      "title": "刪除帳號",
+      "subtitle": "刪除後 API 金鑰將被撤銷，且無法復原。",
+      "button": "刪除",
+      "mailSubject": "帳號刪除申請 (Account deletion request)",
+      "mailBody": "我要求刪除我的 TW Market Data 帳號。\n\n帳號 Email：{email}\n",
+      "error": "目前無法刪除帳號，請稍後再試，或聯繫我們協助處理。",
+      "done": {
+        "title": "帳號已刪除",
+        "body": "你的帳號與 API 金鑰已刪除，金鑰即刻失效。",
+        "retainedTitle": "依法保留的資料",
+        "localNotDeleted": "API 帳號已刪除，但網站登入資料未能一併移除。請聯繫 {email} 讓我們手動清除。",
+        "close": "完成"
+      },
+      "confirm": {
+        "body": "這個動作<strong>無法復原</strong>。你的帳號與 API 金鑰會被刪除，金鑰即刻失效、無法再呼叫 API。",
+        "account": "帳號：{email}",
+        "retentionNote": "依稅務／會計法令必須保留的交易與發票紀錄，會在刪除後向你列出。",
+        "fallback": "自助刪除目前尚未開放。請點下方送出刪除申請，我們會人工處理並回信確認。",
+        "cancel": "取消",
+        "submitRequest": "送出刪除申請",
+        "deleting": "刪除中…",
+        "confirm": "確認刪除"
+      }
+    },
+    "apiKeys": {
+      "neverUsed": "尚未使用",
+      "revokedBadge": "已撤銷",
+      "table": {
+        "name": "Name",
+        "apiKey": "API Key",
+        "lastUsed": "Last used",
+        "actions": "Actions"
+      },
+      "created": {
+        "title": "新 API 金鑰已建立",
+        "copyFull": "複製完整金鑰",
+        "copied": "已複製",
+        "note": "請立即複製並妥善保存。若未保存，可稍後在表格中再次複製新版本金鑰。"
+      },
+      "empty": "目前沒有可用中的 API key。",
+      "showRevoked": "顯示已撤銷金鑰（{count}）",
+      "hideRevoked": "隱藏已撤銷金鑰",
+      "copy": {
+        "aria": "複製 API 金鑰",
+        "revoked": "已撤銷金鑰不可複製",
+        "cannotCopy": "此金鑰無法再次複製，請重新產生以取得可複製版本",
+        "copying": "複製中…",
+        "copied": "已複製",
+        "label": "複製"
+      },
+      "revoke": {
+        "aria": "刪除 {name}",
+        "revokedTitle": "已撤銷",
+        "revokeTitle": "刪除（撤銷）",
+        "confirm": "確定要刪除（撤銷）API 金鑰「{name}」嗎？"
+      },
+      "create": "Create",
+      "createModal": {
+        "title": "建立 API 金鑰",
+        "nameLabel": "名稱",
+        "namePlaceholder": "例如 ai-hedge-fund",
+        "nameHint": "為金鑰命名以便日後辨識（1–40 字，必填）。",
+        "cancel": "取消",
+        "creating": "建立中...",
+        "submit": "建立"
+      },
+      "toast": {
+        "copied": "API key 已複製到剪貼簿"
+      },
+      "footer": {
+        "hint": "API key 可用於呼叫 /v2 API。請妥善保存，若外洩請立即撤銷並重建。",
+        "limit": "目前方案可保留 {limit} 把啟用中的金鑰。"
+      },
+      "hints": {
+        "cannotCreate": "目前方案無法新增 API 金鑰，請升級方案或聯繫我們。"
+      },
+      "errors": {
+        "invalidName": "請輸入 1 到 40 字的金鑰名稱。",
+        "limitReached": "已達方案金鑰上限（{limit} 把）。請先撤銷未使用的金鑰，或升級方案以提高上限。",
+        "limitReachedNoCount": "已達方案金鑰上限。請先撤銷未使用的金鑰，或升級方案以提高上限。",
+        "subscriptionRequired": "免費層不含 API key。你可以直接免金鑰試 5 檔（2330／2317／2454／0050／2603）；要取得 API key 請先選擇方案。",
+        "entitlementInactive": "你的方案目前未生效（可能待付款或已到期）。請至方案頁確認後再試。",
+        "encryptionUnavailable": "目前無法安全建立可複製的金鑰，請稍後再試或聯繫管理員。",
+        "createFailed": "目前無法建立金鑰，請稍後再試。",
+        "revokeFailed": "目前無法撤銷金鑰，請稍後再試。",
+        "secretUnavailable": "此金鑰無法再次複製，請重新產生以取得可複製版本。",
+        "revoked": "已撤銷的金鑰無法複製。",
+        "clipboardWriteFailed": "無法寫入剪貼簿，請手動複製或檢查瀏覽器權限。",
+        "copyFailed": "無法複製金鑰，請稍後再試或檢查瀏覽器權限。"
+      },
+      "noKey": {
+        "title": "免費層不含 API key",
+        "body": "你可以<strong>免金鑰</strong>直接試 5 檔（2330／2317／2454／0050／2603）；要取得 API key 請先選擇方案。",
+        "viewPlans": "查看方案",
+        "quickTrial": "免金鑰快速試用"
+      }
+    },
+    "grantPlan": {
+      "emailLabel": "使用者 Email",
+      "planLabel": "方案",
+      "submit": "免費升級此帳號",
+      "processing": "處理中…",
+      "error": "送出失敗，請稍後再試。",
+      "success": "已成功開通",
+      "failed": "開通失敗"
+    }
+  },
+  "billing": {
+    "processing": "處理中…",
+    "contactUs": "聯繫我們",
+    "perMonth": "月",
+    "resume": {
+      "button": "恢復訂閱",
+      "error": "恢復訂閱未完成，請稍後再試或聯繫我們。"
+    },
+    "portal": {
+      "manage": "管理 / 取消訂閱",
+      "hint": "於 Polar Customer Portal 取消訂閱、更新付款方式或下載發票。"
+    },
+    "cancel": {
+      "trigger": "取消訂閱",
+      "close": "關閉",
+      "title": "確認取消訂閱",
+      "periodLine": "取消採期末生效：服務可使用至 {date}，之後不再自動扣款。",
+      "keep": "保留訂閱",
+      "confirm": "確認取消",
+      "errors": {
+        "unauthenticated": "登入狀態已失效，請重新登入後再試。",
+        "noSubscription": "找不到有效訂閱，請重新整理頁面。",
+        "default": "操作未完成，請稍後再試或聯繫我們。"
+      }
+    },
+    "landing": {
+      "title": "帳務",
+      "subtitle": "管理訂閱方案、credits 與付款相關資訊。",
+      "currentPlanHeading": "目前方案",
+      "planLine": "方案：{plan}",
+      "planPriceLine": "方案價格：{price}",
+      "statusLine": "狀態：{status}",
+      "cycleLine": "週期：{cycle}",
+      "cycleYearly": "年繳",
+      "cycleMonthly": "月繳",
+      "periodEndLine": "目前區間結束：{date}",
+      "cancelAtPeriodEndLine": "期末取消：{state}",
+      "scheduled": "已排定",
+      "notScheduled": "未排定",
+      "backToPricing": "返回方案價格",
+      "chooseAgain": "重新選擇方案",
+      "noPaidPlan": "目前尚未啟用付費訂閱方案。",
+      "subscriptionsCardTitle": "訂閱方案",
+      "subscriptionsCardBody": "查看方案、切換月繳/年繳，並選擇最適合的訂閱層級。",
+      "subscriptionsCardCta": "前往訂閱方案",
+      "creditsCardTitle": "Credits",
+      "creditsCardBody": "查看 credit balance、端點計價與交易紀錄。",
+      "creditsCardCta": "前往 Credits"
+    },
+    "subscriptions": {
+      "free": {
+        "summary": "每月 {quota} 次・RPM {rpm}・1 把 API 金鑰",
+        "tier": "免費層",
+        "current": "目前：免費層",
+        "upgradePrompt": "{summary}。升級以取得更高配額、更多資料集與 API 金鑰。"
+      },
+      "cancelSection": {
+        "title": "取消方案",
+        "body": "取消採期末生效，服務可使用至目前週期結束，不立即中斷、不退款。"
+      },
+      "cancelPending": {
+        "title": "已排定取消",
+        "body": "服務可使用至 {date}，之後不再自動扣款。"
+      },
+      "current": {
+        "eyebrow": "目前方案",
+        "quota": "每月 {quota} 次・RPM {rpm}・{keys} 把 API 金鑰",
+        "customQuota": "客製配額",
+        "overageNote": "included 額度用盡後，超額請求以 credits 錢包計費（overage）；RPM 為每分鐘速率上限，與額度／credits 分開計算。",
+        "billingUnavailable": "扣款資訊暫時無法讀取",
+        "serviceUntil": "服務可用至 {date}",
+        "nextCharge": "下次扣款日 {date}",
+        "nextChargeAmount": "下次扣款日 {date}（{amount}）",
+        "adjustPlan": "調整方案"
+      },
+      "paymentMethod": {
+        "title": "付款方式",
+        "unavailable": "付款方式暫時無法讀取，請稍後再試。",
+        "none": "尚未綁定付款方式。",
+        "expires": "到期 {value}",
+        "default": "預設",
+        "change": "更換付款方式",
+        "set": "設定付款方式"
+      },
+      "invoices": {
+        "title": "扣款紀錄",
+        "unavailable": "扣款紀錄暫時無法讀取，請稍後再試。",
+        "none": "尚無扣款紀錄。",
+        "number": "發票 {number}",
+        "invoiceLink": "發票"
+      },
+      "invoiceStatus": {
+        "paid": "已付款",
+        "pending": "處理中",
+        "refunded": "已退款",
+        "partiallyRefunded": "部分退款",
+        "void": "已作廢",
+        "draft": "草稿"
+      }
+    },
+    "credits": {
+      "balance": {
+        "title": "餘額",
+        "subtitle": "可用 credits 餘額",
+        "refresh": "刷新餘額",
+        "lastActivity": "最近異動：{date}",
+        "lastActivityNone": "最近異動：尚無紀錄",
+        "zeroNote": "目前尚無可用 credits，餘額為 0 屬正常狀態；儲值或訂閱後即會顯示。"
+      },
+      "costTable": {
+        "title": "API 端點",
+        "subtitle": "每次 API 呼叫的 credits 成本",
+        "dataset": "資料集",
+        "endpoint": "端點",
+        "cost": "使用成本",
+        "note": "credits 使用量取決於端點成本與請求量（目前顯示：{mode}）。"
+      },
+      "billingMethod": {
+        "title": "計費方式",
+        "b1": "訂閱方案每月含 included 請求額度；API 請求優先扣此額度，credits 錢包不受影響。",
+        "b2": "included 額度用盡後，超額請求才依上方端點成本從 credits 錢包扣點（overage）。",
+        "b3": "included 已用盡且錢包餘額不足時，請求會被拒絕（需儲值或升級方案）。",
+        "b4": "RPM（每分鐘請求上限）為速率保護，與月額度／credits 分開計算。",
+        "dryRunNote": "目前為計費試算模式：請求會記錄估算成本，但尚未實際扣點或扣款。",
+        "enabledNote": "計費已啟用：超出 included 額度的請求會依端點成本實際扣點。"
+      },
+      "reconciliation": {
+        "title": "使用量 / Credits 對帳（近 {days} 天）",
+        "detail": "使用事件：{events} · 預估用量成本（含試算）：{estimated} · 實際扣點 credits：{charged} · 錢包餘額：{balance}",
+        "dryRunHint": "目前為試算模式，部分請求尚未進入正式扣點流程。",
+        "noData": "尚無對帳資料",
+        "partial": "部分 request 尚未完成對帳",
+        "ok": "對帳正常",
+        "mismatch": "需人工確認：金額不一致 {mismatched} 筆 · 重複扣點 {duplicate} 筆 · 扣點無對應請求 {orphan} 筆"
+      },
+      "topup": {
+        "title": "儲值方案",
+        "subtitle": "彈性補充用量，價格高於訂閱 included credits，適合短期尖峰需求。",
+        "plan": "方案",
+        "amount": "金額",
+        "creditsGranted": "入帳 credits",
+        "unitPrice": "單價 / credit",
+        "buy": "購買",
+        "bestValue": "最划算",
+        "openingCheckout": "開啟結帳…",
+        "note": "付款完成後由 Polar 通知入帳，credits 會自動加進錢包；若尚未顯示，稍候重新整理即可。",
+        "errors": {
+          "checkoutUnavailable": "目前無法開啟結帳，請稍後再試。",
+          "unauthenticated": "請先登入後再購買。",
+          "default": "此儲值方案暫時無法購買。"
+        }
+      },
+      "saveCard": {
+        "title": "使用訂閱方案節省成本",
+        "body": "改用訂閱方案可降低單次呼叫成本，並取得更高穩定性與配額。",
+        "cta": "查看方案"
+      },
+      "spend": {
+        "title": "花費",
+        "prevMonth": "上個月",
+        "nextMonth": "下個月",
+        "empty": "目前沒有花費紀錄。儲值或訂閱後,這裡會顯示實際交易。",
+        "usdOnly": "圖表僅計 USD。你有以新台幣計價的歷史交易,未併入此圖(不同幣別不可直接相加)。",
+        "tooltipDate": "日期 {date}"
+      },
+      "transactions": {
+        "title": "交易記錄",
+        "exportCsv": "匯出 CSV",
+        "type": "類型",
+        "description": "說明",
+        "creditsChange": "credits 變化",
+        "amount": "金額",
+        "date": "日期",
+        "filter": {
+          "all": "全部",
+          "usage": "API 使用",
+          "purchase": "儲值",
+          "refund": "退款",
+          "adjustment": "手動調整"
+        },
+        "typeLabel": {
+          "purchase": "儲值",
+          "refund": "退款",
+          "usage": "API 使用",
+          "adjustment": "手動調整",
+          "other": "其他"
+        },
+        "statusLabel": {
+          "completed": "已完成",
+          "pending": "確認中",
+          "failed": "失敗",
+          "cancelled": "已取消",
+          "expired": "已逾時",
+          "simulated": "模擬",
+          "unconfirmed": "待確認"
+        },
+        "request": "request {id}",
+        "refundWithPackage": "退款：方案 {code}",
+        "refund": "退款",
+        "creditsReturned": "credits 已扣回",
+        "packageLabel": "方案 {code}",
+        "topup": "儲值",
+        "provider": "provider：{provider}",
+        "manualAdjustment": "manual adjustment",
+        "empty": "尚無交易紀錄。"
+      }
+    }
+  },
+  "aiResearch": {
+    "title": "AI Research",
+    "badge": {
+      "proPlus": "Pro+ 功能",
+      "simulationOnly": "僅模擬",
+      "notInvestmentAdvice": "非投資建議"
+    },
+    "intro": "使用台股資料流程產生可審計的研究結論、風險檢查與模擬決策。",
+    "planAvailability": "開放 Pro、Team、Enterprise 方案使用；Developer 僅提供 mock 預覽。",
+    "form": {
+      "ticker": "股票代碼",
+      "asOfDate": "資料日期",
+      "previewPlan": "預覽方案（本地 mock）",
+      "mode": "模式",
+      "runLabel": "執行",
+      "run": "執行研究",
+      "running": "執行中...",
+      "planLocked": "方案未開放"
+    },
+    "meta": {
+      "currentPlan": "目前方案：{plan}",
+      "status": "AI Research：{status}",
+      "monthlyRuns": "每月研究次數：{quota}",
+      "mode": "模式：{mode}"
+    },
+    "dataSource": {
+      "title": "資料來源狀態",
+      "local": {
+        "label": "本地 mock",
+        "description": "使用瀏覽器內建 deterministic mock response，未呼叫後端。"
+      },
+      "proxy": {
+        "label": "tw-ai mock proxy",
+        "description": "透過本機 internal proxy 呼叫 tw-ai mock endpoint。"
+      },
+      "fallback": {
+        "label": "proxy 不可用，已切回本地 mock",
+        "description": "後端 mock proxy 暫時不可用，頁面已使用本地 deterministic mock fallback。"
+      }
+    },
+    "noCredits": "目前為本地 mock entitlement，不扣除 credits。",
+    "englishNotice": "以下研究輸出目前僅提供中文版，英文版將陸續推出。",
+    "summary": {
+      "actionCandidate": "研究動作候選",
+      "confidence": "信心分數",
+      "riskDecision": "風控判斷",
+      "portfolioAction": "投組動作",
+      "simulationStatus": "模擬狀態"
+    },
+    "coverage": {
+      "title": "資料覆蓋狀態"
+    },
+    "availabilityHint": {
+      "ready": "近 6 個月 TWSE 價格資料可用，允許 Market Data Analyst 進入 mock-real。",
+      "unavailable": "找不到此 ticker 的價格資料，Market Data Analyst 將標記為 missing。",
+      "betaLimited": "TPEx 歷史深度尚未完成，研究流程僅能保守回退。",
+      "degraded": "偵測到資料覆蓋限制，研究流程將保守降級並維持 no_action。"
+    },
+    "technicalFixtureNote": "技術面目前為 deterministic fixture，僅供 mock 研究流程展示，不代表完整實盤技術分析。",
+    "timeline": {
+      "title": "研究流程"
+    },
+    "analysts": {
+      "title": "分析師總覽",
+      "planStatus": "目前方案：{plan} · {status}",
+      "table": {
+        "analyst": "分析師",
+        "stance": "立場",
+        "confidence": "信心",
+        "status": "狀態",
+        "keyData": "關鍵資料",
+        "dataGaps": "資料缺口"
+      }
+    },
+    "bullCase": "多方觀點（Bull Case）",
+    "bearCase": "空方觀點（Bear Case）",
+    "charts": {
+      "title": "圖表分析",
+      "confidenceTitle": "分析師信心分數",
+      "coverageTitle": "研究覆蓋狀態"
+    },
+    "risk": {
+      "title": "風控審查",
+      "decision": "風控判斷",
+      "maxAllocation": "最大配置",
+      "requiredConfirmation": "需要使用者確認"
+    },
+    "order": {
+      "title": "模擬訂單",
+      "status": "訂單狀態",
+      "simulationOnly": "僅模擬",
+      "brokerExecution": "券商下單",
+      "reason": "原因：{reason}",
+      "note": "這是模擬研究輸出，不會建立任何券商委託單。"
+    },
+    "dataGaps": {
+      "title": "資料缺口"
+    },
+    "warnings": {
+      "title": "風險提示"
+    },
+    "entitlementStatus": {
+      "free": "未開放",
+      "starter": "預覽",
+      "pro": "已啟用",
+      "max": "完整",
+      "developer": "完整",
+      "enterprise": "客製"
+    },
+    "entitlementQuota": {
+      "free": "0 次 / 月",
+      "starter": "5 次預覽 / 月",
+      "pro": "100 次研究 / 月",
+      "max": "1000 次研究 / 月",
+      "developer": "高頻研究額度",
+      "enterprise": "Custom"
+    },
+    "entitlementHelper": {
+      "free": "此方案不開放 AI Research。",
+      "starter": "Mock preview only，適合開發驗證流程。",
+      "pro": "提供單一 ticker 基本研究流程與 decision log。",
+      "max": "可用 batch 研究與 simulated portfolio（本輪僅顯示 UI，不做功能實作）。",
+      "developer": "最高自助研究額度，含 batch 與 simulated portfolio（本輪僅顯示 UI）。",
+      "enterprise": "可規劃 custom workflow 與客製配額（本輪僅顯示 UI，不做功能實作）。"
+    },
+    "entitlementUpgrade": {
+      "free": "AI Research 為付費功能。請升級至 Starter 以上方案使用。"
+    },
+    "terminal": {
+      "title": "投研終端",
+      "comingSoon": "即將推出",
+      "description": "以官方台股資料為底的線上投研工作台：因子、資料檢視與研究流程，一站完成。",
+      "descriptionEnabled": "登入後可從此直達，無需重新登入。",
+      "descriptionDisabled": "敬請期待。",
+      "enter": "進入投研終端"
+    }
+  },
+  "requestPlayground": {
+    "requestHeading": "Request",
+    "currentPlan": "目前方案：{planName}",
+    "responseHeading": "Response",
+    "fields": {
+      "endpoint": "端點",
+      "apiKey": "API key",
+      "symbol": "股票代號",
+      "period": "期間",
+      "limit": "筆數",
+      "startDate": "開始日期",
+      "endDate": "結束日期"
+    },
+    "actions": {
+      "submit": "發送",
+      "submitting": "送出中...",
+      "copyResponse": "Copy response",
+      "downloadResponse": "Download response"
+    },
+    "status": {
+      "createKeyFirst": "請先建立 API 金鑰。",
+      "planInactive": "目前方案尚未啟用，請選擇方案。",
+      "noEndpoints": "目前方案尚無可用 playground endpoint。",
+      "copied": "已複製",
+      "emptyResponse": "尚未送出請求"
+    },
+    "errors": {
+      "secretUnavailable": "這把金鑰無法取用（建立時間過早，無法還原完整金鑰）。請重新產生一把金鑰後再試。",
+      "missingApiKey": "請先選擇一把 API 金鑰。",
+      "missingSymbol": "此端點需要輸入股票代號。",
+      "invalidEndpoint": "此端點無法使用，請重新選擇。",
+      "backendUnavailable": "資料服務暫時無法連線，請稍後再試。",
+      "requestFailedCode": "請求失敗：{code}",
+      "requestFailedStatus": "請求失敗：HTTP {status}",
+      "sendFailed": "目前無法送出 request，請稍後再試。",
+      "copyFailed": "無法複製回應內容，請檢查瀏覽器權限。"
+    }
+  },
   "common": {
     "englishComingSoon": "English version coming soon.",
     "illustrativeData": "示意資料，非即時行情",

@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
+import { Link } from "@/src/i18n/navigation";
 import { ContactModal } from "@/src/components/layout/contact-modal";
 import { cn } from "@/src/lib/cn";
 import {
@@ -133,6 +134,7 @@ function leafIsActive(item: DashboardLeafNavItem, section: DashboardSection, cur
 }
 
 export function DashboardSidebar({ email, section, plan, currentPath, currentHref }: DashboardSidebarProps) {
+  const t = useTranslations("dashboard");
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const activeGroupIds = useMemo(() => {
     const ids = new Set<string>();
@@ -176,7 +178,7 @@ export function DashboardSidebar({ email, section, plan, currentPath, currentHre
 
   return (
     <aside className="h-full overflow-y-auto px-2 py-1">
-      <p className="text-sm font-semibold text-slate-900">控制台</p>
+      <p className="text-sm font-semibold text-slate-900">{t("shell.title")}</p>
       <p className="mt-1 text-xs text-slate-500">{plan} · {email}</p>
 
       <nav className="mt-5 space-y-0">
@@ -214,7 +216,7 @@ export function DashboardSidebar({ email, section, plan, currentPath, currentHre
                             hasActiveChild ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700",
                           )}
                         />
-                        <span className="font-medium text-slate-700">{node.label}</span>
+                        <span className="font-medium text-slate-700">{t(`nav.${node.id}`)}</span>
                       </span>
                       <ChevronIcon open={isOpen} className="text-slate-500" />
                     </button>
@@ -241,7 +243,7 @@ export function DashboardSidebar({ email, section, plan, currentPath, currentHre
                                   active ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700",
                                 )}
                               />
-                              <span>{child.label}</span>
+                              <span>{t(`nav.${child.id}`)}</span>
                             </Link>
                           );
                         })}
@@ -274,7 +276,7 @@ export function DashboardSidebar({ email, section, plan, currentPath, currentHre
                         active ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700",
                       )}
                     />
-                    <span>{node.label}</span>
+                    <span>{t(`nav.${node.id}`)}</span>
                   </button>
                 );
               }
@@ -299,7 +301,7 @@ export function DashboardSidebar({ email, section, plan, currentPath, currentHre
                       active ? "text-slate-900" : "text-slate-500 group-hover:text-slate-700",
                     )}
                   />
-                  <span>{node.label}</span>
+                  <span>{t(`nav.${node.id}`)}</span>
                 </Link>
               );
             })}

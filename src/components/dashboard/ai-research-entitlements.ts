@@ -1,19 +1,23 @@
 export type AiResearchPlan = "free" | "starter" | "pro" | "max" | "developer" | "enterprise";
 
+// I18N-01 (PR3): display copy moved to the `aiResearch` message namespace. `displayName`, `modeLabel`
+// and `access` stay as literal identifiers (plan/mode names shown identically in both locales); the
+// zh-only prose fields (status / quota / helper / upgrade) became message-key references resolved at
+// render via t(key). Numbers in the quota strings are mirrored exactly across en/zh (鐵律 2).
 export type AiResearchEntitlement = {
   plan: AiResearchPlan;
   displayName: string;
   access: "blocked" | "preview" | "basic" | "full" | "custom";
   canRunResearch: boolean;
   modeLabel: string;
-  quotaLabel: string;
   commercialUse: boolean;
   batch: boolean;
   simulatedPortfolio: boolean;
   customWorkflow: boolean;
-  statusLabel: string;
-  helperCopy: string;
-  upgradeCopy: string | null;
+  quotaKey: string;
+  statusKey: string;
+  helperKey: string;
+  upgradeKey: string | null;
 };
 
 const ENTITLEMENTS: Record<AiResearchPlan, AiResearchEntitlement> = {
@@ -23,14 +27,14 @@ const ENTITLEMENTS: Record<AiResearchPlan, AiResearchEntitlement> = {
     access: "blocked",
     canRunResearch: false,
     modeLabel: "Unavailable",
-    quotaLabel: "0 次 / 月",
     commercialUse: false,
     batch: false,
     simulatedPortfolio: false,
     customWorkflow: false,
-    statusLabel: "未開放",
-    helperCopy: "此方案不開放 AI Research。",
-    upgradeCopy: "AI Research 為付費功能。請升級至 Starter 以上方案使用。",
+    quotaKey: "entitlementQuota.free",
+    statusKey: "entitlementStatus.free",
+    helperKey: "entitlementHelper.free",
+    upgradeKey: "entitlementUpgrade.free",
   },
   starter: {
     plan: "starter",
@@ -38,14 +42,14 @@ const ENTITLEMENTS: Record<AiResearchPlan, AiResearchEntitlement> = {
     access: "preview",
     canRunResearch: true,
     modeLabel: "Mock Preview",
-    quotaLabel: "5 次預覽 / 月",
     commercialUse: true,
     batch: false,
     simulatedPortfolio: false,
     customWorkflow: false,
-    statusLabel: "預覽",
-    helperCopy: "Mock preview only，適合開發驗證流程。",
-    upgradeCopy: null,
+    quotaKey: "entitlementQuota.starter",
+    statusKey: "entitlementStatus.starter",
+    helperKey: "entitlementHelper.starter",
+    upgradeKey: null,
   },
   pro: {
     plan: "pro",
@@ -53,14 +57,14 @@ const ENTITLEMENTS: Record<AiResearchPlan, AiResearchEntitlement> = {
     access: "basic",
     canRunResearch: true,
     modeLabel: "Basic",
-    quotaLabel: "100 次研究 / 月",
     commercialUse: true,
     batch: false,
     simulatedPortfolio: false,
     customWorkflow: false,
-    statusLabel: "已啟用",
-    helperCopy: "提供單一 ticker 基本研究流程與 decision log。",
-    upgradeCopy: null,
+    quotaKey: "entitlementQuota.pro",
+    statusKey: "entitlementStatus.pro",
+    helperKey: "entitlementHelper.pro",
+    upgradeKey: null,
   },
   max: {
     plan: "max",
@@ -68,14 +72,14 @@ const ENTITLEMENTS: Record<AiResearchPlan, AiResearchEntitlement> = {
     access: "full",
     canRunResearch: true,
     modeLabel: "Full",
-    quotaLabel: "1000 次研究 / 月",
     commercialUse: true,
     batch: true,
     simulatedPortfolio: true,
     customWorkflow: false,
-    statusLabel: "完整",
-    helperCopy: "可用 batch 研究與 simulated portfolio（本輪僅顯示 UI，不做功能實作）。",
-    upgradeCopy: null,
+    quotaKey: "entitlementQuota.max",
+    statusKey: "entitlementStatus.max",
+    helperKey: "entitlementHelper.max",
+    upgradeKey: null,
   },
   developer: {
     plan: "developer",
@@ -83,14 +87,14 @@ const ENTITLEMENTS: Record<AiResearchPlan, AiResearchEntitlement> = {
     access: "full",
     canRunResearch: true,
     modeLabel: "Full+",
-    quotaLabel: "高頻研究額度",
     commercialUse: true,
     batch: true,
     simulatedPortfolio: true,
     customWorkflow: false,
-    statusLabel: "完整",
-    helperCopy: "最高自助研究額度，含 batch 與 simulated portfolio（本輪僅顯示 UI）。",
-    upgradeCopy: null,
+    quotaKey: "entitlementQuota.developer",
+    statusKey: "entitlementStatus.developer",
+    helperKey: "entitlementHelper.developer",
+    upgradeKey: null,
   },
   enterprise: {
     plan: "enterprise",
@@ -98,14 +102,14 @@ const ENTITLEMENTS: Record<AiResearchPlan, AiResearchEntitlement> = {
     access: "custom",
     canRunResearch: true,
     modeLabel: "Custom",
-    quotaLabel: "Custom",
     commercialUse: true,
     batch: true,
     simulatedPortfolio: true,
     customWorkflow: true,
-    statusLabel: "客製",
-    helperCopy: "可規劃 custom workflow 與客製配額（本輪僅顯示 UI，不做功能實作）。",
-    upgradeCopy: null,
+    quotaKey: "entitlementQuota.enterprise",
+    statusKey: "entitlementStatus.enterprise",
+    helperKey: "entitlementHelper.enterprise",
+    upgradeKey: null,
   },
 };
 

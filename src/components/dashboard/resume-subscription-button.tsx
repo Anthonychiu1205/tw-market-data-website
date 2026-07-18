@@ -2,11 +2,13 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { resumeSubscription } from "@/src/lib/billing/subscription-actions";
 
 /** Undo a scheduled cancellation (sets cancelAtPeriodEnd back to false via Polar). */
 export function ResumeSubscriptionButton() {
+  const t = useTranslations("billing");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -19,7 +21,7 @@ export function ResumeSubscriptionButton() {
         // Re-read the confirmed state from Polar rather than optimistically flipping.
         router.refresh();
       } else {
-        setError("恢復訂閱未完成，請稍後再試或聯繫我們。");
+        setError(t("resume.error"));
       }
     });
   };
@@ -32,7 +34,7 @@ export function ResumeSubscriptionButton() {
         disabled={isPending}
         className="inline-flex h-9 items-center rounded-lg border border-amber-300 bg-white px-3 text-xs font-medium text-amber-800 transition hover:bg-amber-100 disabled:opacity-50"
       >
-        {isPending ? "處理中…" : "恢復訂閱"}
+        {isPending ? t("processing") : t("resume.button")}
       </button>
       {error ? <p className="mt-2 text-xs text-red-600">{error}</p> : null}
     </div>
