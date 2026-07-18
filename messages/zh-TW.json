@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "product": "產品功能",
+    "pricing": "方案價格",
+    "docs": "文件",
+    "blog": "觀點文章",
+    "contact": "聯絡我們",
+    "dashboard": "儀表板",
+    "signIn": "登入",
+    "getStarted": "開始使用",
+    "siteMap": "網站導覽"
+  },
+  "common": {
+    "englishComingSoon": "English version coming soon."
+  }
+}

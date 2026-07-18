@@ -1,0 +1,16 @@
+{
+  "nav": {
+    "product": "Product",
+    "pricing": "Pricing",
+    "docs": "Docs",
+    "blog": "Blog",
+    "contact": "Contact",
+    "dashboard": "Dashboard",
+    "signIn": "Sign in",
+    "getStarted": "Get started",
+    "siteMap": "Site map"
+  },
+  "common": {
+    "englishComingSoon": "English version coming soon."
+  }
+}
