@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 
+import { Link } from "@/src/i18n/navigation";
 import {
   getAnalyticsConsentValue,
   hasAnalyticsConsent,
@@ -20,6 +21,7 @@ function useTrackPageViews() {
 }
 
 export function AnalyticsControls() {
+  const t = useTranslations("cookieBanner");
   useTrackPageViews();
 
   const storedConsent = useSyncExternalStore(
@@ -41,11 +43,11 @@ export function AnalyticsControls() {
 
   return (
     <div className="fixed bottom-4 left-4 z-[65] w-[min(420px,calc(100vw-2rem))] rounded-xl border border-slate-200 bg-white/95 p-3 shadow-sm backdrop-blur">
-      <p className="text-xs font-medium text-slate-900">Cookies 使用設定</p>
+      <p className="text-xs font-medium text-slate-900">{t("title")}</p>
       <p className="mt-1 text-xs leading-5 text-slate-600">
-        我們使用必要 cookies 維持登入與安全，並使用分析 cookies 改善產品體驗。不會用於廣告追蹤。
+        {t("description")}
         <Link href="/privacy#analytics-cookies" className="ml-1 underline underline-offset-2">
-          了解更多
+          {t("learnMore")}
         </Link>
       </p>
       <div className="mt-3 flex items-center gap-2">
@@ -57,7 +59,7 @@ export function AnalyticsControls() {
           }}
           className="h-8 min-w-[88px] rounded-md border border-slate-200 px-3 text-xs text-slate-600 transition hover:bg-slate-100"
         >
-          拒絕
+          {t("decline")}
         </button>
         <button
           type="button"
@@ -70,7 +72,7 @@ export function AnalyticsControls() {
           }}
           className="h-8 min-w-[138px] rounded-md bg-slate-900 px-3 text-xs font-medium text-white transition hover:bg-slate-800"
         >
-          允許所有 cookies
+          {t("acceptAll")}
         </button>
       </div>
     </div>

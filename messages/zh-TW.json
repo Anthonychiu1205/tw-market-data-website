@@ -8,7 +8,28 @@
     "dashboard": "儀表板",
     "signIn": "登入",
     "getStarted": "開始使用",
-    "siteMap": "網站導覽"
+    "siteMap": "網站導覽",
+    "openMenu": "開啟選單",
+    "closeMenu": "關閉選單",
+    "closeMenuBackdrop": "關閉選單背景"
+  },
+  "footer": {
+    "privacy": "隱私政策",
+    "terms": "服務條款",
+    "help": "幫助中心",
+    "contact": "聯繫我們"
+  },
+  "contactModal": {
+    "close": "關閉",
+    "title": "聯繫我們",
+    "description": "企業合作、資料授權、技術支援或方案諮詢，請來信："
+  },
+  "cookieBanner": {
+    "title": "Cookies 使用設定",
+    "description": "我們使用必要 cookies 維持登入與安全，並使用分析 cookies 改善產品體驗。不會用於廣告追蹤。",
+    "learnMore": "了解更多",
+    "decline": "拒絕",
+    "acceptAll": "允許所有 cookies"
   },
   "common": {
     "englishComingSoon": "English version coming soon."

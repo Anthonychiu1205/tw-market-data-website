@@ -8,7 +8,28 @@
     "dashboard": "Dashboard",
     "signIn": "Sign in",
     "getStarted": "Get started",
-    "siteMap": "Site map"
+    "siteMap": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "closeMenuBackdrop": "Close menu overlay"
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "help": "Help Center",
+    "contact": "Contact us"
+  },
+  "contactModal": {
+    "close": "Close",
+    "title": "Contact us",
+    "description": "For enterprise partnerships, data licensing, technical support, or plan enquiries, email us:"
+  },
+  "cookieBanner": {
+    "title": "Cookie settings",
+    "description": "We use essential cookies to keep you signed in and secure, and analytics cookies to improve the product. We never use them for ad tracking.",
+    "learnMore": "Learn more",
+    "decline": "Decline",
+    "acceptAll": "Allow all cookies"
   },
   "common": {
     "englishComingSoon": "English version coming soon."
