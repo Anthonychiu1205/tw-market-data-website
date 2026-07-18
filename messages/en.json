@@ -140,6 +140,66 @@
       "complete": "Agent: analysis complete."
     }
   },
+  "pricing": {
+    "title": "Pricing",
+    "selfServe": {
+      "instantTitle": "Live in three minutes",
+      "instantDesc": "Pay online and your API key is issued immediately — no contract, no waiting for a sales callback.",
+      "cancelTitle": "Cancel anytime",
+      "cancelDesc": "Turn off any monthly plan from your account page — no lock-in, no cancellation fee.",
+      "selfTitle": "Fully self-serve",
+      "selfDesc": "Sign up, get a key, watch usage, upgrade — all self-service; reach us only when you need to."
+    },
+    "choosePlan": "Choose your plan",
+    "pricedUsd": "Priced in USD, checkout on-site.",
+    "billingCycleAria": "Billing cycle",
+    "featureColumnAria": "Feature",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "save2Months": "2 months free",
+    "mostPopular": "Most popular",
+    "perYear": "yr",
+    "perMonth": "mo",
+    "annualEquals": "Annual = monthly ×10 — two months free.",
+    "annualComingSoon": "Annual coming soon",
+    "openingCheckout": "Opening checkout…",
+    "annualCheckoutNote": "Annual checkout is coming soon; to start now, switch to monthly.",
+    "checkoutError": "Checkout can't open right now — please try again later or contact us.",
+    "cardRecurringNote": "Recurring card billing; cancel anytime from the Customer Portal on the billing page.",
+    "enterpriseNote": "Enterprise / custom: <b>standard plans can be paid by card directly</b>; contact us for dedicated quota, invoicing, or an SLA.",
+    "notAdvice": "This service provides data APIs, tools, and documentation — not investment advice, stock recommendations, or trading signals.",
+    "comparisonHeading": "Plan comparison: datasets and coverage",
+    "comparisonIntro": "See each plan's dataset scope and history depth at a glance. Full dataset list in the <catalog>dataset catalog</catalog>; each dataset's actual coverage and update status follow <coverage>docs coverage</coverage> (we don't fabricate per-cell coverage numbers).",
+    "comparisonFootnote": "Note: TPEx daily history depth is still deferred; adjusted prices, a survivorship-safe universe, and a backtest-grade full-market baseline are not within our current publicly-claimable scope.",
+    "groups": {
+      "datasetAccess": "Dataset access",
+      "quotaBilling": "Quota & billing"
+    },
+    "rows": {
+      "datasetScope": "Available dataset scope",
+      "financialStatements": "Financial statements (income / balance sheet / cash flow)",
+      "historyDepth": "History depth / coverage",
+      "webhook": "Webhook",
+      "price": "Price / month",
+      "apiKeys": "API keys",
+      "rpm": "RPM",
+      "includedRequests": "Included requests / month",
+      "commercialUse": "Commercial use"
+    },
+    "values": {
+      "yes": "Yes",
+      "no": "No",
+      "full": "Full",
+      "fullRaw": "Full (raw)",
+      "reserved": "reserved",
+      "contactUs": "Contact us",
+      "free": "Free",
+      "custom": "Custom",
+      "years5": "5 years",
+      "year1": "1 year",
+      "month1": "1 month"
+    }
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }

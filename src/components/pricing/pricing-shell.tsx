@@ -2,7 +2,7 @@
 
 import { Fragment, useMemo, useState } from "react";
 import type { ComponentType } from "react";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Activity,
   BarChart3,
@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
 
+import { Link } from "@/src/i18n/navigation";
 import { buttonClass } from "@/src/components/ui/button";
 import {
   formatPlanPrice,
@@ -65,30 +66,54 @@ const COMPARISON_TIERS: { key: ComparisonTier; label: string }[] = [
   { key: "free", label: "Free" },
 ];
 
-type ComparisonRow = { label: string; values: Record<ComparisonTier, string> };
-type ComparisonGroup = { title: string; rows: ComparisonRow[] };
+type ComparisonRow = { labelKey: string; values: Record<ComparisonTier, string> };
+type ComparisonGroup = { titleKey: string; rows: ComparisonRow[] };
+
+// Cell values are kept as the canonical zh/data tokens here and localized at render via the
+// pricing.values catalog; numeric cells ($2,000, 12,000, …) and plan-derived values pass through
+// untouched (they carry no language). Row LABELS use i18n keys (pricing.rows.*).
+const CELL_VALUE_KEY: Record<string, string> = {
+  是: "yes",
+  否: "no",
+  完整: "full",
+  "完整 (raw)": "fullRaw",
+  reserved: "reserved",
+  聯繫我們: "contactUs",
+  免費: "free",
+  Custom: "custom",
+  "5 年": "years5",
+  "1 年": "year1",
+  "1 個月": "month1",
+};
 
 // Data-access rows lead the table (financialdatasets.ai-style): what datasets + how much coverage
-// each plan gets. The "可用資料集範圍" row is built at render time from the plan entitlement SSOT
+// each plan gets. The dataset-scope row is built at render time from the plan entitlement SSOT
 // (datasetLimit) so it never drifts. Per-dataset coverage numbers are NOT invented here — the
 // catalog link + docs-coverage note carry the honest, verifiable specifics.
 const DATA_ACCESS_ROWS: ComparisonRow[] = [
-  { label: "財報三表（損益／資產負債／現金流）", values: { enterprise: "是", developer: "是", max: "是", pro: "是", starter: "否", free: "否" } },
-  { label: "歷史深度 / 覆蓋度", values: { enterprise: "完整 (raw)", developer: "完整", max: "完整", pro: "5 年", starter: "1 年", free: "1 個月" } },
-  { label: "Webhook", values: { enterprise: "是", developer: "是", max: "reserved", pro: "reserved", starter: "否", free: "否" } },
+  { labelKey: "rows.financialStatements", values: { enterprise: "是", developer: "是", max: "是", pro: "是", starter: "否", free: "否" } },
+  { labelKey: "rows.historyDepth", values: { enterprise: "完整 (raw)", developer: "完整", max: "完整", pro: "5 年", starter: "1 年", free: "1 個月" } },
+  { labelKey: "rows.webhook", values: { enterprise: "是", developer: "是", max: "reserved", pro: "reserved", starter: "否", free: "否" } },
 ];
 
 const QUOTA_ROWS: ComparisonRow[] = [
-  { label: "價格 / 月", values: { enterprise: "聯繫我們", developer: "$2,000", max: "$200", pro: "$100", starter: "$20", free: "免費" } },
-  { label: "API Keys", values: { enterprise: "Custom", developer: "20", max: "10", pro: "5", starter: "2", free: "1" } },
-  { label: "RPM", values: { enterprise: "Custom", developer: "12,000", max: "3,000", pro: "1,200", starter: "300", free: "60" } },
-  { label: "每月 included requests", values: { enterprise: "Custom", developer: "3,000,000", max: "300,000", pro: "100,000", starter: "10,000", free: "500" } },
-  { label: "商業使用", values: { enterprise: "是", developer: "是", max: "是", pro: "是", starter: "是", free: "否" } },
+  { labelKey: "rows.price", values: { enterprise: "聯繫我們", developer: "$2,000", max: "$200", pro: "$100", starter: "$20", free: "免費" } },
+  { labelKey: "rows.apiKeys", values: { enterprise: "Custom", developer: "20", max: "10", pro: "5", starter: "2", free: "1" } },
+  { labelKey: "rows.rpm", values: { enterprise: "Custom", developer: "12,000", max: "3,000", pro: "1,200", starter: "300", free: "60" } },
+  { labelKey: "rows.includedRequests", values: { enterprise: "Custom", developer: "3,000,000", max: "300,000", pro: "100,000", starter: "10,000", free: "500" } },
+  { labelKey: "rows.commercialUse", values: { enterprise: "是", developer: "是", max: "是", pro: "是", starter: "是", free: "否" } },
 ];
 
 const CARD_CTA_CLASS = buttonClass("primary", "h-14 w-full rounded-2xl px-5 text-base font-medium leading-none");
 
 export function PricingShell() {
+  const t = useTranslations("pricing");
+  // Localize a comparison-table cell: known zh/data tokens go through the pricing.values catalog;
+  // numeric / plan-derived cells pass through unchanged.
+  const translateCell = (value: string): string => {
+    const key = CELL_VALUE_KEY[value];
+    return key ? t(`values.${key}`) : value;
+  };
   const planViews = useMemo(() => getPricingPlanViews(), []);
   const paidPlans = useMemo(
     () => planViews.filter((plan) => plan.planCode !== "free" && !plan.isContactOnly),
@@ -104,14 +129,14 @@ export function PricingShell() {
   // SSOT (datasetLimit) so it can't drift from the plan model.
   const comparisonGroups = useMemo<ComparisonGroup[]>(() => {
     const datasetScopeRow: ComparisonRow = {
-      label: "可用資料集範圍",
+      labelKey: "rows.datasetScope",
       values: Object.fromEntries(
         COMPARISON_TIERS.map((tier) => [tier.key, getPricingPlanView(tier.key).datasetLimit]),
       ) as Record<ComparisonTier, string>,
     };
     return [
-      { title: "資料集存取", rows: [datasetScopeRow, ...DATA_ACCESS_ROWS] },
-      { title: "配額與計費", rows: QUOTA_ROWS },
+      { titleKey: "groups.datasetAccess", rows: [datasetScopeRow, ...DATA_ACCESS_ROWS] },
+      { titleKey: "groups.quotaBilling", rows: QUOTA_ROWS },
     ];
   }, []);
 
@@ -155,11 +180,11 @@ export function PricingShell() {
     <div className="space-y-10">
       <section className="space-y-6">
         <div className="text-center">
-          <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">選擇你的方案</h2>
-          <p className="mt-2 text-sm text-slate-500">以 USD 計價，站內完成結帳。</p>
+          <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">{t("choosePlan")}</h2>
+          <p className="mt-2 text-sm text-slate-500">{t("pricedUsd")}</p>
 
           <div className="mt-6 flex justify-center">
-            <div className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1" role="group" aria-label="計費週期">
+            <div className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1" role="group" aria-label={t("billingCycleAria")}>
               <button
                 type="button"
                 aria-pressed={!isAnnual}
@@ -169,7 +194,7 @@ export function PricingShell() {
                   !isAnnual ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700",
                 )}
               >
-                月繳
+                {t("monthly")}
               </button>
               <button
                 type="button"
@@ -180,8 +205,8 @@ export function PricingShell() {
                   isAnnual ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700",
                 )}
               >
-                年繳
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">送 2 個月</span>
+                {t("annual")}
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">{t("save2Months")}</span>
               </button>
             </div>
           </div>
@@ -205,7 +230,7 @@ export function PricingShell() {
                   <div className="mb-3 h-[26px]">
                     {plan.planCode === "pro" ? (
                       <span className="inline-flex w-fit items-center rounded-full bg-slate-900 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
-                        最受歡迎
+                        {t("mostPopular")}
                       </span>
                     ) : null}
                   </div>
@@ -217,10 +242,10 @@ export function PricingShell() {
                   <div className="mt-10 min-h-[64px]">
                     <p className="whitespace-nowrap text-4xl font-medium tracking-tight text-slate-900">
                       {formatPlanPrice(isAnnual ? plan.annualAmountMinor : plan.monthlyAmountMinor, plan.currency)}
-                      <span className="ml-1.5 inline-block align-baseline text-sm font-normal text-slate-400"> / {isAnnual ? "年" : "月"}</span>
+                      <span className="ml-1.5 inline-block align-baseline text-sm font-normal text-slate-400"> / {isAnnual ? t("perYear") : t("perMonth")}</span>
                     </p>
                     {isAnnual ? (
-                      <p className="mt-1 text-xs font-medium text-emerald-700">年繳 = 月價 ×10，等於送 2 個月。</p>
+                      <p className="mt-1 text-xs font-medium text-emerald-700">{t("annualEquals")}</p>
                     ) : null}
                   </div>
 
@@ -236,15 +261,15 @@ export function PricingShell() {
                       onClick={() => handleUpgrade(plan.planCode)}
                     >
                       {isAnnual
-                        ? "年繳即將開放"
+                        ? t("annualComingSoon")
                         : pendingPlan === plan.planCode
-                          ? "開啟結帳中…"
+                          ? t("openingCheckout")
                           : plan.ctaLabel}
                     </button>
                     {isAnnual ? (
-                      <p className="mt-2 text-xs text-slate-500">年繳結帳即將開放；如需立即開通請先切換為月繳。</p>
+                      <p className="mt-2 text-xs text-slate-500">{t("annualCheckoutNote")}</p>
                     ) : errorPlan === plan.planCode ? (
-                      <p className="mt-2 text-xs text-red-600">結帳暫時無法開啟，請稍後再試或聯繫我們。</p>
+                      <p className="mt-2 text-xs text-red-600">{t("checkoutError")}</p>
                     ) : null}
                   </div>
                 </div>
@@ -263,7 +288,7 @@ export function PricingShell() {
                   })}
                 </ul>
 
-                <p className="mt-6 text-xs text-slate-500">信用卡定期扣款，可於帳務頁 Customer Portal 取消。</p>
+                <p className="mt-6 text-xs text-slate-500">{t("cardRecurringNote")}</p>
               </div>
             </article>
           ))}
@@ -271,23 +296,26 @@ export function PricingShell() {
 
         {/* B-11 enterprise self-serve note (FRICTION-01 §C-1): keep contact, don't block self-serve. */}
         <p className="text-center text-sm text-slate-600">
-          企業 / 客製：<span className="font-medium text-slate-900">標準方案可直接刷卡開通</span>；需要專屬額度、發票或 SLA 再「聯繫我們」。
+          {t.rich("enterpriseNote", {
+            b: (chunks) => <span className="font-medium text-slate-900">{chunks}</span>,
+          })}
         </p>
 
-        <p className="text-center text-xs text-slate-500">
-          本服務提供資料 API、工具與文件，不提供投資建議、個股推薦或交易訊號。
-        </p>
+        <p className="text-center text-xs text-slate-500">{t("notAdvice")}</p>
       </section>
 
       <section className="space-y-4 border-t border-slate-200 pt-8">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight text-slate-900">方案比較：可用資料集與覆蓋度</h2>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-900">{t("comparisonHeading")}</h2>
           <p className="mt-2 text-sm text-slate-600">
-            一眼看出各方案的資料集範圍與歷史覆蓋度。完整資料集清單見{" "}
-            <Link href="/datasets" className="font-medium text-slate-900 underline underline-offset-4">資料集目錄</Link>
-            ；各資料集實際 coverage 與更新狀態以{" "}
-            <Link href="/docs/market-coverage" className="font-medium text-slate-900 underline underline-offset-4">docs coverage</Link>
-            {" "}為準（不逐格編造覆蓋數字）。
+            {t.rich("comparisonIntro", {
+              catalog: (chunks) => (
+                <Link href="/datasets" className="font-medium text-slate-900 underline underline-offset-4">{chunks}</Link>
+              ),
+              coverage: (chunks) => (
+                <Link href="/docs/market-coverage" className="font-medium text-slate-900 underline underline-offset-4">{chunks}</Link>
+              ),
+            })}
           </p>
         </div>
 
@@ -295,7 +323,7 @@ export function PricingShell() {
           <table className="w-full min-w-[900px] table-fixed text-sm leading-5">
             <thead className="text-slate-600">
               <tr>
-                <th className="w-[24%] border-b border-slate-200 px-4 py-3 text-left align-middle font-semibold" aria-label="功能" />
+                <th className="w-[24%] border-b border-slate-200 px-4 py-3 text-left align-middle font-semibold" aria-label={t("featureColumnAria")} />
                 {COMPARISON_TIERS.map((tier) => (
                   <th key={tier.key} className="border-b border-slate-200 px-4 py-3 text-center align-middle font-semibold text-slate-900">{tier.label}</th>
                 ))}
@@ -303,20 +331,20 @@ export function PricingShell() {
             </thead>
             <tbody>
               {comparisonGroups.map((group) => (
-                <Fragment key={group.title}>
+                <Fragment key={group.titleKey}>
                   <tr>
                     <td
                       colSpan={COMPARISON_TIERS.length + 1}
                       className="border-b border-slate-200 px-4 pb-2 pt-6 text-left align-middle text-xs font-semibold uppercase tracking-wide text-slate-500"
                     >
-                      {group.title}
+                      {t(group.titleKey)}
                     </td>
                   </tr>
                   {group.rows.map((row) => (
-                    <tr key={row.label} className="text-slate-700">
-                      <td className="border-b border-slate-100 px-4 py-3 text-left align-middle font-medium text-slate-900">{row.label}</td>
+                    <tr key={row.labelKey} className="text-slate-700">
+                      <td className="border-b border-slate-100 px-4 py-3 text-left align-middle font-medium text-slate-900">{t(row.labelKey)}</td>
                       {COMPARISON_TIERS.map((tier) => (
-                        <td key={tier.key} className="border-b border-slate-100 px-4 py-3 text-center align-middle">{row.values[tier.key]}</td>
+                        <td key={tier.key} className="border-b border-slate-100 px-4 py-3 text-center align-middle">{translateCell(row.values[tier.key])}</td>
                       ))}
                     </tr>
                   ))}
@@ -325,9 +353,7 @@ export function PricingShell() {
             </tbody>
           </table>
         </div>
-        <p className="text-xs text-slate-500">
-          註：TPEx 日線歷史深度目前仍為 deferred；adjusted prices、survivorship-safe universe、backtest-grade full-market baseline 皆不在目前可公開宣稱範圍。
-        </p>
+        <p className="text-xs text-slate-500">{t("comparisonFootnote")}</p>
       </section>
     </div>
   );

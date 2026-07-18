@@ -150,6 +150,17 @@ canonical terms in the glossary below.
 `TW Market Data`, `TWMD`, `TWSE`, `TPEx`, `MCP`, `OHLCV`, dataset `slug`s, `as_of`, `data_gaps`,
 API field names, ticker symbols (e.g. `2330`).
 
+## 5.1 Deferred: billing-SSOT copy localization (`plans.ts`)
+`src/lib/billing/plans.ts` holds plan-card **display copy** in zh: `summary`, `highlights[].text`,
+`ctaLabel`, and `datasetLimit` for all 6 tiers (+ `getRequestLimitLabel`, `formatPlanPrice` fallback
+"聯繫我們"). It is the SSOT shared by the pricing page (PR2), the billing/subscription pages, and
+`cancellation-copy.ts` (PR3). The pricing page's own chrome + comparison table are localized; the
+plan CARDS still render these zh strings on `/en`. **Deferred to the billing-localization step** (do
+it once, alongside PR3) rather than rushed here — recommended approach: move the display copy to the
+messages catalog (`pricing.plans.<code>.*`), keep `plans.ts` as the numeric/structural SSOT (prices,
+quotas, icons, order), and have the pricing shell + billing views zip icon+text at render. Numbers
+stay in `plans.ts`.
+
 ## 5. Open items for owner review
 - **Legal disclaimer EN** (`INVESTMENT_DISCLAIMER_EN` in `src/lib/legal/disclaimer.ts`): faithful
   translation of the canonical zh non-investment-advice line; needs legal sign-off. zh string is

@@ -140,6 +140,66 @@
       "complete": "Agent: analysis complete."
     }
   },
+  "pricing": {
+    "title": "方案價格",
+    "selfServe": {
+      "instantTitle": "刷卡三分鐘開通",
+      "instantDesc": "線上付款即開 API key，無需簽約、不必等業務回電。",
+      "cancelTitle": "隨時可取消",
+      "cancelDesc": "月費方案隨時於帳戶頁停用，不綁約、不收取消費。",
+      "selfTitle": "全自助",
+      "selfDesc": "從註冊、取 key、看用量到升級，全部自己點；需要時才找我們。"
+    },
+    "choosePlan": "選擇你的方案",
+    "pricedUsd": "以 USD 計價，站內完成結帳。",
+    "billingCycleAria": "計費週期",
+    "featureColumnAria": "功能",
+    "monthly": "月繳",
+    "annual": "年繳",
+    "save2Months": "送 2 個月",
+    "mostPopular": "最受歡迎",
+    "perYear": "年",
+    "perMonth": "月",
+    "annualEquals": "年繳 = 月價 ×10，等於送 2 個月。",
+    "annualComingSoon": "年繳即將開放",
+    "openingCheckout": "開啟結帳中…",
+    "annualCheckoutNote": "年繳結帳即將開放；如需立即開通請先切換為月繳。",
+    "checkoutError": "結帳暫時無法開啟，請稍後再試或聯繫我們。",
+    "cardRecurringNote": "信用卡定期扣款，可於帳務頁 Customer Portal 取消。",
+    "enterpriseNote": "企業 / 客製：<b>標準方案可直接刷卡開通</b>；需要專屬額度、發票或 SLA 再「聯繫我們」。",
+    "notAdvice": "本服務提供資料 API、工具與文件，不提供投資建議、個股推薦或交易訊號。",
+    "comparisonHeading": "方案比較：可用資料集與覆蓋度",
+    "comparisonIntro": "一眼看出各方案的資料集範圍與歷史覆蓋度。完整資料集清單見 <catalog>資料集目錄</catalog>；各資料集實際 coverage 與更新狀態以 <coverage>docs coverage</coverage> 為準（不逐格編造覆蓋數字）。",
+    "comparisonFootnote": "註：TPEx 日線歷史深度目前仍為 deferred；adjusted prices、survivorship-safe universe、backtest-grade full-market baseline 皆不在目前可公開宣稱範圍。",
+    "groups": {
+      "datasetAccess": "資料集存取",
+      "quotaBilling": "配額與計費"
+    },
+    "rows": {
+      "datasetScope": "可用資料集範圍",
+      "financialStatements": "財報三表（損益／資產負債／現金流）",
+      "historyDepth": "歷史深度 / 覆蓋度",
+      "webhook": "Webhook",
+      "price": "價格 / 月",
+      "apiKeys": "API Keys",
+      "rpm": "RPM",
+      "includedRequests": "每月 included requests",
+      "commercialUse": "商業使用"
+    },
+    "values": {
+      "yes": "是",
+      "no": "否",
+      "full": "完整",
+      "fullRaw": "完整 (raw)",
+      "reserved": "reserved",
+      "contactUs": "聯繫我們",
+      "free": "免費",
+      "custom": "Custom",
+      "years5": "5 年",
+      "year1": "1 年",
+      "month1": "1 個月"
+    }
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }

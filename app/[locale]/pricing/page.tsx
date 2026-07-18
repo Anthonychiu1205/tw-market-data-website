@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 import { PricingShell } from "@/src/components/pricing/pricing-shell";
 import { Container } from "@/src/components/ui/container";
@@ -76,7 +77,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PricingPage() {
+const SELF_SERVE_CARDS = [
+  { titleKey: "selfServe.instantTitle", descKey: "selfServe.instantDesc" },
+  { titleKey: "selfServe.cancelTitle", descKey: "selfServe.cancelDesc" },
+  { titleKey: "selfServe.selfTitle", descKey: "selfServe.selfDesc" },
+] as const;
+
+export default async function PricingPage() {
+  const t = await getTranslations("pricing");
   return (
     <>
       <script
@@ -85,17 +93,13 @@ export default function PricingPage() {
       />
       <Container className="space-y-10 py-12">
         <section className="border-b border-slate-200 pb-8">
-          <h1 className="text-4xl font-semibold tracking-tight text-slate-900">方案價格</h1>
+          <h1 className="text-4xl font-semibold tracking-tight text-slate-900">{t("title")}</h1>
           {/* B-11 self-serve copy (FRICTION-01 §C-1). */}
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
-            {[
-              ["刷卡三分鐘開通", "線上付款即開 API key，無需簽約、不必等業務回電。"],
-              ["隨時可取消", "月費方案隨時於帳戶頁停用，不綁約、不收取消費。"],
-              ["全自助", "從註冊、取 key、看用量到升級，全部自己點；需要時才找我們。"],
-            ].map(([title, desc]) => (
-              <div key={title} className="rounded-xl border border-slate-200 bg-white p-4">
-                <p className="text-sm font-semibold text-slate-900">{title}</p>
-                <p className="mt-1 text-sm leading-6 text-slate-600">{desc}</p>
+            {SELF_SERVE_CARDS.map((card) => (
+              <div key={card.titleKey} className="rounded-xl border border-slate-200 bg-white p-4">
+                <p className="text-sm font-semibold text-slate-900">{t(card.titleKey)}</p>
+                <p className="mt-1 text-sm leading-6 text-slate-600">{t(card.descKey)}</p>
               </div>
             ))}
           </div>
