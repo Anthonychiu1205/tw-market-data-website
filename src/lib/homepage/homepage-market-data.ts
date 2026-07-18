@@ -2,6 +2,7 @@ import "server-only";
 
 import { getCatalogStats } from "@/src/lib/catalog/catalog-stats";
 import { COVERAGE_FACTS_SNAPSHOT_DATE, coverageFacts } from "@/src/content/coverage-facts";
+import { pickServableLastGood } from "@/src/lib/homepage/homepage-market-lkg";
 
 type SourceMode = "live_api" | "fallback_static" | "unavailable";
 type Trend = "up" | "down" | "neutral";
@@ -191,6 +192,13 @@ function itemFromApiRow(row: AnyRecord): HomepageMarketItem | null {
   };
 }
 
+// Last-known-good snapshot, held in module memory (per warm serverless instance — Fluid Compute
+// reuses instances across requests). Approved LKG: when a live fetch yields nothing, keep showing the
+// last REAL close WITH its real date rather than an empty card. Only ever holds a DATED snapshot
+// (never dateless — rule 2). Not persisted across cold starts/deploys by design: a DB write on every
+// homepage request would be far heavier than the transient upstream blips this guards against.
+let lastGoodMarketSnapshot: { items: HomepageMarketItem[]; asOf: string } | null = null;
+
 // THE single index source for the whole homepage. Both the hero panel and the marquee read this, so
 // the same index can never render two different values again.
 export async function getHomepageMarketSnapshot(): Promise<HomepageMarketSnapshot> {
@@ -215,6 +223,9 @@ export async function getHomepageMarketSnapshot(): Promise<HomepageMarketSnapsho
         typeof result.payload.as_of === "string" && result.payload.as_of.length >= 10
           ? result.payload.as_of.slice(0, 10)
           : items[0].asOf;
+      // Remember this good snapshot for LKG — but only when it carries a real date, so the fallback
+      // can never surface a dateless value.
+      if (asOf) lastGoodMarketSnapshot = { items, asOf };
       return {
         items,
         sourceMode: "live_api",
@@ -229,10 +240,23 @@ export async function getHomepageMarketSnapshot(): Promise<HomepageMarketSnapsho
   // silent way the card ends up empty. safeFetchServiceJson already logged fetch-level failures; this
   // covers the "200 but wrong shape" case so every empty-card cause is traceable.
   if (result.ok && !(isRecord(result.payload) && Array.isArray(result.payload.indices))) {
-    console.warn("[homepage-market] upstream 200 but payload has no `indices` array — unexpected shape, card will render nothing");
+    console.warn("[homepage-market] upstream 200 but payload has no `indices` array — unexpected shape");
   }
 
-  // No live data → render nothing. Showing a stale demo index is worse than showing none.
+  // Live fetch produced nothing → serve the last real close WITH its real date (approved LKG), if we
+  // have a recent-enough one. Real historical value + honest date = rule 2 compliant.
+  const lkg = pickServableLastGood(lastGoodMarketSnapshot, Date.now());
+  if (lkg) {
+    console.warn(`[homepage-market] live fetch empty — serving last-known-good snapshot as_of ${lkg.asOf}`);
+    return {
+      items: lkg.items,
+      sourceMode: "fallback_static",
+      statusLabel: `資料日期 ${lkg.asOf}`,
+      updatedAt: lkg.asOf,
+    };
+  }
+
+  // No live data and no servable cache → render nothing. Showing a stale demo index is worse than none.
   return { items: [], sourceMode: "unavailable", statusLabel: "", updatedAt: null };
 }
 
