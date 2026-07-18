@@ -1,10 +1,15 @@
+import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import { AuthSessionProvider } from "@/src/components/providers/auth-session-provider";
 import { SiteShell } from "@/src/components/layout/site-shell";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
+import { HTML_LANG } from "@/src/i18n/locales";
+import { routing } from "@/src/i18n/routing";
 
-import "./globals.css";
+import "../globals.css";
 
 const organizationLd = {
   "@context": "https://schema.org",
@@ -20,7 +25,7 @@ const websiteLd = {
   "@type": "WebSite",
   name: "TW Market Data",
   url: siteConfig.url,
-  description: "台股資料 API，為系統、量化研究與 AI agent workflow 而設計",
+  description: "台股資料 API,為系統、量化研究與 AI agent workflow 而設計",
 };
 
 export const metadata: Metadata = {
@@ -30,9 +35,6 @@ export const metadata: Metadata = {
     template: "%s | TW Market Data Platform",
   },
   description: siteConfig.description,
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     title: "TW Market Data Platform",
     description: siteConfig.description,
@@ -61,13 +63,27 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+// Pre-render both locale shells at build time (§1.6: keep pages static).
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export default async function LocaleLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }>) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+  // Enable static rendering for this locale subtree (must run before any next-intl API).
+  setRequestLocale(locale);
+
   return (
-    <html lang="zh-Hant">
+    <html lang={HTML_LANG[locale]}>
       <body className="min-h-screen font-sans antialiased">
         <script
           type="application/ld+json"
@@ -77,9 +93,11 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteLd) }}
         />
-        <AuthSessionProvider>
-          <SiteShell>{children}</SiteShell>
-        </AuthSessionProvider>
+        <NextIntlClientProvider>
+          <AuthSessionProvider>
+            <SiteShell>{children}</SiteShell>
+          </AuthSessionProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
