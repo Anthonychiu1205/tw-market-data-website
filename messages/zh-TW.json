@@ -946,6 +946,8 @@
     }
   },
   "common": {
-    "englishComingSoon": "English version coming soon."
+    "englishComingSoon": "English version coming soon.",
+    "illustrativeData": "示意資料，非即時行情",
+    "enLegalReference": "本頁英文翻譯僅供參考，以中文版為準。"
   }
 }

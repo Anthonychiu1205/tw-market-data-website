@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { Container } from "@/src/components/ui/container";
 import { siteConfig } from "@/src/config/site";
@@ -45,10 +45,16 @@ export default async function RefundPage() {
     },
   ];
 
+  const locale = await getLocale();
+  const tc = await getTranslations("common");
+
   return (
     <Container className="space-y-8 py-12">
       <section className="space-y-3 border-b border-slate-200 pb-6">
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{t("title")}</h1>
+        {locale === "en" ? (
+          <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">{tc("enLegalReference")}</p>
+        ) : null}
         <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("intro")}</p>
       </section>
 

@@ -92,6 +92,7 @@ function tokenClass(type: TokenType) {
 
 export function SourceOfTruthSection() {
   const t = useTranslations("home.sourceOfTruth");
+  const tc = useTranslations("common");
   const [activeId, setActiveId] = useState<string>(DEFAULT_ACTIVE_ID);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [isScrollable, setIsScrollable] = useState(false);
@@ -208,6 +209,7 @@ export function SourceOfTruthSection() {
                 <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700">{activeItem.status}</span>
                 <span className="text-slate-400">•</span>
                 <span className="font-medium tracking-tight text-slate-700">{activeItem.responseTitle}</span>
+                <span className="rounded-full bg-amber-50 px-2 py-0.5 font-medium text-amber-700 ring-1 ring-amber-200">{tc("illustrativeData")}</span>
                 <span className="text-slate-400">•</span>
                 <span className="font-mono text-[11px] text-slate-500">{activeItem.responseLabel}</span>
               </div>

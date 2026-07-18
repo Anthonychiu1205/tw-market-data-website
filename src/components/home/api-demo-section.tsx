@@ -198,6 +198,7 @@ function DemoSelect({
 
 export function ApiDemoSection() {
   const t = useTranslations("home.apiDemo");
+  const tc = useTranslations("common");
   const [draftEndpointId, setDraftEndpointId] = useState<EndpointId>("monthlyRevenue");
   const [draftTicker, setDraftTicker] = useState("2330");
   const [activeEndpointId, setActiveEndpointId] = useState<EndpointId>("monthlyRevenue");
@@ -326,6 +327,9 @@ export function ApiDemoSection() {
           </div>
 
           <div className="min-h-[460px] rounded-[2rem] border border-slate-200/60 bg-slate-50/80 p-8">
+            <p className="mb-3 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-amber-200">
+              {tc("illustrativeData")}
+            </p>
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                 <span className="tracking-[0.08em]">{t("response")}</span>

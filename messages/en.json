@@ -946,6 +946,8 @@
     }
   },
   "common": {
-    "englishComingSoon": "English version coming soon."
+    "englishComingSoon": "English version coming soon.",
+    "illustrativeData": "Illustrative data — not real-time quotes",
+    "enLegalReference": "English translation provided for reference; the Chinese version prevails."
   }
 }

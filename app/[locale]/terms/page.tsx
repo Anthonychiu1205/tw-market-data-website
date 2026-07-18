@@ -19,6 +19,7 @@ type TermsSection = {
 export default async function TermsPage() {
   const t = await getTranslations("terms");
   const locale = await getLocale();
+  const tc = await getTranslations("common");
 
   // §九 first paragraph is the canonical non-investment-advice disclaimer (SSOT in
   // @/src/lib/legal/disclaimer). Rendered via the locale-aware selector, NOT the messages catalog.
@@ -135,6 +136,9 @@ export default async function TermsPage() {
     <Container className="space-y-8 py-12">
       <section className="space-y-3 border-b border-slate-200 pb-6">
         <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{t("title")}</h1>
+        {locale === "en" ? (
+          <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">{tc("enLegalReference")}</p>
+        ) : null}
         <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("lead1")}</p>
         <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("lead2")}</p>
       </section>
