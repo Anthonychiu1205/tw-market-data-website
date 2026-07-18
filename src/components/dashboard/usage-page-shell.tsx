@@ -210,10 +210,10 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
         <p className="mt-3 text-xs text-slate-500">{getCreditsModeDescription(creditsModeState)}</p>
         {usageReconciliation ? (
           <p className="mt-1 text-xs text-slate-500">
-            對帳（近 {usageReconciliation.windowDays} 天）：usage={usageReconciliation.totalUsageEvents.toLocaleString()} ·
-            預估（含試算）={usageReconciliation.totalChargedCredits.toLocaleString()} ·
-            實扣 credits={usageReconciliation.totalTransactionCredits.toLocaleString()}
-            {usageReconciliation.mismatchedRequestIds.length > 0 ? " · 含待對帳項目" : ""}
+            近 {usageReconciliation.windowDays} 天：{usageReconciliation.totalUsageEvents.toLocaleString()} 筆請求 ·
+            估算成本 {usageReconciliation.totalChargedCredits.toLocaleString()} credits ·
+            實際扣點 {usageReconciliation.totalTransactionCredits.toLocaleString()} credits
+            {usageReconciliation.mismatchedRequestIds.length > 0 ? " · 有待對帳項目" : ""}
           </p>
         ) : null}
       </DashboardCard>

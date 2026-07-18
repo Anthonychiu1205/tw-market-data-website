@@ -97,6 +97,15 @@ function handlePolarError(context: string, error: unknown): string {
   return "polar_unavailable";
 }
 
+/**
+ * A 404 on an external-customer-scoped read means the account simply has no Polar customer
+ * yet (e.g. internally-provisioned plan, never checked out) — that is a NORMAL empty state,
+ * NOT an error. Map it to empty data so the UI shows "尚未設定" instead of a scary error.
+ */
+function isPolarNotFound(error: unknown): boolean {
+  return (error as { statusCode?: unknown })?.statusCode === 404;
+}
+
 /** Read the first page of items off a Polar PageIterator. */
 async function collectFirstPage(iter: AsyncIterable<{ result?: { items?: unknown[] } }>): Promise<unknown[]> {
   for await (const page of iter) {
@@ -126,6 +135,7 @@ export async function getPolarSubscriptionDetail(
     setCached(cacheKey, result);
     return result;
   } catch (error) {
+    if (isPolarNotFound(error)) return { ok: true, data: null };
     return { ok: false, error: handlePolarError("subscriptions.list", error) };
   }
 }
@@ -147,6 +157,7 @@ export async function getPolarInvoices(
     setCached(cacheKey, result);
     return result;
   } catch (error) {
+    if (isPolarNotFound(error)) return { ok: true, data: [] };
     return { ok: false, error: handlePolarError("orders.list", error) };
   }
 }
@@ -170,6 +181,7 @@ export async function getPolarPaymentMethod(
     setCached(cacheKey, result);
     return result;
   } catch (error) {
+    if (isPolarNotFound(error)) return { ok: true, data: null };
     return { ok: false, error: handlePolarError("customers.listPaymentMethodsExternal", error) };
   }
 }

@@ -41,7 +41,7 @@ export function OverviewUsageChart({ data }: OverviewUsageChartProps) {
       style={{ userSelect: "none", outline: "none", WebkitUserSelect: "none" }}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+        <LineChart data={data} margin={{ top: 8, right: 8, left: -6, bottom: 0 }}>
         <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 4" vertical={false} />
         <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} axisLine={false} />
         <YAxis
@@ -52,7 +52,7 @@ export function OverviewUsageChart({ data }: OverviewUsageChartProps) {
           ticks={yAxisTicks}
           tickFormatter={(value) => String(Math.round(Number(value)))}
           domain={[0, yAxisMax]}
-          width={32}
+          width={44}
         />
         <Tooltip
           cursor={{ stroke: "#94a3b8", strokeWidth: 1, strokeDasharray: "4 4" }}
@@ -76,7 +76,7 @@ export function OverviewUsageChart({ data }: OverviewUsageChartProps) {
           dataKey="requests"
           stroke="#1f2937"
           strokeWidth={1.8}
-          dot={{ r: 2, strokeWidth: 0, fill: "#334155" }}
+          dot={false}
           activeDot={{ r: 3, fill: "#111827" }}
         />
         </LineChart>
