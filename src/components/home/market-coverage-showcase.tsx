@@ -3,29 +3,15 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/src/i18n/navigation";
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 import { buttonClass } from "@/src/components/ui/button";
+import { buildMarketCoverageConfig } from "@/src/lib/homepage/demo-real-data";
 
-import type { AgentWorkflowDemoConfig } from "./agent-workflow-demo";
 import { LazyAgentWorkflowDemo } from "./lazy-agent-workflow-demo";
-
-const MARKET_COVERAGE_DEMO_CONFIG: AgentWorkflowDemoConfig = {
-  queryPrompt: "找出近一年營收成長與毛利率穩定的股票",
-  statusLead: "Agent: searching",
-  statusPill: "TW Market Data",
-  tableHeaders: ["ID", "股票", "營收成長", "毛利率", "營收"],
-  tableRows: [
-    ["1", "2330 台積電", "18.2%", "53.1%", "$2.89T"],
-    ["2", "2454 聯發科", "15.7%", "48.6%", "$1.42T"],
-    ["3", "2317 鴻海", "10.3%", "14.2%", "$6.10T"],
-    ["4", "2308 台達電", "9.8%", "34.5%", "$412B"],
-    ["5", "3711 日月光", "8.7%", "21.3%", "$289B"],
-    ["6", "3231 緯創", "7.9%", "12.6%", "$365B"],
-  ],
-  completionLabel: "Agent: screen complete.",
-  tableGridTemplateColumns: "0.6fr 1.2fr repeat(3,minmax(0,1fr))",
-};
 
 export async function MarketCoverageShowcase() {
   const t = await getTranslations("home.marketCoverage");
+  // Real per-ticker screen (TTM revenue / gross margin / YoY growth), daily ISR. The fabricated
+  // 6-stock table is gone; omitted when no real data is available (rule 2).
+  const config = await buildMarketCoverageConfig();
   return (
     <section className="bg-white py-20 lg:py-24">
       <MarketingContainer>
@@ -47,7 +33,7 @@ export async function MarketCoverageShowcase() {
           </div>
 
           <div className="order-2 w-full min-w-0 max-w-none">
-            <LazyAgentWorkflowDemo config={MARKET_COVERAGE_DEMO_CONFIG} />
+            {config ? <LazyAgentWorkflowDemo config={config} /> : null}
           </div>
         </div>
       </MarketingContainer>

@@ -24,6 +24,9 @@ export type AgentWorkflowDemoConfig = {
   tableRows: string[][];
   completionLabel: string;
   tableGridTemplateColumns: string;
+  // Real as_of date of the underlying data (DEMO-01). Present → the panel shows the honest
+  // 「真實資料 · 資料日期 {date}」 label; absent → the illustrative label.
+  asOf?: string;
 };
 
 function StockLogo({
@@ -59,22 +62,9 @@ function StockLogo({
   );
 }
 
-const DEFAULT_CONFIG: AgentWorkflowDemoConfig = {
-  queryPrompt: "分析台積電近 8 季營收與毛利率變化",
-  statusLead: "Agent: searching",
-  statusPill: "TW Market Data",
-  tableHeaders: ["Item", "2024", "2023", "2022", "2021", "2020"],
-  tableRows: [
-    ["營收", "$2,894.3B", "$2,161.7B", "$2,263.9B", "$1,587.4B", "$1,339.2B"],
-    ["營業成本", "$1,377.5B", "$1,040.2B", "$1,064.1B", "$777.9B", "$674.1B"],
-    ["營業毛利", "$1,516.8B", "$1,121.5B", "$1,199.8B", "$809.5B", "$665.1B"],
-    ["研發費用", "$198.4B", "$176.1B", "$172.4B", "$148.7B", "$136.2B"],
-    ["營業利益", "$1,116.2B", "$779.7B", "$867.1B", "$592.4B", "$493.5B"],
-    ["毛利率", "52.4%", "51.9%", "53.0%", "51.0%", "49.7%"],
-  ],
-  completionLabel: "Agent: analysis complete.",
-  tableGridTemplateColumns: "1.2fr repeat(5,minmax(0,1fr))",
-};
+// DEMO-01: the fabricated DEFAULT_CONFIG (hardcoded TSMC figures on a real ticker) is gone. This demo
+// now only renders with a real config built server-side (buildAgentWorkflowConfig /
+// buildMarketCoverageConfig); the showcases omit it when no real data is available.
 
 function SearchIcon() {
   return (
@@ -130,13 +120,13 @@ function CopyIcon() {
 }
 
 type AgentWorkflowDemoProps = {
-  config?: AgentWorkflowDemoConfig;
+  config: AgentWorkflowDemoConfig;
 };
 
 const TIMING_SCALE = 0.65;
 const scaleMs = (ms: number) => Math.round(ms * TIMING_SCALE);
 
-export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemoProps) {
+export function AgentWorkflowDemo({ config }: AgentWorkflowDemoProps) {
   const t = useTranslations("home.agentWorkflowDemo");
   const tc = useTranslations("common");
   const { elementRef, isVisible } = useReplayOnVisible<HTMLDivElement>({
@@ -248,9 +238,15 @@ export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemo
       ref={elementRef}
       className="w-full rounded-[24px] border border-slate-200 bg-slate-50/60 p-4 shadow-[0_1px_2px_rgba(15,23,42,0.05)] lg:p-4"
     >
-      <p className="mb-2 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-amber-200">
-        {tc("illustrativeData")}
-      </p>
+      {config.asOf ? (
+        <p className="mb-2 inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700 ring-1 ring-emerald-200">
+          {tc("realDataAsOf", { date: config.asOf })}
+        </p>
+      ) : (
+        <p className="mb-2 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-amber-200">
+          {tc("illustrativeData")}
+        </p>
+      )}
       <div
         className={cn(
           "rounded-xl border border-slate-300 bg-white px-4 py-2 font-mono text-[14px] tracking-tight text-slate-800 transition duration-300",

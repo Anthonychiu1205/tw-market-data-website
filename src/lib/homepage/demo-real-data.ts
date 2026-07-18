@@ -7,6 +7,7 @@ import type {
   DemoResponse,
   HomepageDemoData,
 } from "@/src/lib/homepage/demo-real-data-types";
+import type { AgentWorkflowDemoConfig } from "@/src/components/home/agent-workflow-demo";
 
 // DEMO-01: the homepage demo panels must show REAL own-API values, never fabricated numbers on real
 // tickers (rule 2). This adapter fetches the actual `/v2/datasets/<slug>?symbol=<ticker>` row at
@@ -34,16 +35,27 @@ const NOISE_KEYS = new Set([
   "market",
 ]);
 
-// Candidate keys (most-specific first) for the row's real as_of / trade date.
+// Candidate keys (most-specific first) for the row's real as_of / data date. Broad on purpose: each
+// dataset names its date differently (daily prices → trade_date; monthly revenue → revenue_month /
+// data_as_of / period; financials → period_end_date / fiscal_period). Missing the real date used to
+// make getDemoDatasetRow return null → the panel fell back to its FABRICATED code (the monthly_revenue
+// "period 2026-03" regression). `ingested_at`/`updated_at` are last resorts (pipeline time, not data
+// time).
 const AS_OF_KEYS = [
   "trade_date",
   "date",
   "period_end_date",
   "as_of_date",
   "as_of",
+  "data_as_of",
+  "revenue_month",
   "period",
+  "fiscal_period",
+  "report_date",
   "announcement_date",
+  "month",
   "updated_at",
+  "ingested_at",
 ];
 
 function authHeaders(): Record<string, string> {
@@ -92,13 +104,13 @@ export type DemoDatasetRow = { row: AnyRecord; asOf: string };
 // hero card LKG: a transient upstream failure must not blank a panel that had real data seconds ago.
 const lastGoodByKey = new Map<string, { items: [AnyRecord]; asOf: string }>();
 
-async function fetchRawRow(slug: string, ticker: string): Promise<AnyRecord | null> {
+async function fetchRawRows(slug: string, ticker: string, limit: number): Promise<AnyRecord[]> {
   const baseUrl = getTwFeatureEngineBaseUrl();
   if (!baseUrl) {
     console.warn(`[demo-real-data] no BACKEND_API_BASE_URL — ${slug}/${ticker} panel will use LKG or be omitted`);
-    return null;
+    return [];
   }
-  const path = `/v2/datasets/${slug}?symbol=${encodeURIComponent(ticker)}&limit=1`;
+  const path = `/v2/datasets/${slug}?symbol=${encodeURIComponent(ticker)}&limit=${limit}`;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
@@ -110,14 +122,13 @@ async function fetchRawRow(slug: string, ticker: string): Promise<AnyRecord | nu
     });
     if (!res.ok) {
       console.warn(`[demo-real-data] ${slug}/${ticker} upstream responded ${res.status}`);
-      return null;
+      return [];
     }
-    const rows = getRows(await res.json());
-    return rows[0] ?? null;
+    return getRows(await res.json());
   } catch (error) {
     const name = error instanceof Error ? error.name : "UnknownError";
     console.warn(`[demo-real-data] ${slug}/${ticker} fetch failed: ${name}`);
-    return null;
+    return [];
   } finally {
     clearTimeout(timeout);
   }
@@ -127,7 +138,7 @@ async function fetchRawRow(slug: string, ticker: string): Promise<AnyRecord | nu
 // real as_of and refreshes the LKG. On failure falls back to a recent LKG (real value + real date).
 // Returns null only when there is neither live data nor a servable cache — caller omits the panel.
 export async function getDemoDatasetRow(slug: string, ticker: string): Promise<DemoDatasetRow | null> {
-  const raw = await fetchRawRow(slug, ticker);
+  const raw = (await fetchRawRows(slug, ticker, 1))[0] ?? null;
   if (raw) {
     const asOf = pickAsOf(raw);
     const cleaned = cleanRow(raw);
@@ -140,6 +151,26 @@ export async function getDemoDatasetRow(slug: string, ticker: string): Promise<D
   if (lkg) {
     console.warn(`[demo-real-data] ${slug}/${ticker} serving last-known-good as_of ${lkg.asOf}`);
     return { row: lkg.items[0], asOf: lkg.asOf };
+  }
+  return null;
+}
+
+// Multi-row variant (e.g. last N quarters of financials) with the same per-key LKG safety. Returns
+// cleaned rows newest-first + the as_of of the newest row, or null when neither live nor cached.
+const lastGoodRowsByKey = new Map<string, { items: AnyRecord[]; asOf: string }>();
+
+export async function getDemoDatasetRows(slug: string, ticker: string, limit: number): Promise<{ rows: AnyRecord[]; asOf: string } | null> {
+  const raw = await fetchRawRows(slug, ticker, limit);
+  const cleaned = raw.map(cleanRow).filter((r) => Object.keys(r).length > 0);
+  const asOf = cleaned.length > 0 ? pickAsOf(raw[0]) : "";
+  if (cleaned.length > 0 && asOf) {
+    lastGoodRowsByKey.set(`${slug}:${ticker}:${limit}`, { items: cleaned, asOf });
+    return { rows: cleaned, asOf };
+  }
+  const lkg = pickServableLastGood(lastGoodRowsByKey.get(`${slug}:${ticker}:${limit}`), Date.now());
+  if (lkg) {
+    console.warn(`[demo-real-data] ${slug}/${ticker} (rows) serving last-known-good as_of ${lkg.asOf}`);
+    return { rows: lkg.items, asOf: lkg.asOf };
   }
   return null;
 }
@@ -209,4 +240,126 @@ export async function getHomepageDemoData(): Promise<HomepageDemoData> {
   ]);
 
   return { apiDemo: { responses }, sourceOfTruth: { byId: sotById } };
+}
+
+// ─── PR-B: real config for the agent-workflow + market-coverage demo tables ───────────────────────
+
+function num(row: AnyRecord, keys: string[]): number | null {
+  for (const k of keys) {
+    const v = row[k];
+    if (typeof v === "number" && Number.isFinite(v)) return v;
+    if (typeof v === "string") {
+      const n = Number(v.replace(/[,%\s]/g, ""));
+      if (v.trim() !== "" && Number.isFinite(n)) return n;
+    }
+  }
+  return null;
+}
+
+// MOPS financial-statement amounts are in THOUSANDS of TWD (verified against the dataset: 2330
+// quarterly revenue ≈ 1,134,103,440 thousand ≈ NT$1.13T, matching TSMC's real ~1T/quarter). Rendered
+// in T / B TWD to mirror the previous display scale. Owner sanity-checks magnitude at acceptance.
+function fmtAmountTWD(thousands: number): string {
+  const billions = thousands / 1e6; // thousands → billions
+  if (billions >= 1000) return `$${(billions / 1000).toFixed(2)}T`;
+  return `$${billions.toFixed(1)}B`;
+}
+function fmtPct(ratio: number): string {
+  return `${(ratio * 100).toFixed(1)}%`;
+}
+
+// Quarter label like "25Q4" from the row's fiscal fields (fallback: derive from the period date).
+function quarterLabel(row: AnyRecord): string {
+  const y = num(row, ["fiscal_year"]);
+  const q = num(row, ["fiscal_quarter"]);
+  if (y && q) return `${String(y).slice(2)}Q${q}`;
+  const d = pickAsOf(row);
+  if (d.length >= 7) {
+    const [yy, mm] = d.split("-");
+    return `${yy.slice(2)}Q${Math.ceil(Number(mm) / 3)}`;
+  }
+  return "—";
+}
+
+const AGENT_WORKFLOW_TICKER = "2330";
+const AGENT_WORKFLOW_QUARTERS = 8;
+
+// TSMC last-8-quarters real income table (approved redesign: quarterly, no fabricated R&D row).
+export async function buildAgentWorkflowConfig(): Promise<AgentWorkflowDemoConfig | null> {
+  const result = await getDemoDatasetRows("income-statement", AGENT_WORKFLOW_TICKER, AGENT_WORKFLOW_QUARTERS);
+  if (!result || result.rows.length === 0) return null;
+  const rows = result.rows; // newest-first
+  const amount = (r: AnyRecord, keys: string[]) => {
+    const v = num(r, keys);
+    return v === null ? "—" : fmtAmountTWD(v);
+  };
+  return {
+    queryPrompt: "分析台積電近 8 季營收與毛利率變化",
+    statusLead: "Agent: searching",
+    statusPill: "TW Market Data",
+    tableHeaders: ["Item", ...rows.map(quarterLabel)],
+    tableRows: [
+      ["營收", ...rows.map((r) => amount(r, ["revenue", "net_revenue", "total_revenue"]))],
+      ["營業毛利", ...rows.map((r) => amount(r, ["gross_profit"]))],
+      ["毛利率", ...rows.map((r) => {
+        const rev = num(r, ["revenue", "net_revenue", "total_revenue"]);
+        const gp = num(r, ["gross_profit"]);
+        return rev && gp !== null ? fmtPct(gp / rev) : "—";
+      })],
+      ["營業利益", ...rows.map((r) => amount(r, ["operating_income"]))],
+      ["EPS", ...rows.map((r) => {
+        const v = num(r, ["eps"]);
+        return v === null ? "—" : v.toFixed(2);
+      })],
+    ],
+    completionLabel: "Agent: analysis complete.",
+    tableGridTemplateColumns: `1.2fr repeat(${rows.length},minmax(0,1fr))`,
+    asOf: result.asOf,
+  };
+}
+
+const COVERAGE_TICKERS: { symbol: string; name: string }[] = [
+  { symbol: "2330", name: "2330 台積電" },
+  { symbol: "2454", name: "2454 聯發科" },
+  { symbol: "2317", name: "2317 鴻海" },
+  { symbol: "2308", name: "2308 台達電" },
+  { symbol: "3711", name: "3711 日月光" },
+  { symbol: "3231", name: "3231 緯創" },
+];
+
+// Per-ticker real screen: TTM revenue, latest gross margin, YoY revenue growth (latest quarter vs the
+// same quarter a year ago). Each metric is real or "—"; a ticker with no usable data is dropped.
+export async function buildMarketCoverageConfig(): Promise<AgentWorkflowDemoConfig | null> {
+  const results = await Promise.all(
+    COVERAGE_TICKERS.map(async (tk) => ({ tk, data: await getDemoDatasetRows("income-statement", tk.symbol, 8) })),
+  );
+  const tableRows: string[][] = [];
+  let latestAsOf = "";
+  for (const { tk, data } of results) {
+    if (!data || data.rows.length === 0) continue;
+    const q = data.rows; // newest-first
+    const rev0 = num(q[0], ["revenue", "net_revenue", "total_revenue"]);
+    const gp0 = num(q[0], ["gross_profit"]);
+    const rev4 = q.length > 4 ? num(q[4], ["revenue", "net_revenue", "total_revenue"]) : null;
+    const ttm = q.slice(0, 4).reduce((sum, r) => {
+      const v = num(r, ["revenue", "net_revenue", "total_revenue"]);
+      return v === null ? sum : sum + v;
+    }, 0);
+    const growth = rev0 !== null && rev4 ? fmtPct((rev0 - rev4) / rev4) : "—";
+    const margin = rev0 && gp0 !== null ? fmtPct(gp0 / rev0) : "—";
+    const revenue = ttm > 0 ? fmtAmountTWD(ttm) : "—";
+    tableRows.push([String(tableRows.length + 1), tk.name, growth, margin, revenue]);
+    if (data.asOf > latestAsOf) latestAsOf = data.asOf;
+  }
+  if (tableRows.length === 0) return null;
+  return {
+    queryPrompt: "找出近一年營收成長與毛利率穩定的股票",
+    statusLead: "Agent: searching",
+    statusPill: "TW Market Data",
+    tableHeaders: ["ID", "股票", "營收成長", "毛利率", "營收"],
+    tableRows,
+    completionLabel: "Agent: screen complete.",
+    tableGridTemplateColumns: "0.6fr 1.2fr repeat(3,minmax(0,1fr))",
+    asOf: latestAsOf,
+  };
 }

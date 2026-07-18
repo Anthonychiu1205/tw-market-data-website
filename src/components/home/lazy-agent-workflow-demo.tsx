@@ -19,7 +19,7 @@ function WorkflowDemoSkeleton() {
 }
 
 type LazyAgentWorkflowDemoProps = {
-  config?: AgentWorkflowDemoConfig;
+  config: AgentWorkflowDemoConfig;
 };
 
 export function LazyAgentWorkflowDemo({ config }: LazyAgentWorkflowDemoProps) {
