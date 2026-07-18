@@ -518,8 +518,12 @@ export function ApiKeysManager({
                   placeholder="例如 ai-hedge-fund"
                   className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
                   disabled={!canCreateNow || isSubmitting}
+                  required
+                  minLength={1}
                   maxLength={40}
+                  aria-required="true"
                 />
+                <span className="text-xs text-slate-400">為金鑰命名以便日後辨識（1–40 字，必填）。</span>
               </label>
 
               <div className="flex justify-end gap-2">
@@ -531,7 +535,11 @@ export function ApiKeysManager({
                 >
                   取消
                 </button>
-                <button type="submit" disabled={!canSubmit} className={buttonClass("primary", "h-10 rounded-lg px-4 text-sm")}>
+                <button
+                  type="submit"
+                  disabled={!canSubmit || newKeyName.trim().length === 0}
+                  className={buttonClass("primary", "h-10 rounded-lg px-4 text-sm")}
+                >
                   {isSubmitting ? "建立中..." : "建立"}
                 </button>
               </div>

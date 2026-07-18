@@ -423,12 +423,11 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
             {!usageReconciliation ? "尚無對帳資料" : reconciliationMismatch ? "部分 request 尚未完成對帳" : "對帳正常"}
           </span>
         </div>
-        {usageReconciliation ? (
+        {usageReconciliation && reconciliationMismatch ? (
           <p className="mt-3 text-xs text-slate-500">
-            待比對 request：{usageReconciliation.mismatchedRequestIds.length.toLocaleString()} ·
-            尚待串接請求：{usageReconciliation.orphanUsageEvents.length.toLocaleString()} ·
-            未連結交易：{usageReconciliation.orphanUsageTransactions.length.toLocaleString()} ·
-            重複交易檢查：{usageReconciliation.duplicateUsageTransactions.length.toLocaleString()}
+            需人工確認：金額不一致 {usageReconciliation.mismatchedRequestIds.length.toLocaleString()} 筆 ·
+            重複扣點 {usageReconciliation.duplicateUsageTransactions.length.toLocaleString()} 筆 ·
+            扣點無對應請求 {usageReconciliation.orphanUsageTransactions.length.toLocaleString()} 筆
           </p>
         ) : null}
       </DashboardCard>
