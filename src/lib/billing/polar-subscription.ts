@@ -61,6 +61,16 @@ function setCached<T>(key: string, value: T) {
 }
 
 /**
+ * Drop a user's cached Polar reads. Call after a write (cancel/resume) so the very next
+ * page render reflects the new state instead of a stale ≤60s cached snapshot.
+ */
+export function invalidatePolarBillingCache(userId: string) {
+  polarBillingCache.delete(`polar:sub:${userId}`);
+  polarBillingCache.delete(`polar:invoices:${userId}`);
+  polarBillingCache.delete(`polar:pm:${userId}`);
+}
+
+/**
  * Log the REAL Polar failure server-side (status code + body) so the cause is
  * diagnosable — never guess "insufficient scope" vs 401 vs network from behaviour —
  * and return a stable, non-leaky reason code for the UI. Note: an empty result
@@ -125,6 +135,10 @@ export async function getPolarSubscriptionDetail(
     const polar = getPolarClient();
     const iter = await polar.subscriptions.list({ externalCustomerId: userId, limit: 20 });
     const items = await collectFirstPage(iter as unknown as AsyncIterable<{ result?: { items?: unknown[] } }>);
+    // SBX-63 diagnostics: confirm which Polar we hit and how many subs came back for this externalId.
+    console.info(
+      `[polar-billing] subscriptions.list server=${process.env.POLAR_API_BASE?.trim() || "production"} externalCustomerId=${userId} rawItems=${items.length}`,
+    );
     const mapped = items
       .map(mapPolarSubscription)
       .filter((sub): sub is PolarSubscriptionDetail => sub !== null);

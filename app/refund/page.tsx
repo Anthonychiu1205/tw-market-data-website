@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { Container } from "@/src/components/ui/container";
 import { siteConfig } from "@/src/config/site";
+import { CANCELLATION_EFFECTIVE_AT_PERIOD_END } from "@/src/lib/legal/cancellation-copy";
 
 export const metadata: Metadata = {
   title: "退款政策",
@@ -35,7 +36,8 @@ const sections = [
     title: "四、取消訂閱",
     items: [
       "您可隨時於帳戶或訂閱管理流程取消訂閱。",
-      "取消後通常自下一計費週期起停止收費；已生效期間不另行按比例退款（依法另有規定者除外）。",
+      // Canonical clause — shared verbatim with the in-app cancel-confirm modal (SSOT).
+      CANCELLATION_EFFECTIVE_AT_PERIOD_END,
     ],
   },
   {

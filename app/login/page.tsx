@@ -110,9 +110,42 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </p>
 
               {process.env.NODE_ENV !== "production" ? (
-                <details className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+                <details
+                  className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600"
+                  open={process.env.ALLOW_DEV_LOGIN === "1"}
+                >
                   <summary className="cursor-pointer font-medium text-slate-700">本機開發用</summary>
-                  <p className="mt-2">Google OAuth 需設定 `GOOGLE_CLIENT_ID` 與 `GOOGLE_CLIENT_SECRET` 後可測試。</p>
+                  {process.env.ALLOW_DEV_LOGIN === "1" ? (
+                    <form method="post" action="/api/dev-login" className="mt-3 grid gap-2">
+                      <p className="text-[11px] text-slate-500">
+                        dev-login：以指定 userId 建立 session（userId = sandbox 訂閱的 externalCustomerId）。僅本機。
+                      </p>
+                      <input
+                        name="email"
+                        type="email"
+                        required
+                        placeholder="email（如 anthonyiaaan@gmail.com）"
+                        className="h-9 rounded-md border border-slate-300 bg-white px-2 text-sm text-slate-900"
+                      />
+                      <input
+                        name="userId"
+                        type="text"
+                        required
+                        placeholder="userId = sandbox sub externalId"
+                        className="h-9 rounded-md border border-slate-300 bg-white px-2 font-mono text-sm text-slate-900"
+                      />
+                      <button
+                        type="submit"
+                        className="h-9 rounded-md bg-slate-900 text-sm font-medium text-white hover:bg-slate-800"
+                      >
+                        Dev 登入
+                      </button>
+                    </form>
+                  ) : (
+                    <p className="mt-2">
+                      設 `ALLOW_DEV_LOGIN=1`（僅 .env.local）可用 dev-login 表單；或設定 Google OAuth。
+                    </p>
+                  )}
                 </details>
               ) : null}
             </div>
