@@ -60,11 +60,40 @@ function setCached<T>(key: string, value: T) {
   polarBillingCache.set(key, { value, expiresAt: Date.now() + POLAR_BILLING_CACHE_TTL_MS });
 }
 
-/** Map any Polar/client failure to a stable, non-leaky reason code for the UI. */
-function describePolarError(error: unknown): string {
+/**
+ * Log the REAL Polar failure server-side (status code + body) so the cause is
+ * diagnosable — never guess "insufficient scope" vs 401 vs network from behaviour —
+ * and return a stable, non-leaky reason code for the UI. Note: an empty result
+ * (customer has no subscription / card / invoices) is NOT an error; it flows through
+ * the `{ ok: true, data: null | [] }` path and never reaches here.
+ */
+function handlePolarError(context: string, error: unknown): string {
   if (error instanceof Error && error.message.includes("POLAR_ACCESS_TOKEN")) {
+    console.warn(`[polar-billing] ${context} — POLAR_ACCESS_TOKEN not configured`);
     return "billing_not_configured";
   }
+
+  // Polar's Speakeasy-generated errors carry a numeric statusCode and a body/rawResponse.
+  const err = error as { statusCode?: unknown; name?: unknown; message?: unknown; body?: unknown };
+  const statusCode = typeof err?.statusCode === "number" ? err.statusCode : undefined;
+  const name = typeof err?.name === "string" ? err.name : "UnknownError";
+  const message = typeof err?.message === "string" ? err.message : String(error);
+  let bodySnippet = "";
+  if (typeof err?.body === "string") {
+    bodySnippet = err.body.slice(0, 500);
+  } else if (err?.body && typeof err.body === "object") {
+    try {
+      bodySnippet = JSON.stringify(err.body).slice(0, 500);
+    } catch {
+      bodySnippet = "[unserializable body]";
+    }
+  }
+  console.warn(
+    `[polar-billing] ${context} failed — status=${statusCode ?? "n/a"} name=${name} message=${message} body=${bodySnippet}`,
+  );
+
+  if (statusCode === 401) return "billing_auth"; // bad/expired token
+  if (statusCode === 403) return "billing_forbidden"; // token missing a scope
   return "polar_unavailable";
 }
 
@@ -97,7 +126,7 @@ export async function getPolarSubscriptionDetail(
     setCached(cacheKey, result);
     return result;
   } catch (error) {
-    return { ok: false, error: describePolarError(error) };
+    return { ok: false, error: handlePolarError("subscriptions.list", error) };
   }
 }
 
@@ -118,7 +147,7 @@ export async function getPolarInvoices(
     setCached(cacheKey, result);
     return result;
   } catch (error) {
-    return { ok: false, error: describePolarError(error) };
+    return { ok: false, error: handlePolarError("orders.list", error) };
   }
 }
 
@@ -141,7 +170,7 @@ export async function getPolarPaymentMethod(
     setCached(cacheKey, result);
     return result;
   } catch (error) {
-    return { ok: false, error: describePolarError(error) };
+    return { ok: false, error: handlePolarError("customers.listPaymentMethodsExternal", error) };
   }
 }
 
