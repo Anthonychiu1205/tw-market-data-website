@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { INVESTMENT_DISCLAIMER } from "@/src/lib/legal/disclaimer";
+
 import { Container } from "../ui/container";
 
 const policyLinks = [
@@ -18,7 +20,8 @@ type SiteFooterProps = {
 export function SiteFooter({ onContactClick }: SiteFooterProps) {
   return (
     <footer className="border-t border-slate-200 bg-slate-50">
-      <Container className="flex flex-col items-start justify-between gap-4 py-6 md:flex-row md:items-center">
+      <Container className="flex flex-col items-center gap-3 py-6">
+        <p className="text-center text-xs text-slate-500">{INVESTMENT_DISCLAIMER}</p>
         <div className="mx-auto flex flex-wrap items-center justify-center text-sm text-slate-600">
           {policyLinks.map((item) => (
             <span key={item.label} className="inline-flex items-center">
