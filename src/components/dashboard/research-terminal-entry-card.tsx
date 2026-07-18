@@ -1,8 +1,20 @@
-import { LineChart } from "lucide-react";
+"use client";
+
+import { useTranslations } from "next-intl";
+import { ArrowRight, LineChart } from "lucide-react";
+
+import { Link } from "@/src/i18n/navigation";
+import { buttonClass } from "@/src/components/ui/button";
 
 // T-05 dashboard entry card for the 投研終端 (research terminal).
-// 暫未開放 — 顯示「即將推出」，入口連結關閉（owner request 2026-07-16，尚未對外開放）。
+// Feature-flagged: default OFF → 顯示「即將推出」、入口關閉。
+// 正式開放時在 Vercel 設 NEXT_PUBLIC_RESEARCH_TERMINAL_ENABLED=1 並重新部署（不需改碼、不會誤開）。
+const TERMINAL_URL = "https://terminal.twmarketdata.com";
+const TERMINAL_ENABLED = process.env.NEXT_PUBLIC_RESEARCH_TERMINAL_ENABLED === "1";
+
 export function ResearchTerminalEntryCard() {
+  const t = useTranslations("aiResearch");
+
   return (
     <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
       <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:p-7">
@@ -11,22 +23,35 @@ export function ResearchTerminalEntryCard() {
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-white">
               <LineChart size={18} strokeWidth={1.75} />
             </span>
-            <h2 className="text-lg font-semibold tracking-tight text-slate-900">投研終端</h2>
-            <span className="ml-1 inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">
-              即將推出
-            </span>
+            <h2 className="text-lg font-semibold tracking-tight text-slate-900">{t("terminal.title")}</h2>
+            {!TERMINAL_ENABLED && (
+              <span className="ml-1 inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">
+                {t("terminal.comingSoon")}
+              </span>
+            )}
           </div>
           <p className="mt-3 max-w-xl text-sm leading-6 text-slate-600">
-            以官方台股資料為底的線上投研工作台：因子、資料檢視與研究流程，一站完成。敬請期待。
+            {t("terminal.description")}
+            {TERMINAL_ENABLED ? t("terminal.descriptionEnabled") : t("terminal.descriptionDisabled")}
           </p>
 
           <div className="mt-5">
-            <span
-              aria-disabled="true"
-              className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-400"
-            >
-              即將推出
-            </span>
+            {TERMINAL_ENABLED ? (
+              <Link
+                href={TERMINAL_URL}
+                className={buttonClass("primary", "inline-flex items-center gap-2")}
+              >
+                {t("terminal.enter")}
+                <ArrowRight size={16} strokeWidth={2} />
+              </Link>
+            ) : (
+              <span
+                aria-disabled="true"
+                className="inline-flex cursor-not-allowed items-center gap-2 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-400"
+              >
+                {t("terminal.comingSoon")}
+              </span>
+            )}
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Copy, Download } from "lucide-react";
 
 import type { ApiKeyItem } from "@/src/lib/backend-adapter";
@@ -64,16 +65,18 @@ type RequestResponsePlaygroundProps = {
 // Turn the proxy's machine codes into something actionable. secret_unavailable is the one a user can
 // actually hit: a key minted before at-rest encryption cannot be revealed, so the server cannot use
 // it to call the API — the fix is to regenerate the key, not to retry.
-function describeError(code: string | undefined, status: number): string {
+type PlaygroundTranslator = (key: string, values?: Record<string, string | number>) => string;
+
+function describeError(t: PlaygroundTranslator, code: string | undefined, status: number): string {
   if (code === "secret_unavailable") {
-    return "這把金鑰無法取用（建立時間過早，無法還原完整金鑰）。請重新產生一把金鑰後再試。";
+    return t("errors.secretUnavailable");
   }
-  if (code === "missing_api_key") return "請先選擇一把 API 金鑰。";
-  if (code === "missing_symbol") return "此端點需要輸入股票代號。";
-  if (code === "invalid_endpoint") return "此端點無法使用，請重新選擇。";
-  if (code === "backend_base_url_missing") return "資料服務暫時無法連線，請稍後再試。";
-  if (code) return `請求失敗：${code}`;
-  return `請求失敗：HTTP ${status}`;
+  if (code === "missing_api_key") return t("errors.missingApiKey");
+  if (code === "missing_symbol") return t("errors.missingSymbol");
+  if (code === "invalid_endpoint") return t("errors.invalidEndpoint");
+  if (code === "backend_base_url_missing") return t("errors.backendUnavailable");
+  if (code) return t("errors.requestFailedCode", { code });
+  return t("errors.requestFailedStatus", { status });
 }
 
 function normalizePlanCode(planCode: string): PlanCode {
@@ -87,6 +90,7 @@ function normalizePlanCode(planCode: string): PlanCode {
 }
 
 export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntitled }: RequestResponsePlaygroundProps) {
+  const t = useTranslations("requestPlayground");
   const userPlan = normalizePlanCode(planCode);
   const availableEndpoints = useMemo(() => {
     if (!isEntitled) {
@@ -202,10 +206,10 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
       setResult(payload);
 
       if (!response.ok || payload.error) {
-        setErrorMessage(describeError(payload.error, response.status));
+        setErrorMessage(describeError(t, payload.error, response.status));
       }
     } catch {
-      setErrorMessage("目前無法送出 request，請稍後再試。");
+      setErrorMessage(t("errors.sendFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -218,7 +222,7 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      setErrorMessage("無法複製回應內容，請檢查瀏覽器權限。");
+      setErrorMessage(t("errors.copyFailed"));
     }
   }
 
@@ -238,12 +242,12 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1.15fr_0.85fr]">
         <form onSubmit={handleSubmit} className="rounded-xl border border-slate-200 bg-slate-50/50 p-8">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-900">Request</h3>
-            <p className="text-xs text-slate-500">目前方案：{planName}</p>
+            <h3 className="text-sm font-semibold text-slate-900">{t("requestHeading")}</h3>
+            <p className="text-xs text-slate-500">{t("currentPlan", { planName })}</p>
           </div>
           <div className="space-y-6">
             <label className="space-y-2.5 text-sm font-medium text-slate-500">
-              端點
+              {t("fields.endpoint")}
               <select
                 value={endpoint}
                 onChange={(event) => setEndpoint(event.target.value)}
@@ -258,7 +262,7 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
             </label>
 
             <label className="space-y-2.5 text-sm font-medium text-slate-500">
-              API key
+              {t("fields.apiKey")}
               <select
                 value={selectedKeyId}
                 onChange={(event) => onApiKeySelectionChange(event.target.value)}
@@ -276,7 +280,7 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
 
             {endpointConfig.showSymbol ? (
               <label className="space-y-2.5 text-sm font-medium text-slate-500">
-                股票代號
+                {t("fields.symbol")}
                 <input
                   value={symbol}
                   onChange={(event) => setSymbol(event.target.value)}
@@ -288,7 +292,7 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
 
             <div className="grid grid-cols-2 gap-6">
               <label className="space-y-2.5 text-sm font-medium text-slate-500">
-                  期間
+                  {t("fields.period")}
                   <select
                     value={period}
                     onChange={(event) => setPeriod(event.target.value)}
@@ -303,7 +307,7 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
 
               {endpointConfig.showLimit ? (
                 <label className="space-y-2.5 text-sm font-medium text-slate-500">
-                  筆數
+                  {t("fields.limit")}
                   <input
                     value={limit}
                     onChange={(event) => setLimit(event.target.value)}
@@ -319,7 +323,7 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
             {endpointConfig.showDateRange ? (
               <>
                 <label className="space-y-2.5 text-sm font-medium text-slate-500">
-                  開始日期
+                  {t("fields.startDate")}
                   <input
                     type="date"
                     value={startDate}
@@ -329,7 +333,7 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
                 </label>
 
                 <label className="space-y-2.5 text-sm font-medium text-slate-500">
-                  結束日期
+                  {t("fields.endDate")}
                   <input
                     type="date"
                     value={endDate}
@@ -347,26 +351,26 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
               disabled={submitting || !hasAvailableEndpoints || !hasKeyOptions}
               className="inline-flex h-10 items-center justify-center rounded-xl bg-black px-7 text-sm font-medium text-white transition-colors duration-150 hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-500"
             >
-              {submitting ? "送出中..." : "發送"}
+              {submitting ? t("actions.submitting") : t("actions.submit")}
             </button>
-            {!hasKeyOptions && isEntitled ? <p className="mt-3 text-sm text-slate-500">請先建立 API 金鑰。</p> : null}
+            {!hasKeyOptions && isEntitled ? <p className="mt-3 text-sm text-slate-500">{t("status.createKeyFirst")}</p> : null}
           </div>
-          {!isEntitled ? <p className="mt-2 text-sm text-slate-500">目前方案尚未啟用，請選擇方案。</p> : null}
-          {isEntitled && !hasAvailableEndpoints ? <p className="mt-2 text-sm text-slate-500">目前方案尚無可用 playground endpoint。</p> : null}
+          {!isEntitled ? <p className="mt-2 text-sm text-slate-500">{t("status.planInactive")}</p> : null}
+          {isEntitled && !hasAvailableEndpoints ? <p className="mt-2 text-sm text-slate-500">{t("status.noEndpoints")}</p> : null}
           {errorMessage ? <p className="mt-2 text-sm text-red-600">{errorMessage}</p> : null}
         </form>
 
         <div className="rounded-xl border border-slate-200 bg-slate-100 p-4 text-slate-900">
           <div className="flex items-center justify-between gap-2 border-b border-slate-200 pb-2">
-            <h3 className="text-sm font-semibold text-slate-900">Response</h3>
+            <h3 className="text-sm font-semibold text-slate-900">{t("responseHeading")}</h3>
             <div className="flex gap-1.5">
               <button
                 type="button"
                 onClick={copyResponse}
                 disabled={!result}
                 className="inline-flex items-center justify-center border-0 bg-transparent p-0 text-slate-400 shadow-none hover:text-slate-700 disabled:text-slate-300"
-                aria-label="Copy response"
-                title="Copy response"
+                aria-label={t("actions.copyResponse")}
+                title={t("actions.copyResponse")}
               >
                 <Copy className="h-4 w-4" />
               </button>
@@ -375,8 +379,8 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
                 onClick={downloadResponse}
                 disabled={!result}
                 className="inline-flex items-center justify-center border-0 bg-transparent p-0 text-slate-400 shadow-none hover:text-slate-700 disabled:text-slate-300"
-                aria-label="Download response"
-                title="Download response"
+                aria-label={t("actions.downloadResponse")}
+                title={t("actions.downloadResponse")}
               >
                 <Download className="h-4 w-4" />
               </button>
@@ -384,9 +388,9 @@ export function RequestResponsePlayground({ apiKeys, planCode, planName, isEntit
           </div>
           <p className="mt-2 text-xs font-medium text-slate-600">HTTP {typeof result?.status === "number" ? result.status : "—"}</p>
           <pre className="mt-2 max-h-[420px] overflow-auto rounded-md bg-slate-50 p-2 text-xs leading-6 text-slate-700">
-            {JSON.stringify(result ?? { message: "尚未送出請求" }, null, 2)}
+            {JSON.stringify(result ?? { message: t("status.emptyResponse") }, null, 2)}
           </pre>
-          {copied ? <p className="mt-2 text-[11px] text-slate-500">已複製</p> : null}
+          {copied ? <p className="mt-2 text-[11px] text-slate-500">{t("status.copied")}</p> : null}
         </div>
       </div>
     </section>

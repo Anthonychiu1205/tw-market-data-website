@@ -1,3 +1,5 @@
+import type { AppLocale } from "@/src/i18n/locales";
+
 export type CreditsMode = "dry_run" | "charged" | "blocked";
 
 export type CreditsDeductionRuntimeState = {
@@ -59,8 +61,16 @@ function normalizeModeInput(input: boolean | CreditsDeductionRuntimeState) {
   return input.mode;
 }
 
-export function getCreditsModeLabel(input: boolean | CreditsDeductionRuntimeState) {
+export function getCreditsModeLabel(
+  input: boolean | CreditsDeductionRuntimeState,
+  locale: AppLocale = "zh-TW",
+) {
   const mode = normalizeModeInput(input);
+  if (locale === "en") {
+    if (mode === "charged") return "Charged";
+    if (mode === "blocked") return "Deduction disabled";
+    return "Dry run";
+  }
   if (mode === "charged") return "已扣點";
   if (mode === "blocked") return "扣點未啟用";
   return "試算模式";
@@ -72,15 +82,31 @@ export function getCreditsModeLabel(input: boolean | CreditsDeductionRuntimeStat
  * in dry_run they are the ESTIMATED cost, no wallet deduction (audit P0-2: an estimate
  * shown as a bare "credits" number was misread — even by the owner — as a real charge).
  */
-export function getCreditsAmountLabel(input: boolean | CreditsDeductionRuntimeState) {
+export function getCreditsAmountLabel(
+  input: boolean | CreditsDeductionRuntimeState,
+  locale: AppLocale = "zh-TW",
+) {
   const mode = normalizeModeInput(input);
+  if (locale === "en") {
+    if (mode === "charged") return "credits charged";
+    if (mode === "blocked") return "credits (disabled)";
+    return "credits (estimated · not charged)";
+  }
   if (mode === "charged") return "已實扣 credits";
   if (mode === "blocked") return "credits（未啟用）";
   return "credits（試算・未實扣）";
 }
 
-export function getCreditsModeDescription(input: boolean | CreditsDeductionRuntimeState) {
+export function getCreditsModeDescription(
+  input: boolean | CreditsDeductionRuntimeState,
+  locale: AppLocale = "zh-TW",
+) {
   const mode = normalizeModeInput(input);
+  if (locale === "en") {
+    if (mode === "charged") return "API credits deduction is active.";
+    if (mode === "blocked") return "Deduction mode is misconfigured, so charging is disabled.";
+    return "API credits are in dry-run mode and are not being charged yet.";
+  }
   if (mode === "charged") return "API credits 已啟用正式扣點。";
   if (mode === "blocked") return "偵測到扣點模式設定不完整，扣點未啟用。";
   return "目前 API credits 為試算模式，尚未正式扣點。";

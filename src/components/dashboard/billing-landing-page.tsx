@@ -1,5 +1,7 @@
-import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 
+import { Link } from "@/src/i18n/navigation";
+import type { AppLocale } from "@/src/i18n/locales";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
 import { buttonClass } from "@/src/components/ui/button";
 import { CancelSubscriptionDialog } from "@/src/components/dashboard/cancel-subscription-dialog";
@@ -33,11 +35,11 @@ function formatPlanName(planCode: string) {
   return planCode;
 }
 
-function formatPlanAmount(planCode: string) {
+function formatPlanAmount(planCode: string, locale: AppLocale, contactUsLabel: string, perMonthLabel: string) {
   if (!isPlanCode(planCode)) return "—";
   const plan = getPlanByCode(planCode);
-  if (plan.monthlyAmountMinor === null) return "聯繫我們";
-  return `${formatPlanPrice(plan.monthlyAmountMinor, plan.currency)} / 月`;
+  if (plan.monthlyAmountMinor === null) return contactUsLabel;
+  return `${formatPlanPrice(plan.monthlyAmountMinor, plan.currency, locale)} / ${perMonthLabel}`;
 }
 
 function getToneClass(tone: ReturnType<typeof getSubscriptionStatusTone>) {
@@ -48,9 +50,9 @@ function getToneClass(tone: ReturnType<typeof getSubscriptionStatusTone>) {
   return "border-slate-200 bg-slate-50 text-slate-700";
 }
 
-function formatDate(date: Date | null) {
+function formatDate(date: Date | null, locale: AppLocale) {
   if (!date) return "—";
-  return new Intl.DateTimeFormat("zh-TW", {
+  return new Intl.DateTimeFormat(locale === "en" ? "en-CA" : "zh-TW", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -58,15 +60,20 @@ function formatDate(date: Date | null) {
 }
 
 export function BillingLandingPage({ subscription }: BillingLandingPageProps) {
+  const t = useTranslations("billing");
+  const locale = useLocale() as AppLocale;
   const statusLabel = subscription
-    ? getSubscriptionStatusLabel(subscription.status, subscription.cancelAtPeriodEnd)
+    ? getSubscriptionStatusLabel(subscription.status, subscription.cancelAtPeriodEnd, locale)
     : null;
   const statusDescription = subscription
-    ? getSubscriptionStatusDescription({
-        status: subscription.status,
-        cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-        currentPeriodEnd: subscription.currentPeriodEnd,
-      })
+    ? getSubscriptionStatusDescription(
+        {
+          status: subscription.status,
+          cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+          currentPeriodEnd: subscription.currentPeriodEnd,
+        },
+        locale,
+      )
     : null;
   const statusTone = subscription
     ? getSubscriptionStatusTone(subscription.status, subscription.cancelAtPeriodEnd)
@@ -83,30 +90,30 @@ export function BillingLandingPage({ subscription }: BillingLandingPageProps) {
   return (
     <div className="space-y-4">
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">帳務</h1>
-        <p className="mt-2 text-sm text-slate-600">管理訂閱方案、credits 與付款相關資訊。</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{t("landing.title")}</h1>
+        <p className="mt-2 text-sm text-slate-600">{t("landing.subtitle")}</p>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-slate-900">目前方案</h2>
+        <h2 className="text-lg font-semibold tracking-tight text-slate-900">{t("landing.currentPlanHeading")}</h2>
         {subscription ? (
           <div className="mt-3 space-y-2 text-sm text-slate-700">
-            <p>方案：{formatPlanName(subscription.planCode)}</p>
-            <p>方案價格：{formatPlanAmount(subscription.planCode)}</p>
+            <p>{t("landing.planLine", { plan: formatPlanName(subscription.planCode) })}</p>
+            <p>{t("landing.planPriceLine", { price: formatPlanAmount(subscription.planCode, locale, t("contactUs"), t("perMonth")) })}</p>
             {statusLabel && statusDescription && statusTone ? (
               <div className={`rounded-xl border px-3 py-2 ${getToneClass(statusTone)}`}>
-                <p className="text-sm font-medium">狀態：{statusLabel}</p>
+                <p className="text-sm font-medium">{t("landing.statusLine", { status: statusLabel })}</p>
                 <p className="mt-1 text-sm">{statusDescription}</p>
               </div>
             ) : null}
-            <p>週期：{subscription.billingCycle === "yearly" ? "年繳" : "月繳"}</p>
-            <p>目前區間結束：{formatDate(subscription.currentPeriodEnd)}</p>
-            <p>期末取消：{subscription.cancelAtPeriodEnd ? "已排定" : "未排定"}</p>
+            <p>{t("landing.cycleLine", { cycle: subscription.billingCycle === "yearly" ? t("landing.cycleYearly") : t("landing.cycleMonthly") })}</p>
+            <p>{t("landing.periodEndLine", { date: formatDate(subscription.currentPeriodEnd, locale) })}</p>
+            <p>{t("landing.cancelAtPeriodEndLine", { state: subscription.cancelAtPeriodEnd ? t("landing.scheduled") : t("landing.notScheduled") })}</p>
 
             {showPendingHint ? (
               <div className="pt-1">
                 <Link href="/pricing" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
-                  返回方案價格
+                  {t("landing.backToPricing")}
                 </Link>
               </div>
             ) : null}
@@ -114,30 +121,30 @@ export function BillingLandingPage({ subscription }: BillingLandingPageProps) {
             {showRetryAction ? (
               <div className="flex flex-wrap gap-2 pt-1">
                 <Link href="/pricing" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
-                  重新選擇方案
+                  {t("landing.chooseAgain")}
                 </Link>
                 <Link href="/contact" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
-                  聯繫我們
+                  {t("contactUs")}
                 </Link>
               </div>
             ) : null}
           </div>
         ) : (
-          <p className="mt-3 text-sm text-slate-600">目前尚未啟用付費訂閱方案。</p>
+          <p className="mt-3 text-sm text-slate-600">{t("landing.noPaidPlan")}</p>
         )}
         {subscription && canCancel ? <CancelSubscriptionDialog subscription={subscription} /> : null}
       </section>
 
       <section className="grid gap-4 md:grid-cols-2">
         <DashboardCard>
-          <p className="text-lg font-semibold text-slate-900">訂閱方案</p>
-          <p className="mt-2 text-sm text-slate-600">查看方案、切換月繳/年繳，並選擇最適合的訂閱層級。</p>
-          <Link href="/billing/subscriptions" className={buttonClass("secondary", "mt-5")}>前往訂閱方案</Link>
+          <p className="text-lg font-semibold text-slate-900">{t("landing.subscriptionsCardTitle")}</p>
+          <p className="mt-2 text-sm text-slate-600">{t("landing.subscriptionsCardBody")}</p>
+          <Link href="/billing/subscriptions" className={buttonClass("secondary", "mt-5")}>{t("landing.subscriptionsCardCta")}</Link>
         </DashboardCard>
         <DashboardCard>
-          <p className="text-lg font-semibold text-slate-900">Credits</p>
-          <p className="mt-2 text-sm text-slate-600">查看 credit balance、端點計價與交易紀錄。</p>
-          <Link href="/billing/credits" className={buttonClass("secondary", "mt-5")}>前往 Credits</Link>
+          <p className="text-lg font-semibold text-slate-900">{t("landing.creditsCardTitle")}</p>
+          <p className="mt-2 text-sm text-slate-600">{t("landing.creditsCardBody")}</p>
+          <Link href="/billing/credits" className={buttonClass("secondary", "mt-5")}>{t("landing.creditsCardCta")}</Link>
         </DashboardCard>
       </section>
     </div>

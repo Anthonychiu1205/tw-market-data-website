@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
 import { buttonClass } from "@/src/components/ui/button";
 import {
@@ -37,40 +38,50 @@ function availabilityBadgeClass(tone: AiResearchViewModel["availabilitySummary"]
   return "border-slate-300 bg-slate-50 text-slate-600";
 }
 
-function availabilityHint(summary: AiResearchViewModel["availabilitySummary"]) {
+// Returns the `aiResearch` message key for the coverage hint (resolved via t() at render). The hint is
+// page chrome describing the mock research state, not fabricated data — safe to localize.
+function availabilityHintKey(summary: AiResearchViewModel["availabilitySummary"]) {
   if (summary.readiness === "ready" && summary.agentAction === "proceed") {
-    return "近 6 個月 TWSE 價格資料可用，允許 Market Data Analyst 進入 mock-real。";
+    return "availabilityHint.ready";
   }
   if (summary.readiness === "unavailable" || summary.agentAction === "skip") {
-    return "找不到此 ticker 的價格資料，Market Data Analyst 將標記為 missing。";
+    return "availabilityHint.unavailable";
   }
   if (summary.readiness === "beta_limited") {
-    return "TPEx 歷史深度尚未完成，研究流程僅能保守回退。";
+    return "availabilityHint.betaLimited";
   }
-  return "偵測到資料覆蓋限制，研究流程將保守降級並維持 no_action。";
+  return "availabilityHint.degraded";
 }
 
 export function AiResearchStaticMockPage() {
   type DataSourceState = "local" | "proxy" | "fallback";
   type RunState = "idle" | "running" | "success" | "fallback";
 
+  const t = useTranslations("aiResearch");
+  const locale = useLocale();
+  // §2.5 fallback: the research OUTPUT below (analyst prose, summaries, bull/bear cases, timeline,
+  // disclaimer, data gaps/warnings) is rendered from the untranslated deterministic mock fixture
+  // (ai-research-mock-response.ts). On /en we surface an "English coming soon" notice rather than
+  // machine-translate that mock content (which would entrench fabricated numbers into English).
+  const showEnglishNotice = locale === "en";
+
   const sourceStatusMap: Record<
     DataSourceState,
     { label: string; description: string; badgeClass: string }
   > = {
     local: {
-      label: "本地 mock",
-      description: "使用瀏覽器內建 deterministic mock response，未呼叫後端。",
+      label: t("dataSource.local.label"),
+      description: t("dataSource.local.description"),
       badgeClass: "border-slate-300 text-slate-700 bg-white",
     },
     proxy: {
-      label: "tw-ai mock proxy",
-      description: "透過本機 internal proxy 呼叫 tw-ai mock endpoint。",
+      label: t("dataSource.proxy.label"),
+      description: t("dataSource.proxy.description"),
       badgeClass: "border-slate-300 text-slate-700 bg-slate-50",
     },
     fallback: {
-      label: "proxy 不可用，已切回本地 mock",
-      description: "後端 mock proxy 暫時不可用，頁面已使用本地 deterministic mock fallback。",
+      label: t("dataSource.fallback.label"),
+      description: t("dataSource.fallback.description"),
       badgeClass: "border-slate-300 text-slate-700 bg-slate-50",
     },
   };
@@ -181,28 +192,24 @@ export function AiResearchStaticMockPage() {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-[26px] font-semibold tracking-tight text-slate-900">AI Research</h1>
+              <h1 className="text-[26px] font-semibold tracking-tight text-slate-900">{t("title")}</h1>
               <span className="rounded-full border border-slate-300 px-2.5 py-1 text-[11px] font-medium text-slate-700">
-                Pro+ 功能
+                {t("badge.proPlus")}
               </span>
               <span className="rounded-full border border-slate-300 px-2.5 py-1 text-[11px] font-medium text-slate-700">
-                僅模擬
+                {t("badge.simulationOnly")}
               </span>
               <span className="rounded-full border border-slate-300 px-2.5 py-1 text-[11px] font-medium text-slate-700">
-                非投資建議
+                {t("badge.notInvestmentAdvice")}
               </span>
             </div>
-            <p className="max-w-3xl text-sm text-slate-600">
-              使用台股資料流程產生可審計的研究結論、風險檢查與模擬決策。
-            </p>
-            <p className="text-xs text-slate-500">
-              開放 Pro、Team、Enterprise 方案使用；Developer 僅提供 mock 預覽。
-            </p>
+            <p className="max-w-3xl text-sm text-slate-600">{t("intro")}</p>
+            <p className="text-xs text-slate-500">{t("planAvailability")}</p>
           </div>
 
           <div className="grid w-full gap-2 sm:grid-cols-2 lg:w-[420px]">
             <label className="space-y-1">
-              <span className="text-xs text-slate-500">股票代碼</span>
+              <span className="text-xs text-slate-500">{t("form.ticker")}</span>
               <input
                 value={tickerInput}
                 onChange={(event) => setTickerInput(event.target.value)}
@@ -210,7 +217,7 @@ export function AiResearchStaticMockPage() {
               />
             </label>
             <label className="space-y-1">
-              <span className="text-xs text-slate-500">資料日期</span>
+              <span className="text-xs text-slate-500">{t("form.asOfDate")}</span>
               <input
                 type="date"
                 value={asOfDateInput}
@@ -219,7 +226,7 @@ export function AiResearchStaticMockPage() {
               />
             </label>
             <label className="space-y-1 sm:col-span-2">
-              <span className="text-xs text-slate-500">預覽方案（本地 mock）</span>
+              <span className="text-xs text-slate-500">{t("form.previewPlan")}</span>
               <select
                 value={selectedPlan}
                 onChange={(event) => setSelectedPlan(event.target.value as AiResearchPlan)}
@@ -233,69 +240,75 @@ export function AiResearchStaticMockPage() {
               </select>
             </label>
             <div className="space-y-1">
-              <span className="text-xs text-slate-500">模式</span>
+              <span className="text-xs text-slate-500">{t("form.mode")}</span>
               <div className="h-10 rounded-lg border border-slate-300 bg-slate-50 px-3 text-sm leading-10 text-slate-700">
                 {entitlement.modeLabel}
               </div>
             </div>
             <div className="space-y-1">
-              <span className="text-xs text-transparent">執行</span>
+              <span className="text-xs text-transparent">{t("form.runLabel")}</span>
               <button
                 type="button"
                 onClick={handleRunResearch}
                 disabled={runButtonDisabled}
                 className={buttonClass("primary", "h-10 w-full rounded-lg text-sm")}
               >
-                {isRunning ? "執行中..." : canRunResearch ? "執行研究" : "方案未開放"}
+                {isRunning ? t("form.running") : canRunResearch ? t("form.run") : t("form.planLocked")}
               </button>
             </div>
           </div>
         </div>
         <div className="mt-2 grid gap-2 text-xs text-slate-500 sm:grid-cols-2 lg:grid-cols-4">
-          <p>目前方案：{entitlement.displayName}</p>
-          <p>AI Research：{entitlement.statusLabel}</p>
-          <p>每月研究次數：{entitlement.quotaLabel}</p>
-          <p>模式：{entitlement.modeLabel}</p>
+          <p>{t("meta.currentPlan", { plan: entitlement.displayName })}</p>
+          <p>{t("meta.status", { status: t(entitlement.statusKey) })}</p>
+          <p>{t("meta.monthlyRuns", { quota: t(entitlement.quotaKey) })}</p>
+          <p>{t("meta.mode", { mode: entitlement.modeLabel })}</p>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-          <span>資料來源狀態</span>
+          <span>{t("dataSource.title")}</span>
           <span className={`rounded-full border px-2 py-0.5 ${sourceStatusMap[dataSource].badgeClass}`}>
             {sourceStatusMap[dataSource].label}
           </span>
-          {runState === "running" ? <span className="text-slate-500">執行中...</span> : null}
+          {runState === "running" ? <span className="text-slate-500">{t("form.running")}</span> : null}
           <span className="w-full sm:w-auto">{sourceStatusMap[dataSource].description}</span>
         </div>
-        <p className="mt-1 text-xs text-slate-500">{entitlement.helperCopy}</p>
-        {entitlement.upgradeCopy ? (
-          <p className="mt-1 text-xs text-slate-500">{entitlement.upgradeCopy}</p>
+        <p className="mt-1 text-xs text-slate-500">{t(entitlement.helperKey)}</p>
+        {entitlement.upgradeKey ? (
+          <p className="mt-1 text-xs text-slate-500">{t(entitlement.upgradeKey)}</p>
         ) : null}
-        <p className="mt-1 text-xs text-slate-500">目前為本地 mock entitlement，不扣除 credits。</p>
+        <p className="mt-1 text-xs text-slate-500">{t("noCredits")}</p>
+
+        {showEnglishNotice ? (
+          <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-xs text-amber-800">
+            {t("englishNotice")}
+          </p>
+        ) : null}
 
         <div className="mt-5 grid gap-4 border-t border-slate-200 pt-4 md:grid-cols-5">
           <div>
-            <p className="text-xs text-slate-500">研究動作候選</p>
+            <p className="text-xs text-slate-500">{t("summary.actionCandidate")}</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{viewModel.summary.actionCandidate}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500">信心分數</p>
+            <p className="text-xs text-slate-500">{t("summary.confidence")}</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{viewModel.summary.confidence}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500">風控判斷</p>
+            <p className="text-xs text-slate-500">{t("summary.riskDecision")}</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{viewModel.summary.riskDecision}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500">投組動作</p>
+            <p className="text-xs text-slate-500">{t("summary.portfolioAction")}</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{viewModel.summary.portfolioAction}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500">模擬狀態</p>
+            <p className="text-xs text-slate-500">{t("summary.simulationStatus")}</p>
             <p className="mt-1 text-lg font-semibold text-slate-900">{viewModel.summary.simulationStatus}</p>
           </div>
         </div>
         <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-xs text-slate-500">資料覆蓋狀態</p>
+            <p className="text-xs text-slate-500">{t("coverage.title")}</p>
             <span
               className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${availabilityBadgeClass(viewModel.availabilitySummary.statusTone)}`}
             >
@@ -306,7 +319,7 @@ export function AiResearchStaticMockPage() {
           <p className="mt-1 text-xs text-slate-500">
             coverage window: {viewModel.availabilitySummary.coverageWindow}
           </p>
-          <p className="mt-1 text-xs text-slate-600">{availabilityHint(viewModel.availabilitySummary)}</p>
+          <p className="mt-1 text-xs text-slate-600">{t(availabilityHintKey(viewModel.availabilitySummary))}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {viewModel.availabilitySummary.qualityNotes.map((item) => (
               <span key={item} className="rounded-full border border-slate-300 px-2 py-0.5 text-[11px] text-slate-600">
@@ -327,14 +340,12 @@ export function AiResearchStaticMockPage() {
           safety: broker_execution={viewModel.safetyFlags.brokerExecution} / simulation_only={viewModel.safetyFlags.simulationOnly} /
           not_investment_advice={viewModel.safetyFlags.notInvestmentAdvice}
         </p>
-        <p className="mt-1 text-xs text-slate-500">
-          技術面目前為 deterministic fixture，僅供 mock 研究流程展示，不代表完整實盤技術分析。
-        </p>
+        <p className="mt-1 text-xs text-slate-500">{t("technicalFixtureNote")}</p>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white">
         <div className="px-6 py-5">
-          <h2 className="text-sm font-semibold tracking-wide text-slate-900">研究流程</h2>
+          <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("timeline.title")}</h2>
           <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-7">
             {viewModel.timelineSteps.map((step, index) => (
               <div key={step.stage} className="min-w-0 rounded-lg bg-slate-50/80 px-3 py-2">
@@ -354,9 +365,12 @@ export function AiResearchStaticMockPage() {
 
         <div className="border-t border-slate-200 px-6 py-5">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold tracking-wide text-slate-900">分析師總覽</h2>
+            <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("analysts.title")}</h2>
             <div className="text-xs text-slate-500">
-              目前方案：{entitlement.displayName} · {entitlement.statusLabel}
+              {t("analysts.planStatus", {
+                plan: entitlement.displayName,
+                status: t(entitlement.statusKey),
+              })}
             </div>
           </div>
           <div>
@@ -371,12 +385,12 @@ export function AiResearchStaticMockPage() {
               </colgroup>
               <thead>
                 <tr className="border-b border-slate-200 text-left text-xs tracking-wide text-slate-500">
-                  <th className="py-2 pr-4 font-medium">分析師</th>
-                  <th className="py-2 pr-4 font-medium">立場</th>
-                  <th className="py-2 pr-4 font-medium">信心</th>
-                  <th className="py-2 pr-4 font-medium">狀態</th>
-                  <th className="py-2 pr-4 font-medium">關鍵資料</th>
-                  <th className="py-2 font-medium">資料缺口</th>
+                  <th className="py-2 pr-4 font-medium">{t("analysts.table.analyst")}</th>
+                  <th className="py-2 pr-4 font-medium">{t("analysts.table.stance")}</th>
+                  <th className="py-2 pr-4 font-medium">{t("analysts.table.confidence")}</th>
+                  <th className="py-2 pr-4 font-medium">{t("analysts.table.status")}</th>
+                  <th className="py-2 pr-4 font-medium">{t("analysts.table.keyData")}</th>
+                  <th className="py-2 font-medium">{t("analysts.table.dataGaps")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -402,7 +416,7 @@ export function AiResearchStaticMockPage() {
         <div className="border-t border-slate-200 px-6 py-5">
           <div className="grid gap-8 lg:grid-cols-2">
             <div>
-              <h2 className="text-sm font-semibold tracking-wide text-slate-900">多方觀點（Bull Case）</h2>
+              <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("bullCase")}</h2>
               <ul className="mt-3 space-y-2 text-sm text-slate-700">
                 {viewModel.bullCasePoints.map((item) => (
                   <li key={item}>{item}</li>
@@ -410,7 +424,7 @@ export function AiResearchStaticMockPage() {
               </ul>
             </div>
             <div>
-              <h2 className="text-sm font-semibold tracking-wide text-slate-900">空方觀點（Bear Case）</h2>
+              <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("bearCase")}</h2>
               <ul className="mt-3 space-y-2 text-sm text-slate-700">
                 {viewModel.bearCasePoints.map((item) => (
                   <li key={item}>{item}</li>
@@ -421,10 +435,10 @@ export function AiResearchStaticMockPage() {
         </div>
 
         <div className="border-t border-slate-200 px-6 py-5">
-          <h2 className="text-sm font-semibold tracking-wide text-slate-900">圖表分析</h2>
+          <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("charts.title")}</h2>
           <div className="mt-4 grid gap-6 lg:grid-cols-2">
             <div className="space-y-2">
-              <p className="text-xs text-slate-500">分析師信心分數</p>
+              <p className="text-xs text-slate-500">{t("charts.confidenceTitle")}</p>
               <div className="space-y-2">
                 {viewModel.confidenceChartData.map((row) => (
                   <div key={row.name} className="grid grid-cols-[150px_minmax(0,1fr)_40px] items-center gap-3">
@@ -439,7 +453,7 @@ export function AiResearchStaticMockPage() {
             </div>
 
             <div className="space-y-2">
-              <p className="text-xs text-slate-500">研究覆蓋狀態</p>
+              <p className="text-xs text-slate-500">{t("charts.coverageTitle")}</p>
               <div className="space-y-3">
                 {viewModel.coverageChartData.map((row) => {
                   const total = viewModel.coverageChartData.reduce((acc, item) => acc + item.value, 0);
@@ -464,13 +478,13 @@ export function AiResearchStaticMockPage() {
         <div className="border-t border-slate-200 px-6 py-5">
           <div className="grid gap-6 lg:grid-cols-2">
             <div>
-              <h2 className="text-sm font-semibold tracking-wide text-slate-900">風控審查</h2>
+              <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("risk.title")}</h2>
               <dl className="mt-3 grid grid-cols-2 gap-y-2 text-sm text-slate-700">
-                <dt className="text-slate-500">風控判斷</dt>
+                <dt className="text-slate-500">{t("risk.decision")}</dt>
                 <dd className="font-medium text-slate-900">{viewModel.risk.decision}</dd>
-                <dt className="text-slate-500">最大配置</dt>
+                <dt className="text-slate-500">{t("risk.maxAllocation")}</dt>
                 <dd className="font-medium text-slate-900">{viewModel.risk.maxAllocation}</dd>
-                <dt className="text-slate-500">需要使用者確認</dt>
+                <dt className="text-slate-500">{t("risk.requiredConfirmation")}</dt>
                 <dd className="font-medium text-slate-900">{viewModel.risk.requiredUserConfirmation}</dd>
               </dl>
               <ul className="mt-3 space-y-1.5 text-sm text-slate-700">
@@ -481,17 +495,17 @@ export function AiResearchStaticMockPage() {
             </div>
 
             <div>
-              <h2 className="text-sm font-semibold tracking-wide text-slate-900">模擬訂單</h2>
+              <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("order.title")}</h2>
               <dl className="mt-3 grid grid-cols-2 gap-y-2 text-sm text-slate-700">
-                <dt className="text-slate-500">訂單狀態</dt>
+                <dt className="text-slate-500">{t("order.status")}</dt>
                 <dd className="font-medium text-slate-900">{viewModel.order.status}</dd>
-                <dt className="text-slate-500">僅模擬</dt>
+                <dt className="text-slate-500">{t("order.simulationOnly")}</dt>
                 <dd className="font-medium text-slate-900">{viewModel.order.simulationOnly}</dd>
-                <dt className="text-slate-500">券商下單</dt>
+                <dt className="text-slate-500">{t("order.brokerExecution")}</dt>
                 <dd className="font-medium text-slate-900">{viewModel.order.brokerExecution}</dd>
               </dl>
-              <p className="mt-3 text-sm text-slate-700">原因：{viewModel.order.reason}</p>
-              <p className="mt-2 text-xs text-slate-500">這是模擬研究輸出，不會建立任何券商委託單。</p>
+              <p className="mt-3 text-sm text-slate-700">{t("order.reason", { reason: viewModel.order.reason })}</p>
+              <p className="mt-2 text-xs text-slate-500">{t("order.note")}</p>
             </div>
           </div>
         </div>
@@ -499,7 +513,7 @@ export function AiResearchStaticMockPage() {
         <div className="border-t border-slate-200 px-6 py-5">
           <div className="grid gap-6 lg:grid-cols-2">
             <div>
-              <h2 className="text-sm font-semibold tracking-wide text-slate-900">資料缺口</h2>
+              <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("dataGaps.title")}</h2>
               <ul className="mt-3 space-y-1.5 text-sm text-slate-700">
                 {viewModel.dataGaps.map((item) => (
                   <li key={item}>{item}</li>
@@ -507,7 +521,7 @@ export function AiResearchStaticMockPage() {
               </ul>
             </div>
             <div>
-              <h2 className="text-sm font-semibold tracking-wide text-slate-900">風險提示</h2>
+              <h2 className="text-sm font-semibold tracking-wide text-slate-900">{t("warnings.title")}</h2>
               <ul className="mt-3 space-y-1.5 text-sm text-slate-700">
                 {viewModel.warnings.map((item) => (
                   <li key={item}>{item}</li>

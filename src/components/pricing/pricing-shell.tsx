@@ -2,7 +2,7 @@
 
 import { Fragment, useMemo, useState } from "react";
 import type { ComponentType } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Activity,
   BarChart3,
@@ -24,6 +24,7 @@ import {
 import { PolarEmbedCheckout } from "@polar-sh/checkout/embed";
 
 import { Link } from "@/src/i18n/navigation";
+import type { AppLocale } from "@/src/i18n/locales";
 import { buttonClass } from "@/src/components/ui/button";
 import {
   formatPlanPrice,
@@ -108,13 +109,14 @@ const CARD_CTA_CLASS = buttonClass("primary", "h-14 w-full rounded-2xl px-5 text
 
 export function PricingShell() {
   const t = useTranslations("pricing");
+  const locale = useLocale() as AppLocale;
   // Localize a comparison-table cell: known zh/data tokens go through the pricing.values catalog;
   // numeric / plan-derived cells pass through unchanged.
   const translateCell = (value: string): string => {
     const key = CELL_VALUE_KEY[value];
     return key ? t(`values.${key}`) : value;
   };
-  const planViews = useMemo(() => getPricingPlanViews(), []);
+  const planViews = useMemo(() => getPricingPlanViews(locale), [locale]);
   const paidPlans = useMemo(
     () => planViews.filter((plan) => plan.planCode !== "free" && !plan.isContactOnly),
     [planViews],
@@ -131,14 +133,14 @@ export function PricingShell() {
     const datasetScopeRow: ComparisonRow = {
       labelKey: "rows.datasetScope",
       values: Object.fromEntries(
-        COMPARISON_TIERS.map((tier) => [tier.key, getPricingPlanView(tier.key).datasetLimit]),
+        COMPARISON_TIERS.map((tier) => [tier.key, getPricingPlanView(tier.key, locale).datasetLimit]),
       ) as Record<ComparisonTier, string>,
     };
     return [
       { titleKey: "groups.datasetAccess", rows: [datasetScopeRow, ...DATA_ACCESS_ROWS] },
       { titleKey: "groups.quotaBilling", rows: QUOTA_ROWS },
     ];
-  }, []);
+  }, [locale]);
 
   async function handleUpgrade(planCode: string) {
     if (pendingPlan) return;
@@ -241,7 +243,7 @@ export function PricingShell() {
 
                   <div className="mt-10 min-h-[64px]">
                     <p className="whitespace-nowrap text-4xl font-medium tracking-tight text-slate-900">
-                      {formatPlanPrice(isAnnual ? plan.annualAmountMinor : plan.monthlyAmountMinor, plan.currency)}
+                      {formatPlanPrice(isAnnual ? plan.annualAmountMinor : plan.monthlyAmountMinor, plan.currency, locale)}
                       <span className="ml-1.5 inline-block align-baseline text-sm font-normal text-slate-400"> / {isAnnual ? t("perYear") : t("perMonth")}</span>
                     </p>
                     {isAnnual ? (

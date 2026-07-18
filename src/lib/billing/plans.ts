@@ -10,6 +10,7 @@
 //   developer  $2000  20 keys RPM 12,000  3,000,000/mo  all datasets, full history, webhook
 //   enterprise contact custom custom      custom        all datasets, full_raw, dedicated
 import { formatMoneyOrFallback, type CurrencyCode } from "@/src/lib/billing/money";
+import type { AppLocale } from "@/src/i18n/locales";
 
 export type PlanCode = "starter" | "pro" | "max" | "developer" | "enterprise";
 export type PricingPlanCode = PlanCode | "free";
@@ -56,6 +57,8 @@ export type BillingPlan = {
   monthlyRequestQuota: number | null;
   rateLimitPerMin: number | null;
   datasetLimit: string;
+  // English mirror of datasetLimit. Numbers/scope are identical — only the language differs.
+  datasetLimitEn: string;
   isContactOnly: boolean;
 };
 
@@ -88,6 +91,7 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     monthlyRequestQuota: 10_000,
     rateLimitPerMin: 300,
     datasetLimit: "全部資料集（不含財報三表）",
+    datasetLimitEn: "All datasets (excludes the three financial statements)",
     isContactOnly: false,
   },
   pro: {
@@ -100,6 +104,7 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     monthlyRequestQuota: 100_000,
     rateLimitPerMin: 1_200,
     datasetLimit: "全部資料集（含財報三表）",
+    datasetLimitEn: "All datasets (includes the three financial statements)",
     isContactOnly: false,
   },
   max: {
@@ -112,6 +117,7 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     monthlyRequestQuota: 300_000,
     rateLimitPerMin: 3_000,
     datasetLimit: "全部資料集（完整歷史）",
+    datasetLimitEn: "All datasets (full history)",
     isContactOnly: false,
   },
   developer: {
@@ -124,6 +130,7 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     monthlyRequestQuota: 3_000_000,
     rateLimitPerMin: 12_000,
     datasetLimit: "全部資料集（含 webhook）",
+    datasetLimitEn: "All datasets (includes webhook)",
     isContactOnly: false,
   },
   enterprise: {
@@ -136,13 +143,30 @@ export const BILLING_PLANS: Record<PlanCode, BillingPlan> = {
     monthlyRequestQuota: null,
     rateLimitPerMin: null,
     datasetLimit: "客製資料範圍",
+    datasetLimitEn: "Custom dataset scope",
     isContactOnly: true,
   },
 };
 
-const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "displayName" | "monthlyAmountMinor" | "annualAmountMinor" | "currency" | "isContactOnly" | "apiKeyLimit" | "datasetLimit">> = {
+// Display copy for each paid tier, in both languages. Numbers/RPM/quota are identical across
+// languages (they carry no language). `*En` fields mirror the zh fields token-for-token.
+type PlanPresentation = {
+  summary: string;
+  summaryEn: string;
+  monthlyHint: string;
+  usageMultiplier: string;
+  highlights: PlanHighlight[];
+  highlightsEn: PlanHighlight[];
+  ctaLabel: string;
+  ctaLabelEn: string;
+  href: string;
+  featured?: boolean;
+};
+
+const PLAN_PRESENTATION: Record<PlanCode, PlanPresentation> = {
   enterprise: {
     summary: "以已驗證資料集為核心，搭配客製化方案。",
+    summaryEn: "Verified datasets at the core, paired with a custom plan.",
     monthlyHint: "客製合約",
     usageMultiplier: "Custom",
     highlights: [
@@ -153,11 +177,21 @@ const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "di
       { text: "Webhook 與歷史回補", icon: "workflow" },
       { text: "專屬支援", icon: "headphones" },
     ],
+    highlightsEn: [
+      { text: "All datasets (per coverage status)", icon: "database" },
+      { text: "Custom API keys / quota / RPM", icon: "key" },
+      { text: "Commercial use and advanced entitlements", icon: "shield" },
+      { text: "Dedicated infrastructure and SLA available", icon: "server" },
+      { text: "Webhook and historical backfill", icon: "workflow" },
+      { text: "Dedicated support", icon: "headphones" },
+    ],
     ctaLabel: "聯繫我們",
+    ctaLabelEn: "Contact us",
     href: "/contact",
   },
   developer: {
     summary: "最高自助層級，高頻 production 與 webhook。",
+    summaryEn: "Top self-serve tier for high-frequency production and webhooks.",
     monthlyHint: "月付方案",
     usageMultiplier: "200 req/s",
     highlights: [
@@ -170,11 +204,23 @@ const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "di
       { text: "商業使用", icon: "shield" },
       { text: "優先支援", icon: "headphones" },
     ],
+    highlightsEn: [
+      { text: "All datasets (includes the three financial statements)", icon: "database" },
+      { text: "20 API keys", icon: "key" },
+      { text: "RPM 12,000", icon: "gauge" },
+      { text: "3,000,000 included requests/month", icon: "activity" },
+      { text: "Webhook enabled", icon: "workflow" },
+      { text: "Full history and backfill", icon: "clock3" },
+      { text: "Commercial use", icon: "shield" },
+      { text: "Priority support", icon: "headphones" },
+    ],
     ctaLabel: "選擇 Developer",
+    ctaLabelEn: "Choose Developer",
     href: "/dashboard",
   },
   max: {
     summary: "高頻用量與完整歷史深度。",
+    summaryEn: "High-frequency usage with full historical depth.",
     monthlyHint: "月付方案",
     usageMultiplier: "50 req/s",
     highlights: [
@@ -187,12 +233,24 @@ const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "di
       { text: "高頻 API 存取", icon: "zap" },
       { text: "優先支援", icon: "headphones" },
     ],
+    highlightsEn: [
+      { text: "All datasets (includes the three financial statements)", icon: "database" },
+      { text: "10 API keys", icon: "key" },
+      { text: "RPM 3,000", icon: "gauge" },
+      { text: "300,000 included requests/month", icon: "activity" },
+      { text: "Full historical depth", icon: "clock3" },
+      { text: "Commercial use", icon: "shield" },
+      { text: "High-frequency API access", icon: "zap" },
+      { text: "Priority support", icon: "headphones" },
+    ],
     ctaLabel: "選擇 Max",
+    ctaLabelEn: "Choose Max",
     href: "/dashboard",
     featured: true,
   },
   pro: {
     summary: "進階資料與正式商業使用。",
+    summaryEn: "Advanced data for production commercial use.",
     monthlyHint: "月付方案",
     usageMultiplier: "20 req/s",
     highlights: [
@@ -204,11 +262,22 @@ const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "di
       { text: "5 年歷史深度", icon: "clock3" },
       { text: "歷史回補", icon: "layers3" },
     ],
+    highlightsEn: [
+      { text: "All datasets (includes the three financial statements)", icon: "database" },
+      { text: "5 API keys", icon: "key" },
+      { text: "RPM 1,200", icon: "gauge" },
+      { text: "100,000 included requests/month", icon: "activity" },
+      { text: "Commercial use", icon: "shield" },
+      { text: "5 years of historical depth", icon: "clock3" },
+      { text: "Historical backfill", icon: "layers3" },
+    ],
     ctaLabel: "選擇 Pro",
+    ctaLabelEn: "Choose Pro",
     href: "/dashboard",
   },
   starter: {
     summary: "輕量整合與正式商業使用起點。",
+    summaryEn: "A lightweight starting point for integration and commercial use.",
     monthlyHint: "月付方案",
     usageMultiplier: "5 req/s",
     highlights: [
@@ -219,7 +288,16 @@ const PLAN_PRESENTATION: Record<PlanCode, Omit<PricingPlanView, "planCode" | "di
       { text: "商業使用", icon: "shield" },
       { text: "1 年歷史深度", icon: "clock3" },
     ],
+    highlightsEn: [
+      { text: "All datasets (excludes the three financial statements)", icon: "database" },
+      { text: "2 API keys", icon: "key" },
+      { text: "RPM 300", icon: "gauge" },
+      { text: "10,000 included requests/month", icon: "activity" },
+      { text: "Commercial use", icon: "shield" },
+      { text: "1 year of historical depth", icon: "clock3" },
+    ],
     ctaLabel: "選擇 Starter",
+    ctaLabelEn: "Choose Starter",
     href: "/dashboard",
   },
 };
@@ -246,6 +324,20 @@ const FREE_PLAN_VIEW: PricingPlanView = {
   datasetLimit: "基礎資料集（不含財報三表）",
 };
 
+// English mirror of the free-tier display copy. Numbers (RPM 60, 500 requests) are identical.
+const FREE_PLAN_VIEW_EN: PricingPlanView = {
+  ...FREE_PLAN_VIEW,
+  summary: "Free access for evaluation and testing — non-commercial use.",
+  highlights: [
+    { text: "Core datasets (excludes the three financial statements)", icon: "database" },
+    { text: "1 API key, RPM 60", icon: "key" },
+    { text: "500 included requests/month", icon: "activity" },
+    { text: "Basic usage display", icon: "sparkles" },
+  ],
+  ctaLabel: "Get started",
+  datasetLimit: "Core datasets (excludes the three financial statements)",
+};
+
 export const PRICING_PLAN_ORDER: PricingPlanCode[] = ["enterprise", "developer", "max", "pro", "starter", "free"];
 export const BILLING_SUBSCRIPTION_PLAN_ORDER: Exclude<PlanCode, "enterprise">[] = ["starter", "pro", "max", "developer"];
 export const PAID_PLAN_CODES: Exclude<PlanCode, "enterprise">[] = ["starter", "pro", "max", "developer"];
@@ -266,17 +358,22 @@ export function getPlanByCode(planCode: PlanCode) {
  * Plan price for display. Contact-only tiers have no amount — say so rather than printing "$0".
  * Delegates to the central currency-aware formatter; this module no longer hardcodes a symbol.
  */
-export function formatPlanPrice(amountMinor: number | null, currency: CurrencyCode = "USD") {
-  return formatMoneyOrFallback(amountMinor, currency, "聯繫我們");
+export function formatPlanPrice(
+  amountMinor: number | null,
+  currency: CurrencyCode = "USD",
+  locale: AppLocale = "zh-TW",
+) {
+  return formatMoneyOrFallback(amountMinor, currency, locale === "en" ? "Contact us" : "聯繫我們");
 }
 
-export function getPricingPlanView(planCode: PricingPlanCode): PricingPlanView {
+export function getPricingPlanView(planCode: PricingPlanCode, locale: AppLocale = "zh-TW"): PricingPlanView {
   if (planCode === "free") {
-    return FREE_PLAN_VIEW;
+    return locale === "en" ? FREE_PLAN_VIEW_EN : FREE_PLAN_VIEW;
   }
 
   const plan = BILLING_PLANS[planCode];
   const presentation = PLAN_PRESENTATION[planCode];
+  const isEn = locale === "en";
 
   return {
     planCode,
@@ -286,17 +383,23 @@ export function getPricingPlanView(planCode: PricingPlanCode): PricingPlanView {
     currency: plan.currency,
     isContactOnly: plan.isContactOnly,
     apiKeyLimit: plan.apiKeyLimit,
-    datasetLimit: plan.datasetLimit,
-    ...presentation,
+    datasetLimit: isEn ? plan.datasetLimitEn : plan.datasetLimit,
+    summary: isEn ? presentation.summaryEn : presentation.summary,
+    monthlyHint: presentation.monthlyHint,
+    usageMultiplier: presentation.usageMultiplier,
+    highlights: isEn ? presentation.highlightsEn : presentation.highlights,
+    ctaLabel: isEn ? presentation.ctaLabelEn : presentation.ctaLabel,
+    href: presentation.href,
+    featured: presentation.featured,
   };
 }
 
-export function getPricingPlanViews() {
-  return PRICING_PLAN_ORDER.map((planCode) => getPricingPlanView(planCode));
+export function getPricingPlanViews(locale: AppLocale = "zh-TW") {
+  return PRICING_PLAN_ORDER.map((planCode) => getPricingPlanView(planCode, locale));
 }
 
-export function getBillingSubscriptionPlanViews() {
-  return BILLING_SUBSCRIPTION_PLAN_ORDER.map((planCode) => getPricingPlanView(planCode));
+export function getBillingSubscriptionPlanViews(locale: AppLocale = "zh-TW") {
+  return BILLING_SUBSCRIPTION_PLAN_ORDER.map((planCode) => getPricingPlanView(planCode, locale));
 }
 
 // Included quota / rate limit for EVERY plan code, including free (which is not a BILLING_PLAN).
@@ -316,8 +419,14 @@ export function getPlanRequestLimits(planCode: string) {
 }
 
 /** Human label, DERIVED from the numbers above so the two can never drift apart. */
-export function getRequestLimitLabel(planCode: string): string {
+export function getRequestLimitLabel(planCode: string, locale: AppLocale = "zh-TW"): string {
   const limits = getPlanRequestLimits(planCode);
-  if (limits.monthlyRequestQuota === null || limits.rateLimitPerMin === null) return "客製配額";
-  return `每月 included ${limits.monthlyRequestQuota.toLocaleString("en-US")} requests / RPM ${limits.rateLimitPerMin.toLocaleString("en-US")}`;
+  if (limits.monthlyRequestQuota === null || limits.rateLimitPerMin === null) {
+    return locale === "en" ? "Custom quota" : "客製配額";
+  }
+  const quota = limits.monthlyRequestQuota.toLocaleString("en-US");
+  const rpm = limits.rateLimitPerMin.toLocaleString("en-US");
+  return locale === "en"
+    ? `${quota} included requests/month / RPM ${rpm}`
+    : `每月 included ${quota} requests / RPM ${rpm}`;
 }
