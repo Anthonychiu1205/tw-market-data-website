@@ -164,6 +164,19 @@ export function isNotFoundError(error: unknown): boolean {
   return typeof error === "object" && error !== null && (error as { statusCode?: unknown }).statusCode === 404;
 }
 
+/**
+ * True when a Polar error means "no customer for this externalCustomerId" — the account never
+ * checked out (entitlement-only user). Polar returns 422 PolarRequestValidationError
+ * "Customer does not exist." (or 404). The portal/session route must handle this, not 500.
+ */
+export function isPolarCustomerMissing(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false;
+  const e = error as { statusCode?: unknown; body?: unknown; message?: unknown };
+  if (e.statusCode !== 404 && e.statusCode !== 422) return false;
+  const text = `${typeof e.body === "string" ? e.body : ""} ${typeof e.message === "string" ? e.message : ""}`;
+  return /customer does not exist/i.test(text);
+}
+
 export function isOrderOwnedByUser(order: unknown, userId: string): boolean {
   if (!order || typeof order !== "object") return false;
   if (!userId) return false;

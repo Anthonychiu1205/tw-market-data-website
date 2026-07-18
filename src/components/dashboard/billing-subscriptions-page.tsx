@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ComponentType } from "react";
+import { Suspense, type ComponentType } from "react";
 import {
   Activity,
   AlertTriangle,
@@ -41,6 +41,7 @@ import {
 } from "@/src/lib/legal/cancellation-copy";
 import { CancelSubscriptionButton } from "@/src/components/dashboard/cancel-subscription-button";
 import { ResumeSubscriptionButton } from "@/src/components/dashboard/resume-subscription-button";
+import { BillingPortalNotice } from "@/src/components/dashboard/billing-portal-notice";
 import type {
   PolarBillingSnapshot,
   PolarInvoice,
@@ -99,10 +100,14 @@ function formatDateYmd(date: Date | null): string {
 }
 
 export function BillingSubscriptionsPage({ currentPlanId, polar }: BillingSubscriptionsPageProps) {
-  if (!currentPlanId) {
-    return <FreeUpgradeView />;
-  }
-  return <PaidBillingView planId={currentPlanId} polar={polar} />;
+  return (
+    <>
+      <Suspense fallback={null}>
+        <BillingPortalNotice />
+      </Suspense>
+      {!currentPlanId ? <FreeUpgradeView /> : <PaidBillingView planId={currentPlanId} polar={polar} />}
+    </>
+  );
 }
 
 // ---------------------------------------------------------------------------
