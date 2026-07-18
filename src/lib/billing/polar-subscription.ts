@@ -135,6 +135,10 @@ export async function getPolarSubscriptionDetail(
     const polar = getPolarClient();
     const iter = await polar.subscriptions.list({ externalCustomerId: userId, limit: 20 });
     const items = await collectFirstPage(iter as unknown as AsyncIterable<{ result?: { items?: unknown[] } }>);
+    // SBX-63 diagnostics: confirm which Polar we hit and how many subs came back for this externalId.
+    console.info(
+      `[polar-billing] subscriptions.list server=${process.env.POLAR_API_BASE?.trim() || "production"} externalCustomerId=${userId} rawItems=${items.length}`,
+    );
     const mapped = items
       .map(mapPolarSubscription)
       .filter((sub): sub is PolarSubscriptionDetail => sub !== null);

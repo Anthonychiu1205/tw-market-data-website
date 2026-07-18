@@ -51,6 +51,21 @@ export function getPolarProductId(plan: PolarPaidPlanCode): string {
   return value;
 }
 
+/**
+ * Reverse of getPolarProductId: map a Polar subscription's product id back to our plan code.
+ * The /billing/subscriptions page uses this so the paid/free state + plan come from the LIVE Polar
+ * subscription (SSOT) rather than the read API entitlement (which gates dataset access separately).
+ * Returns null when the product id matches no configured plan.
+ */
+export function planFromPolarProductId(productId: string | null | undefined): PolarPaidPlanCode | null {
+  const target = productId?.trim();
+  if (!target) return null;
+  for (const plan of POLAR_PAID_PLAN_CODES) {
+    if (process.env[PRODUCT_ENV_BY_PLAN[plan]]?.trim() === target) return plan;
+  }
+  return null;
+}
+
 export function getEmbedOrigin(): string | undefined {
   return process.env.NEXT_PUBLIC_SITE_URL?.trim() || undefined;
 }

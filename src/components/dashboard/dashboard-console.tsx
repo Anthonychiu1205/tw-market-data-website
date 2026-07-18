@@ -23,6 +23,7 @@ import { DeleteAccountCard } from "@/src/components/dashboard/delete-account-car
 import { ResearchTerminalEntryCard } from "@/src/components/dashboard/research-terminal-entry-card";
 import type { CreditSpendSeries } from "@/src/lib/billing/credits";
 import type { PolarBillingSnapshot } from "@/src/lib/billing/polar-subscription";
+import { planFromPolarProductId } from "@/src/lib/billing/polar";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
 import { getCreditsAmountLabel, getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
 
@@ -477,14 +478,22 @@ export function renderSection(section: DashboardSection, props: DashboardConsole
   }
   if (section === "billing") {
     if (props.currentPath === "/billing/subscriptions") {
-      const currentPlanId = props.subscription?.planCode;
-      const paidPlanId =
-        currentPlanId === "starter" ||
-        currentPlanId === "pro" ||
-        currentPlanId === "max" ||
-        currentPlanId === "developer"
-          ? currentPlanId
+      // Polar is SSOT for subscription state on this page: derive the paid plan from the ACTIVE
+      // Polar subscription's product. Only fall back to the read API entitlement plan when Polar
+      // has no active sub (so the page still works if Polar is momentarily unavailable).
+      const polarSub = props.polar?.subscription.ok ? props.polar.subscription.data : null;
+      const polarActive =
+        polarSub && ["active", "trialing", "past_due"].includes(polarSub.status.toLowerCase());
+      const polarPlan = polarActive ? planFromPolarProductId(polarSub!.productId) : null;
+      const entitlementPlan = props.subscription?.planCode;
+      const entitlementPaid =
+        entitlementPlan === "starter" ||
+        entitlementPlan === "pro" ||
+        entitlementPlan === "max" ||
+        entitlementPlan === "developer"
+          ? entitlementPlan
           : null;
+      const paidPlanId = polarPlan ?? entitlementPaid;
       return <BillingSubscriptionsPage currentPlanId={paidPlanId} polar={props.polar ?? null} />;
     }
     if (props.currentPath === "/billing/credits") {

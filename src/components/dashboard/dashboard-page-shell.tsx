@@ -282,14 +282,11 @@ async function DashboardSectionData({
   const needsUsageSummary = section === "overview" || section === "usage";
   const needsUsageRows = section === "usage";
   const needsBillingDisplaySubscription = section === "billing";
-  // Live Polar read for the billing area — only for paid users, and not on the credits
-  // sub-page (which does not display subscription detail). Free users see the upgrade
-  // cards with no Polar call.
-  const needsPolarBilling =
-    section === "billing" &&
-    currentPath !== "/billing/credits" &&
-    entitlement.isEntitled &&
-    entitlement.planCode !== "free";
+  // Live Polar read for the billing area. Polar is the SSOT for subscription state, so fetch it
+  // regardless of the read API entitlement — otherwise an active Polar subscription is invisible
+  // whenever the entitlement projection lags/differs (e.g. sandbox: Polar has a paid sub but the
+  // prod read API still reports free). Skip only the credits sub-page (no subscription detail).
+  const needsPolarBilling = section === "billing" && currentPath !== "/billing/credits";
   const needsWallet = section === "billing" || section === "overview" || currentPath === "/billing/credits";
   const needsCreditTransactions = currentPath === "/billing/credits";
   const needsReconciliation = section === "usage" || currentPath === "/billing/credits";
