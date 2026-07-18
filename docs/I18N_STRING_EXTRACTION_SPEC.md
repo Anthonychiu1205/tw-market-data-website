@@ -169,7 +169,21 @@ API field names, ticker symbols (e.g. `2330`).
 - Answers cluster: answer-pages.ts already per-locale (5 en + 3 zh-Hant entries, distinct slugs) → `getPublishedAnswerPages(locale)`,
   page + [slug] chrome.
 - Blog cluster: chrome + category-label map + §2.5 "English coming soon" fallback (article bodies stay zh for human EN copywriting — flag below).
-- Message catalog: **564 keys, full en/zh parity**. Multiple full production builds green.
+- site.ts: platformCapabilities + sourcePolicy → `*_en` + selectors (product/about wired).
+- Docs cluster: shell/nav (docs-layout/page-shell/section-heading), `docs-sidebar.ts` → `getDocsSidebar(locale)`,
+  onboarding content (landing/quick-start/authentication fully EN; tools-mcp in-component), interactive
+  components (code-block/playground/live-demo/side-panel/coverage-limits), and the §2.5 "English coming soon"
+  fallback on `[...slug]` (docs-pages.ts 12k body stays zh). Thin docs pages are redirects (no work).
+- **PR2 (公開頁) = COMPLETE.** Message catalog: **664 keys, full en/zh parity**. Multiple full production builds green.
+
+**Remaining = the two structured phases (separate PRs):**
+- **PR3 (dashboard):** dashboard/* (20 components) + dashboard.ts + billing/subscription pages + `plans.ts` plan-card
+  copy (§5.1) + cancellation-copy.ts + datasetProducts (site.ts, backend). Protected/dynamic pages.
+- **PR4 (SEO):** per-page `metadata`/`generateMetadata` + hreflang (zh-Hant/en/x-default) + canonical self-ref +
+  JSON-LD bilingual + `sitemap.ts`/`robots.ts` locale URLs + missing-key telemetry + reconcile docs-pages.ts
+  sidebar dup (§ flag). Note: html `lang` per locale already done (layout); §2.5 fallback already on blog + docs.
+- **Human-copywriting follow-ups:** blog article bodies (EN), docs-pages.ts reference prose, docs.ts aboutSections,
+  docs-guide-content.ts — all currently zh with §2.5 fallback.
 
 **Remaining content-data files (need `*_en` fields + locale selector, spec §1.6):**
 - `src/content/site.ts` — `platformCapabilities` + `sourcePolicy` (product/about) + `datasetProducts` (28 rows, datasets).
