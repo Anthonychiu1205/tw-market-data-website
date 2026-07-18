@@ -37,14 +37,7 @@
       "news": "市場新聞",
       "viewAll": "查看全部資料",
       "viewMore": "查看更多",
-      "asOf": "資料日期 {date}",
-      "names": {
-        "twse_taiex": "加權指數",
-        "tpex_otci": "櫃買指數",
-        "twii_0050": "台灣50",
-        "sector_ele": "電子類股",
-        "sector_fin": "金融保險"
-      }
+      "asOf": "資料日期 {date}"
     },
     "hero": {
       "title": "台股資料 API，為系統與量化流程而設計",
