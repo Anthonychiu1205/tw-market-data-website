@@ -381,6 +381,23 @@ export function BillingCreditsPage({ creditsModeState, walletBalance, spendSerie
       </section>
 
       <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
+        <p className="text-[15px] font-medium text-slate-900">計費方式</p>
+        <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-600">
+          <li>訂閱方案每月含 included 請求額度；API 請求優先扣此額度，credits 錢包不受影響。</li>
+          <li>included 額度用盡後，超額請求才依上方端點成本從 credits 錢包扣點（overage）。</li>
+          <li>included 已用盡且錢包餘額不足時，請求會被拒絕（需儲值或升級方案）。</li>
+          <li>RPM（每分鐘請求上限）為速率保護，與月額度／credits 分開計算。</li>
+        </ul>
+        {creditsModeState.mode === "dry_run" ? (
+          <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            目前為計費試算模式：請求會記錄估算成本，但尚未實際扣點或扣款。
+          </p>
+        ) : (
+          <p className="mt-3 text-xs text-slate-500">計費已啟用：超出 included 額度的請求會依端點成本實際扣點。</p>
+        )}
+      </DashboardCard>
+
+      <DashboardCard className="rounded-3xl border-slate-200/70 bg-white p-6 shadow-none">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-[15px] font-medium text-slate-900">使用量 / Credits 對帳（近 {usageReconciliation?.windowDays ?? 30} 天）</p>
