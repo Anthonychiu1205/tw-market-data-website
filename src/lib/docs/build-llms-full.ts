@@ -79,6 +79,7 @@ export function buildLlmsFullText(): string {
     `> ${siteConfig.description}`,
     "> not_investment_advice=true；資料有缺如實標記、絕不以推測值補洞；TWSE-first，不宣稱 full-market。",
     "> 本檔由 docs 源自動生成（禁手維護）。中文為主，術語保留英文。",
+    "> openapi=https://twmarketdata.com/openapi.json ; openapi_yaml=https://twmarketdata.com/openapi.yaml ; skill=https://twmarketdata.com/skill.md",
     "",
     "## 資料集目錄 (Dataset catalog)",
     ...datasetSeoEntries.map((d) => `- ${d.name} (${d.slug}) — ${d.shortDescription} · docs: ${d.docsHref}`),

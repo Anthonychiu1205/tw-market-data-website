@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/release_migrate.mjs && prisma generate && next build",
+    "build": "node scripts/generate_openapi.mjs && node scripts/release_migrate.mjs && prisma generate && next build",
     "migrate:deploy": "prisma migrate deploy",
     "migrate:status": "prisma migrate status",
     "start": "next start",
@@ -23,7 +23,9 @@
     "check:email-auth-security": "node scripts/check_email_auth_security.mjs",
     "check:auth-throttle": "node scripts/check_auth_throttle.mjs",
     "smoke:gateway-cache": "node scripts/smoke_gateway_cache.mjs",
-    "check:dataset-factory-docs": "node scripts/check-dataset-factory-docs-sync.mjs"
+    "check:dataset-factory-docs": "node scripts/check-dataset-factory-docs-sync.mjs",
+    "generate:openapi": "node scripts/generate_openapi.mjs",
+    "check:openapi": "node scripts/generate_openapi.mjs --check"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",

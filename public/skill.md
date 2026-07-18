@@ -40,6 +40,35 @@ curl -H "X-API-Key: $TWMD_API_KEY" \
   "https://api.twmarketdata.com/v2/datasets/income-statement?symbol=2330&period=ttm"
 ```
 
+## Framework quickstart（agent 框架一行接入 / one-line framework onboarding）
+任何支援 OpenAPI 的 agent 框架都能直接載入 spec 自動取得全部工具，零整合開發。
+Any OpenAPI-compatible agent framework can load the spec to get every tool automatically — no integration code.
+
+- **Spec**：`https://twmarketdata.com/openapi.json`（或 `/openapi.yaml`）。免 key 端點標 `security: []`（如 `get_twse_daily_price`），框架可直接試跑；其餘標 `ApiKeyAuth`。
+  The spec marks keyless endpoints with `security: []` (e.g. `get_twse_daily_price`) so frameworks know which tools they can call without a key.
+
+- **LangChain**（Python）:
+  ```python
+  from langchain_community.utilities.openapi import OpenAPISpec
+  spec = OpenAPISpec.from_url("https://twmarketdata.com/openapi.json")
+  # 或 / or: APIChain.from_llm_and_api_docs(llm, requests.get(".../openapi.json").text)
+  ```
+- **LlamaIndex**（Python）:
+  ```python
+  import requests
+  from llama_index.tools.openapi import OpenAPIToolSpec
+  spec = requests.get("https://twmarketdata.com/openapi.json").json()
+  tools = OpenAPIToolSpec(spec=spec).to_tool_list()
+  ```
+- **OpenAI function calling**:
+  ```python
+  import requests
+  spec = requests.get("https://twmarketdata.com/openapi.json").json()
+  # 每個 operation → 一個 tool / one tool per operation, keyed by operationId:
+  tools = [{"type": "function", "function": {"name": op["operationId"], "description": op.get("summary", ""), "parameters": {"type": "object"}}}
+           for path in spec["paths"].values() for op in path.values() if "operationId" in op]
+  ```
+
 ## 回傳格式
 - JSON（預設）；加 `?format=csv` 或 `?format=ndjson` 可換格式；支援 gzip。
 - 回應含頂層 `data_as_of`（資料時點）；分頁時含 `next_page_url`（cursor）。
