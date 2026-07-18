@@ -1,6 +1,10 @@
 import path from "node:path";
 
+import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
+
+// I18N-01: point next-intl at the request config (locale + messages per request).
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -51,4 +55,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);
