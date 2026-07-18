@@ -35,6 +35,12 @@ import {
   getSubscriptionStatusTone,
   type SubscriptionStatusTone,
 } from "@/src/lib/billing/status";
+import {
+  CANCELLATION_API_KEY_DOWNGRADE_WARNING,
+  CANCELLATION_EFFECTIVE_AT_PERIOD_END,
+} from "@/src/lib/legal/cancellation-copy";
+import { CancelSubscriptionButton } from "@/src/components/dashboard/cancel-subscription-button";
+import { ResumeSubscriptionButton } from "@/src/components/dashboard/resume-subscription-button";
 import type {
   PolarBillingSnapshot,
   PolarInvoice,
@@ -193,6 +199,22 @@ function PaidBillingView({ planId, polar }: { planId: PaidPlanCode; polar: Polar
       <PaymentMethodCard result={polar?.paymentMethod ?? null} />
 
       <InvoicesCard result={polar?.invoices ?? null} />
+
+      {sub && !cancelPending ? (
+        <section className="rounded-2xl border border-slate-200 bg-white p-6">
+          <h3 className="text-sm font-semibold text-slate-900">取消方案</h3>
+          <p className="mt-1 text-sm text-slate-600">
+            取消採期末生效，服務可使用至目前週期結束，不立即中斷、不退款。
+          </p>
+          <div className="mt-4">
+            <CancelSubscriptionButton
+              periodEndLabel={formatDateYmd(sub.currentPeriodEnd ?? sub.endsAt)}
+              effectiveClause={CANCELLATION_EFFECTIVE_AT_PERIOD_END}
+              apiKeyWarning={CANCELLATION_API_KEY_DOWNGRADE_WARNING}
+            />
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }
@@ -206,6 +228,7 @@ function CancelPendingBanner({ sub }: { sub: PolarSubscriptionDetail }) {
         <div>
           <p className="text-sm font-medium">已排定取消</p>
           <p className="mt-1 text-sm">服務可使用至 {untilDate}，之後不再自動扣款。</p>
+          <ResumeSubscriptionButton />
         </div>
       </div>
     </section>
@@ -305,6 +328,16 @@ function PaymentMethodCard({ result }: { result: PolarReadResult<PolarPaymentMet
           </div>
         )}
       </div>
+      {result?.ok ? (
+        <div className="mt-3">
+          <a
+            href="/api/billing/portal"
+            className="inline-flex h-8 items-center rounded-lg border border-slate-200 px-3 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+          >
+            {result.data ? "更換付款方式" : "設定付款方式"}
+          </a>
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -345,6 +378,12 @@ function InvoicesCard({ result }: { result: PolarReadResult<PolarInvoice[]> | nu
                   <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] text-slate-500">
                     {INVOICE_STATUS_LABEL[invoice.status.toLowerCase()] ?? invoice.status}
                   </span>
+                  <a
+                    href={`/api/billing/invoice/${invoice.id}`}
+                    className="text-xs font-medium text-slate-500 underline underline-offset-2 transition hover:text-slate-800"
+                  >
+                    發票
+                  </a>
                 </div>
               </li>
             ))}

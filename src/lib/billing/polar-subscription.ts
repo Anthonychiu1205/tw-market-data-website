@@ -61,6 +61,16 @@ function setCached<T>(key: string, value: T) {
 }
 
 /**
+ * Drop a user's cached Polar reads. Call after a write (cancel/resume) so the very next
+ * page render reflects the new state instead of a stale ≤60s cached snapshot.
+ */
+export function invalidatePolarBillingCache(userId: string) {
+  polarBillingCache.delete(`polar:sub:${userId}`);
+  polarBillingCache.delete(`polar:invoices:${userId}`);
+  polarBillingCache.delete(`polar:pm:${userId}`);
+}
+
+/**
  * Log the REAL Polar failure server-side (status code + body) so the cause is
  * diagnosable — never guess "insufficient scope" vs 401 vs network from behaviour —
  * and return a stable, non-leaky reason code for the UI. Note: an empty result
