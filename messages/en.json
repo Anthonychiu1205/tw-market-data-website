@@ -540,6 +540,138 @@
     "linkWhichTier": "Which tier is right for me",
     "summary": "In short: <b>free trial goes through the one-liner, developer integration goes through an API key, paid consumer chat goes through the connector.</b>"
   },
+  "authLogin": {
+    "welcomeBack": "Welcome back",
+    "errorGeneric": "Sign-in failed. Please try again in a moment.",
+    "passwordResetNotice": "Your password has been updated. Please sign in again.",
+    "divider": "or",
+    "googleNotConfigured": "Google OAuth isn't configured on this machine. Sign in with email and password.",
+    "agreementNotice": "By signing in, you agree to our <terms>Terms</terms> and <privacy>Privacy Policy</privacy>",
+    "errorInvalidCredentials": "Incorrect email or password. Please check and try again.",
+    "errorUnavailable": "Sign-in is unavailable right now. Please try again later.",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "submitting": "Signing in...",
+    "submit": "Sign in with email",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "register": "Sign up",
+    "devTitle": "Local development",
+    "devDescription": "dev-login: creates a session for a given userId (userId = the sandbox subscription's externalCustomerId). Local only.",
+    "devEmailPlaceholder": "email (e.g. anthonyiaaan@gmail.com)",
+    "devUserIdPlaceholder": "userId = sandbox sub externalId",
+    "devSubmit": "Dev sign in",
+    "devHint": "Set `ALLOW_DEV_LOGIN=1` (in .env.local only) to enable the dev-login form; or configure Google OAuth.",
+    "phrases": {
+      "p1": {
+        "primary": "Verifiable Taiwan market data",
+        "secondary": "built for AI agents"
+      },
+      "p2": {
+        "primary": "Prices, financials, and events",
+        "secondary": "in one data pipeline"
+      },
+      "p3": {
+        "primary": "Quant research and automation",
+        "secondary": "on one shared data foundation"
+      },
+      "p4": {
+        "primary": "Structured data",
+        "secondary": "for reproducible research workflows"
+      },
+      "p5": {
+        "primary": "Feed your models market data",
+        "secondary": "that's traceable, not noise"
+      }
+    }
+  },
+  "authGoogle": {
+    "signingIn": "Signing in...",
+    "signInWithGoogle": "Sign in with Google"
+  },
+  "authRegister": {
+    "hero": {
+      "title": "Create your TW Market Data account",
+      "subtitle": "We'll send a 6-digit verification code after you sign up. Verify your email to sign in to the dashboard and data platform."
+    },
+    "heading": "Create account",
+    "or": "or",
+    "termsNotice": "By signing up, you agree to the <terms>Terms</terms> and <privacy>Privacy</privacy>",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "confirmPasswordLabel": "Confirm password",
+    "confirmPasswordPlaceholder": "Re-enter password",
+    "submit": "Sign up and get verification code",
+    "submitting": "Submitting...",
+    "haveAccount": "Already have an account?",
+    "login": "Sign in",
+    "goToLogin": "Go to sign in",
+    "forgotPassword": "Forgot password",
+    "errors": {
+      "passwordTooShort": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match",
+      "emailServiceNotConfigured": "The registration email service isn't configured yet. Please try again later.",
+      "emailDeliveryFailed": "Failed to send the verification code. Please try again later.",
+      "invalidInput": "Check your email and password format.",
+      "unavailable": "Registration is unavailable right now. Please try again later.",
+      "loginOrReset": "If this email is already registered, sign in directly or use forgot password."
+    }
+  },
+  "authVerify": {
+    "hero": {
+      "title": "Complete email verification",
+      "description": "We sent a 6-digit verification code. Enter it to create a session and go to the console."
+    },
+    "heading": "Verify email",
+    "subheading": "The code is valid for 10 minutes. If it doesn't arrive, you can resend it.",
+    "codeLabel": "6-digit verification code",
+    "submit": "Verify and sign in",
+    "submitLoading": "Verifying...",
+    "resend": "Resend verification code",
+    "resendLoading": "Sending...",
+    "resendSuccess": "If the address can be verified, a new code has been sent. Check your inbox.",
+    "backTo": "Back to",
+    "loginLink": "sign in",
+    "errors": {
+      "tooManyAttempts": "Too many failed attempts. Resend the code and try again.",
+      "codeExpired": "The verification code has expired. Please resend it.",
+      "invalidCode": "Incorrect verification code. Please check and try again.",
+      "verifyFailed": "Verification is unavailable right now. Please try again later.",
+      "resendFailed": "Unable to resend the verification code right now. Please try again later."
+    }
+  },
+  "authForgot": {
+    "heroTitle": "Forgot password",
+    "heroSubtitle": "Enter your account email and we'll send you a password reset link.",
+    "formTitle": "Reset password",
+    "formSubtitle": "Enter your account email.",
+    "infoSent": "If this email is registered, we'll send a password reset link.",
+    "submit": "Send reset link",
+    "submitting": "Sending...",
+    "backTo": "Back to",
+    "login": "Sign in"
+  },
+  "authReset": {
+    "heroTitle": "Set a new password",
+    "heroSubtitle": "Enter a new password to complete the reset.",
+    "formTitle": "Reset password",
+    "invalidLink": "This link is invalid. Please request a new password reset.",
+    "goToForgot": "Go to forgot password",
+    "passwordLabel": "New password",
+    "passwordPlaceholder": "At least 8 characters",
+    "confirmLabel": "Confirm password",
+    "confirmPlaceholder": "Re-enter password",
+    "errorTooShort": "Password must be at least 8 characters",
+    "errorMismatch": "The two passwords do not match",
+    "errorExpired": "This reset link has expired. Please request a new one.",
+    "errorInvalidFormat": "Please check the password format (at least 8 characters).",
+    "errorGeneric": "Unable to reset your password right now. Please try again later.",
+    "submit": "Reset password",
+    "submitting": "Processing...",
+    "backTo": "Back to",
+    "login": "Sign in"
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }

@@ -1,11 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
 
 import { buttonClass } from "@/src/components/ui/button";
+import { Link } from "@/src/i18n/navigation";
 
 export function RegisterForm() {
+  const t = useTranslations("authRegister");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,13 +26,13 @@ export function RegisterForm() {
     const trimmedEmail = email.trim().toLowerCase();
 
     if (password.length < 8) {
-      setErrorMessage("密碼至少需要 8 碼");
+      setErrorMessage(t("errors.passwordTooShort"));
       setIsSubmitting(false);
       return;
     }
 
     if (password !== confirmPassword) {
-      setErrorMessage("兩次輸入的密碼不一致");
+      setErrorMessage(t("errors.passwordMismatch"));
       setIsSubmitting(false);
       return;
     }
@@ -52,39 +54,39 @@ export function RegisterForm() {
       if (!response.ok || !payload.ok) {
         const errorCode = payload.code ?? payload.error;
         if (errorCode === "email_service_not_configured") {
-          setErrorMessage("註冊信件服務尚未設定，請稍後再試。");
+          setErrorMessage(t("errors.emailServiceNotConfigured"));
           return;
         }
         if (errorCode === "email_delivery_failed") {
-          setErrorMessage("驗證碼寄送失敗，請稍後再試。");
+          setErrorMessage(t("errors.emailDeliveryFailed"));
           return;
         }
         if (errorCode === "invalid_registration_input") {
-          setErrorMessage("請確認 email 與密碼格式。");
+          setErrorMessage(t("errors.invalidInput"));
           return;
         }
         if (errorCode === "registration_unavailable") {
-          setErrorMessage("目前無法完成註冊，請稍後再試。");
+          setErrorMessage(t("errors.unavailable"));
           return;
         }
         if (errorCode === "login_or_reset") {
-          setErrorMessage("如果這個 Email 已經註冊，請直接登入或使用忘記密碼。");
+          setErrorMessage(t("errors.loginOrReset"));
           setShowLoginOrResetHint(true);
           return;
         }
-        setErrorMessage("目前無法完成註冊，請稍後再試。");
+        setErrorMessage(t("errors.unavailable"));
         return;
       }
 
       if (payload.next === "login_or_reset") {
-        setErrorMessage("如果這個 Email 已經註冊，請直接登入或使用忘記密碼。");
+        setErrorMessage(t("errors.loginOrReset"));
         setShowLoginOrResetHint(true);
         return;
       }
 
       window.location.assign(`/verify-email?email=${encodeURIComponent(trimmedEmail)}`);
     } catch {
-      setErrorMessage("目前無法完成註冊，請稍後再試。");
+      setErrorMessage(t("errors.unavailable"));
     } finally {
       setIsSubmitting(false);
     }
@@ -94,7 +96,7 @@ export function RegisterForm() {
     <form className="grid gap-3" onSubmit={handleSubmit}>
       <div className="grid gap-1">
         <label htmlFor="register-email" className="text-xs font-medium text-slate-700">
-          Email
+          {t("emailLabel")}
         </label>
         <input
           id="register-email"
@@ -110,7 +112,7 @@ export function RegisterForm() {
 
       <div className="grid gap-1">
         <label htmlFor="register-password" className="text-xs font-medium text-slate-700">
-          密碼
+          {t("passwordLabel")}
         </label>
         <input
           id="register-password"
@@ -121,13 +123,13 @@ export function RegisterForm() {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
-          placeholder="至少 8 碼"
+          placeholder={t("passwordPlaceholder")}
         />
       </div>
 
       <div className="grid gap-1">
         <label htmlFor="register-confirm-password" className="text-xs font-medium text-slate-700">
-          確認密碼
+          {t("confirmPasswordLabel")}
         </label>
         <input
           id="register-confirm-password"
@@ -138,7 +140,7 @@ export function RegisterForm() {
           value={confirmPassword}
           onChange={(event) => setConfirmPassword(event.target.value)}
           className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
-          placeholder="再次輸入密碼"
+          placeholder={t("confirmPasswordPlaceholder")}
         />
       </div>
 
@@ -146,23 +148,23 @@ export function RegisterForm() {
       {showLoginOrResetHint ? (
         <p className="text-xs text-slate-600">
           <Link href="/login" className="underline decoration-slate-300 underline-offset-2 hover:text-slate-800">
-            前往登入
+            {t("goToLogin")}
           </Link>
-          <span className="mx-1">或</span>
+          <span className="mx-1">{t("or")}</span>
           <Link href="/forgot-password" className="underline decoration-slate-300 underline-offset-2 hover:text-slate-800">
-            忘記密碼
+            {t("forgotPassword")}
           </Link>
         </p>
       ) : null}
 
       <button type="submit" disabled={isSubmitting} className={buttonClass("primary", "h-11 text-sm")}>
-        {isSubmitting ? "送出中..." : "註冊並取得驗證碼"}
+        {isSubmitting ? t("submitting") : t("submit")}
       </button>
 
       <p className="text-center text-xs text-slate-500">
-        已經有帳戶？
+        {t("haveAccount")}
         <Link href="/login" className="ml-1 underline decoration-slate-300 underline-offset-2 hover:text-slate-700">
-          登入
+          {t("login")}
         </Link>
       </p>
     </form>

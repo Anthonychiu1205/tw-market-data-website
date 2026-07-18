@@ -540,6 +540,138 @@
     "linkWhichTier": "哪一層適合我",
     "summary": "一句話總結：<b>免費試玩走一句話，開發整合走 API key，消費者聊天付費走 connector。</b>"
   },
+  "authLogin": {
+    "welcomeBack": "歡迎回來",
+    "errorGeneric": "登入失敗，請稍後再試一次。",
+    "passwordResetNotice": "密碼已更新，請重新登入。",
+    "divider": "或",
+    "googleNotConfigured": "本機未設定 Google OAuth，請使用 Email 與密碼登入。",
+    "agreementNotice": "登入即表示同意<terms>Terms</terms>與<privacy>Privacy</privacy>",
+    "errorInvalidCredentials": "帳號或密碼錯誤，請重新確認。",
+    "errorUnavailable": "目前無法登入，請稍後再試。",
+    "passwordLabel": "密碼",
+    "passwordPlaceholder": "至少 8 碼",
+    "submitting": "登入中...",
+    "submit": "使用 Email 登入",
+    "forgotPassword": "忘記密碼？",
+    "noAccount": "還沒有帳戶？",
+    "register": "註冊",
+    "devTitle": "本機開發用",
+    "devDescription": "dev-login：以指定 userId 建立 session（userId = sandbox 訂閱的 externalCustomerId）。僅本機。",
+    "devEmailPlaceholder": "email（如 anthonyiaaan@gmail.com）",
+    "devUserIdPlaceholder": "userId = sandbox sub externalId",
+    "devSubmit": "Dev 登入",
+    "devHint": "設 `ALLOW_DEV_LOGIN=1`（僅 .env.local）可用 dev-login 表單；或設定 Google OAuth。",
+    "phrases": {
+      "p1": {
+        "primary": "為 AI agent 提供",
+        "secondary": "可驗證的台股資料"
+      },
+      "p2": {
+        "primary": "把價格、財報與事件",
+        "secondary": "接進同一條資料流程"
+      },
+      "p3": {
+        "primary": "讓量化研究與自動化",
+        "secondary": "共用同一份資料底座"
+      },
+      "p4": {
+        "primary": "用結構化資料",
+        "secondary": "建立可重複的研究流程"
+      },
+      "p5": {
+        "primary": "讓模型讀到的不是雜訊",
+        "secondary": "而是可追溯的市場資料"
+      }
+    }
+  },
+  "authGoogle": {
+    "signingIn": "登入中...",
+    "signInWithGoogle": "使用 Google 登入"
+  },
+  "authRegister": {
+    "hero": {
+      "title": "建立你的 TW Market Data 帳戶",
+      "subtitle": "註冊後會寄送 6 位數驗證碼，完成 email 驗證即可登入控制台與資料平台。"
+    },
+    "heading": "建立帳戶",
+    "or": "或",
+    "termsNotice": "註冊即表示同意<terms>Terms</terms>與<privacy>Privacy</privacy>",
+    "emailLabel": "Email",
+    "passwordLabel": "密碼",
+    "passwordPlaceholder": "至少 8 碼",
+    "confirmPasswordLabel": "確認密碼",
+    "confirmPasswordPlaceholder": "再次輸入密碼",
+    "submit": "註冊並取得驗證碼",
+    "submitting": "送出中...",
+    "haveAccount": "已經有帳戶？",
+    "login": "登入",
+    "goToLogin": "前往登入",
+    "forgotPassword": "忘記密碼",
+    "errors": {
+      "passwordTooShort": "密碼至少需要 8 碼",
+      "passwordMismatch": "兩次輸入的密碼不一致",
+      "emailServiceNotConfigured": "註冊信件服務尚未設定，請稍後再試。",
+      "emailDeliveryFailed": "驗證碼寄送失敗，請稍後再試。",
+      "invalidInput": "請確認 email 與密碼格式。",
+      "unavailable": "目前無法完成註冊，請稍後再試。",
+      "loginOrReset": "如果這個 Email 已經註冊，請直接登入或使用忘記密碼。"
+    }
+  },
+  "authVerify": {
+    "hero": {
+      "title": "完成 Email 驗證",
+      "description": "我們已寄出 6 位數驗證碼。輸入後即可建立 session 並進入控制台。"
+    },
+    "heading": "驗證 Email",
+    "subheading": "驗證碼 10 分鐘內有效。若未收到可重新寄送。",
+    "codeLabel": "6 位數驗證碼",
+    "submit": "驗證並登入",
+    "submitLoading": "驗證中...",
+    "resend": "重新寄送驗證碼",
+    "resendLoading": "寄送中...",
+    "resendSuccess": "若信箱可驗證，驗證碼已重新寄出。請檢查收件匣。",
+    "backTo": "回到",
+    "loginLink": "登入",
+    "errors": {
+      "tooManyAttempts": "驗證失敗次數過多，請重新寄送驗證碼後再試。",
+      "codeExpired": "驗證碼已過期，請重新寄送。",
+      "invalidCode": "驗證碼不正確，請重新確認。",
+      "verifyFailed": "目前無法完成驗證，請稍後再試。",
+      "resendFailed": "目前無法重新寄送驗證碼，請稍後再試。"
+    }
+  },
+  "authForgot": {
+    "heroTitle": "忘記密碼",
+    "heroSubtitle": "輸入帳戶 Email，我們會寄送重設密碼連結。",
+    "formTitle": "重設密碼",
+    "formSubtitle": "請輸入你的帳戶 Email。",
+    "infoSent": "如果此 Email 已註冊，我們會寄出重設密碼連結。",
+    "submit": "寄送重設密碼信",
+    "submitting": "寄送中...",
+    "backTo": "回到",
+    "login": "登入"
+  },
+  "authReset": {
+    "heroTitle": "設定新密碼",
+    "heroSubtitle": "請輸入新密碼完成重設。",
+    "formTitle": "重設密碼",
+    "invalidLink": "連結無效，請重新申請重設密碼。",
+    "goToForgot": "前往忘記密碼",
+    "passwordLabel": "新密碼",
+    "passwordPlaceholder": "至少 8 碼",
+    "confirmLabel": "確認密碼",
+    "confirmPlaceholder": "再次輸入密碼",
+    "errorTooShort": "密碼至少需要 8 碼",
+    "errorMismatch": "兩次輸入的密碼不一致",
+    "errorExpired": "重設連結已失效，請重新申請。",
+    "errorInvalidFormat": "請確認密碼格式（至少 8 碼）。",
+    "errorGeneric": "目前無法重設密碼，請稍後再試。",
+    "submit": "重設密碼",
+    "submitting": "處理中...",
+    "backTo": "回到",
+    "login": "登入"
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }

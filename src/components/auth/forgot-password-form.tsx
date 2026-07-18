@@ -1,11 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { FormEvent, useState } from "react";
 
+import { Link } from "@/src/i18n/navigation";
 import { buttonClass } from "@/src/components/ui/button";
 
 export function ForgotPasswordForm() {
+  const t = useTranslations("authForgot");
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
@@ -28,9 +30,9 @@ export function ForgotPasswordForm() {
         }),
       });
 
-      setInfoMessage("如果此 Email 已註冊，我們會寄出重設密碼連結。");
+      setInfoMessage(t("infoSent"));
     } catch {
-      setInfoMessage("如果此 Email 已註冊，我們會寄出重設密碼連結。");
+      setInfoMessage(t("infoSent"));
     } finally {
       setIsSubmitting(false);
     }
@@ -57,13 +59,13 @@ export function ForgotPasswordForm() {
       {infoMessage ? <p className="text-xs text-slate-600">{infoMessage}</p> : null}
 
       <button type="submit" disabled={isSubmitting} className={buttonClass("primary", "h-11 text-sm")}>
-        {isSubmitting ? "寄送中..." : "寄送重設密碼信"}
+        {isSubmitting ? t("submitting") : t("submit")}
       </button>
 
       <p className="text-center text-xs text-slate-500">
-        回到
+        {t("backTo")}
         <Link href="/login" className="ml-1 underline decoration-slate-300 underline-offset-2 hover:text-slate-700">
-          登入
+          {t("login")}
         </Link>
       </p>
     </form>
