@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   CartesianGrid,
   Line,
@@ -20,6 +21,7 @@ type OverviewUsageChartProps = {
 };
 
 export function OverviewUsageChart({ data }: OverviewUsageChartProps) {
+  const t = useTranslations("dashboard");
   const maxValue = Math.max(...data.map((item) => item.requests), 1);
   const yAxisTicks = (() => {
     if (maxValue <= 1) return [0, 1];
@@ -67,9 +69,9 @@ export function OverviewUsageChart({ data }: OverviewUsageChartProps) {
             const rawValue = Array.isArray(value) ? value[0] : value;
             const numericValue = typeof rawValue === "number" ? rawValue : Number(rawValue ?? 0);
             const safeValue = Number.isFinite(numericValue) ? numericValue : 0;
-            return [safeValue.toLocaleString(), "請求數"];
+            return [safeValue.toLocaleString(), t("chart.requests")];
           }}
-          labelFormatter={(label) => `日期 ${label}`}
+          labelFormatter={(label) => t("chart.dateLabel", { label })}
         />
         <Line
           type="monotone"

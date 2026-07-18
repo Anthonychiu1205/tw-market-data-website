@@ -945,6 +945,308 @@
       "next": "Next → <link>Source policy</link>"
     }
   },
+  "dashboard": {
+    "shell": {
+      "title": "Console",
+      "serviceStatus": "Service status",
+      "authUnavailableTitle": "Sign-in is temporarily unavailable. Please try again shortly.",
+      "authUnavailableBody": "If the problem persists, contact us for help.",
+      "fallbackDatasetLimit": "Core datasets (excludes the three financial statements)",
+      "fallbackRequestLimit": "500 included requests/month / RPM 60"
+    },
+    "nav": {
+      "overview": "Overview",
+      "billing": "Billing",
+      "billing-subscriptions": "Subscription",
+      "billing-credits": "Credits",
+      "usage": "Usage",
+      "settings": "Settings",
+      "docs": "Docs",
+      "tools": "Tools & MCP",
+      "support": "Support",
+      "upgrade": "Upgrade plan"
+    },
+    "mode": {
+      "live": "Connected",
+      "fallback": "Simplified mode"
+    },
+    "usageActivity": {
+      "title": "Activity & usage",
+      "monthlyRemaining": "Monthly remaining {remaining} / {quota}",
+      "usedLine": "Used {used} ({pct}%) · resets {reset}",
+      "rateLimitLine": "Rate limit {rate}/min · daily window resets around {reset}",
+      "requestsTodayLine": "Requests today: {count}",
+      "requests30dLine": "30-day requests: {count}",
+      "credits30dLine": "30-day {label}: {value}",
+      "recentErrors": "Recent errors: {list}",
+      "latestActive": "Last active: {date} · {count} requests",
+      "noActivity": "Not enough activity data yet."
+    },
+    "overview": {
+      "currentPlan": "Current plan: {plan}",
+      "inUseSuffix": " (active)",
+      "source": {
+        "subscription": "Plan data synced",
+        "backend": "Showing plan data from account summary for now",
+        "fallback": "No paid plan active yet"
+      },
+      "apiKeysStat": "API keys",
+      "requestsToday": "Requests today",
+      "requests30d": "30-day requests",
+      "availableCredits": "Available credits",
+      "currentMode": "Current mode: {mode}",
+      "quotaExhaustedTitle": "You’ve used up your quota",
+      "quotaExhaustedBody": "Upgrade your plan or buy credits to resume data queries.",
+      "upgradeCta": "Upgrade plan",
+      "apiKeysHeading": "API keys",
+      "activeKeys": "{count} active"
+    },
+    "keys": {
+      "title": "API keys",
+      "description": "Manage keys and last-used times.",
+      "listTitle": "Key list"
+    },
+    "settings": {
+      "planSection": "Plan",
+      "managePlan": "Manage plan",
+      "accountSection": "Account details",
+      "otherSection": "Other",
+      "logout": "Log out"
+    },
+    "docs": {
+      "title": "Docs",
+      "description": "Jump to onboarding docs and the API reference.",
+      "links": {
+        "quickStart": "Quick start",
+        "apiReference": "API reference",
+        "datasetCatalog": "Dataset catalog",
+        "sourcePolicy": "Source policy"
+      }
+    },
+    "support": {
+      "title": "Support",
+      "description": "Sales inquiries, data requests, and integration help.",
+      "contactCta": "Go to contact page",
+      "items": {
+        "sales": {
+          "title": "Sales inquiries",
+          "text": "Plans and procurement"
+        },
+        "data": {
+          "title": "Data requests",
+          "text": "Fields or coverage"
+        },
+        "integration": {
+          "title": "Integration support",
+          "text": "API onboarding and usage questions"
+        }
+      }
+    },
+    "chart": {
+      "requests": "Requests",
+      "dateLabel": "Date {label}"
+    },
+    "usagePage": {
+      "status": {
+        "success": "Success",
+        "unauthorized": "Unauthorized",
+        "insufficientCredits": "Insufficient credits",
+        "upstreamError": "Upstream error",
+        "pending": "Pending"
+      },
+      "requestsToday": "Requests today",
+      "requests30d": "30-day requests",
+      "credits30d": "30-day {label}",
+      "noData": "No data yet",
+      "reconcileLine": "Last {days} days: {events} requests · estimated cost {charged} credits · actual charged {actual} credits",
+      "reconcilePending": " · reconciliation pending",
+      "exhaustedTitle": "You’ve used up your quota",
+      "exhaustedBody": "Upgrade your plan or buy credits.",
+      "lowTitle": "Your quota is almost used up",
+      "lowBody": "Consider upgrading your plan or buying credits to avoid request interruptions.",
+      "upgradeCta": "Upgrade plan",
+      "dailyRequests": "Daily requests",
+      "prevMonth": "Previous month",
+      "nextMonth": "Next month",
+      "endpointUsage": "Endpoint usage",
+      "noEndpointData": "No endpoint usage data yet",
+      "requestLog": "Request log",
+      "exportCsv": "Export CSV",
+      "col": {
+        "date": "Date",
+        "endpoint": "Endpoint",
+        "status": "Status",
+        "reconcile": "Reconciliation"
+      },
+      "copyRequestIdTitle": "Copy full requestId",
+      "collapse": "Collapse",
+      "expand": "Details",
+      "copied": "Copied",
+      "linked": "Linked",
+      "notCharged": "Not charged",
+      "notChargedDetail": "Not charged (dry-run or failed request)",
+      "noUsage": "No API request usage yet.",
+      "showingRecent": "Showing the {count} most recent",
+      "cappedNote": "Showing only the {limit} most recent",
+      "showingAll": "Showing all"
+    }
+  },
+  "account": {
+    "profile": {
+      "email": {
+        "label": "Email"
+      },
+      "accountStatus": "Account status",
+      "google": "Google: {status}",
+      "password": "Email/password: {status}",
+      "linked": "Linked",
+      "notLinked": "Not linked",
+      "configured": "Set",
+      "notConfigured": "Not set",
+      "displayName": {
+        "label": "Display name",
+        "placeholder": "e.g. Ant Wang"
+      },
+      "company": {
+        "label": "Company name",
+        "placeholder": "Company name (optional)"
+      },
+      "role": {
+        "label": "Role"
+      },
+      "useCase": {
+        "label": "Primary use case"
+      },
+      "selectPlaceholder": "Select…",
+      "save": "Save",
+      "saving": "Saving…",
+      "saveSuccess": "Account details updated.",
+      "loadError": "Unable to load your account details right now. Please try again later.",
+      "saveError": "Unable to save your account details right now. Please try again later.",
+      "roles": {
+        "developer": "AI agent development",
+        "quant_researcher": "Quantitative trading",
+        "data_team": "Enterprise team",
+        "founder": "SaaS / platform",
+        "other": "Other"
+      },
+      "useCases": {
+        "ai_agent": "AI agent",
+        "quantitative_research": "Market research / backtesting",
+        "internal_data_tool": "Internal data platform",
+        "trading_workflow": "Automated trading",
+        "product_integration": "Dashboard / app",
+        "other": "Other"
+      }
+    },
+    "delete": {
+      "title": "Delete account",
+      "subtitle": "Deleting your account revokes your API keys and cannot be undone.",
+      "button": "Delete",
+      "mailSubject": "Account deletion request",
+      "mailBody": "I'd like to delete my TW Market Data account.\n\nAccount email: {email}\n",
+      "error": "Unable to delete your account right now. Please try again later, or contact us for help.",
+      "done": {
+        "title": "Account deleted",
+        "body": "Your account and API keys have been deleted; the keys are now invalid.",
+        "retainedTitle": "Data retained by law",
+        "localNotDeleted": "Your API account was deleted, but your website login could not be removed at the same time. Contact {email} and we'll clear it manually.",
+        "close": "Done"
+      },
+      "confirm": {
+        "body": "This action <strong>cannot be undone</strong>. Your account and API keys will be deleted; the keys stop working immediately and can no longer call the API.",
+        "account": "Account: {email}",
+        "retentionNote": "Transaction and invoice records that tax and accounting rules require us to keep will be listed for you after deletion.",
+        "fallback": "Self-service deletion isn't available yet. Tap the button below to submit a deletion request; we'll process it manually and confirm by email.",
+        "cancel": "Cancel",
+        "submitRequest": "Submit deletion request",
+        "deleting": "Deleting…",
+        "confirm": "Confirm deletion"
+      }
+    },
+    "apiKeys": {
+      "neverUsed": "Never used",
+      "revokedBadge": "Revoked",
+      "table": {
+        "name": "Name",
+        "apiKey": "API Key",
+        "lastUsed": "Last used",
+        "actions": "Actions"
+      },
+      "created": {
+        "title": "New API key created",
+        "copyFull": "Copy full key",
+        "copied": "Copied",
+        "note": "Copy and store it now. If you don't, you can copy a new version from the table later."
+      },
+      "empty": "You have no active API keys.",
+      "showRevoked": "Show revoked keys ({count})",
+      "hideRevoked": "Hide revoked keys",
+      "copy": {
+        "aria": "Copy API key",
+        "revoked": "Revoked keys can't be copied",
+        "cannotCopy": "This key can't be copied again. Regenerate it to get a copyable version.",
+        "copying": "Copying…",
+        "copied": "Copied",
+        "label": "Copy"
+      },
+      "revoke": {
+        "aria": "Delete {name}",
+        "revokedTitle": "Revoked",
+        "revokeTitle": "Delete (revoke)",
+        "confirm": "Delete (revoke) API key “{name}”?"
+      },
+      "create": "Create",
+      "createModal": {
+        "title": "Create API key",
+        "nameLabel": "Name",
+        "namePlaceholder": "e.g. ai-hedge-fund",
+        "nameHint": "Name the key so you can recognize it later (1–40 characters, required).",
+        "cancel": "Cancel",
+        "creating": "Creating…",
+        "submit": "Create"
+      },
+      "toast": {
+        "copied": "API key copied to clipboard"
+      },
+      "footer": {
+        "hint": "API keys authenticate calls to the /v2 API. Keep them safe; if a key leaks, revoke it and create a new one immediately.",
+        "limit": " Your current plan can keep {limit} active keys."
+      },
+      "hints": {
+        "cannotCreate": "Your current plan can't create API keys. Upgrade your plan or contact us."
+      },
+      "errors": {
+        "invalidName": "Enter a key name between 1 and 40 characters.",
+        "limitReached": "You've reached your plan's key limit ({limit}). Revoke an unused key, or upgrade your plan to raise the limit.",
+        "limitReachedNoCount": "You've reached your plan's key limit. Revoke an unused key, or upgrade your plan to raise the limit.",
+        "subscriptionRequired": "The free tier doesn't include an API key. You can try 5 tickers (2330／2317／2454／0050／2603) with no key; to get an API key, choose a plan first.",
+        "entitlementInactive": "Your plan isn't active right now (payment may be pending, or it may have expired). Check the plan page and try again.",
+        "encryptionUnavailable": "We can't securely create a copyable key right now. Please try again later or contact an administrator.",
+        "createFailed": "Unable to create a key right now. Please try again later.",
+        "revokeFailed": "Unable to revoke the key right now. Please try again later.",
+        "secretUnavailable": "This key can't be copied again. Regenerate it to get a copyable version.",
+        "revoked": "Revoked keys can't be copied.",
+        "clipboardWriteFailed": "Couldn't write to the clipboard. Copy manually, or check your browser permissions.",
+        "copyFailed": "Couldn't copy the key. Try again later, or check your browser permissions."
+      },
+      "noKey": {
+        "title": "The free tier doesn't include an API key",
+        "body": "You can try 5 tickers (2330／2317／2454／0050／2603) <strong>without a key</strong>; to get an API key, choose a plan first.",
+        "viewPlans": "View plans",
+        "quickTrial": "No-key quick start"
+      }
+    },
+    "grantPlan": {
+      "emailLabel": "User email",
+      "planLabel": "Plan",
+      "submit": "Upgrade this account for free",
+      "processing": "Processing…",
+      "error": "Submission failed. Please try again later.",
+      "success": "Provisioned successfully",
+      "failed": "Provisioning failed"
+    }
+  },
   "common": {
     "englishComingSoon": "English version coming soon.",
     "illustrativeData": "Illustrative data — not real-time quotes",

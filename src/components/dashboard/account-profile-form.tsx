@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { buttonClass } from "@/src/components/ui/button";
 import {
@@ -13,24 +14,8 @@ type AccountProfileFormProps = {
   email: string;
 };
 
-const userRoleLabels: Record<(typeof USER_ROLE_OPTIONS)[number], string> = {
-  developer: "AI Agent 開發",
-  quant_researcher: "量化交易",
-  data_team: "企業團隊",
-  founder: "SaaS / 平台",
-  other: "其他",
-};
-
-const useCaseLabels: Record<(typeof USE_CASE_OPTIONS)[number], string> = {
-  ai_agent: "AI Agent",
-  quantitative_research: "市場研究 / 回測",
-  internal_data_tool: "內部資料平台",
-  trading_workflow: "自動化交易",
-  product_integration: "Dashboard / App",
-  other: "其他",
-};
-
 export function AccountProfileForm({ email }: AccountProfileFormProps) {
+  const t = useTranslations("account");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -66,7 +51,7 @@ export function AccountProfileForm({ email }: AccountProfileFormProps) {
         setPasswordConfigured(payload.profile.connectedAccounts.password);
       } catch {
         if (!active) return;
-        setErrorMessage("目前無法讀取帳戶資料，請稍後再試。");
+        setErrorMessage(t("profile.loadError"));
       } finally {
         if (active) {
           setLoading(false);
@@ -113,9 +98,9 @@ export function AccountProfileForm({ email }: AccountProfileFormProps) {
       setUseCase(payload.profile.useCase ?? "");
       setGoogleLinked(payload.profile.connectedAccounts.google);
       setPasswordConfigured(payload.profile.connectedAccounts.password);
-      setSuccessMessage("帳戶資料已更新。");
+      setSuccessMessage(t("profile.saveSuccess"));
     } catch {
-      setErrorMessage("目前無法儲存帳戶資料，請稍後再試。");
+      setErrorMessage(t("profile.saveError"));
     } finally {
       setSaving(false);
     }
@@ -124,7 +109,7 @@ export function AccountProfileForm({ email }: AccountProfileFormProps) {
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
       <div className="grid gap-1 text-sm text-slate-700">
-        <span className="font-medium text-slate-900">電子郵件</span>
+        <span className="font-medium text-slate-900">{t("profile.email.label")}</span>
         <input
           value={email}
           readOnly
@@ -133,64 +118,64 @@ export function AccountProfileForm({ email }: AccountProfileFormProps) {
       </div>
 
       <div className="grid gap-2 rounded-lg border border-slate-200 bg-white px-3 py-3 text-xs text-slate-600">
-        <p className="font-medium text-slate-900">帳號狀態</p>
-        <p>Google：{googleLinked ? "已連結" : "未連結"}</p>
-        <p>Email/password：{passwordConfigured ? "已設定" : "未設定"}</p>
+        <p className="font-medium text-slate-900">{t("profile.accountStatus")}</p>
+        <p>{t("profile.google", { status: googleLinked ? t("profile.linked") : t("profile.notLinked") })}</p>
+        <p>{t("profile.password", { status: passwordConfigured ? t("profile.configured") : t("profile.notConfigured") })}</p>
       </div>
 
       <label className="grid gap-1 text-sm text-slate-700">
-        <span className="font-medium text-slate-900">顯示名稱</span>
+        <span className="font-medium text-slate-900">{t("profile.displayName.label")}</span>
         <input
           value={displayName}
           onChange={(event) => setDisplayName(event.target.value)}
           maxLength={80}
           disabled={loading || saving}
           className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
-          placeholder="例如：Ant Wang"
+          placeholder={t("profile.displayName.placeholder")}
         />
       </label>
 
       <label className="grid gap-1 text-sm text-slate-700">
-        <span className="font-medium text-slate-900">公司名稱</span>
+        <span className="font-medium text-slate-900">{t("profile.company.label")}</span>
         <input
           value={companyName}
           onChange={(event) => setCompanyName(event.target.value)}
           maxLength={120}
           disabled={loading || saving}
           className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
-          placeholder="公司名稱（可選）"
+          placeholder={t("profile.company.placeholder")}
         />
       </label>
 
       <label className="grid gap-1 text-sm text-slate-700">
-        <span className="font-medium text-slate-900">角色類型</span>
+        <span className="font-medium text-slate-900">{t("profile.role.label")}</span>
         <select
           value={userRole}
           onChange={(event) => setUserRole(event.target.value)}
           disabled={loading || saving}
           className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
         >
-          <option value="">請選擇</option>
+          <option value="">{t("profile.selectPlaceholder")}</option>
           {USER_ROLE_OPTIONS.map((value) => (
             <option key={value} value={value}>
-              {userRoleLabels[value]}
+              {t(`profile.roles.${value}`)}
             </option>
           ))}
         </select>
       </label>
 
       <label className="grid gap-1 text-sm text-slate-700">
-        <span className="font-medium text-slate-900">主要使用情境</span>
+        <span className="font-medium text-slate-900">{t("profile.useCase.label")}</span>
         <select
           value={useCase}
           onChange={(event) => setUseCase(event.target.value)}
           disabled={loading || saving}
           className="h-10 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
         >
-          <option value="">請選擇</option>
+          <option value="">{t("profile.selectPlaceholder")}</option>
           {USE_CASE_OPTIONS.map((value) => (
             <option key={value} value={value}>
-              {useCaseLabels[value]}
+              {t(`profile.useCases.${value}`)}
             </option>
           ))}
         </select>
@@ -202,7 +187,7 @@ export function AccountProfileForm({ email }: AccountProfileFormProps) {
           disabled={loading || saving}
           className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}
         >
-          {saving ? "儲存中..." : "儲存"}
+          {saving ? t("profile.saving") : t("profile.save")}
         </button>
         {successMessage ? <span className="text-xs text-emerald-700">{successMessage}</span> : null}
         {errorMessage ? <span className="text-xs text-red-600">{errorMessage}</span> : null}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { buttonClass } from "@/src/components/ui/button";
 
@@ -21,16 +22,15 @@ type RetainedItem = { label: string; detail?: string };
 type DeleteResult = { retained: RetainedItem[]; billingNote: string | null; localDeleted: boolean };
 
 export function DeleteAccountCard({ email }: { email: string }) {
+  const t = useTranslations("account");
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [result, setResult] = useState<DeleteResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [needsSupportFallback, setNeedsSupportFallback] = useState(false);
 
-  const subject = encodeURIComponent("帳號刪除申請 (Account deletion request)");
-  const body = encodeURIComponent(
-    `我要求刪除我的 TW Market Data 帳號。\n\n帳號 Email：${email}\n`,
-  );
+  const subject = encodeURIComponent(t("delete.mailSubject"));
+  const body = encodeURIComponent(t("delete.mailBody", { email }));
 
   function close() {
     setIsOpen(false);
@@ -67,7 +67,7 @@ export function DeleteAccountCard({ email }: { email: string }) {
         localDeleted: payload.localDeleted ?? true,
       });
     } catch {
-      setErrorMessage("目前無法刪除帳號，請稍後再試，或聯繫我們協助處理。");
+      setErrorMessage(t("delete.error"));
     } finally {
       setIsDeleting(false);
     }
@@ -77,15 +77,15 @@ export function DeleteAccountCard({ email }: { email: string }) {
     <>
       <div className="flex items-center justify-between gap-4 px-5 py-4">
         <div>
-          <p className="text-sm font-medium text-slate-900">刪除帳號</p>
-          <p className="mt-0.5 text-xs text-slate-500">刪除後 API 金鑰將被撤銷，且無法復原。</p>
+          <p className="text-sm font-medium text-slate-900">{t("delete.title")}</p>
+          <p className="mt-0.5 text-xs text-slate-500">{t("delete.subtitle")}</p>
         </div>
         <button
           type="button"
           onClick={() => setIsOpen(true)}
           className={buttonClass("danger-secondary", "h-9 rounded-lg px-4 text-xs")}
         >
-          刪除
+          {t("delete.button")}
         </button>
       </div>
 
@@ -95,14 +95,14 @@ export function DeleteAccountCard({ email }: { email: string }) {
             {result ? (
               // Deleted. Show exactly what the API says it retains.
               <>
-                <h3 className="text-base font-semibold text-slate-900">帳號已刪除</h3>
+                <h3 className="text-base font-semibold text-slate-900">{t("delete.done.title")}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  你的帳號與 API 金鑰已刪除，金鑰即刻失效。
+                  {t("delete.done.body")}
                 </p>
 
                 {result.retained.length > 0 ? (
                   <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-                    <p className="text-xs font-medium text-slate-900">依法保留的資料</p>
+                    <p className="text-xs font-medium text-slate-900">{t("delete.done.retainedTitle")}</p>
                     <ul className="mt-1 list-disc space-y-1 pl-4 text-xs leading-5 text-slate-600">
                       {result.retained.map((item) => (
                         <li key={item.label}>
@@ -120,7 +120,7 @@ export function DeleteAccountCard({ email }: { email: string }) {
 
                 {!result.localDeleted ? (
                   <p className="mt-3 text-xs leading-5 text-amber-700">
-                    API 帳號已刪除，但網站登入資料未能一併移除。請聯繫 {SUPPORT_EMAIL} 讓我們手動清除。
+                    {t("delete.done.localNotDeleted", { email: SUPPORT_EMAIL })}
                   </p>
                 ) : null}
 
@@ -130,27 +130,29 @@ export function DeleteAccountCard({ email }: { email: string }) {
                     onClick={close}
                     className={buttonClass("primary", "h-10 rounded-lg px-4 text-sm")}
                   >
-                    完成
+                    {t("delete.done.close")}
                   </button>
                 </div>
               </>
             ) : (
               <>
-                <h3 className="text-base font-semibold text-slate-900">刪除帳號</h3>
+                <h3 className="text-base font-semibold text-slate-900">{t("delete.title")}</h3>
 
                 <div className="mt-3 space-y-3 text-sm leading-6 text-slate-600">
                   <p>
-                    這個動作<strong>無法復原</strong>。你的帳號與 API 金鑰會被刪除，金鑰即刻失效、無法再呼叫 API。
+                    {t.rich("delete.confirm.body", {
+                      strong: (chunks) => <strong>{chunks}</strong>,
+                    })}
                   </p>
-                  <p className="text-xs text-slate-500">帳號：{email}</p>
+                  <p className="text-xs text-slate-500">{t("delete.confirm.account", { email })}</p>
                   <p className="text-xs text-slate-500">
-                    依稅務／會計法令必須保留的交易與發票紀錄，會在刪除後向你列出。
+                    {t("delete.confirm.retentionNote")}
                   </p>
                 </div>
 
                 {needsSupportFallback ? (
                   <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-800">
-                    自助刪除目前尚未開放。請點下方送出刪除申請，我們會人工處理並回信確認。
+                    {t("delete.confirm.fallback")}
                   </div>
                 ) : null}
                 {errorMessage ? <p className="mt-3 text-xs text-red-600">{errorMessage}</p> : null}
@@ -162,14 +164,14 @@ export function DeleteAccountCard({ email }: { email: string }) {
                     disabled={isDeleting}
                     className={buttonClass("secondary", "h-10 rounded-lg px-4 text-sm")}
                   >
-                    取消
+                    {t("delete.confirm.cancel")}
                   </button>
                   {needsSupportFallback ? (
                     <a
                       href={`mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`}
                       className={buttonClass("primary", "h-10 rounded-lg px-4 text-sm")}
                     >
-                      送出刪除申請
+                      {t("delete.confirm.submitRequest")}
                     </a>
                   ) : (
                     <button
@@ -178,7 +180,7 @@ export function DeleteAccountCard({ email }: { email: string }) {
                       disabled={isDeleting}
                       className={buttonClass("danger-secondary", "h-10 rounded-lg px-4 text-sm")}
                     >
-                      {isDeleting ? "刪除中…" : "確認刪除"}
+                      {isDeleting ? t("delete.confirm.deleting") : t("delete.confirm.confirm")}
                     </button>
                   )}
                 </div>

@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { getTranslations } from "next-intl/server";
 
 import { AuthRuntimeUnavailableError } from "@/src/auth/session";
 import { getRequiredSession } from "@/src/lib/auth/session";
@@ -187,6 +188,7 @@ function SectionSkeleton() {
 
 export async function DashboardPageShell({ section, currentPath, currentHref }: DashboardPageShellProps) {
   const creditsModeState = assertCreditsDeductionRuntimeSafe();
+  const t = await getTranslations("dashboard");
 
   let session: Awaited<ReturnType<typeof getRequiredSession>>;
   try {
@@ -197,13 +199,13 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
         <div className="h-[calc(100dvh-73px)] overflow-hidden px-4 py-4 lg:px-8 lg:py-6">
           <div className="grid h-full min-h-0 gap-4 overflow-hidden lg:grid-cols-[280px_minmax(0,1fr)]">
             <aside className="min-h-0 h-full overflow-hidden rounded-2xl border border-slate-200 bg-white p-4">
-              <p className="text-sm font-semibold text-slate-900">控制台</p>
-              <p className="mt-1 text-xs text-slate-500">服務狀態</p>
+              <p className="text-sm font-semibold text-slate-900">{t("shell.title")}</p>
+              <p className="mt-1 text-xs text-slate-500">{t("shell.serviceStatus")}</p>
             </aside>
             <main className="min-h-0 min-w-0 h-full overflow-y-auto pr-1">
               <section className="rounded-2xl border border-slate-200 bg-white p-6">
-                <h1 className="text-lg font-semibold tracking-tight text-slate-900">登入服務暫時不可用，請稍後再試。</h1>
-                <p className="mt-2 text-sm text-slate-600">如果問題持續發生，請聯繫我們協助排查。</p>
+                <h1 className="text-lg font-semibold tracking-tight text-slate-900">{t("shell.authUnavailableTitle")}</h1>
+                <p className="mt-2 text-sm text-slate-600">{t("shell.authUnavailableBody")}</p>
               </section>
             </main>
           </div>
@@ -231,8 +233,8 @@ export async function DashboardPageShell({ section, currentPath, currentHref }: 
       source: "fallback" as const,
       isEntitled: false,
       apiKeyLimit: 1,
-      datasetLimit: "基礎資料集（不含財報三表）",
-      requestLimitLabel: "每月 included 500 requests / RPM 60",
+      datasetLimit: t("shell.fallbackDatasetLimit"),
+      requestLimitLabel: t("shell.fallbackRequestLimit"),
     };
   });
 

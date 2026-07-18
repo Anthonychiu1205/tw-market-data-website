@@ -2,10 +2,12 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, Loader2, Trash2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 
 import type { ApiKeyItem } from "@/src/lib/backend-adapter";
 import { trackEvent } from "@/src/lib/analytics/client";
 import { buttonClass } from "@/src/components/ui/button";
+import { Link } from "@/src/i18n/navigation";
 import { cn } from "@/src/lib/cn";
 
 type ApiKeysManagerProps = {
@@ -76,11 +78,11 @@ async function revealSecret(itemId: string): Promise<{ secret?: string; error?: 
   return { secret: payload.secret };
 }
 
-function formatDateTime(raw: string | null | undefined) {
-  if (!raw || raw === "-") return "尚未使用";
+function formatDateTime(raw: string | null | undefined, locale: string, neverUsedLabel: string) {
+  if (!raw || raw === "-") return neverUsedLabel;
   const date = new Date(raw);
-  if (Number.isNaN(date.getTime())) return "尚未使用";
-  return new Intl.DateTimeFormat("zh-TW", {
+  if (Number.isNaN(date.getTime())) return neverUsedLabel;
+  return new Intl.DateTimeFormat(locale, {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -98,6 +100,8 @@ export function ApiKeysManager({
   createDisabledReason,
   needsSubscription,
 }: ApiKeysManagerProps) {
+  const t = useTranslations("account");
+  const locale = useLocale();
   const [keys, setKeys] = useState(initialKeys);
   const [newKeyName, setNewKeyName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -135,9 +139,9 @@ export function ApiKeysManager({
   const createDisabledHint = isSubmitting
     ? null
     : atPlanLimit
-      ? `已達方案金鑰上限（${keyLimit} 把）。請先撤銷未使用的金鑰，或升級方案以提高上限。`
+      ? t("apiKeys.errors.limitReached", { limit: keyLimit ?? 0 })
       : !canCreate
-        ? createDisabledReason ?? "目前方案無法新增 API 金鑰，請升級方案或聯繫我們。"
+        ? createDisabledReason ?? t("apiKeys.hints.cannotCreate")
         : null;
 
   function publishKeysUpdate(nextKeys: ApiKeyItem[]) {
@@ -217,27 +221,25 @@ export function ApiKeysManager({
       setIsModalOpen(false);
     } catch (error) {
       if (error instanceof Error && error.message === "invalid_api_key_name") {
-        setErrorMessage("請輸入 1 到 40 字的金鑰名稱。");
+        setErrorMessage(t("apiKeys.errors.invalidName"));
       } else if (error instanceof Error && error.message === "api_key_limit_reached") {
         setErrorMessage(
           typeof keyLimit === "number"
-            ? `已達方案金鑰上限（${keyLimit} 把）。請先撤銷未使用的金鑰，或升級方案以提高上限。`
-            : "已達方案金鑰上限。請先撤銷未使用的金鑰，或升級方案以提高上限。",
+            ? t("apiKeys.errors.limitReached", { limit: keyLimit })
+            : t("apiKeys.errors.limitReachedNoCount"),
         );
       } else if (error instanceof Error && error.message === "subscription_required") {
         // Permanent gate — do NOT say "請稍後再試" (the old message implied a transient error and
         // left every new signup at a dead end). Close the modal and point at the real path.
         setIsModalOpen(false);
-        setErrorMessage(
-          "免費層不含 API key。你可以直接免金鑰試 5 檔（2330／2317／2454／0050／2603）；要取得 API key 請先選擇方案。",
-        );
+        setErrorMessage(t("apiKeys.errors.subscriptionRequired"));
       } else if (error instanceof Error && error.message === "entitlement_inactive") {
         setIsModalOpen(false);
-        setErrorMessage("你的方案目前未生效（可能待付款或已到期）。請至方案頁確認後再試。");
+        setErrorMessage(t("apiKeys.errors.entitlementInactive"));
       } else if (error instanceof Error && error.message === "api_key_encryption_unavailable") {
-        setErrorMessage("目前無法安全建立可複製的金鑰，請稍後再試或聯繫管理員。");
+        setErrorMessage(t("apiKeys.errors.encryptionUnavailable"));
       } else {
-        setErrorMessage("目前無法建立金鑰，請稍後再試。");
+        setErrorMessage(t("apiKeys.errors.createFailed"));
       }
     } finally {
       setIsSubmitting(false);
@@ -247,7 +249,7 @@ export function ApiKeysManager({
   async function handleRevokeKey(item: ApiKeyItem) {
     if (!canRevoke || isSubmitting || item.status === "revoked") return;
 
-    const confirmed = window.confirm(`確定要刪除（撤銷）API 金鑰「${item.name}」嗎？`);
+    const confirmed = window.confirm(t("apiKeys.revoke.confirm", { name: item.name }));
     if (!confirmed) return;
 
     setIsSubmitting(true);
@@ -294,7 +296,7 @@ export function ApiKeysManager({
         { dedupeKey: `api-key-revoked:${item.id}` },
       );
     } catch {
-      setErrorMessage("目前無法撤銷金鑰，請稍後再試。");
+      setErrorMessage(t("apiKeys.errors.revokeFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -328,7 +330,7 @@ export function ApiKeysManager({
       },
       { dedupeKey: `api-key-copied:${item.id}`, dedupeMs: 2000 },
     );
-    pushToast("API key 已複製到剪貼簿");
+    pushToast(t("apiKeys.toast.copied"));
     window.setTimeout(() => {
       setCopiedKeyId((prev) => (prev === item.id ? null : prev));
     }, 1200);
@@ -356,11 +358,11 @@ export function ApiKeysManager({
       if (!result.secret) {
         if (result.error === "secret_unavailable") {
           // Only hash-only keys (no retrievable raw) can't be re-copied — regenerate to get one.
-          setErrorMessage("此金鑰無法再次複製，請重新產生以取得可複製版本。");
+          setErrorMessage(t("apiKeys.errors.secretUnavailable"));
           return;
         }
         if (result.error === "api_key_revoked") {
-          setErrorMessage("已撤銷的金鑰無法複製。");
+          setErrorMessage(t("apiKeys.errors.revoked"));
           return;
         }
         throw new Error("copy_failed");
@@ -368,12 +370,12 @@ export function ApiKeysManager({
       prefetchedSecretsRef.current.set(item.id, result.secret);
       const copied = await copyToClipboard(result.secret);
       if (!copied) {
-        setErrorMessage("無法寫入剪貼簿，請手動複製或檢查瀏覽器權限。");
+        setErrorMessage(t("apiKeys.errors.clipboardWriteFailed"));
         return;
       }
       onCopySuccess(item);
     } catch {
-      setErrorMessage("無法複製金鑰，請稍後再試或檢查瀏覽器權限。");
+      setErrorMessage(t("apiKeys.errors.copyFailed"));
     } finally {
       setCopyingId(null);
     }
@@ -383,11 +385,11 @@ export function ApiKeysManager({
     if (!createdSecret) return;
     const copied = await copyToClipboard(createdSecret);
     if (!copied) {
-      setErrorMessage("無法寫入剪貼簿，請手動複製或檢查瀏覽器權限。");
+      setErrorMessage(t("apiKeys.errors.clipboardWriteFailed"));
       return;
     }
     setSecretCopied(true);
-    pushToast("API key 已複製到剪貼簿");
+    pushToast(t("apiKeys.toast.copied"));
     window.setTimeout(() => setSecretCopied(false), 1200);
   }
 
@@ -396,18 +398,18 @@ export function ApiKeysManager({
       {createdSecret ? (
         <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-medium text-slate-900">新 API 金鑰已建立</p>
+            <p className="text-sm font-medium text-slate-900">{t("apiKeys.created.title")}</p>
             <button
               type="button"
               onClick={copyCreatedSecret}
               className={buttonClass("secondary", "h-8 rounded-lg px-3 text-xs")}
             >
-              {secretCopied ? "已複製" : "複製完整金鑰"}
+              {secretCopied ? t("apiKeys.created.copied") : t("apiKeys.created.copyFull")}
             </button>
           </div>
           <p className="mt-1 break-all font-mono text-xs text-slate-700">{createdSecret}</p>
           <p className="mt-1 text-xs text-slate-500">
-            請立即複製並妥善保存。若未保存，可稍後在表格中再次複製新版本金鑰。
+            {t("apiKeys.created.note")}
           </p>
         </div>
       ) : null}
@@ -416,10 +418,10 @@ export function ApiKeysManager({
         <table className="w-full min-w-[680px] text-sm">
           <thead className="text-left text-slate-500">
             <tr>
-              <th className="border-b border-slate-200 py-3 pr-3 font-medium">Name</th>
-              <th className="border-b border-slate-200 py-3 pr-3 font-medium">API Key</th>
-              <th className="border-b border-slate-200 py-3 pr-3 font-medium">Last used</th>
-              <th className="border-b border-slate-200 py-3 text-right font-medium">Actions</th>
+              <th className="border-b border-slate-200 py-3 pr-3 font-medium">{t("apiKeys.table.name")}</th>
+              <th className="border-b border-slate-200 py-3 pr-3 font-medium">{t("apiKeys.table.apiKey")}</th>
+              <th className="border-b border-slate-200 py-3 pr-3 font-medium">{t("apiKeys.table.lastUsed")}</th>
+              <th className="border-b border-slate-200 py-3 text-right font-medium">{t("apiKeys.table.actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -433,7 +435,7 @@ export function ApiKeysManager({
                   <tr key={item.id} className={rowMuted ? "opacity-60" : ""}>
                     <td className="border-b border-slate-100 py-3 pr-3 text-slate-900">
                       {item.name}
-                      {rowMuted ? <span className="ml-2 text-xs text-slate-500">已撤銷</span> : null}
+                      {rowMuted ? <span className="ml-2 text-xs text-slate-500">{t("apiKeys.revokedBadge")}</span> : null}
                     </td>
                     <td className="border-b border-slate-100 py-3 pr-3">
                       <div className="flex items-center gap-2">
@@ -448,17 +450,17 @@ export function ApiKeysManager({
                             "inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-transparent text-slate-500 transition duration-150 ease-out hover:border-slate-200 hover:bg-slate-100 hover:text-slate-700 active:scale-95 active:opacity-80",
                             (copyDisabled || isCopying) && "cursor-not-allowed text-slate-300 hover:border-transparent hover:bg-transparent hover:text-slate-300",
                           )}
-                          aria-label="複製 API 金鑰"
+                          aria-label={t("apiKeys.copy.aria")}
                           title={
                             item.status === "revoked"
-                              ? "已撤銷金鑰不可複製"
+                              ? t("apiKeys.copy.revoked")
                               : item.canCopy === false
-                                ? "此金鑰無法再次複製，請重新產生以取得可複製版本"
+                                ? t("apiKeys.copy.cannotCopy")
                                 : isCopying
-                                  ? "複製中…"
+                                  ? t("apiKeys.copy.copying")
                                   : copied
-                                    ? "已複製"
-                                    : "複製"
+                                    ? t("apiKeys.copy.copied")
+                                    : t("apiKeys.copy.label")
                           }
                         >
                           {isCopying ? (
@@ -471,7 +473,7 @@ export function ApiKeysManager({
                         </button>
                       </div>
                     </td>
-                    <td className="border-b border-slate-100 py-3 pr-3 text-slate-600">{formatDateTime(item.lastUsed)}</td>
+                    <td className="border-b border-slate-100 py-3 pr-3 text-slate-600">{formatDateTime(item.lastUsed, locale, t("apiKeys.neverUsed"))}</td>
                     <td className="border-b border-slate-100 py-3 text-right">
                       <button
                         type="button"
@@ -482,8 +484,8 @@ export function ApiKeysManager({
                           (!canRevoke || isSubmitting || item.status === "revoked") &&
                             "cursor-not-allowed text-slate-300 hover:border-transparent hover:bg-transparent hover:text-slate-300",
                         )}
-                        aria-label={`刪除 ${item.name}`}
-                        title={item.status === "revoked" ? "已撤銷" : "刪除（撤銷）"}
+                        aria-label={t("apiKeys.revoke.aria", { name: item.name })}
+                        title={item.status === "revoked" ? t("apiKeys.revoke.revokedTitle") : t("apiKeys.revoke.revokeTitle")}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -494,7 +496,7 @@ export function ApiKeysManager({
             ) : (
               <tr>
                 <td className="py-4 text-sm text-slate-500" colSpan={4}>
-                  目前沒有可用中的 API key。
+                  {t("apiKeys.empty")}
                 </td>
               </tr>
             )}
@@ -509,7 +511,7 @@ export function ApiKeysManager({
             onClick={() => setShowRevoked((prev) => !prev)}
             className="text-xs text-slate-500 underline-offset-4 transition hover:text-slate-700 hover:underline"
           >
-            {showRevoked ? "隱藏已撤銷金鑰" : `顯示已撤銷金鑰（${revokedCount}）`}
+            {showRevoked ? t("apiKeys.hideRevoked") : t("apiKeys.showRevoked", { count: revokedCount })}
           </button>
         </div>
       ) : null}
@@ -518,17 +520,19 @@ export function ApiKeysManager({
           path — free no-key trial + choose a plan — instead of a Create button that always fails. */}
       {needsSubscription ? (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-          <p className="text-sm font-medium text-amber-900">免費層不含 API key</p>
+          <p className="text-sm font-medium text-amber-900">{t("apiKeys.noKey.title")}</p>
           <p className="mt-1 text-sm leading-6 text-amber-800">
-            你可以<strong>免金鑰</strong>直接試 5 檔（2330／2317／2454／0050／2603）；要取得 API key 請先選擇方案。
+            {t.rich("apiKeys.noKey.body", {
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <a href="/pricing" className={buttonClass("primary", "h-9 rounded-lg px-4 text-xs")}>
-              查看方案
-            </a>
-            <a href="/docs/quick-start" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
-              免金鑰快速試用
-            </a>
+            <Link href="/pricing" className={buttonClass("primary", "h-9 rounded-lg px-4 text-xs")}>
+              {t("apiKeys.noKey.viewPlans")}
+            </Link>
+            <Link href="/docs/quick-start" className={buttonClass("secondary", "h-9 rounded-lg px-4 text-xs")}>
+              {t("apiKeys.noKey.quickTrial")}
+            </Link>
           </div>
         </div>
       ) : (
@@ -543,29 +547,29 @@ export function ApiKeysManager({
             title={createDisabledHint ?? undefined}
             className={buttonClass("primary", "h-11 rounded-2xl px-6 text-sm")}
           >
-            Create
+            {t("apiKeys.create")}
           </button>
           {createDisabledHint ? <p className="text-xs text-amber-600">{createDisabledHint}</p> : null}
         </div>
       )}
 
       <p className="text-xs text-slate-500">
-        API key 可用於呼叫 /v2 API。請妥善保存，若外洩請立即撤銷並重建。
-        {typeof keyLimit === "number" ? `目前方案可保留 ${keyLimit} 把啟用中的金鑰。` : null}
+        {t("apiKeys.footer.hint")}
+        {typeof keyLimit === "number" ? t("apiKeys.footer.limit", { limit: keyLimit }) : null}
       </p>
       {errorMessage ? <p className="text-xs text-red-600">{errorMessage}</p> : null}
 
       {isModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 px-4">
           <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-5">
-            <h3 className="text-base font-semibold text-slate-900">建立 API 金鑰</h3>
+            <h3 className="text-base font-semibold text-slate-900">{t("apiKeys.createModal.title")}</h3>
             <form className="mt-4 space-y-4" onSubmit={handleCreateKey}>
               <label className="block space-y-1 text-sm text-slate-600">
-                <span>名稱</span>
+                <span>{t("apiKeys.createModal.nameLabel")}</span>
                 <input
                   value={newKeyName}
                   onChange={(event) => setNewKeyName(event.target.value)}
-                  placeholder="例如 ai-hedge-fund"
+                  placeholder={t("apiKeys.createModal.namePlaceholder")}
                   className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
                   disabled={!canCreateNow || isSubmitting}
                   required
@@ -573,7 +577,7 @@ export function ApiKeysManager({
                   maxLength={40}
                   aria-required="true"
                 />
-                <span className="text-xs text-slate-400">為金鑰命名以便日後辨識（1–40 字，必填）。</span>
+                <span className="text-xs text-slate-400">{t("apiKeys.createModal.nameHint")}</span>
               </label>
 
               <div className="flex justify-end gap-2">
@@ -583,14 +587,14 @@ export function ApiKeysManager({
                   className={buttonClass("secondary", "h-10 rounded-lg px-4 text-sm")}
                   disabled={isSubmitting}
                 >
-                  取消
+                  {t("apiKeys.createModal.cancel")}
                 </button>
                 <button
                   type="submit"
                   disabled={!canSubmit || newKeyName.trim().length === 0}
                   className={buttonClass("primary", "h-10 rounded-lg px-4 text-sm")}
                 >
-                  {isSubmitting ? "建立中..." : "建立"}
+                  {isSubmitting ? t("apiKeys.createModal.creating") : t("apiKeys.createModal.submit")}
                 </button>
               </div>
             </form>
