@@ -13,6 +13,7 @@ import type {
 } from "@/src/lib/backend-adapter";
 import { getBillingSummary } from "@/src/lib/backend-adapter";
 import { getDashboardEntitlementForUser } from "@/src/lib/billing/subscription";
+import { getPolarBillingSnapshot, type PolarBillingSnapshot } from "@/src/lib/billing/polar-subscription";
 import { formatMoney } from "@/src/lib/billing/money";
 import { getCreditSpendSeriesForUser, getCreditTransactionsForUser, getCreditWalletForUser } from "@/src/lib/billing/credits";
 import { assertCreditsDeductionRuntimeSafe } from "@/src/lib/billing/credits-mode";
@@ -281,6 +282,14 @@ async function DashboardSectionData({
   const needsUsageSummary = section === "overview" || section === "usage";
   const needsUsageRows = section === "usage";
   const needsBillingDisplaySubscription = section === "billing";
+  // Live Polar read for the billing area — only for paid users, and not on the credits
+  // sub-page (which does not display subscription detail). Free users see the upgrade
+  // cards with no Polar call.
+  const needsPolarBilling =
+    section === "billing" &&
+    currentPath !== "/billing/credits" &&
+    entitlement.isEntitled &&
+    entitlement.planCode !== "free";
   const needsWallet = section === "billing" || section === "overview" || currentPath === "/billing/credits";
   const needsCreditTransactions = currentPath === "/billing/credits";
   const needsReconciliation = section === "usage" || currentPath === "/billing/credits";
@@ -354,6 +363,17 @@ async function DashboardSectionData({
         })
       : Promise.resolve(null);
 
+    // Live subscription/invoice/payment-method read straight from Polar (SSOT). Each
+    // sub-fetch already fails closed to an error result, so a null here only covers an
+    // unexpected throw — the page still renders (error state, never fabricated data).
+    const polarBillingPromise: Promise<PolarBillingSnapshot | null> = needsPolarBilling
+      ? timedStage("polarBilling", () => getPolarBillingSnapshot(session.id)).catch((error) => {
+          const errorName = error instanceof Error ? error.name : "UnknownError";
+          console.warn(`[dashboard] failed to fetch polar billing snapshot (${errorName})`);
+          return null;
+        })
+      : Promise.resolve(null);
+
     const [
       apiKeys,
       localUsageSummary,
@@ -363,6 +383,7 @@ async function DashboardSectionData({
       creditTransactions,
       spendSeries,
       reconciliation,
+      polarBilling,
     ] = await Promise.all([
       apiKeysPromise,
       localUsageSummaryPromise,
@@ -372,20 +393,24 @@ async function DashboardSectionData({
       creditTransactionsPromise,
       spendSeriesPromise,
       reconciliationPromise,
+      polarBillingPromise,
     ]);
 
-    // Build the billing display subscription from the backend (single source of
-    // truth). No subscription is stored locally; cancellation is via Customer Portal.
+    // Build the billing display subscription. Polar is the SSOT: when the live snapshot
+    // is available, cancel-at-period-end / period end / status come straight from Polar
+    // (the read API's projection does not persist these). Fall back to the read API's
+    // renewal date / status only when Polar is unavailable — never fabricate.
     const isBillingEntitled = entitlement.isEntitled && entitlement.planCode !== "free";
     const renewalDate = parseRenewalDate(billingSummary?.renewalDate);
+    const polarSub = polarBilling?.subscription.ok ? polarBilling.subscription.data : null;
     const billingDisplaySubscription = isBillingEntitled
       ? {
           id: "polar",
           planCode: entitlement.planCode,
-          status: (billingSummary?.subscriptionStatus ?? "active").toLowerCase(),
+          status: (polarSub?.status ?? billingSummary?.subscriptionStatus ?? "active").toLowerCase(),
           billingCycle: "monthly",
-          currentPeriodEnd: renewalDate,
-          cancelAtPeriodEnd: false,
+          currentPeriodEnd: polarSub?.currentPeriodEnd ?? renewalDate,
+          cancelAtPeriodEnd: polarSub?.cancelAtPeriodEnd ?? false,
           cancelReason: null as string | null,
           cancelReasonDetail: null as string | null,
         }
@@ -440,6 +465,7 @@ async function DashboardSectionData({
             cancelReasonDetail: billingDisplaySubscription.cancelReasonDetail,
           }
         : null,
+      polar: polarBilling,
       creditWalletBalance: creditWallet?.balance ?? 0,
       spendSeries,
       creditsModeState,
