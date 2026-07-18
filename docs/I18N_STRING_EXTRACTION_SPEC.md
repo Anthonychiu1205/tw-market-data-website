@@ -157,7 +157,9 @@ API field names, ticker symbols (e.g. `2330`).
 - Chrome: header, footer, contact-modal, cookie-banner; legal disclaimer EN selector.
 - Home: homepage body + hero + all `home/*` sections + all `home/*` demos (chrome only) + mega-menu content data.
 - Pricing: page + shell + comparison table (plan-card copy deferred — see §5.1).
-- Public pages: contact, about, product, refund.
+- Public pages: contact, about, product, refund, terms, privacy, compare, connect.
+  (legal EN for terms/privacy/refund + disclaimer EN → pending owner legal sign-off.)
+  (connect `pasteLine` copy command still zh — minor, localize later.)
 
 **Remaining content-data files (need `*_en` fields + locale selector, spec §1.6):**
 - `src/content/site.ts` — `platformCapabilities` (product page).
@@ -169,7 +171,7 @@ API field names, ticker symbols (e.g. `2330`).
 
 **Remaining component clusters:** docs/* (12), auth/* (6), blog/* (3), datasets/* (2), help/* (1), dashboard/* (20, PR3).
 
-**Remaining page bodies:** terms, privacy, compare, connect (+which-tier/key-safety), answers (+[slug]), blog (+[slug]), login/register/verify-email/forgot/reset, datasets (+[slug]), docs (+[...slug]), faq/help/help-center.
+**Remaining page bodies:** connect/which-tier, connect/key-safety, answers (+[slug]), blog (+[slug]), login/register/verify-email/forgot/reset (auth), datasets (+[slug]), docs (+[...slug]), faq/help/help-center.
 
 **Remaining cross-cutting:** page `metadata`/`generateMetadata` + hreflang/canonical/JSON-LD/`sitemap.ts`/`robots.ts` (PR4 SEO); missing-page fallback + missing-key telemetry (PR4).
 
