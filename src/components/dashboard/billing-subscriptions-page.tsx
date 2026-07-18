@@ -269,6 +269,9 @@ function CurrentPlanCard({
             </span>
           </div>
           <p className="mt-2 text-sm text-slate-600">{quotaSummary}</p>
+          <p className="mt-1 text-xs text-slate-500">
+            included 額度用盡後，超額請求以 credits 錢包計費（overage）；RPM 為每分鐘速率上限，與額度／credits 分開計算。
+          </p>
         </div>
         <span className={cn("shrink-0 rounded-full border px-3 py-1 text-xs font-medium", BADGE_TONE_CLASS[badgeTone])}>
           {badgeLabel}
