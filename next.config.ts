@@ -35,6 +35,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // Static export now generates every page twice (en + zh-TW). On slow/local disks a few
+  // content-heavy pages (docs/[...slug]) can exceed the 60s default and fail after 3 retries;
+  // Vercel's build infra finishes them well under this. Raise the ceiling for build reliability.
+  staticPageGenerationTimeout: 300,
   async headers() {
     return [
       {

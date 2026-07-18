@@ -8,9 +8,946 @@
     "dashboard": "Dashboard",
     "signIn": "Sign in",
     "getStarted": "Get started",
-    "siteMap": "Site map"
+    "siteMap": "Menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "closeMenuBackdrop": "Close menu overlay"
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "help": "Help Center",
+    "contact": "Contact us"
+  },
+  "contactModal": {
+    "close": "Close",
+    "title": "Contact us",
+    "description": "For enterprise partnerships, data licensing, technical support, or plan enquiries, email us:"
+  },
+  "cookieBanner": {
+    "title": "Cookie settings",
+    "description": "We use essential cookies to keep you signed in and secure, and analytics cookies to improve the product. We never use them for ad tracking.",
+    "learnMore": "Learn more",
+    "decline": "Decline",
+    "acceptAll": "Allow all cookies"
+  },
+  "home": {
+    "marketPanel": {
+      "indicators": "Market indicators",
+      "news": "Market news",
+      "viewAll": "View all data",
+      "viewMore": "View more"
+    },
+    "hero": {
+      "title": "A Taiwan market data API built for systems and quant workflows",
+      "subhead1": "A consistent Taiwan stock data API for AI agents, automation, and quantitative research.",
+      "subhead2": "Centered on TWSE-listed data, with verified datasets that clearly state their coverage window, sources, and limits."
+    },
+    "infra": {
+      "heading": "Taiwan market data infrastructure",
+      "subheading": "Sourced from official providers and shaped into a stable, queryable, traceable API."
+    },
+    "pillars": {
+      "twseFirst": {
+        "value": "TWSE-first",
+        "label": "Verified baseline",
+        "description": "Centered on listed-market data, expanding coverage to other markets over time."
+      },
+      "lowLatency": {
+        "value": "Low-latency queries",
+        "label": "Built for API & agent workflows",
+        "description": "Tuned for automated queries and research pipelines, with a continually improved read path."
+      },
+      "officialFirst": {
+        "value": "Official-source first",
+        "label": "Lineage & data gaps preserved",
+        "description": "Prioritizes TWSE, TPEx, MOPS, and official public sources — no mixed provenance."
+      },
+      "clearBoundary": {
+        "value": "Clear boundaries",
+        "label": "No overclaiming",
+        "description": "No claims of full-market, adjusted prices, survivorship-safety, or investment advice."
+      }
+    },
+    "finalCta": {
+      "heading": "Get started",
+      "body1": "From prices and financials to corporate events, connect to the Taiwan market data API in minutes.",
+      "body2": "After signing up you can choose a plan, create your own API keys, and get data access and usage quota by plan."
+    },
+    "cta": {
+      "signIn": "Sign in",
+      "register": "Sign up"
+    },
+    "aiAgentWorkflow": {
+      "title": "AI agent workflow",
+      "intro": "From task planning to reliable data retrieval — built for AI agent and quant workflows, so data is verifiable, traceable, and programmatically usable.",
+      "step1Title": "Task understanding and planning",
+      "step1Description": "The AI agent parses the user's question and plans the required data and metrics.",
+      "step2Title": "Find the right dataset and fields",
+      "step2Description": "Use the data catalog and schema to select the exact dataset and fields.",
+      "step3Title": "Call the API to retrieve data",
+      "step3Description": "Retrieve data through a standardized API; responses include source and lineage.",
+      "step4Title": "Validation and quality checks",
+      "step4Description": "Check freshness, source tier, and field completeness to ensure reliability.",
+      "step5Title": "Data processing and analysis",
+      "step5Description": "Compute metrics, engineer features, or run analysis to produce traceable conclusions.",
+      "step6Title": "Output results with traceability",
+      "step6Description": "Return results while retaining source, timestamp, and lineage — verifiable and auditable.",
+      "footnote": "Traceable, verifiable, and programmatic — built for agent workflows."
+    },
+    "agentWorkflowShowcase": {
+      "title": "Let AI agents read traceable Taiwan stock data directly",
+      "description": "Wire prices, financials, and disclosures into your agent workflow. A consistent response structure with source_role / lineage keeps the data both readable and verifiable."
+    },
+    "agentDocumentsShowcase": {
+      "title": "Give AI agents direct understanding of filings and financial reports",
+      "description": "Turn material announcements, filings, and financial-statement notes into analyzable text context, so agents don't just read the numbers — they understand what a company actually disclosed."
+    },
+    "marketCoverage": {
+      "heading": "Query across TWSE- and TPEx-listed stocks, ETFs, warrants, and more",
+      "description": "Covers the Taiwan market's main data themes — prices, financial statements, operating metrics, and corporate events. Supports queries across stocks, time, and multiple datasets, so agents can run analysis and screening in a single data layer. Positioned publicly as a TWSE-first verified baseline; makes no claim to full-market historical coverage.",
+      "exploreDatasets": "Explore datasets"
+    },
+    "agentWorkflowDemo": {
+      "copyResult": "Copy result"
+    },
+    "apiDemo": {
+      "heading": "Clean, direct Taiwan stock market data API",
+      "description": "Consistent endpoints and response formats to quickly integrate market quotes, financial statements, revenue, and event data into your systems.",
+      "fields": {
+        "endpoint": "Endpoint",
+        "ticker": "Ticker"
+      },
+      "run": "Run",
+      "running": "Running",
+      "response": "RESPONSE",
+      "generating": "Generating response...",
+      "endpoints": {
+        "monthlyRevenue": "Monthly revenue",
+        "twseDailyPrice": "TWSE daily price",
+        "incomeStatement": "Income statement",
+        "technicalIndicators": "Technical indicators"
+      }
+    },
+    "sourceOfTruth": {
+      "heading": "A single trusted source of truth",
+      "description": "Sample data topics currently at the public boundary. The public scope uses a TWSE-first verified baseline; TPEx historical coverage, adjusted prices, and a survivorship-safe universe remain deferred / in-progress.",
+      "copyResponse": "Copy example response"
+    },
+    "agentDocumentsDemo": {
+      "pulling": "Agent: pulling company filings and financial notes",
+      "extracting": "Agent: extracting key passages",
+      "complete": "Agent: analysis complete."
+    }
+  },
+  "pricing": {
+    "title": "Pricing",
+    "selfServe": {
+      "instantTitle": "Live in three minutes",
+      "instantDesc": "Pay online and your API key is issued immediately — no contract, no waiting for a sales callback.",
+      "cancelTitle": "Cancel anytime",
+      "cancelDesc": "Turn off any monthly plan from your account page — no lock-in, no cancellation fee.",
+      "selfTitle": "Fully self-serve",
+      "selfDesc": "Sign up, get a key, watch usage, upgrade — all self-service; reach us only when you need to."
+    },
+    "choosePlan": "Choose your plan",
+    "pricedUsd": "Priced in USD, checkout on-site.",
+    "billingCycleAria": "Billing cycle",
+    "featureColumnAria": "Feature",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "save2Months": "2 months free",
+    "mostPopular": "Most popular",
+    "perYear": "yr",
+    "perMonth": "mo",
+    "annualEquals": "Annual = monthly ×10 — two months free.",
+    "annualComingSoon": "Annual coming soon",
+    "openingCheckout": "Opening checkout…",
+    "annualCheckoutNote": "Annual checkout is coming soon; to start now, switch to monthly.",
+    "checkoutError": "Checkout can't open right now — please try again later or contact us.",
+    "cardRecurringNote": "Recurring card billing; cancel anytime from the Customer Portal on the billing page.",
+    "enterpriseNote": "Enterprise / custom: <b>standard plans can be paid by card directly</b>; contact us for dedicated quota, invoicing, or an SLA.",
+    "notAdvice": "This service provides data APIs, tools, and documentation — not investment advice, stock recommendations, or trading signals.",
+    "comparisonHeading": "Plan comparison: datasets and coverage",
+    "comparisonIntro": "See each plan's dataset scope and history depth at a glance. Full dataset list in the <catalog>dataset catalog</catalog>; each dataset's actual coverage and update status follow <coverage>docs coverage</coverage> (we don't fabricate per-cell coverage numbers).",
+    "comparisonFootnote": "Note: TPEx daily history depth is still deferred; adjusted prices, a survivorship-safe universe, and a backtest-grade full-market baseline are not within our current publicly-claimable scope.",
+    "groups": {
+      "datasetAccess": "Dataset access",
+      "quotaBilling": "Quota & billing"
+    },
+    "rows": {
+      "datasetScope": "Available dataset scope",
+      "financialStatements": "Financial statements (income / balance sheet / cash flow)",
+      "historyDepth": "History depth / coverage",
+      "webhook": "Webhook",
+      "price": "Price / month",
+      "apiKeys": "API keys",
+      "rpm": "RPM",
+      "includedRequests": "Included requests / month",
+      "commercialUse": "Commercial use"
+    },
+    "values": {
+      "yes": "Yes",
+      "no": "No",
+      "full": "Full",
+      "fullRaw": "Full (raw)",
+      "reserved": "reserved",
+      "contactUs": "Contact us",
+      "free": "Free",
+      "custom": "Custom",
+      "years5": "5 years",
+      "year1": "1 year",
+      "month1": "1 month"
+    }
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Contact us",
+    "intro": "For enterprise partnerships, data licensing, technical support, or plan questions, email us:"
+  },
+  "about": {
+    "title": "Trust & source policy",
+    "description": "Source principles and traceable design for the Taiwan-stock data platform.",
+    "trustModel": {
+      "heading": "Trust model",
+      "body": "Layered as canonical, fallback, and helper to avoid mixing sources; responses retain lineage and freshness."
+    },
+    "sourcePolicy": {
+      "heading": "Source policy"
+    },
+    "whyUs": {
+      "heading": "Why this product",
+      "body": "For research, quant, and development workflows, what matters isn't just getting the data — it's that the data is traceable, verifiable, and continuously deliverable."
+    }
+  },
+  "product": {
+    "eyebrow": "Product",
+    "title": "TWSE-first verified data API product",
+    "lead": "The current public positioning is a TWSE-first verified baseline; TPEx historical coverage and the full-market claim remain managed as deferred / blocked.",
+    "codeWindowTitle": "Product surface",
+    "verifiedHeading": "Verified baseline / publicly claimable",
+    "deferredHeading": "Deferred / blocked claims",
+    "gettingStarted": {
+      "heading": "Getting started",
+      "body": "Start with the Quickstart and the docs, then integrate from a verified baseline dataset. Treat each dataset's coverage/status notes as the source of truth for any data claim.",
+      "quickstartLink": "Open the Quickstart",
+      "docsLink": "View the docs"
+    }
+  },
+  "refund": {
+    "title": "Refund Policy",
+    "intro": "This policy explains the refund principles for TW Market Data subscriptions and digital services, and serves as important reference before subscribing and paying.",
+    "section1Title": "1. Nature of digital services",
+    "section1Body1": "This service is a digital-content and API subscription service; once activated, you can access the platform features and data.",
+    "section1Body2": "Because digital services are delivered instantly, the return model for ordinary physical goods does not, as a rule, apply.",
+    "section2Title": "2. General refund principle",
+    "section2Body1": "Except as otherwise provided in this policy, subscription fees or usage fees already collected are, as a rule, non-refundable.",
+    "section2Body2": "If you do not wish to renew, please cancel your subscription before the next billing cycle.",
+    "section3Title": "3. Exceptions",
+    "section3Body1": "If a major platform system error renders a paid service unusable within a reasonable period, you may submit a refund request.",
+    "section3Body2": "We will review each case on its actual circumstances and may provide a full or partial refund, or equivalent-value service compensation.",
+    "section3Body3": "Whether an exceptional refund condition is met is determined by our review results and system records.",
+    "section4Title": "4. Cancelling your subscription",
+    "section4Body1": "You may cancel your subscription at any time through your account or the subscription management flow.",
+    "section5Title": "5. Contact",
+    "section5Body1": "To request a refund or ask about billing questions, please contact us via the contact page.",
+    "section5EmailLabel": "Email: ",
+    "section5ContactLabel": "Contact page: "
+  },
+  "terms": {
+    "title": "Terms of Use",
+    "lead1": "These Terms of Use govern the rights, obligations, scope of license, and limitations of liability between you and the platform operator when you access and use TW Market Data. Please read these Terms in full before using the Service.",
+    "lead2": "When you register an account, create an API key, access the Service, call the Service API, or otherwise use the Service, you represent that you have read, understood, and agree to be bound by these Terms; if you do not agree to all or part of these Terms, please stop using the Service.",
+    "scope": {
+      "title": "1. Scope",
+      "p1": "These Terms apply to your use of the platform website, datasets, API, documentation, console, downloadable content, and related features.",
+      "p2": "The platform may separately publish supplementary rules for specific features, plans, promotions, beta features, or enterprise partnerships; once published, such supplementary rules form part of these Terms."
+    },
+    "definitions": {
+      "title": "2. Definitions",
+      "p1": "Unless the context otherwise requires, the terms used in these Terms are defined as follows.",
+      "b1": "Account: the member identity created by a user in order to use the Service.",
+      "b2": "API Key: the access credential used to authenticate a user's calls to the Service API.",
+      "b3": "Plan: the service tier set by the platform for different data scopes, quotas, features, and license conditions.",
+      "b4": "Dataset: a collection of market, company, financial, event, classification, quantitative, or other data made available by the platform for query, download, analysis, or integration.",
+      "b5": "Commercial Use: use for profit, providing paid services to third parties, integration into commercialized products, enterprise operational analysis, customer service, internal commercial decision support, or any other use scenario with a commercial purpose.",
+      "b6": "Third-Party Data: data, content, or information not originally produced by the platform but obtained from public sources, official sources, or other third-party providers."
+    },
+    "service": {
+      "title": "3. Service Content",
+      "p1": "The platform provides a Taiwan stock data API, dataset access capabilities, a console, documentation, and related product interfaces.",
+      "p2": "The datasets, features, access boundaries, quotas, rate limits, license scope, and other conditions of use actually available under the Service are governed by your current account plan, the product interface, the subscription page, or any individual agreement.",
+      "p3": "The platform may, based on product development, source availability, regulatory requirements, technical maintenance, or other reasonable factors, add, adjust, suspend, remove, or replace certain datasets, fields, features, quotas, rate limits, or product content, and may notify users by website announcement, console notice, email, or other reasonable means."
+    },
+    "account": {
+      "title": "4. Account and API Key",
+      "p1": "You shall properly safeguard the security of your account and API key, and shall not transfer, sell, share, rent, lend, or otherwise provide your account or API key for unauthorized use by any third party.",
+      "p2": "You are solely responsible for all activity and requests made under your account and API key.",
+      "p3": "If you discover that your account or API key is suspected of being leaked, subject to unauthorized access, used abnormally, or presents any other security concern, you shall immediately notify the platform and take necessary measures to disable, reset, or rotate it.",
+      "p4": "The platform may, based on information security, abuse prevention, system stability, regulatory compliance, or reasonable risk control needs, suspend, restrict, revoke, reset, or require replacement of a specific account or API key.",
+      "b1": "API calls and data access",
+      "b2": "Quota consumption and rate usage",
+      "b3": "Account-related settings, management, and operations"
+    },
+    "license": {
+      "title": "5. License Scope and Use Restrictions",
+      "p1": "Subject to the plan applicable to you, the platform grants you a revocable, non-exclusive, non-transferable, non-sublicensable right of use to access and use the Service within the scope of the license.",
+      "b1": "You may not circumvent, interfere with, bypass, or test the platform's authentication, quotas, rate limits, license controls, or other protection mechanisms.",
+      "b2": "You may not, without authorization, bulk-download, mirror, reconstruct, resell, sublicense, redistribute, or build a data service that is highly substitutable for the platform.",
+      "b3": "You may not use the Service for illegal, infringing, fraudulent, request-flooding, stress-testing, system-interference, or other improper purposes.",
+      "b4": "You may not use crawlers, batch programs, or other means to use the Service beyond the scope authorized by your plan.",
+      "b5": "You may not, directly or indirectly, use a plan intended solely for testing, evaluation, research, or non-commercial use for Commercial Use.",
+      "b6": "The Free and Developer plans are licensed for non-commercial use only.",
+      "b7": "The Pro, Team, and Enterprise plans may be used for Commercial Use within the scope of the license."
+    },
+    "plans": {
+      "title": "6. Plans, Fees, and Subscriptions",
+      "p1": "The price, billing cycle, license scope, dataset availability, quotas, rate limits, number of API keys, and related features of a paid plan are governed by the content set out on the website, console, order, or other official page at the time you subscribe or purchase.",
+      "p2": "The platform may, based on product, cost, regulatory, or operational needs, adjust plan prices, feature content, quotas, rate limits, dataset scope, or other plan conditions, taking effect after announcement or notice by reasonable means.",
+      "p3": "If you fail to pay as agreed, a payment fails, a refund dispute arises, or there are other reasonably necessary circumstances, the platform may restrict, suspend, or terminate your use of part or all of the Service.",
+      "p4": "Plan upgrades and downgrades, effective times, data access scope, and the manner of switching account permissions are governed by the product interface and plan rules in effect at the time."
+    },
+    "dataSources": {
+      "title": "7. Data Sources and Third-Party Data",
+      "p1": "The data provided by the platform may include content from official sources, public sources, third-party sources, or content compiled, standardized, structured, or derived by the platform according to certain methods. Different data sources may be affected by their original license conditions, availability, update frequency, technical limitations, latency, corrections, and interruptions.",
+      "p2": "You understand and agree that the continued supply, content quality, and lawful availability of Third-Party Data may be affected by third-party factors.",
+      "p3": "You remain responsible for judging whether the data is suitable for your intended purpose, and for confirming whether it complies with applicable laws, third-party rights, and your internal compliance requirements.",
+      "p4": "The platform does not guarantee that any Third-Party Data will be provided perpetually and continuously, will remain entirely unchanged, or may be used without restriction under any circumstances."
+    },
+    "disclaimerGeneral": {
+      "title": "8. Disclaimer of Warranties",
+      "p1": "The Service and all of its data, content, documentation, fields, indicators, events, model outputs, and related information are provided on an \"as is\" and \"as available\" basis.",
+      "p2": "To the extent permitted by applicable law, the platform makes no express or implied warranty as to accuracy, completeness, timeliness, continuous availability, freedom from error, freedom from interruption, fitness for a particular purpose, or full conformity with your expectations.",
+      "p3": "You understand that data may experience delay, omission, correction, amendment, restatement, backfill, suspension, removal, or source interruption."
+    },
+    "notInvestmentAdvice": {
+      "title": "9. Not Investment Advice",
+      "p1": "The data, fields, indicators, events, news, valuation information, derived information, documentation content, or any explanation provided by the platform do not constitute investment advice, investment solicitation, buy/sell recommendations, guarantees of returns, legal opinions, accounting opinions, or tax opinions.",
+      "p2": "You should not treat the platform's data or content as a recommendation, offer, or endorsement of any financial product.",
+      "p3": "Any investment, trading, asset allocation, risk management, or business decision shall be made at your own judgment and risk; where necessary, you should consult your own professional advisors."
+    },
+    "suspension": {
+      "title": "10. Suspension, Restriction, and Termination",
+      "p1": "If any of the following circumstances occurs, the platform may, to the extent necessary, suspend, restrict, or terminate your access to all or part of the Service.",
+      "b1": "Violation of these Terms or other applicable rules.",
+      "b2": "Conduct affecting the security or stability of the platform or the rights of other users.",
+      "b3": "Suspected abuse, circumvention of restrictions, or unauthorized sharing of an account or API key.",
+      "b4": "Violation of applicable laws, third-party rights, or regulatory requirements.",
+      "b5": "Payment failure, billing anomalies, subscription lapse, or other reasonable operational needs.",
+      "b6": "You may also stop using the Service, cancel your subscription, or terminate your account through the product flow. After account termination, certain data, records, logs, billing information, or content subject to statutory retention may still be retained in accordance with law, compliance, or operational needs."
+    },
+    "ip": {
+      "title": "11. Intellectual Property",
+      "p1": "The intellectual property rights in the platform website, interfaces, code, design, documentation, trademarks, data compilation methods, data structures, textual content, and other related content, except as otherwise stated, belong to the platform or its lawful rights holders.",
+      "p2": "Except as expressly licensed under these Terms, you acquire no other intellectual property right, ownership, sublicensing right, or right to reproduce, distribute, publicly transmit, or adapt the data by using the Service."
+    },
+    "privacy": {
+      "title": "12. Privacy and Data Protection",
+      "p1": "The platform values user privacy. The collection, processing, and use of personal data involved in your use of the Service are handled in accordance with the platform's Privacy Policy.",
+      "p2": "Please read the Privacy Policy carefully before use to understand how the platform processes data and your rights."
+    },
+    "serviceChanges": {
+      "title": "13. Service Changes, Maintenance, and Beta Features",
+      "p1": "The platform may change part or all of the Service based on maintenance, upgrade, security, performance, testing, correction, or architectural adjustment needs.",
+      "p2": "During maintenance, updates, testing, or troubleshooting, the Service may be briefly interrupted, delayed, restricted, or render certain features unavailable.",
+      "p3": "The platform will make reasonable efforts to minimize the impact on users, but does not guarantee that the Service will be free from interruption or anomaly at all times."
+    },
+    "liability": {
+      "title": "14. Limitation of Liability",
+      "p1": "To the extent permitted by applicable law, the platform shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from use, inability to use, data delay, data error, data omission, service interruption, feature restriction, Third-Party Data anomaly, or other circumstances related to the Service.",
+      "p2": "To the extent permitted by law, the platform's total liability to you shall be capped at the total fees you actually paid to the platform for the Service in the twelve months preceding the event giving rise to the damage; if you have paid no fees, the minimum extent required by law shall govern."
+    },
+    "governingLaw": {
+      "title": "15. Governing Law and Dispute Resolution",
+      "p1": "The interpretation, validity, and application of these Terms shall be governed by the laws of the Republic of China (Taiwan).",
+      "p2": "For any dispute arising from or in connection with these Terms or the Service, the parties shall first seek to resolve it through good-faith negotiation; if negotiation fails, then unless otherwise mandatorily required by law, the parties agree that the Taiwan Taipei District Court shall be the court of first instance with jurisdiction."
+    },
+    "contact": {
+      "title": "16. Contact",
+      "p1": "If you have any questions about these Terms, the Service, or account use, please contact us via the contact page on the platform's official website."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "intro": "This Privacy Policy explains how TW Market Data collects, uses, protects, and processes the information you provide when using this platform and its related services. Please read this policy carefully before using the service.",
+    "collect": {
+      "title": "1. Types of Information We Collect",
+      "intro": "We may collect the following information.",
+      "account": "Account information: such as name, email, company name, login credentials, or account identifiers.",
+      "usage": "Usage information: such as API call logs, usage timestamps, feature activity logs, console interactions, and device and browser information.",
+      "payment": "Payment and subscription information: such as plan, payment status, subscription records, and billing information.",
+      "contact": "Contact information: such as content you provide through forms, email, or support channels."
+    },
+    "use": {
+      "title": "2. How We Use Information",
+      "intro": "We may use the information we collect for the following purposes.",
+      "provide": "To provide, maintain, and improve this service.",
+      "verify": "To verify accounts and API keys.",
+      "quota": "To manage quotas, rate limits, and authorization boundaries.",
+      "billing": "To process subscriptions, payments, billing, and support requests.",
+      "abuse": "To detect anomalous activity, abuse, or security incidents.",
+      "notify": "To send important notices related to the service.",
+      "internal": "To conduct internal analytics, product optimization, and compliance management."
+    },
+    "share": {
+      "title": "3. Data Sharing and Disclosure",
+      "intro": "Except in the following circumstances, we do not arbitrarily sell or disclose your personal data.",
+      "consent": "With your consent.",
+      "vendors": "As necessary to perform the service, working with payment, cloud, analytics, customer support, or technical vendors.",
+      "legal": "To comply with legal obligations, court orders, or requirements of competent authorities.",
+      "protect": "To protect the rights, safety, or legitimate interests of this platform, its users, or third parties."
+    },
+    "retention": {
+      "title": "4. Data Retention and Security",
+      "security": "We adopt reasonable technical and administrative measures to protect the security of your information, including but not limited to access controls, authentication, logging, and other reasonable safeguards. However, no method of transmission or storage over the internet can guarantee absolute security, and you should still properly manage your account and API keys.",
+      "period": "We will retain your information for a reasonable and necessary period based on the nature of the data, legal requirements, compliance needs, and the purposes of the service."
+    },
+    "cookies": {
+      "title": "5. Cookies and Similar Technologies",
+      "body": "This platform may use cookies or similar technologies to maintain your login state, improve your experience, analyze traffic, and support website functionality. You may manage cookies through your browser settings, but some features may be affected as a result."
+    },
+    "rights": {
+      "title": "6. Your Rights",
+      "body": "Within the scope of applicable law, you may have the right to access, correct, delete, restrict the processing of, or exercise other related rights over your data. If you wish to exercise these rights, please contact us through the platform's contact page, and we will process your request within a reasonable period."
+    },
+    "updates": {
+      "title": "7. Policy Updates",
+      "body": "We may update this Privacy Policy in response to legal, service, or product changes. The updated version will be published on the website and takes effect from the effective date announced or indicated."
+    },
+    "contact": {
+      "title": "8. Contact Us",
+      "body": "If you have any questions about this Privacy Policy, please contact us through the official website's contact page."
+    },
+    "analytics": {
+      "title": "Analytics & Cookies (Product Analytics)",
+      "body": "We use necessary cookies to maintain login, security, and website functionality. We may also use analytics cookies to understand product usage, such as login flows, API key operations, documentation browsing, and gateway error events.",
+      "noAdTracking": "Not used for ad tracking.",
+      "noSell": "We do not sell personal data.",
+      "noSecrets": "We do not collect raw API keys, tokens, passwords, or database connection strings.",
+      "userChoice": "Users can choose to decline or allow analytics cookies in the cookie prompt."
+    }
+  },
+  "compare": {
+    "h1": "How to choose a Taiwan stock data API: FinMind vs TEJ vs TW Market Data",
+    "intro": "Taiwan stock data APIs come in three common flavors, matching different budgets and levels of granularity. This is an honest comparison to help you pick the right tool for your scenario.",
+    "positioningTitle": "Three products, one line each",
+    "positioning": {
+      "finmind": "<strong>FinMind</strong> — large free tier, strong community ecosystem, deep chip-flow data. Good for getting started, personal research, and quick prototypes.",
+      "tej": "<strong>TEJ (Taiwan Economic Journal)</strong> — institutional-grade, extremely clean data, complete point-in-time, includes delisted stocks. Taiwan's \"Bloomberg/Compustat\", but expensive with a high barrier for individual developers.",
+      "twmd": "<strong>TW Market Data</strong> — first-party official value-by-value traceability, knowledge_date on every record (PIT), honest data_gaps, no-key instant trial, affordable. Positioned between FinMind's accessibility and TEJ's rigor."
+    },
+    "tableTitle": "Comparison table",
+    "tableHeaderAspect": "Aspect",
+    "tableCaption": "The table marks each provider's public positioning only; refer to each provider's own site for actual fields and plans. The TW Market Data column lists shipped capabilities only, with coverage transparently marked per dataset.",
+    "rows": {
+      "officialSource": {
+        "aspect": "First-party official source",
+        "finmind": "Partial",
+        "tej": "✓",
+        "twmd": "✓ (TWSE/TPEx/MOPS/TAIFEX)"
+      },
+      "reconciliation": {
+        "aspect": "Value-by-value reconciliation against official sources",
+        "finmind": "—",
+        "tej": "—",
+        "twmd": "✓ (reconciliation mechanism, traceable)"
+      },
+      "pit": {
+        "aspect": "Point-in-time / knowledge_date",
+        "finmind": "Approximated from publish date",
+        "tej": "✓ (complete)",
+        "twmd": "✓ (knowledge_date on every record)"
+      },
+      "delisted": {
+        "aspect": "Includes delisted stocks",
+        "finmind": "Partial",
+        "tej": "✓",
+        "twmd": "✓ ({stoppedStocks} tickers of price history, back to {startYear})"
+      },
+      "dataGaps": {
+        "aspect": "Honest data_gaps disclosure",
+        "finmind": "—",
+        "tej": "—",
+        "twmd": "✓ (no guessed backfill)"
+      },
+      "freeTrial": {
+        "aspect": "Free / no-key trial",
+        "finmind": "✓ (free tier)",
+        "tej": "✗",
+        "twmd": "✓ (5 tickers, no key)"
+      },
+      "aiAgent": {
+        "aspect": "AI-agent integration (llms.txt/openapi)",
+        "finmind": "✓ (llms.txt + skill)",
+        "tej": "—",
+        "twmd": "✓ (llms.txt/llms-full/openapi)"
+      },
+      "pricing": {
+        "aspect": "Indie-developer-friendly pricing",
+        "finmind": "✓",
+        "tej": "✗ (expensive)",
+        "twmd": "✓"
+      },
+      "chipDepth": {
+        "aspect": "Institutional / chip-flow depth",
+        "finmind": "✓ (strong)",
+        "tej": "✓",
+        "twmd": "✓ (per-day, per-ticker)"
+      }
+    },
+    "scenariosTitle": "How to choose by scenario",
+    "scenarios": {
+      "finmind": "<strong>Getting started / personal research / free exploration</strong> → FinMind.",
+      "tej": "<strong>Institutional-grade, ample budget, want the most complete PIT and delisted stocks</strong> → TEJ.",
+      "twmd": "<strong>Want official traceability + point-in-time, but TEJ is too expensive / unfriendly to individuals, and you also want to feed an AI agent</strong> → <link>TW Market Data</link> (try 2330 with no key before deciding)."
+    },
+    "traceabilityTitle": "Why \"traceability\" matters especially for backtesting",
+    "traceabilityBody": "Quantitative backtesting fears look-ahead bias and survivorship bias most. The former needs point-in-time — knowing what had been published \"at the time\"; the latter needs data that includes delisted stocks. TW Market Data carries knowledge_date on every record to support as-of replay, and retains price history for {stoppedStocks} stocks that have stopped trading, covering both biases; gaps are shown explicitly via data_gaps rather than implicitly backfilled.",
+    "faqTitle": "FAQ",
+    "faq": {
+      "otherApis": {
+        "question": "What Taiwan stock data APIs are there besides FinMind?",
+        "answer": "Common choices include TEJ (institutional-grade PIT), TW Market Data (official reconciliation + PIT + affordable + AI-agent), Fugle/Shioaji (broker real-time + order placement), and TWSE/TPEx OpenAPI (official, free)."
+      },
+      "bestForPit": {
+        "question": "Which Taiwan stock API is best for point-in-time backtesting?",
+        "answer": "TEJ offers the most complete institutional-grade PIT; for affordable PIT that is friendly to individuals and AI agents, TW Market Data carries knowledge_date on every record, includes delisted stocks, and is honest about data_gaps."
+      },
+      "vsFinmind": {
+        "question": "How does TW Market Data differ from FinMind?",
+        "answer": "FinMind is free with a strong community ecosystem; TW Market Data emphasizes official value-by-value traceability, a point-in-time contract, and honest data_gaps disclosure, and gives AI agents llms.txt/openapi discovery entry points. The two can be used together."
+      }
+    },
+    "relatedAiAgents": "Taiwan Stock Data API for AI Agents",
+    "relatedDatasets": "Browse the dataset catalog"
+  },
+  "connect": {
+    "h1": "Connect your AI",
+    "intro": "Pick a tier to start pulling first-hand official Taiwan market data — try it free, integrate as a developer, or use it inside paid chat.",
+    "tier1Label": "Tier 1",
+    "tier1Title": "30-second trial (no auth, no signup)",
+    "tier1PasteLead": "Paste this to your AI:",
+    "tier1Tickers": "Any agent can pull real data instantly with the five key-free tickers (2330 TSMC / 2317 Hon Hai / 2454 MediaTek / 0050 Yuanta Taiwan 50 / 2603 Evergreen).",
+    "tier2Label": "Tier 2",
+    "tier2Title": "Developer channel (API key)",
+    "tier2Body": "Claude Code / Cursor / your own agent: get an API key from your account page, call the REST API, and pay by usage.",
+    "tier2KeyWarning": "Open a <b>dedicated key</b> for each agent (see <link>key safety</link>), and never paste your primary key into a conversation.",
+    "tier3Label": "Tier 3",
+    "tier3Title": "Consumer chat (MCP connector, OAuth)",
+    "tier3Body": "The <b>only supported way</b> to pay for access inside Claude.ai / ChatGPT, and the most reliable path for tool calls: add the TW Market Data connector, authorize, and go.",
+    "tier3Note": "If you paste the one-liner in Claude.ai but can't get paid data, <b>the product isn't broken</b> — consumer chat goes through this connector tier.",
+    "linkKeySafety": "Key safety guide",
+    "linkWhichTier": "Which tier is right for me",
+    "summary": "In short: <b>free trial goes through the one-liner, developer integration goes through an API key, paid consumer chat goes through the connector.</b>"
+  },
+  "authLogin": {
+    "welcomeBack": "Welcome back",
+    "errorGeneric": "Sign-in failed. Please try again in a moment.",
+    "passwordResetNotice": "Your password has been updated. Please sign in again.",
+    "divider": "or",
+    "googleNotConfigured": "Google OAuth isn't configured on this machine. Sign in with email and password.",
+    "agreementNotice": "By signing in, you agree to our <terms>Terms</terms> and <privacy>Privacy Policy</privacy>",
+    "errorInvalidCredentials": "Incorrect email or password. Please check and try again.",
+    "errorUnavailable": "Sign-in is unavailable right now. Please try again later.",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "submitting": "Signing in...",
+    "submit": "Sign in with email",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "register": "Sign up",
+    "devTitle": "Local development",
+    "devDescription": "dev-login: creates a session for a given userId (userId = the sandbox subscription's externalCustomerId). Local only.",
+    "devEmailPlaceholder": "email (e.g. anthonyiaaan@gmail.com)",
+    "devUserIdPlaceholder": "userId = sandbox sub externalId",
+    "devSubmit": "Dev sign in",
+    "devHint": "Set `ALLOW_DEV_LOGIN=1` (in .env.local only) to enable the dev-login form; or configure Google OAuth.",
+    "phrases": {
+      "p1": {
+        "primary": "Verifiable Taiwan market data",
+        "secondary": "built for AI agents"
+      },
+      "p2": {
+        "primary": "Prices, financials, and events",
+        "secondary": "in one data pipeline"
+      },
+      "p3": {
+        "primary": "Quant research and automation",
+        "secondary": "on one shared data foundation"
+      },
+      "p4": {
+        "primary": "Structured data",
+        "secondary": "for reproducible research workflows"
+      },
+      "p5": {
+        "primary": "Feed your models market data",
+        "secondary": "that's traceable, not noise"
+      }
+    }
+  },
+  "authGoogle": {
+    "signingIn": "Signing in...",
+    "signInWithGoogle": "Sign in with Google"
+  },
+  "authRegister": {
+    "hero": {
+      "title": "Create your TW Market Data account",
+      "subtitle": "We'll send a 6-digit verification code after you sign up. Verify your email to sign in to the dashboard and data platform."
+    },
+    "heading": "Create account",
+    "or": "or",
+    "termsNotice": "By signing up, you agree to the <terms>Terms</terms> and <privacy>Privacy</privacy>",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "confirmPasswordLabel": "Confirm password",
+    "confirmPasswordPlaceholder": "Re-enter password",
+    "submit": "Sign up and get verification code",
+    "submitting": "Submitting...",
+    "haveAccount": "Already have an account?",
+    "login": "Sign in",
+    "goToLogin": "Go to sign in",
+    "forgotPassword": "Forgot password",
+    "errors": {
+      "passwordTooShort": "Password must be at least 8 characters",
+      "passwordMismatch": "Passwords do not match",
+      "emailServiceNotConfigured": "The registration email service isn't configured yet. Please try again later.",
+      "emailDeliveryFailed": "Failed to send the verification code. Please try again later.",
+      "invalidInput": "Check your email and password format.",
+      "unavailable": "Registration is unavailable right now. Please try again later.",
+      "loginOrReset": "If this email is already registered, sign in directly or use forgot password."
+    }
+  },
+  "authVerify": {
+    "hero": {
+      "title": "Complete email verification",
+      "description": "We sent a 6-digit verification code. Enter it to create a session and go to the console."
+    },
+    "heading": "Verify email",
+    "subheading": "The code is valid for 10 minutes. If it doesn't arrive, you can resend it.",
+    "codeLabel": "6-digit verification code",
+    "submit": "Verify and sign in",
+    "submitLoading": "Verifying...",
+    "resend": "Resend verification code",
+    "resendLoading": "Sending...",
+    "resendSuccess": "If the address can be verified, a new code has been sent. Check your inbox.",
+    "backTo": "Back to",
+    "loginLink": "sign in",
+    "errors": {
+      "tooManyAttempts": "Too many failed attempts. Resend the code and try again.",
+      "codeExpired": "The verification code has expired. Please resend it.",
+      "invalidCode": "Incorrect verification code. Please check and try again.",
+      "verifyFailed": "Verification is unavailable right now. Please try again later.",
+      "resendFailed": "Unable to resend the verification code right now. Please try again later."
+    }
+  },
+  "authForgot": {
+    "heroTitle": "Forgot password",
+    "heroSubtitle": "Enter your account email and we'll send you a password reset link.",
+    "formTitle": "Reset password",
+    "formSubtitle": "Enter your account email.",
+    "infoSent": "If this email is registered, we'll send a password reset link.",
+    "submit": "Send reset link",
+    "submitting": "Sending...",
+    "backTo": "Back to",
+    "login": "Sign in"
+  },
+  "authReset": {
+    "heroTitle": "Set a new password",
+    "heroSubtitle": "Enter a new password to complete the reset.",
+    "formTitle": "Reset password",
+    "invalidLink": "This link is invalid. Please request a new password reset.",
+    "goToForgot": "Go to forgot password",
+    "passwordLabel": "New password",
+    "passwordPlaceholder": "At least 8 characters",
+    "confirmLabel": "Confirm password",
+    "confirmPlaceholder": "Re-enter password",
+    "errorTooShort": "Password must be at least 8 characters",
+    "errorMismatch": "The two passwords do not match",
+    "errorExpired": "This reset link has expired. Please request a new one.",
+    "errorInvalidFormat": "Please check the password format (at least 8 characters).",
+    "errorGeneric": "Unable to reset your password right now. Please try again later.",
+    "submit": "Reset password",
+    "submitting": "Processing...",
+    "backTo": "Back to",
+    "login": "Sign in"
+  },
+  "connectWhichTier": {
+    "h1": "Which tier fits me",
+    "colWho": "You are…",
+    "colTier": "Which tier",
+    "colHow": "How to start",
+    "rows": {
+      "try": {
+        "who": "Just want to try it / paste one line to an AI",
+        "tier": "Tier 1 · No key",
+        "how": "Paste the /skill.md line, try it with a few quotes"
+      },
+      "developer": {
+        "who": "Developer / building an agent / quant",
+        "tier": "Tier 2 · API key",
+        "how": "Get a key from your account page, call the REST API with metered billing"
+      },
+      "consumer": {
+        "who": "Want to pay for use inside Claude.ai / ChatGPT",
+        "tier": "Tier 3 · MCP connector",
+        "how": "Add the connector, authorize with OAuth"
+      }
+    },
+    "summary": "In one line: <b>free trial runs on one line, dev integration runs on an API key, consumer chat billing runs on the connector.</b>",
+    "backLink": "Back to Connect your AI"
+  },
+  "connectKeySafety": {
+    "title": "Build a dedicated key for your AI",
+    "points": {
+      "oneKeyPerAgent": {
+        "term": "One key per agent",
+        "desc": "Add a new key under \"API Keys\" in your account page and name it (e.g. claude-desktop, research-bot) so it's easy to identify later."
+      },
+      "independentRevoke": {
+        "term": "Revoke independently",
+        "desc": "If a key leaks or is no longer used, revoke that key directly — it won't affect other agents and you never need to rotate your main key."
+      },
+      "neverPasteMainKey": {
+        "term": "Never paste your main key into a conversation",
+        "desc": "Conversation logs may be retained; give agents a dedicated sub-key only."
+      },
+      "rotate": {
+        "term": "Rotate regularly",
+        "desc": "For high-frequency or public-facing scenarios, rotate the key on a regular schedule."
+      }
+    },
+    "capabilityNote": "Capability check: the system already supports multiple named, independently revocable keys per account (<keyLabel></keyLabel> / <revokedAt></revokedAt> / <createdByCustomer></createdByCustomer>). If your account page hasn't yet enabled \"add multiple keys\", that's a small remaining prerequisite.",
+    "backToConnect": "Back to Connect your AI"
+  },
+  "helpCenter": {
+    "statusBadge": "Self-serve support",
+    "searchLabel": "Search the FAQ",
+    "searchPlaceholder": "Search questions, API, SDK, billing, error codes…",
+    "searchHint": "Search directly for keywords like 401, 502, requestId, credits, SDK, or MCP",
+    "faqSectionTitle": "FAQ categories",
+    "allCategories": "All categories",
+    "topicSectionTitle": "Questions",
+    "resultsCount": "{count} results",
+    "topicsCount": "{count} questions",
+    "emptyState": "No matching results. Try a different keyword or contact us."
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Product notes on the Taiwan market data API, data engineering, quant research, and AI agent workflows.",
+    "searchLabel": "Search articles",
+    "emptyState": "No matching articles. Try a different category or keyword.",
+    "categories": {
+      "all": "All",
+      "productUpdates": "Product updates",
+      "dataEngineering": "Data engineering",
+      "apiTutorials": "API tutorials",
+      "quantResearch": "Quant research",
+      "aiAgent": "AI Agent",
+      "productization": "Productization"
+    },
+    "tableOfContents": "On this page",
+    "keyTakeaways": "Key takeaways",
+    "backToBlog": "Back to the blog",
+    "backToList": "Back to all articles",
+    "englishNotice": "This article is currently available in Chinese only; English versions are coming soon."
+  },
+  "answers": {
+    "eyebrow": "Answer",
+    "title": "Answers",
+    "subtitle": "Direct answers to common questions about Taiwan stock market data and APIs.",
+    "empty": "Answer pages are being prepared.",
+    "related": "Related",
+    "apiDocs": "API docs"
+  },
+  "datasets": {
+    "listEyebrow": "Datasets",
+    "datasetEyebrow": "Dataset",
+    "heroTitle": "Taiwan stock datasets, built for APIs and research workflows",
+    "heroBody": "TW Market Data organizes Taiwan-stock prices, the three financial statements, monthly revenue, and institutional net buy/sell into traceable, re-runnable, workflow-ready API products, with source lineage on every response and disclosed data_gaps preserved. The current public positioning is a TWSE-first verified baseline; TPEx historical depth and full-market claims are not yet available.",
+    "viewApiDocs": "View API docs",
+    "viewPricing": "View pricing",
+    "usageTitle": "How stock analysis uses this data",
+    "catalogTitle": "Dataset catalog",
+    "familyTablistLabel": "Dataset families",
+    "datasetOverview": "Dataset overview",
+    "apiDocs": "API docs",
+    "breadcrumbRoot": "Datasets",
+    "downloadSampleCsv": "Download sample CSV (2330)",
+    "sampleCaption": "Download without registration: sample data using one of the five no-key symbols (2330 TSMC) as the example.",
+    "whatItIsTitle": "What this data is",
+    "useCasesTitle": "Use cases",
+    "whyItMattersTitle": "Why it matters for stock analysis",
+    "coverageTitle": "Coverage / Freshness / Source Policy",
+    "developerTitle": "Developer entry points",
+    "developerApiDocsLabel": "API docs: ",
+    "developerOpenApiLabel": "OpenAPI: ",
+    "relatedLinksTitle": "Related links",
+    "catalogOverview": "All datasets",
+    "coveragePrefix": "Coverage: ",
+    "freshnessPrefix": "Update cadence: ",
+    "sourcePolicyPrefix": "Source policy: ",
+    "badgeGreenTitle": "Every value is traceable value-by-value to the official source; this is the date of the last reconciliation that passed.",
+    "badgeGreenLabel": "Last reconciled to official source: ",
+    "badgePendingTitle": "Reconciliation is in progress; a passing date has not been produced yet.",
+    "badgePending": "Reconciliation in progress"
+  },
+  "docs": {
+    "navHeading": "Docs navigation",
+    "docLabel": "Docs",
+    "sidebarTitle": "Documentation",
+    "onThisPage": "On this page",
+    "noSections": "This page has no section outline yet.",
+    "expand": " Expand",
+    "collapse": " Collapse",
+    "breadcrumbHome": "Home",
+    "aiHint": "Building an AI agent? Start with <llms>/llms.txt</llms> for the full site index.",
+    "englishNotice": "This documentation page is currently available in Chinese only; English versions are coming soon."
+  },
+  "docsDemo": {
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyCode": "Copy code",
+    "requestExample": "Request example",
+    "sidePanel": {
+      "statusCodes": "Status codes"
+    },
+    "coverage": {
+      "heading": "Coverage",
+      "instruments": "Instruments",
+      "startYear": "Start year",
+      "updateTiming": "Update timing",
+      "includesDelisted": "Includes delisted",
+      "comingValue": "Not yet available (coming)",
+      "caption": "Figures are measured from the DB; unlisted fields defer to <nowrap>docs coverage</nowrap> (coming) — we don't fabricate cell by cell."
+    },
+    "limitations": {
+      "heading": "Limitations & notes",
+      "items": [
+        "Coverage is not the full market or full history; the actual range is defined by the coverage table above and the data_gaps in the response.",
+        "Missing data is flagged honestly — we don't fill gaps with estimated values.",
+        "The platform focuses on daily-frequency and fundamental data; it does not provide real-time quotes, intraday bars, or cryptocurrencies.",
+        "TWSE is the verified baseline; TPEx history depth and adjusted prices are currently beta / deferred, flagged per dataset."
+      ]
+    },
+    "liveDemo": {
+      "heading": "Live Demo (TWSE Daily Price)",
+      "description": "This demo calls the local API directly: ",
+      "placeholder": "e.g. 2330",
+      "loading": "Loading...",
+      "fetchData": "Fetch Data",
+      "errorEnterSymbol": "Enter a symbol first.",
+      "errorRequestFailed": "API request failed.",
+      "errorConnect": "Cannot connect to the local API (http://127.0.0.1:8011).",
+      "planLimitedTitle": "Your current plan shows only the first {count} rows",
+      "planLimitedUpgrade": "Upgrade to retrieve up to 5000 rows",
+      "upgradePlan": "Upgrade plan"
+    },
+    "playground": {
+      "run": "Run",
+      "running": "Running...",
+      "close": "Close",
+      "selectLanguage": "Select request example language",
+      "tryTitle": "Try the API request",
+      "tryDescription": "Fill in the parameters to call the real API and see the live response here.",
+      "required": "Required",
+      "optional": "Optional",
+      "enterApiKey": "Enter X-API-Key",
+      "copyResult": "Copy result",
+      "copiedResult": "Copied result",
+      "downloadResult": "Download result JSON",
+      "download": "Download",
+      "notRunYet": "Not run yet. Click Run to see the result here.",
+      "responseUpdated": "Response updated.",
+      "noStatusExample": "No matching status example is available for this endpoint yet — see the documentation body.",
+      "errorEnterKey": "Enter an API key first.",
+      "errorInvalidKey": "Enter a valid API key, not example or masked text.",
+      "errorMissingParams": "Missing required parameters — fill them in before running.",
+      "errorConnect": "Cannot connect to the API. Please try again later."
+    }
+  },
+  "docsContent": {
+    "landing": {
+      "intro1": "TW Market Data turns official data from TWSE, TPEx, MOPS, and TAIFEX into a consistent, easy-to-integrate REST API. We ingest and parse every dataset directly from the official sources — never second-hand.",
+      "intro2": "Every response carries its source and knowledge_date; gaps are marked honestly, and holes are never filled with estimates.",
+      "access": {
+        "heading": "What you can access",
+        "intro": "Daily prices for individual TWSE-listed stocks go back to <y>{year}</y>, and we keep the full price history of <c>{count}</c> stocks that have stopped trading (delisted / long-term suspended), so backtests aren't inflated by survivorship bias. Currently available:",
+        "betaNote": "TPEx daily bars and adjusted prices are currently in beta, with coverage marked per dataset."
+      },
+      "dataFormat": {
+        "heading": "Data format"
+      },
+      "builtFor": {
+        "heading": "Who it's for",
+        "b1": "AI financial agents and LLM pipelines that need data to feed on",
+        "b2": "Quantitative research and factor development",
+        "b3": "Backtesting and automated trading systems",
+        "b4": "The internal data layer of fintech products"
+      },
+      "designPrinciples": {
+        "heading": "Design principles"
+      },
+      "ready": "Ready to go? → <link>Quick start</link>"
+    },
+    "quickStart": {
+      "step0": {
+        "heading": "Step 0 · Try one call with zero sign-up (no key)",
+        "intro": "These 5 symbols work without a key: 2330 TSMC / 2317 Hon Hai / 2454 MediaTek / 0050 / 2603. Paste this to your AI or run curl directly:",
+        "note": "(Other stocks / other datasets need the API key below.)"
+      },
+      "getKey": {
+        "heading": "1. Get an API key",
+        "body": "Register in the <dash>dashboard</dash> and create an API key there. Put the key in the request header, not in the URL."
+      },
+      "firstRequest": {
+        "heading": "2. Make your first request",
+        "body": "Every data endpoint is <endpoint></endpoint>, with the key passed in the <key></key> header."
+      },
+      "seeResponse": {
+        "heading": "3. Read the response",
+        "body": "You get typed JSON, each record carrying its source; missing data is left empty rather than filled in. Field definitions are on each <link>dataset page</link>."
+      },
+      "whatsNext": {
+        "heading": "What's next",
+        "pickIntro": "Pick a dataset to start: ",
+        "separator": ", ",
+        "pickEnd": ".",
+        "quota": "See quotas and plans → <link>plan pricing</link>.",
+        "next": "Next → <link>Authentication</link>"
+      },
+      "datasets": {
+        "twse-daily-price": "TWSE daily prices",
+        "monthly-revenue": "Monthly revenue",
+        "institutional-flow": "Institutional investors",
+        "income-statement": "Financial statements"
+      }
+    },
+    "auth": {
+      "intro": "Every request carries the <code></code> header. Create, rotate, and revoke keys yourself in the <dash>dashboard</dash> — no need to contact us.",
+      "habitsHeading": "A few habits",
+      "habit1": {
+        "term": "Keep the key in the header, not the URL",
+        "desc": "So it doesn't end up in server logs or browsing history."
+      },
+      "habit2": {
+        "term": "One key per environment",
+        "desc": "Keep development and production separate, so you revoke only the leaked one (multiple keys are available by plan)."
+      },
+      "habit3": {
+        "term": "Quota follows your plan",
+        "desc": "Each key's per-minute requests and monthly usage are metered by plan."
+      },
+      "errorsHeading": "Common errors",
+      "error1": "<code></code> — API key missing or invalid (except the five no-key symbols 2330/2317/2454/0050/2603, which return 200 directly).",
+      "error2": "<code></code> — your plan is not entitled to this dataset (paywall).",
+      "error3": "<code></code> — quota or rate limit exceeded.",
+      "next": "Next → <link>Source policy</link>"
+    }
   },
   "common": {
-    "englishComingSoon": "English version coming soon."
+    "englishComingSoon": "English version coming soon.",
+    "illustrativeData": "Illustrative data — not real-time quotes",
+    "enLegalReference": "English translation provided for reference; the Chinese version prevails."
   }
 }

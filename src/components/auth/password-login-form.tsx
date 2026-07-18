@@ -1,8 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { FormEvent, useMemo, useState } from "react";
 
+import { Link } from "@/src/i18n/navigation";
 import { buttonClass } from "@/src/components/ui/button";
 
 type PasswordLoginFormProps = {
@@ -10,6 +11,7 @@ type PasswordLoginFormProps = {
 };
 
 export function PasswordLoginForm({ callbackPath }: PasswordLoginFormProps) {
+  const t = useTranslations("authLogin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,13 +54,13 @@ export function PasswordLoginForm({ callbackPath }: PasswordLoginFormProps) {
       }
 
       if (!response.ok || !payload.ok) {
-        setErrorMessage("帳號或密碼錯誤，請重新確認。")
+        setErrorMessage(t("errorInvalidCredentials"))
         return;
       }
 
       window.location.assign(payload.redirectTo ?? "/dashboard");
     } catch {
-      setErrorMessage("目前無法登入，請稍後再試。");
+      setErrorMessage(t("errorUnavailable"));
     } finally {
       setIsSubmitting(false);
     }
@@ -84,7 +86,7 @@ export function PasswordLoginForm({ callbackPath }: PasswordLoginFormProps) {
 
       <div className="grid gap-1">
         <label htmlFor="login-password" className="text-xs font-medium text-slate-700">
-          密碼
+          {t("passwordLabel")}
         </label>
         <input
           id="login-password"
@@ -95,26 +97,26 @@ export function PasswordLoginForm({ callbackPath }: PasswordLoginFormProps) {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           className="h-11 rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-slate-500"
-          placeholder="至少 8 碼"
+          placeholder={t("passwordPlaceholder")}
         />
       </div>
 
       {errorMessage ? <p className="text-xs text-red-600">{errorMessage}</p> : null}
 
       <button type="submit" disabled={isSubmitting} className={buttonClass("primary", "h-11 text-sm")}> 
-        {isSubmitting ? "登入中..." : "使用 Email 登入"}
+        {isSubmitting ? t("submitting") : t("submit")}
       </button>
 
       <p className="text-center text-xs text-slate-500">
         <Link href="/forgot-password" className="underline decoration-slate-300 underline-offset-2 hover:text-slate-700">
-          忘記密碼？
+          {t("forgotPassword")}
         </Link>
       </p>
 
       <p className="text-center text-xs text-slate-500">
-        還沒有帳戶？
+        {t("noAccount")}
         <Link href="/register" className="ml-1 underline decoration-slate-300 underline-offset-2 hover:text-slate-700">
-          註冊
+          {t("register")}
         </Link>
       </p>
     </form>

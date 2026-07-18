@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 
+import { getLocale, getTranslations } from "next-intl/server";
+
 import { Container } from "@/src/components/ui/container";
-import { INVESTMENT_DISCLAIMER } from "@/src/lib/legal/disclaimer";
+import { investmentDisclaimer } from "@/src/lib/legal/disclaimer";
 
 export const metadata: Metadata = {
   title: "使用條款",
@@ -14,157 +16,131 @@ type TermsSection = {
   bullets?: string[];
 };
 
-const sections: TermsSection[] = [
-  {
-    title: "一、適用範圍",
-    paragraphs: [
-      "本條款適用於您對本平台網站、資料集、API、文件、控制台、下載內容及相關功能之使用。",
-      "本平台得就特定功能、方案、促銷、測試功能或企業合作另行公告補充規則；該等補充規則一經公告，即構成本條款之一部分。",
-    ],
-  },
-  {
-    title: "二、名詞定義",
-    paragraphs: ["除上下文另有說明外，本條款所稱用語定義如下。"],
-    bullets: [
-      "帳號：指使用者為使用本服務所建立之會員身分。",
-      "API 金鑰：指用於驗證使用者呼叫本服務 API 之存取憑證。",
-      "方案：指本平台針對不同資料範圍、配額、功能與授權條件所設定之服務層級。",
-      "資料集：指本平台提供查詢、下載、分析或串接之市場、公司、財務、事件、分類、量化或其他資料集合。",
-      "商業使用：指以營利、對外提供付費服務、商業化產品整合、企業營運分析、客戶服務、內部商業決策支援或其他具有商業目的之使用情境。",
-      "第三方資料：指非由本平台原始產生，而係來自公開來源、官方來源或其他第三方提供者之資料、內容或資訊。",
-    ],
-  },
-  {
-    title: "三、服務內容",
-    paragraphs: [
-      "本平台提供台股資料 API、資料集存取能力、控制台、文件與相關產品介面。",
-      "本服務實際可用之資料集、功能、存取邊界、配額、速率限制、授權範圍及其他使用條件，應以您當前帳號方案、產品介面、訂閱頁面或個別約定為準。",
-      "本平台得依產品發展、來源可用性、法規要求、技術維護或其他合理因素，新增、調整、暫停、下架或更換部分資料集、欄位、功能、配額、速率限制或產品內容，並得以網站公告、控制台通知、電子郵件或其他合理方式通知使用者。",
-    ],
-  },
-  {
-    title: "四、帳號與 API 金鑰",
-    paragraphs: [
-      "您應妥善管理帳號與 API 金鑰之安全，不得將帳號或 API 金鑰轉讓、出售、共享、出租、出借，或以其他方式提供第三人未經授權使用。",
-      "您並應自行負責帳號及 API 金鑰項下之一切活動與請求。",
-      "如您發現帳號、API 金鑰疑似外洩、遭未授權存取、異常使用或有其他安全疑慮，應立即通知本平台，並採取必要之停用、重設或輪替措施。",
-      "本平台得基於資訊安全、濫用防制、系統穩定性、法規遵循或合理風險控管需要，暫停、限制、撤銷、重設或要求更換特定帳號或 API 金鑰。",
-    ],
-    bullets: ["API 呼叫與資料存取", "配額耗用與速率使用", "帳號相關設定、管理與操作"],
-  },
-  {
-    title: "五、授權範圍與使用限制",
-    paragraphs: ["本平台依您所適用之方案，授予您可撤回、非專屬、不可轉讓、不可再授權之使用權，以於授權範圍內存取與使用本服務。"],
-    bullets: [
-      "不得規避、干擾、繞過或測試本平台之驗證、配額、速率限制、授權控制或其他保護機制。",
-      "不得未經授權大量下載、鏡像、重建、轉售、轉授權、再散布或建立與本平台高度可替代之資料服務。",
-      "不得使用本服務從事違法、侵權、詐欺、濫發請求、壓力測試、系統干擾或其他不當用途。",
-      "不得以爬蟲、批次程序或其他方式，超出方案授權範圍使用本服務。",
-      "不得將僅供測試、評估、研究或非商業用途之方案，直接或間接用於商業使用。",
-      "Free 與 Developer 方案僅授權非商業使用。",
-      "Pro、Team 與 Enterprise 方案得於授權範圍內進行商業使用。",
-    ],
-  },
-  {
-    title: "六、方案、費用與訂閱",
-    paragraphs: [
-      "付費方案之價格、計費週期、授權範圍、資料集可用性、配額、速率限制、API 金鑰數量及相關功能，以您訂閱或購買當時於網站、控制台、訂單或其他正式頁面所載內容為準。",
-      "本平台得基於產品、成本、法規或營運需要調整方案價格、功能內容、配額、速率限制、資料集範圍或其他方案條件，並以合理方式公告或通知後生效。",
-      "若您未依約付款、付款失敗、發生退款爭議或有其他合理必要情形，本平台得限制、暫停或終止您對部分或全部服務之使用。",
-      "方案升降級、生效時間、資料存取範圍與帳號權限切換方式，應以當時產品介面與方案規則為準。",
-    ],
-  },
-  {
-    title: "七、資料來源與第三方資料",
-    paragraphs: [
-      "本平台所提供之資料，可能包含來自官方來源、公開來源、第三方來源，或由本平台依一定方法整理、標準化、結構化或衍生加工後之內容。不同資料來源可能受其原始授權條件、可用性、更新頻率、技術限制、延遲、修正與中斷影響。",
-      "您了解並同意，第三方資料之持續供應、內容品質與合法可用性，可能受第三方因素影響。",
-      "您仍應自行判斷資料是否適合您的使用目的，並確認是否符合適用法令、第三方權利與您的內部合規要求。",
-      "本平台不保證任何第三方資料將永久持續提供、完全不變或可於任何情況下不受限制使用。",
-    ],
-  },
-  {
-    title: "八、免責聲明",
-    paragraphs: [
-      "本服務及其所有資料、內容、文件、欄位、指標、事件、模型輸出與相關資訊，均按「現況」及「可用」基礎提供。",
-      "在適用法令允許範圍內，本平台不就正確性、完整性、即時性、持續可用性、無錯誤、無中斷、適合特定用途或與您預期完全一致作任何明示或默示保證。",
-      "您了解資料可能發生延遲、缺漏、修正、更正、重述、補檔、暫停、下架或來源中斷等情形。",
-    ],
-  },
-  {
-    title: "九、非投資建議聲明",
-    paragraphs: [
-      INVESTMENT_DISCLAIMER,
-      "本平台所提供之資料、欄位、指標、事件、新聞、估值資訊、衍生資訊、文件內容或任何說明，均不構成投資建議、投資招攬、買賣建議、保證收益承諾、法律意見、會計意見或稅務意見。",
-      "您不應將本平台之資料或內容視為任何金融商品之推薦、邀約或背書。",
-      "任何投資、交易、資產配置、風險控管或商業決策，均應由您自行判斷並承擔風險；必要時，您應自行諮詢專業顧問。",
-    ],
-  },
-  {
-    title: "十、暫停、限制與終止",
-    paragraphs: ["如有下列情形之一，本平台得在必要範圍內暫停、限制或終止您對本服務之全部或部分存取。"],
-    bullets: [
-      "違反本條款或其他適用規則。",
-      "有影響本平台安全、穩定或其他使用者權益之行為。",
-      "疑似濫用、繞過限制、未授權分享帳號或 API 金鑰。",
-      "違反適用法令、第三方權利或監理要求。",
-      "付款失敗、帳務異常、訂閱失效或其他合理營運需要。",
-      "您亦得依產品流程停止使用、取消訂閱或終止帳號。帳號終止後，部分資料、記錄、日誌、帳務資訊或法定保存內容，仍可能依法令、合規或營運需求而保留。",
-    ],
-  },
-  {
-    title: "十一、知識產權",
-    paragraphs: [
-      "本平台網站、介面、程式碼、設計、文件、商標、資料整理方式、資料結構、文字內容及其他相關內容之智慧財產權，除另有說明外，均屬本平台或其合法權利人所有。",
-      "除本條款明示授權外，您不因使用本服務而取得任何其他智慧財產權、所有權、再授權權利或資料重製、散布、公開傳輸、改作之權利。",
-    ],
-  },
-  {
-    title: "十二、隱私與資料保護",
-    paragraphs: [
-      "本平台重視使用者隱私。您使用本服務所涉個人資料之蒐集、處理與利用，依本平台隱私政策辦理。",
-      "請您於使用前詳閱隱私政策，以了解本平台之資料處理方式與您的權利。",
-    ],
-  },
-  {
-    title: "十三、服務變更、維護與測試功能",
-    paragraphs: [
-      "本平台得基於維護、升級、安全、效能、測試、修正或架構調整需要，對本服務進行部分或全部之變更。",
-      "維護、更新、測試或故障排除期間，服務可能短暫中斷、延遲、受限或產生部分功能不可用之情形。",
-      "本平台將盡合理努力降低對使用者之影響，但不保證本服務於任何時間均不受中斷或異常影響。",
-    ],
-  },
-  {
-    title: "十四、責任限制",
-    paragraphs: [
-      "在適用法令允許範圍內，本平台對於因使用、無法使用、資料延遲、資料錯誤、資料缺漏、服務中斷、功能限制、第三方資料異常或其他與本服務相關情形所生之任何間接、附帶、特別、衍生或懲罰性損害，不負任何責任。",
-      "在法律允許範圍內，本平台對您之總責任上限，以損害事件發生前十二個月內，您就本服務實際支付予本平台之費用總額為上限；如您未支付任何費用，則以法律最低要求範圍為準。",
-    ],
-  },
-  {
-    title: "十五、準據法與爭議處理",
-    paragraphs: [
-      "本條款之解釋、效力與適用，應依中華民國法律處理。",
-      "因本條款或本服務所生或與之相關之任何爭議，雙方應先以誠信協商方式處理；協商不成時，除法律另有強制規定外，雙方同意以台灣台北地方法院為第一審管轄法院。",
-    ],
-  },
-  {
-    title: "十六、聯絡方式",
-    paragraphs: ["如您對本條款、本服務或帳號使用有任何問題，請透過本平台官網聯絡頁與我們聯繫。"],
-  },
-];
+export default async function TermsPage() {
+  const t = await getTranslations("terms");
+  const locale = await getLocale();
+  const tc = await getTranslations("common");
 
-export default function TermsPage() {
+  // §九 first paragraph is the canonical non-investment-advice disclaimer (SSOT in
+  // @/src/lib/legal/disclaimer). Rendered via the locale-aware selector, NOT the messages catalog.
+  const disclaimer = investmentDisclaimer(locale === "en" ? "en" : "zh-TW");
+
+  const sections: TermsSection[] = [
+    {
+      title: t("scope.title"),
+      paragraphs: [t("scope.p1"), t("scope.p2")],
+    },
+    {
+      title: t("definitions.title"),
+      paragraphs: [t("definitions.p1")],
+      bullets: [
+        t("definitions.b1"),
+        t("definitions.b2"),
+        t("definitions.b3"),
+        t("definitions.b4"),
+        t("definitions.b5"),
+        t("definitions.b6"),
+      ],
+    },
+    {
+      title: t("service.title"),
+      paragraphs: [t("service.p1"), t("service.p2"), t("service.p3")],
+    },
+    {
+      title: t("account.title"),
+      paragraphs: [t("account.p1"), t("account.p2"), t("account.p3"), t("account.p4")],
+      bullets: [t("account.b1"), t("account.b2"), t("account.b3")],
+    },
+    {
+      title: t("license.title"),
+      paragraphs: [t("license.p1")],
+      bullets: [
+        t("license.b1"),
+        t("license.b2"),
+        t("license.b3"),
+        t("license.b4"),
+        t("license.b5"),
+        t("license.b6"),
+        t("license.b7"),
+      ],
+    },
+    {
+      title: t("plans.title"),
+      paragraphs: [t("plans.p1"), t("plans.p2"), t("plans.p3"), t("plans.p4")],
+    },
+    {
+      title: t("dataSources.title"),
+      paragraphs: [
+        t("dataSources.p1"),
+        t("dataSources.p2"),
+        t("dataSources.p3"),
+        t("dataSources.p4"),
+      ],
+    },
+    {
+      title: t("disclaimerGeneral.title"),
+      paragraphs: [
+        t("disclaimerGeneral.p1"),
+        t("disclaimerGeneral.p2"),
+        t("disclaimerGeneral.p3"),
+      ],
+    },
+    {
+      title: t("notInvestmentAdvice.title"),
+      paragraphs: [
+        disclaimer,
+        t("notInvestmentAdvice.p1"),
+        t("notInvestmentAdvice.p2"),
+        t("notInvestmentAdvice.p3"),
+      ],
+    },
+    {
+      title: t("suspension.title"),
+      paragraphs: [t("suspension.p1")],
+      bullets: [
+        t("suspension.b1"),
+        t("suspension.b2"),
+        t("suspension.b3"),
+        t("suspension.b4"),
+        t("suspension.b5"),
+        t("suspension.b6"),
+      ],
+    },
+    {
+      title: t("ip.title"),
+      paragraphs: [t("ip.p1"), t("ip.p2")],
+    },
+    {
+      title: t("privacy.title"),
+      paragraphs: [t("privacy.p1"), t("privacy.p2")],
+    },
+    {
+      title: t("serviceChanges.title"),
+      paragraphs: [t("serviceChanges.p1"), t("serviceChanges.p2"), t("serviceChanges.p3")],
+    },
+    {
+      title: t("liability.title"),
+      paragraphs: [t("liability.p1"), t("liability.p2")],
+    },
+    {
+      title: t("governingLaw.title"),
+      paragraphs: [t("governingLaw.p1"), t("governingLaw.p2")],
+    },
+    {
+      title: t("contact.title"),
+      paragraphs: [t("contact.p1")],
+    },
+  ];
+
   return (
     <Container className="space-y-8 py-12">
       <section className="space-y-3 border-b border-slate-200 pb-6">
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">使用條款</h1>
-        <p className="max-w-3xl text-sm leading-7 text-slate-600">
-          本使用條款規範您存取、使用 TW Market Data 時，與本平台營運方之間的權利義務、授權範圍與責任限制。請您於使用本服務前，詳閱本條款全部內容。
-        </p>
-        <p className="max-w-3xl text-sm leading-7 text-slate-600">
-          當您註冊帳號、建立 API 金鑰、存取本服務、呼叫本服務 API，或以其他方式使用本服務時，即表示您已閱讀、理解並同意受本條款拘束；如您不同意本條款之全部或部分內容，請停止使用本服務。
-        </p>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">{t("title")}</h1>
+        {locale === "en" ? (
+          <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">{tc("enLegalReference")}</p>
+        ) : null}
+        <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("lead1")}</p>
+        <p className="max-w-3xl text-sm leading-7 text-slate-600">{t("lead2")}</p>
       </section>
 
       <div className="space-y-8">

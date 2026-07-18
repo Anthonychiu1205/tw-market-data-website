@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@/src/lib/cn";
 import { useReplayOnVisible } from "@/src/hooks/use-replay-on-visible";
 
@@ -53,6 +55,7 @@ function CheckIcon() {
 }
 
 export function AgentDocumentsDemo() {
+  const t = useTranslations("home.agentDocumentsDemo");
   const { elementRef, isVisible } = useReplayOnVisible<HTMLDivElement>({
     threshold: 0.4,
     rootMargin: "0px 0px -8% 0px",
@@ -162,7 +165,7 @@ export function AgentDocumentsDemo() {
           pullingVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
         )}
       >
-        <span>Agent: pulling 公司公告與財報附註</span>
+        <span>{t("pulling")}</span>
         <CheckIcon />
       </div>
 
@@ -186,7 +189,7 @@ export function AgentDocumentsDemo() {
           extractVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
         )}
       >
-        <span>Agent: extracting 關鍵段落</span>
+        <span>{t("extracting")}</span>
         <CheckIcon />
       </div>
 
@@ -227,7 +230,7 @@ export function AgentDocumentsDemo() {
         )}
       >
         <CheckIcon />
-        <span>Agent: analysis complete.</span>
+        <span>{t("complete")}</span>
       </div>
     </div>
   );

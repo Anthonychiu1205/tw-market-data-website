@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
+
+import { Link } from "@/src/i18n/navigation";
 
 import { ApiRunPlayground } from "@/src/components/docs/api-run-playground";
 import { ApiSidePanel } from "@/src/components/docs/api-side-panel";
@@ -81,6 +83,18 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
   }
   const pageForShell = { ...page, apiReferenceFactory: undefined };
 
+  const locale = await getLocale();
+  const t = await getTranslations("docs");
+  // §2.5 fallback: docs-pages.ts bodies stay zh (12k lines, DATA). On /en show an amber "English
+  // coming soon" notice above the still-Chinese content. No docs page has an EN body, so the
+  // condition is simply locale === "en".
+  const englishNotice =
+    locale === "en" ? (
+      <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        {t("englishNotice")}
+      </div>
+    ) : null;
+
   const currentHref = `/docs/${slug.join("/")}`;
   const groupTargetHref = resolveDocsGroupTargetHref(currentHref);
   if (groupTargetHref && groupTargetHref !== currentHref) {
@@ -110,7 +124,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
       return (
         <DocsPageShell
-          page={pageForShell}
+          page={pageForShell} topNotice={englishNotice}
           tocSections={tocSections}
           pageLabel={api.categoryLabel}
           rightPanelTitle="請求與回應"
@@ -269,7 +283,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
     return (
       <DocsPageShell
-        page={pageForShell}
+        page={pageForShell} topNotice={englishNotice}
         tocSections={tocSections}
         rightPanelTitle="請求與回應"
         rightPanelContent={
@@ -433,7 +447,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
   if (page.slug.join("/") === "quick-start") {
     return (
-      <DocsPageShell page={pageForShell} pageLabel="Overview">
+      <DocsPageShell page={pageForShell} topNotice={englishNotice} pageLabel="Overview">
         <QuickStartContent />
       </DocsPageShell>
     );
@@ -441,7 +455,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
   if (page.slug.join("/") === "tools-and-mcp") {
     return (
-      <DocsPageShell page={pageForShell} pageLabel="Overview">
+      <DocsPageShell page={pageForShell} topNotice={englishNotice} pageLabel="Overview">
         <ToolsMcpContent />
       </DocsPageShell>
     );
@@ -449,7 +463,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
   if (page.slug.join("/") === "introduction") {
     return (
-      <DocsPageShell page={pageForShell} pageLabel="Overview">
+      <DocsPageShell page={pageForShell} topNotice={englishNotice} pageLabel="Overview">
         <DocsLandingContent />
       </DocsPageShell>
     );
@@ -457,7 +471,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
   if (page.slug.join("/") === "authentication") {
     return (
-      <DocsPageShell page={pageForShell} pageLabel="Overview">
+      <DocsPageShell page={pageForShell} topNotice={englishNotice} pageLabel="Overview">
         <AuthenticationContent />
       </DocsPageShell>
     );
@@ -504,7 +518,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
     ] as const;
 
     return (
-      <DocsPageShell page={pageForShell} pageLabel="SDKs">
+      <DocsPageShell page={pageForShell} topNotice={englishNotice} pageLabel="SDKs">
         <div className="space-y-8 py-8">
           <section id="status-matrix" data-doc-section className="space-y-3 border-b border-slate-200 pb-8">
             <SectionHeading id="status-matrix">Release Status Matrix</SectionHeading>
@@ -559,7 +573,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
   if (page.slug.join("/") === "support") {
     return (
       <DocsPageShell
-        page={pageForShell}
+        page={pageForShell} topNotice={englishNotice}
         pageLabel="Overview"
         tocSections={[
           { id: "contact", label: "聯繫方式" },
@@ -614,7 +628,7 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
 
   return (
       <DocsPageShell
-        page={pageForShell}
+        page={pageForShell} topNotice={englishNotice}
         pageLabel={
           page.slug.join("/") === "workflows/company-fundamentals"
             ? "Workflows / Use Cases"

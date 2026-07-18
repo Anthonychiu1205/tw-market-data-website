@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import { cn } from "@/src/lib/cn";
@@ -13,6 +14,7 @@ type GoogleSignInButtonProps = {
 };
 
 export function GoogleSignInButton({ callbackUrl = "/dashboard", className, children }: GoogleSignInButtonProps) {
+  const t = useTranslations("authGoogle");
   const [isPending, setIsPending] = useState(false);
 
   async function handleSignIn() {
@@ -55,7 +57,7 @@ export function GoogleSignInButton({ callbackUrl = "/dashboard", className, chil
           />
         </svg>
       </span>
-      <span>{children ?? (isPending ? "登入中..." : "使用 Google 登入")}</span>
+      <span>{children ?? (isPending ? t("signingIn") : t("signInWithGoogle"))}</span>
     </button>
   );
 }

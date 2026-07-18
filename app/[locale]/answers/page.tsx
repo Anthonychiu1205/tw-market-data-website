@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { Container } from "@/src/components/ui/container";
 import { getPublishedAnswerPages } from "@/src/content/answer-pages";
+import { Link } from "@/src/i18n/navigation";
+import type { AppLocale } from "@/src/i18n/locales";
 
 // Hub for AEO-01 §2.3 answer-shaped pages. Only lists PUBLISHED pages; while every page is still a
 // draft (awaiting Cowork content) this hub is noindex so no thin/empty page is indexed.
@@ -15,20 +17,23 @@ export const metadata: Metadata = {
   robots: published.length > 0 ? { index: true, follow: true } : { index: false, follow: true },
 };
 
-export default function AnswersIndexPage() {
+export default async function AnswersIndexPage() {
+  const locale = (await getLocale()) as AppLocale;
+  const t = await getTranslations("answers");
+  // Each answer entry is already authored per-locale — list only the current locale's entries.
+  const localePages = getPublishedAnswerPages(locale);
+
   return (
     <Container className="py-12 sm:py-14">
       <div className="mx-auto max-w-3xl space-y-8">
         <header className="space-y-3 border-b border-slate-200 pb-8">
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">Answers</h1>
-          <p className="text-base leading-7 text-slate-600">
-            Direct answers to common questions about Taiwan stock market data and APIs.
-          </p>
+          <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{t("title")}</h1>
+          <p className="text-base leading-7 text-slate-600">{t("subtitle")}</p>
         </header>
 
-        {published.length > 0 ? (
+        {localePages.length > 0 ? (
           <ul className="space-y-3">
-            {published.map((page) => (
+            {localePages.map((page) => (
               <li key={page.slug}>
                 <Link
                   href={`/answers/${page.slug}`}
@@ -40,7 +45,7 @@ export default function AnswersIndexPage() {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-slate-500">Answer pages are being prepared.</p>
+          <p className="text-sm text-slate-500">{t("empty")}</p>
         )}
       </div>
     </Container>

@@ -1,8 +1,11 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
+import { Link } from "@/src/i18n/navigation";
 import { getHomepageMarketSnapshot } from "@/src/lib/homepage/homepage-market-data";
 import { getMarketMarqueeSnapshotView } from "@/src/lib/market-marquee-snapshot";
 
+// NOTE: these are DATA KEYS matched against the live snapshot's item.name (zh from the API), not
+// display strings — they must stay zh or the market-row lookup breaks. Do not translate.
 const MARKET_LABELS = ["加權指數", "櫃買指數", "台灣50", "電子類股", "金融保險"] as const;
 
 function toneClass(trend: "up" | "down" | "neutral") {
@@ -20,6 +23,7 @@ function isPublicNewsHref(href: string): boolean {
 }
 
 export async function HeroMarketIntel() {
+  const t = await getTranslations("home.marketPanel");
   const [marketSnapshot, newsSnapshot] = await Promise.all([
     getHomepageMarketSnapshot(),
     getMarketMarqueeSnapshotView(),
@@ -39,9 +43,9 @@ export async function HeroMarketIntel() {
         {marketRows.length > 0 ? (
         <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_12px_34px_rgba(15,23,42,0.05)]">
           <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
-            <p className="text-base font-semibold text-slate-900">市場指標</p>
+            <p className="text-base font-semibold text-slate-900">{t("indicators")}</p>
             <Link href="/datasets" className="text-sm font-medium text-slate-400 transition hover:text-slate-700">
-              查看全部資料 &gt;
+              {t("viewAll")} &gt;
             </Link>
           </div>
           {marketSnapshot.statusLabel ? (
@@ -62,9 +66,9 @@ export async function HeroMarketIntel() {
 
         <div className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-[0_12px_34px_rgba(15,23,42,0.05)]">
           <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
-            <p className="text-base font-semibold text-slate-900">市場新聞</p>
+            <p className="text-base font-semibold text-slate-900">{t("news")}</p>
             <Link href="/datasets" className="text-sm font-medium text-slate-400 transition hover:text-slate-700">
-              查看更多 &gt;
+              {t("viewMore")} &gt;
             </Link>
           </div>
 

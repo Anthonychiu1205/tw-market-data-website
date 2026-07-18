@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Copy } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useMemo, useState, type ReactNode } from "react";
 
 import { cn } from "@/src/lib/cn";
@@ -109,8 +110,9 @@ function renderHighlightedCode(code: string, language: CodeBlockLanguage, wrapLi
 
 function CopyControl({ code, variant = "icon" }: { code: string; variant?: CopyButtonVariant }) {
   const [copied, setCopied] = useState(false);
+  const t = useTranslations("docsDemo");
 
-  const ariaLabel = copied ? "已複製" : "複製程式碼";
+  const ariaLabel = copied ? t("copied") : t("copyCode");
 
   async function onCopy() {
     try {
@@ -143,7 +145,7 @@ function CopyControl({ code, variant = "icon" }: { code: string; variant?: CopyB
         className="inline-flex h-7 items-center rounded-md border border-slate-200 bg-white px-2.5 text-[11px] font-medium leading-none text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-800"
         aria-label={ariaLabel}
       >
-        {copied ? "已複製" : "複製"}
+        {copied ? t("copied") : t("copy")}
       </button>
     );
   }

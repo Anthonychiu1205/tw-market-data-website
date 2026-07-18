@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
+import { Link } from "@/src/i18n/navigation";
 import { AgentDocumentsShowcase } from "@/src/components/home/agent-documents-showcase";
 import { AgentWorkflowShowcase } from "@/src/components/home/agent-workflow-showcase";
 import { ApiDemoSectionDeferred } from "@/src/components/home/api-demo-section-deferred";
@@ -52,7 +53,15 @@ export const metadata: Metadata = {
   },
 };
 
+const PILLARS = [
+  { key: "twseFirst", metricKey: "twse_first", metricFallback: "TWSE official-first" },
+  { key: "lowLatency", metricKey: "low_latency", metricFallback: "API-first workflow" },
+  { key: "officialFirst", metricKey: "official_first", metricFallback: "official/public-first" },
+  { key: "clearBoundary", metricKey: "clear_boundary", metricFallback: "scoped dataset claims" },
+] as const;
+
 export default async function HomePage() {
+  const t = await getTranslations("home");
   const coverageMetrics = await getHomepageCoverageMetrics();
   const coverageByKey = Object.fromEntries(coverageMetrics.map((metric) => [metric.key, metric.value])) as Record<string, string>;
 
@@ -67,18 +76,18 @@ export default async function HomePage() {
           <div className="grid items-start gap-14 pt-10 pb-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20 lg:pt-12 lg:pb-20 xl:pt-14">
             <div className="max-w-3xl pt-2 lg:pt-20 xl:pt-24">
               <h1 className="max-w-[760px] text-[48px] font-semibold leading-[1.04] tracking-[-0.04em] text-slate-950 lg:text-[60px]">
-                台股資料 API，為系統與量化流程而設計
+                {t("hero.title")}
               </h1>
               <p className="mt-7 max-w-[700px] text-[19px] leading-9 text-slate-600">
-                為 AI agent、自動化流程與量化研究提供一致的台股資料 API。<br />
-                以 TWSE 上市資料為核心，已驗證資料集會清楚標示 coverage window、來源與限制。
+                {t("hero.subhead1")}<br />
+                {t("hero.subhead2")}
               </p>
               <div className="mt-9 flex gap-4">
                 <Link href="/login" className={buttonClass("secondary")}>
-                  登入
+                  {t("cta.signIn")}
                 </Link>
                 <Link href="/register" className={buttonClass("primary")}>
-                  註冊
+                  {t("cta.register")}
                 </Link>
               </div>
             </div>
@@ -95,27 +104,22 @@ export default async function HomePage() {
       <section className="border-b border-slate-200 bg-white py-14">
         <MarketingContainer className="space-y-8">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">台股資料基礎設施</h2>
+            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">{t("infra.heading")}</h2>
             <p className="mt-2 max-w-3xl text-sm text-slate-600">
-              從官方來源取得資料，整理成穩定、可查詢、可追溯的 API。
+              {t("infra.subheading")}
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-y-8 md:grid-cols-4">
-            {[
-              ["TWSE 優先", "已驗證基準", "以上市資料為核心，逐步擴充其他市場 coverage。", coverageByKey.twse_first ?? "TWSE official-first"],
-              ["低延遲查詢", "面向 API 與 agent workflow", "以自動化查詢與研究流程為目標，持續優化讀取體驗。", coverageByKey.low_latency ?? "API-first workflow"],
-              ["官方來源優先", "保留 lineage 與 data gaps", "以 TWSE、TPEx、MOPS 與官方公開來源為優先，避免來源混雜。", coverageByKey.official_first ?? "official/public-first"],
-              ["邊界清楚", "不做過度宣稱", "不宣稱 full-market、adjusted price、survivorship-safe 或投資建議。", coverageByKey.clear_boundary ?? "scoped dataset claims"],
-            ].map(([value, label, description, metric], index) => (
+            {PILLARS.map((pillar, index) => (
               <div
-                key={`${value}-${label}`}
+                key={pillar.key}
                 className={`md:border-l md:border-slate-200 md:pl-8 ${index === 0 ? "md:border-l-0 md:pl-0" : ""}`}
               >
-                <p className="text-3xl font-semibold leading-none tracking-tight text-slate-900 sm:text-4xl">{value}</p>
-                <p className="mt-2 text-base font-semibold text-slate-900">{label}</p>
-                <p className="mt-1 text-xs font-medium text-slate-500">{metric}</p>
-                <p className="mt-2 text-sm text-slate-600">{description}</p>
+                <p className="text-3xl font-semibold leading-none tracking-tight text-slate-900 sm:text-4xl">{t(`pillars.${pillar.key}.value`)}</p>
+                <p className="mt-2 text-base font-semibold text-slate-900">{t(`pillars.${pillar.key}.label`)}</p>
+                <p className="mt-1 text-xs font-medium text-slate-500">{coverageByKey[pillar.metricKey] ?? pillar.metricFallback}</p>
+                <p className="mt-2 text-sm text-slate-600">{t(`pillars.${pillar.key}.description`)}</p>
               </div>
             ))}
           </div>
@@ -132,18 +136,18 @@ export default async function HomePage() {
       <section className="bg-white py-14">
         <MarketingContainer>
           <div className="border-t border-slate-200 pt-8">
-            <h3 className="text-3xl font-semibold tracking-tight text-slate-900">立即開始使用</h3>
+            <h3 className="text-3xl font-semibold tracking-tight text-slate-900">{t("finalCta.heading")}</h3>
             <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
-              從行情、財報到公司事件，快速接入台股資料 API。
+              {t("finalCta.body1")}
               <br />
-              註冊後即可自助選擇方案、自行建立 API key，依方案提供資料存取與使用配額。
+              {t("finalCta.body2")}
             </p>
             <div className="mt-6 flex flex-wrap gap-4">
               <Link href="/login" className={buttonClass("secondary")}>
-                登入
+                {t("cta.signIn")}
               </Link>
               <Link href="/register" className={buttonClass("primary")}>
-                註冊
+                {t("cta.register")}
               </Link>
             </div>
           </div>

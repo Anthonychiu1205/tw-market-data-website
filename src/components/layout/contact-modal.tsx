@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 
 type ContactModalProps = {
@@ -9,6 +10,7 @@ type ContactModalProps = {
 };
 
 export function ContactModal({ isOpen, onClose }: ContactModalProps) {
+  const t = useTranslations("contactModal");
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const lastActiveElementRef = useRef<HTMLElement | null>(null);
@@ -86,16 +88,16 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            aria-label="關閉"
+            aria-label={t("close")}
             className="absolute right-5 top-5 rounded-full p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900"
           >
             <X className="h-5 w-5" />
           </button>
           <h2 id="contact-modal-title" className="text-xl font-semibold text-slate-950">
-            聯繫我們
+            {t("title")}
           </h2>
           <p id="contact-modal-description" className="mt-4 text-base leading-7 text-slate-600">
-            企業合作、資料授權、技術支援或方案諮詢，請來信：
+            {t("description")}
           </p>
           <a
             href="mailto:avenra.platform@gmail.com"

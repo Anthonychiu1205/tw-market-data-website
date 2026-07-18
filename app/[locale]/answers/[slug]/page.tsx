@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl } from "@/src/config/site";
 import { answerPages, getAnswerPageBySlug } from "@/src/content/answer-pages";
 import { coverageFacts } from "@/src/content/coverage-facts";
+import { Link } from "@/src/i18n/navigation";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -54,10 +55,14 @@ function ContentSlot({ note }: { note: string }) {
 
 export default async function AnswerPage({ params }: PageProps) {
   const { slug } = await params;
+  // Each answer slug is authored for a single locale (en and zh-Hant entries use distinct slugs), so
+  // a slug lookup already resolves the current-locale entry; there is no cross-locale variant to
+  // prefer, and no slug exists in both locales to fabricate a translation for.
   const page = getAnswerPageBySlug(slug);
   if (!page) {
     notFound();
   }
+  const t = await getTranslations("answers");
 
   const pageUrl = getAbsoluteUrl(`/answers/${page.slug}`);
   const ctaHref = page.cta.href;
@@ -68,7 +73,7 @@ export default async function AnswerPage({ params }: PageProps) {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "TW Market Data", item: getAbsoluteUrl("/") },
-      { "@type": "ListItem", position: 2, name: "Answers", item: getAbsoluteUrl("/answers") },
+      { "@type": "ListItem", position: 2, name: t("title"), item: getAbsoluteUrl("/answers") },
       { "@type": "ListItem", position: 3, name: page.question, item: pageUrl },
     ],
   };
@@ -157,7 +162,7 @@ export default async function AnswerPage({ params }: PageProps) {
       <Container className="py-12 sm:py-14">
         <div className="mx-auto max-w-3xl space-y-8">
           <header className="space-y-4 border-b border-slate-200 pb-8">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Answer</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("eyebrow")}</p>
             <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{page.question}</h1>
             {page.shortAnswer ? (
               <p className="text-lg leading-8 text-slate-700">{page.shortAnswer}</p>
@@ -193,7 +198,7 @@ export default async function AnswerPage({ params }: PageProps) {
           })}
 
           <section className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-            <p className="text-sm text-slate-600">Related</p>
+            <p className="text-sm text-slate-600">{t("related")}</p>
             <div className="mt-3 flex flex-wrap gap-3">
               <Link href={ctaHref} className={buttonClass("primary")}>
                 {page.cta.label}
@@ -204,7 +209,7 @@ export default async function AnswerPage({ params }: PageProps) {
                 </Link>
               ))}
               <Link href="/docs/introduction" className={buttonClass("secondary")}>
-                API docs
+                {t("apiDocs")}
               </Link>
             </div>
           </section>

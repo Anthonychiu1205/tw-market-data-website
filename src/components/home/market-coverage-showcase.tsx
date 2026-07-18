@@ -1,5 +1,6 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
+import { Link } from "@/src/i18n/navigation";
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 import { buttonClass } from "@/src/components/ui/button";
 
@@ -23,7 +24,8 @@ const MARKET_COVERAGE_DEMO_CONFIG: AgentWorkflowDemoConfig = {
   tableGridTemplateColumns: "0.6fr 1.2fr repeat(3,minmax(0,1fr))",
 };
 
-export function MarketCoverageShowcase() {
+export async function MarketCoverageShowcase() {
+  const t = await getTranslations("home.marketCoverage");
   return (
     <section className="bg-white py-20 lg:py-24">
       <MarketingContainer>
@@ -31,15 +33,14 @@ export function MarketCoverageShowcase() {
           <div className="order-1 lg:border-r lg:border-slate-200 lg:pr-4">
             <div className="w-full max-w-[520px] text-left">
               <h2 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-                跨上市／上櫃股票與 ETF、權證等標的進行查詢
+                {t("heading")}
               </h2>
               <p className="mt-5 max-w-lg text-base leading-7 text-slate-600">
-                涵蓋台股市場主要資料主題，包括股價、財報、營運指標與公司事件。支援跨股票、跨時間與多資料集查詢，讓
-                agent 可在單一資料層完成分析與篩選。公開定位採 TWSE-first verified baseline，不宣稱 full-market historical coverage。
+                {t("description")}
               </p>
               <div className="mt-6">
                 <Link href="/datasets" className={buttonClass("primary")}>
-                  探索資料集
+                  {t("exploreDatasets")}
                 </Link>
               </div>
             </div>

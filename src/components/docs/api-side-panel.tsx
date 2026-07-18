@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
 import { CodeBlock } from "@/src/components/docs/code-block";
@@ -21,6 +22,7 @@ const codeTabLabels: Record<CodeTabId, string> = {
 };
 
 export function ApiSidePanel({ requestExample, codeExamples, statusExamples }: ApiSidePanelProps) {
+  const t = useTranslations("docsDemo");
   const [activeCodeTab, setActiveCodeTab] = useState<CodeTabId>("curl");
   const [activeStatus, setActiveStatus] = useState<ApiStatusExample["status"]>(statusExamples[0]?.status ?? "200");
 
@@ -43,7 +45,7 @@ export function ApiSidePanel({ requestExample, codeExamples, statusExamples }: A
   return (
     <div className="space-y-5">
       <section className="space-y-2">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">請求範例</p>
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{t("requestExample")}</p>
         <CodeBlock
           code={activeRequestCode}
           language={activeCodeTab === "curl" ? "curl" : activeCodeTab}
@@ -72,7 +74,7 @@ export function ApiSidePanel({ requestExample, codeExamples, statusExamples }: A
       </section>
 
       <section className="space-y-2">
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">狀態碼</p>
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{t("sidePanel.statusCodes")}</p>
         <div className="flex flex-wrap gap-2">
           {statusExamples.map((example) => (
             <button

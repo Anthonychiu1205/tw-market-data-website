@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 import { ReconciliationBadge } from "@/src/components/datasets/reconciliation-badge";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
-import { getDatasetBySlug, datasetSeoEntries } from "@/src/content/datasets";
+import { getDatasetBySlug, getDatasetSeoEntry, datasetSeoEntries } from "@/src/content/datasets";
 import { datasetTemporalCoverage } from "@/src/content/coverage-facts";
+import { Link } from "@/src/i18n/navigation";
+import type { AppLocale } from "@/src/i18n/locales";
 import { getDatasetReconciliation } from "@/src/lib/reconciliation/dataset-reconciliation";
 
 type PageProps = {
@@ -23,6 +25,7 @@ export function generateStaticParams() {
 // rebuild — the rest of the page is static content from src/content/datasets.ts.
 export const revalidate = 3600;
 
+// SEO PR4 will localize metadata; until then it reads the zh dataset fields (getDatasetBySlug).
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const dataset = getDatasetBySlug(slug);
@@ -60,7 +63,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function DatasetSlugPage({ params }: PageProps) {
   const { slug } = await params;
-  const dataset = getDatasetBySlug(slug);
+  const locale = await getLocale();
+  const appLocale: AppLocale = locale === "en" ? "en" : "zh-TW";
+  const t = await getTranslations("datasets");
+
+  const dataset = getDatasetSeoEntry(slug, appLocale);
 
   if (!dataset) {
     notFound();
@@ -79,7 +86,7 @@ export default async function DatasetSlugPage({ params }: PageProps) {
       {
         "@type": "ListItem",
         position: 1,
-        name: "資料集",
+        name: t("breadcrumbRoot"),
         item: "https://twmarketdata.com/datasets",
       },
       {
@@ -96,9 +103,9 @@ export default async function DatasetSlugPage({ params }: PageProps) {
   // eligible for (and differentiated in) Google Dataset Search — no competitor can copy it.
   const datasetDescription = [
     dataset.jsonLdDescription,
-    `涵蓋範圍：${dataset.coverageNote}`,
-    `更新頻率：${dataset.freshnessNote}`,
-    `資料來源政策：${dataset.sourcePolicyNote}`,
+    `${t("coveragePrefix")}${dataset.coverageNote}`,
+    `${t("freshnessPrefix")}${dataset.freshnessNote}`,
+    `${t("sourcePolicyPrefix")}${dataset.sourcePolicyNote}`,
   ].join(" ");
 
   const organization = {
@@ -135,7 +142,7 @@ export default async function DatasetSlugPage({ params }: PageProps) {
     distribution: [
       {
         "@type": "DataDownload",
-        name: `${dataset.name} API 文件`,
+        name: `${dataset.name} ${t("apiDocs")}`,
         contentUrl: docsUrl,
         encodingFormat: "application/json",
       },
@@ -149,37 +156,37 @@ export default async function DatasetSlugPage({ params }: PageProps) {
 
       <div className="mx-auto max-w-4xl space-y-8">
         <nav className="text-sm text-slate-500" aria-label="Breadcrumb">
-          <Link href="/datasets" className="hover:text-slate-900">資料集</Link>
+          <Link href="/datasets" className="hover:text-slate-900">{t("breadcrumbRoot")}</Link>
           <span className="mx-2">/</span>
           <span className="text-slate-700">{dataset.name}</span>
         </nav>
 
         <header className="space-y-4 rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Dataset</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("datasetEyebrow")}</p>
           <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{dataset.name}</h1>
           <p className="max-w-3xl text-base leading-7 text-slate-600">{dataset.shortDescription}</p>
           <div className="flex flex-wrap gap-3 pt-1">
-            <Link href={dataset.docsHref} className={buttonClass("primary")}>查看 API 文件</Link>
+            <Link href={dataset.docsHref} className={buttonClass("primary")}>{t("viewApiDocs")}</Link>
             {/* B-4 (FRICTION-01): zero-registration sample CSV via the no-key free symbol 2330. */}
             <a
               href={`https://api.twmarketdata.com/v2/datasets/${dataset.slug}?symbol=2330&format=csv&limit=50`}
               className={buttonClass("secondary")}
               rel="noopener"
             >
-              下載樣本 CSV（2330）
+              {t("downloadSampleCsv")}
             </a>
-            <Link href={dataset.pricingHref} className={buttonClass("secondary")}>查看方案</Link>
+            <Link href={dataset.pricingHref} className={buttonClass("secondary")}>{t("viewPricing")}</Link>
           </div>
-          <p className="text-xs text-slate-500">零註冊即可下載：以免 key 五檔之一（2330 台積電）為示範標的的樣本資料。</p>
+          <p className="text-xs text-slate-500">{t("sampleCaption")}</p>
         </header>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
-          <h2 className="text-xl font-semibold text-slate-950">這是什麼資料</h2>
+          <h2 className="text-xl font-semibold text-slate-950">{t("whatItIsTitle")}</h2>
           <p className="mt-3 text-base leading-7 text-slate-600">{dataset.whatItIs}</p>
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
-          <h2 className="text-xl font-semibold text-slate-950">資料用途</h2>
+          <h2 className="text-xl font-semibold text-slate-950">{t("useCasesTitle")}</h2>
           <ul className="mt-4 list-disc space-y-2 pl-5 text-base leading-7 text-slate-600">
             {dataset.useCases.map((item) => (
               <li key={item}>{item}</li>
@@ -188,13 +195,13 @@ export default async function DatasetSlugPage({ params }: PageProps) {
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
-          <h2 className="text-xl font-semibold text-slate-950">為什麼對股票分析重要</h2>
+          <h2 className="text-xl font-semibold text-slate-950">{t("whyItMattersTitle")}</h2>
           <p className="mt-3 text-base leading-7 text-slate-600">{dataset.whyItMatters}</p>
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-xl font-semibold text-slate-950">Coverage / Freshness / Source Policy</h2>
+            <h2 className="text-xl font-semibold text-slate-950">{t("coverageTitle")}</h2>
             <ReconciliationBadge data={reconciliation} />
           </div>
           <div className="mt-4 space-y-3 text-base leading-7 text-slate-600">
@@ -205,22 +212,22 @@ export default async function DatasetSlugPage({ params }: PageProps) {
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
-          <h2 className="text-xl font-semibold text-slate-950">Developer 入口</h2>
+          <h2 className="text-xl font-semibold text-slate-950">{t("developerTitle")}</h2>
           <ul className="mt-4 space-y-2 text-base leading-7 text-slate-600">
             <li>
-              API 文件：<Link href={dataset.docsHref} className="text-slate-900 underline-offset-4 hover:underline">{dataset.docsHref}</Link>
+              {t("developerApiDocsLabel")}<Link href={dataset.docsHref} className="text-slate-900 underline-offset-4 hover:underline">{dataset.docsHref}</Link>
             </li>
             <li>
-              OpenAPI：<Link href="/openapi.json" className="text-slate-900 underline-offset-4 hover:underline">/openapi.json</Link>
+              {t("developerOpenApiLabel")}<Link href="/openapi.json" className="text-slate-900 underline-offset-4 hover:underline">/openapi.json</Link>
             </li>
           </ul>
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
-          <h2 className="text-xl font-semibold text-slate-950">相關連結</h2>
+          <h2 className="text-xl font-semibold text-slate-950">{t("relatedLinksTitle")}</h2>
           <div className="mt-4 flex flex-wrap gap-3">
-            <Link href="/datasets" className={buttonClass("secondary")}>資料集總覽</Link>
-            <Link href={dataset.docsHref} className={buttonClass("secondary")}>API 文件</Link>
+            <Link href="/datasets" className={buttonClass("secondary")}>{t("catalogOverview")}</Link>
+            <Link href={dataset.docsHref} className={buttonClass("secondary")}>{t("apiDocs")}</Link>
             <Link href="/pricing" className={buttonClass("secondary")}>Pricing</Link>
             <Link href="/llms.txt" className={buttonClass("secondary")}>llms.txt</Link>
             <Link href="/openapi.json" className={buttonClass("secondary")}>openapi.json</Link>

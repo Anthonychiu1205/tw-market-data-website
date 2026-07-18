@@ -1,15 +1,17 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { FormEvent, useMemo, useState } from "react";
 
 import { buttonClass } from "@/src/components/ui/button";
+import { Link } from "@/src/i18n/navigation";
 
 type VerifyEmailFormProps = {
   initialEmail: string;
 };
 
 export function VerifyEmailForm({ initialEmail }: VerifyEmailFormProps) {
+  const t = useTranslations("authVerify");
   const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,20 +45,20 @@ export function VerifyEmailForm({ initialEmail }: VerifyEmailFormProps) {
 
       if (!response.ok || !payload.ok) {
         if (payload.error === "too_many_attempts") {
-          setErrorMessage("驗證失敗次數過多，請重新寄送驗證碼後再試。");
+          setErrorMessage(t("errors.tooManyAttempts"));
           return;
         }
         if (payload.error === "code_expired") {
-          setErrorMessage("驗證碼已過期，請重新寄送。");
+          setErrorMessage(t("errors.codeExpired"));
           return;
         }
-        setErrorMessage("驗證碼不正確，請重新確認。")
+        setErrorMessage(t("errors.invalidCode"))
         return;
       }
 
       window.location.assign(payload.redirectTo ?? "/dashboard");
     } catch {
-      setErrorMessage("目前無法完成驗證，請稍後再試。");
+      setErrorMessage(t("errors.verifyFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -82,13 +84,13 @@ export function VerifyEmailForm({ initialEmail }: VerifyEmailFormProps) {
 
       const payload = (await response.json()) as { ok?: boolean; error?: string };
       if (!response.ok || !payload.ok) {
-        setErrorMessage("目前無法重新寄送驗證碼，請稍後再試。");
+        setErrorMessage(t("errors.resendFailed"));
         return;
       }
 
-      setInfoMessage("若信箱可驗證，驗證碼已重新寄出。請檢查收件匣。")
+      setInfoMessage(t("resendSuccess"))
     } catch {
-      setErrorMessage("目前無法重新寄送驗證碼，請稍後再試。");
+      setErrorMessage(t("errors.resendFailed"));
     } finally {
       setIsResending(false);
     }
@@ -114,7 +116,7 @@ export function VerifyEmailForm({ initialEmail }: VerifyEmailFormProps) {
 
       <div className="grid gap-1">
         <label htmlFor="verify-code" className="text-xs font-medium text-slate-700">
-          6 位數驗證碼
+          {t("codeLabel")}
         </label>
         <input
           id="verify-code"
@@ -133,18 +135,18 @@ export function VerifyEmailForm({ initialEmail }: VerifyEmailFormProps) {
       {errorMessage ? <p className="text-xs text-red-600">{errorMessage}</p> : null}
       {infoMessage ? <p className="text-xs text-emerald-700">{infoMessage}</p> : null}
 
-      <button type="submit" disabled={isSubmitting} className={buttonClass("primary", "h-11 text-sm")}> 
-        {isSubmitting ? "驗證中..." : "驗證並登入"}
+      <button type="submit" disabled={isSubmitting} className={buttonClass("primary", "h-11 text-sm")}>
+        {isSubmitting ? t("submitLoading") : t("submit")}
       </button>
 
       <button type="button" disabled={isResending} onClick={handleResend} className={buttonClass("secondary", "h-11 text-sm")}>
-        {isResending ? "寄送中..." : "重新寄送驗證碼"}
+        {isResending ? t("resendLoading") : t("resend")}
       </button>
 
       <p className="text-center text-xs text-slate-500">
-        回到
+        {t("backTo")}
         <Link href="/login" className="ml-1 underline decoration-slate-300 underline-offset-2 hover:text-slate-700">
-          登入
+          {t("loginLink")}
         </Link>
       </p>
     </form>

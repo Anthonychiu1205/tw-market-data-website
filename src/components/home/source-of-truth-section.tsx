@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Copy } from "lucide-react";
 
 import { cn } from "@/src/lib/cn";
@@ -90,6 +91,8 @@ function tokenClass(type: TokenType) {
 }
 
 export function SourceOfTruthSection() {
+  const t = useTranslations("home.sourceOfTruth");
+  const tc = useTranslations("common");
   const [activeId, setActiveId] = useState<string>(DEFAULT_ACTIVE_ID);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [isScrollable, setIsScrollable] = useState(false);
@@ -150,9 +153,9 @@ export function SourceOfTruthSection() {
     <section className="bg-white py-10">
       <MarketingContainer className="space-y-7">
         <div>
-          <h2 className="text-3xl font-semibold tracking-tight text-slate-900">單一可信資料來源</h2>
+          <h2 className="text-3xl font-semibold tracking-tight text-slate-900">{t("heading")}</h2>
           <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-            以下展示目前 public boundary 的資料主題範例。公開定位採 TWSE-first verified baseline；TPEx 歷史覆蓋、adjusted prices 與 survivorship-safe universe 仍屬 deferred / in-progress。
+            {t("description")}
           </p>
         </div>
 
@@ -206,12 +209,13 @@ export function SourceOfTruthSection() {
                 <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700">{activeItem.status}</span>
                 <span className="text-slate-400">•</span>
                 <span className="font-medium tracking-tight text-slate-700">{activeItem.responseTitle}</span>
+                <span className="rounded-full bg-amber-50 px-2 py-0.5 font-medium text-amber-700 ring-1 ring-amber-200">{tc("illustrativeData")}</span>
                 <span className="text-slate-400">•</span>
                 <span className="font-mono text-[11px] text-slate-500">{activeItem.responseLabel}</span>
               </div>
               <button
                 type="button"
-                aria-label="複製範例回應"
+                aria-label={t("copyResponse")}
                 onClick={() => navigator.clipboard.writeText(activeItem.code)}
                 className="inline-flex items-center justify-center bg-transparent p-0 text-slate-400 transition-colors hover:text-slate-700"
               >

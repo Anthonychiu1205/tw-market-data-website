@@ -1,25 +1,33 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import { useLocale, useTranslations } from "next-intl";
 import { Menu, X } from "lucide-react";
 
-import { productMegaMenuColumns } from "../../content/mega-menu-links";
+import { Link } from "@/src/i18n/navigation";
+import { getProductMegaMenuColumns } from "../../content/mega-menu-links";
 import { MarketingContainer } from "../ui/marketing-container";
 import { buttonClass } from "../ui/button";
 
-const navItems = [
-  { href: "/product", label: "產品功能", withArrow: true, isMega: true },
-  { href: "/pricing", label: "方案價格" },
-  { href: "/docs", label: "文件" },
-  { href: "/blog", label: "觀點文章" },
+type NavItem = {
+  href: string;
+  labelKey: "product" | "pricing" | "docs" | "blog";
+  withArrow?: boolean;
+  isMega?: boolean;
+};
+
+const navItems: NavItem[] = [
+  { href: "/product", labelKey: "product", withArrow: true, isMega: true },
+  { href: "/pricing", labelKey: "pricing" },
+  { href: "/docs", labelKey: "docs" },
+  { href: "/blog", labelKey: "blog" },
 ];
 
-const mobileNavItems = [
-  { href: "/pricing", label: "方案價格" },
-  { href: "/docs", label: "文件" },
-  { href: "/blog", label: "觀點文章" },
+const mobileNavItems: NavItem[] = [
+  { href: "/pricing", labelKey: "pricing" },
+  { href: "/docs", labelKey: "docs" },
+  { href: "/blog", labelKey: "blog" },
 ];
 
 type SiteHeaderProps = {
@@ -27,6 +35,9 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ onContactClick }: SiteHeaderProps) {
+  const t = useTranslations("nav");
+  const locale = useLocale();
+  const productMegaMenuColumns = getProductMegaMenuColumns(locale === "en" ? "en" : "zh-TW");
   const [isProductsMenuOpen, setIsProductsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const hasHydratedRef = useRef(false);
@@ -100,7 +111,7 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
             {navItems.map((item) =>
               item.isMega ? (
                 <div
-                  key={item.label}
+                  key={item.labelKey}
                   className="relative"
                   onMouseEnter={openProductsMenu}
                   onMouseLeave={scheduleCloseProductsMenu}
@@ -122,7 +133,7 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
                         : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                     }`}
                   >
-                    {item.label}
+                    {t(item.labelKey)}
                     {item.withArrow ? (
                       <span className={`text-xs transition-transform ${isProductsMenuOpen ? "rotate-180 text-slate-700" : "text-slate-500"}`}>
                         ▾
@@ -164,11 +175,11 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
                 </div>
               ) : (
                 <Link
-                  key={item.label}
+                  key={item.labelKey}
                   href={item.href}
                   className="inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-[15px] font-medium leading-6 text-slate-700 transition hover:bg-slate-100 hover:text-slate-900"
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                   {item.withArrow ? <span className="text-xs text-slate-500">▾</span> : null}
                 </Link>
               ),
@@ -182,16 +193,16 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
               className={buttonClass("secondary")}
               onClick={onContactClick}
             >
-            聯絡我們
+            {t("contact")}
             </button>
             <Link href="/login" className={`${buttonClass("primary")} hidden md:inline-flex`}>
-              儀表板
+              {t("dashboard")}
             </Link>
             <button
               type="button"
               aria-expanded={isMobileMenuOpen}
               aria-controls="site-mobile-menu"
-              aria-label={isMobileMenuOpen ? "關閉選單" : "開啟選單"}
+              aria-label={isMobileMenuOpen ? t("closeMenu") : t("openMenu")}
               onClick={() => setIsMobileMenuOpen((previous) => !previous)}
               className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 md:hidden"
             >
@@ -205,7 +216,7 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
         <div className="fixed inset-0 z-40 md:hidden">
           <button
             type="button"
-            aria-label="關閉選單背景"
+            aria-label={t("closeMenuBackdrop")}
             onClick={() => setIsMobileMenuOpen(false)}
             className="absolute inset-0 bg-slate-950/45"
           />
@@ -214,12 +225,12 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
             className="absolute right-0 top-0 flex h-full w-[min(86vw,360px)] flex-col border-l border-slate-200 bg-white p-5 shadow-2xl"
           >
             <div className="flex items-center justify-between pb-4">
-              <p className="text-sm font-semibold text-slate-900">網站導覽</p>
+              <p className="text-sm font-semibold text-slate-900">{t("siteMap")}</p>
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
-                aria-label="關閉選單"
+                aria-label={t("closeMenu")}
               >
                 <X className="h-5 w-5" />
               </button>
@@ -233,7 +244,7 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="block rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900"
                 >
-                  {item.label}
+                  {t(item.labelKey)}
                 </Link>
               ))}
             </nav>
@@ -247,14 +258,14 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
                 }}
                 className={`${buttonClass("secondary")} w-full justify-center`}
               >
-                聯絡我們
+                {t("contact")}
               </button>
               <Link
                 href="/login"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`${buttonClass("primary")} w-full justify-center`}
               >
-                儀表板
+                {t("dashboard")}
               </Link>
             </div>
           </div>

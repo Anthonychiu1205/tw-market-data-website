@@ -8,9 +8,946 @@
     "dashboard": "儀表板",
     "signIn": "登入",
     "getStarted": "開始使用",
-    "siteMap": "網站導覽"
+    "siteMap": "網站導覽",
+    "openMenu": "開啟選單",
+    "closeMenu": "關閉選單",
+    "closeMenuBackdrop": "關閉選單背景"
+  },
+  "footer": {
+    "privacy": "隱私政策",
+    "terms": "服務條款",
+    "help": "幫助中心",
+    "contact": "聯繫我們"
+  },
+  "contactModal": {
+    "close": "關閉",
+    "title": "聯繫我們",
+    "description": "企業合作、資料授權、技術支援或方案諮詢，請來信："
+  },
+  "cookieBanner": {
+    "title": "Cookies 使用設定",
+    "description": "我們使用必要 cookies 維持登入與安全，並使用分析 cookies 改善產品體驗。不會用於廣告追蹤。",
+    "learnMore": "了解更多",
+    "decline": "拒絕",
+    "acceptAll": "允許所有 cookies"
+  },
+  "home": {
+    "marketPanel": {
+      "indicators": "市場指標",
+      "news": "市場新聞",
+      "viewAll": "查看全部資料",
+      "viewMore": "查看更多"
+    },
+    "hero": {
+      "title": "台股資料 API，為系統與量化流程而設計",
+      "subhead1": "為 AI agent、自動化流程與量化研究提供一致的台股資料 API。",
+      "subhead2": "以 TWSE 上市資料為核心，已驗證資料集會清楚標示 coverage window、來源與限制。"
+    },
+    "infra": {
+      "heading": "台股資料基礎設施",
+      "subheading": "從官方來源取得資料，整理成穩定、可查詢、可追溯的 API。"
+    },
+    "pillars": {
+      "twseFirst": {
+        "value": "TWSE 優先",
+        "label": "已驗證基準",
+        "description": "以上市資料為核心，逐步擴充其他市場 coverage。"
+      },
+      "lowLatency": {
+        "value": "低延遲查詢",
+        "label": "面向 API 與 agent workflow",
+        "description": "以自動化查詢與研究流程為目標，持續優化讀取體驗。"
+      },
+      "officialFirst": {
+        "value": "官方來源優先",
+        "label": "保留 lineage 與 data gaps",
+        "description": "以 TWSE、TPEx、MOPS 與官方公開來源為優先，避免來源混雜。"
+      },
+      "clearBoundary": {
+        "value": "邊界清楚",
+        "label": "不做過度宣稱",
+        "description": "不宣稱 full-market、adjusted price、survivorship-safe 或投資建議。"
+      }
+    },
+    "finalCta": {
+      "heading": "立即開始使用",
+      "body1": "從行情、財報到公司事件，快速接入台股資料 API。",
+      "body2": "註冊後即可自助選擇方案、自行建立 API key，依方案提供資料存取與使用配額。"
+    },
+    "cta": {
+      "signIn": "登入",
+      "register": "註冊"
+    },
+    "aiAgentWorkflow": {
+      "title": "AI Agent 使用流程",
+      "intro": "從任務規劃到取得可靠資料，專為 AI Agent / Quant 工作流程設計，讓資料可驗證、可追溯、可程式化使用。",
+      "step1Title": "任務理解與規劃",
+      "step1Description": "AI Agent 解析使用者問題，規劃所需資料與指標。",
+      "step2Title": "找對資料集與欄位",
+      "step2Description": "透過資料目錄與 schema，精準選擇資料集與欄位。",
+      "step3Title": "調用 API 取得資料",
+      "step3Description": "以標準化 API 取得資料，回應包含來源與 lineage。",
+      "step4Title": "驗證與品質檢查",
+      "step4Description": "檢查 freshness、來源層級與欄位完整性，確保可靠性。",
+      "step5Title": "資料處理與分析",
+      "step5Description": "進行指標計算、特徵工程或分析，產生可溯源結論。",
+      "step6Title": "輸出結果與可追溯性",
+      "step6Description": "回傳結果並保留來源、時間與 lineage，可驗證、可稽核。",
+      "footnote": "可追溯、可驗證、可程式化，適合 agent workflow。"
+    },
+    "agentWorkflowShowcase": {
+      "title": "讓 AI agent 直接讀取可追溯的台股資料",
+      "description": "將股價、財報與公告接入 agent workflow。使用一致的回應結構與 source_role / lineage，讓資料可讀也可驗證。"
+    },
+    "agentDocumentsShowcase": {
+      "title": "讓 AI agent 直接理解公告與財報內容",
+      "description": "將重大訊息、公告與財報附註轉為可分析的文字 context。讓 agent 不只讀取數值，也能理解公司實際揭露了什麼。"
+    },
+    "marketCoverage": {
+      "heading": "跨上市／上櫃股票與 ETF、權證等標的進行查詢",
+      "description": "涵蓋台股市場主要資料主題，包括股價、財報、營運指標與公司事件。支援跨股票、跨時間與多資料集查詢，讓 agent 可在單一資料層完成分析與篩選。公開定位採 TWSE-first verified baseline，不宣稱 full-market historical coverage。",
+      "exploreDatasets": "探索資料集"
+    },
+    "agentWorkflowDemo": {
+      "copyResult": "複製結果"
+    },
+    "apiDemo": {
+      "heading": "乾淨、直接的台股資料 API",
+      "description": "用一致的 endpoint 與回應格式，快速把行情、財報、營收與事件資料接進你的系統。",
+      "fields": {
+        "endpoint": "Endpoint",
+        "ticker": "Ticker"
+      },
+      "run": "Run",
+      "running": "Running",
+      "response": "RESPONSE",
+      "generating": "正在產生回應...",
+      "endpoints": {
+        "monthlyRevenue": "月營收",
+        "twseDailyPrice": "TWSE 日線價格",
+        "incomeStatement": "財報損益表",
+        "technicalIndicators": "技術指標"
+      }
+    },
+    "sourceOfTruth": {
+      "heading": "單一可信資料來源",
+      "description": "以下展示目前 public boundary 的資料主題範例。公開定位採 TWSE-first verified baseline；TPEx 歷史覆蓋、adjusted prices 與 survivorship-safe universe 仍屬 deferred / in-progress。",
+      "copyResponse": "複製範例回應"
+    },
+    "agentDocumentsDemo": {
+      "pulling": "Agent: pulling 公司公告與財報附註",
+      "extracting": "Agent: extracting 關鍵段落",
+      "complete": "Agent: analysis complete."
+    }
+  },
+  "pricing": {
+    "title": "方案價格",
+    "selfServe": {
+      "instantTitle": "刷卡三分鐘開通",
+      "instantDesc": "線上付款即開 API key，無需簽約、不必等業務回電。",
+      "cancelTitle": "隨時可取消",
+      "cancelDesc": "月費方案隨時於帳戶頁停用，不綁約、不收取消費。",
+      "selfTitle": "全自助",
+      "selfDesc": "從註冊、取 key、看用量到升級，全部自己點；需要時才找我們。"
+    },
+    "choosePlan": "選擇你的方案",
+    "pricedUsd": "以 USD 計價，站內完成結帳。",
+    "billingCycleAria": "計費週期",
+    "featureColumnAria": "功能",
+    "monthly": "月繳",
+    "annual": "年繳",
+    "save2Months": "送 2 個月",
+    "mostPopular": "最受歡迎",
+    "perYear": "年",
+    "perMonth": "月",
+    "annualEquals": "年繳 = 月價 ×10，等於送 2 個月。",
+    "annualComingSoon": "年繳即將開放",
+    "openingCheckout": "開啟結帳中…",
+    "annualCheckoutNote": "年繳結帳即將開放；如需立即開通請先切換為月繳。",
+    "checkoutError": "結帳暫時無法開啟，請稍後再試或聯繫我們。",
+    "cardRecurringNote": "信用卡定期扣款，可於帳務頁 Customer Portal 取消。",
+    "enterpriseNote": "企業 / 客製：<b>標準方案可直接刷卡開通</b>；需要專屬額度、發票或 SLA 再「聯繫我們」。",
+    "notAdvice": "本服務提供資料 API、工具與文件，不提供投資建議、個股推薦或交易訊號。",
+    "comparisonHeading": "方案比較：可用資料集與覆蓋度",
+    "comparisonIntro": "一眼看出各方案的資料集範圍與歷史覆蓋度。完整資料集清單見 <catalog>資料集目錄</catalog>；各資料集實際 coverage 與更新狀態以 <coverage>docs coverage</coverage> 為準（不逐格編造覆蓋數字）。",
+    "comparisonFootnote": "註：TPEx 日線歷史深度目前仍為 deferred；adjusted prices、survivorship-safe universe、backtest-grade full-market baseline 皆不在目前可公開宣稱範圍。",
+    "groups": {
+      "datasetAccess": "資料集存取",
+      "quotaBilling": "配額與計費"
+    },
+    "rows": {
+      "datasetScope": "可用資料集範圍",
+      "financialStatements": "財報三表（損益／資產負債／現金流）",
+      "historyDepth": "歷史深度 / 覆蓋度",
+      "webhook": "Webhook",
+      "price": "價格 / 月",
+      "apiKeys": "API Keys",
+      "rpm": "RPM",
+      "includedRequests": "每月 included requests",
+      "commercialUse": "商業使用"
+    },
+    "values": {
+      "yes": "是",
+      "no": "否",
+      "full": "完整",
+      "fullRaw": "完整 (raw)",
+      "reserved": "reserved",
+      "contactUs": "聯繫我們",
+      "free": "免費",
+      "custom": "Custom",
+      "years5": "5 年",
+      "year1": "1 年",
+      "month1": "1 個月"
+    }
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "聯繫我們",
+    "intro": "企業合作、資料授權、技術支援或方案諮詢，請來信："
+  },
+  "about": {
+    "title": "信任與來源政策",
+    "description": "台股資料平台的來源原則與可追溯設計。",
+    "trustModel": {
+      "heading": "信任模型",
+      "body": "以 canonical、fallback、helper 分層，避免來源混用；回應保留 lineage 與 freshness。"
+    },
+    "sourcePolicy": {
+      "heading": "來源政策"
+    },
+    "whyUs": {
+      "heading": "為什麼是這個產品",
+      "body": "對研究、量化與開發流程來說，重點不是抓到資料，而是資料可追溯、可驗證、可持續交付。"
+    }
+  },
+  "product": {
+    "eyebrow": "產品",
+    "title": "TWSE-first verified 資料 API 產品",
+    "lead": "目前公開定位為 TWSE-first verified baseline；TPEx 歷史覆蓋與 full-market claim 仍採 deferred / blocked 管理。",
+    "codeWindowTitle": "產品面向",
+    "verifiedHeading": "Verified baseline / 可公開主張",
+    "deferredHeading": "Deferred / blocked claims",
+    "gettingStarted": {
+      "heading": "開始使用",
+      "body": "建議先閱讀 Quickstart 與文件，再從 verified baseline dataset 開始整合。所有資料主張請以各 dataset coverage/status 註記為準。",
+      "quickstartLink": "前往 Quickstart",
+      "docsLink": "查看文件"
+    }
+  },
+  "refund": {
+    "title": "退款政策",
+    "intro": "本政策說明 TW Market Data 訂閱與數位服務之退款原則，作為訂閱與付款前的重要參考。",
+    "section1Title": "一、數位服務性質",
+    "section1Body1": "本服務屬於數位內容與 API 訂閱服務，開通後即可存取平台功能與資料。",
+    "section1Body2": "由於數位服務具即時交付特性，原則上不適用一般實體商品退貨模式。",
+    "section2Title": "二、一般退款原則",
+    "section2Body1": "除本政策另有規定外，已收取之訂閱費用或使用費用原則上不提供退款。",
+    "section2Body2": "若您不希望續訂，請於下一計費週期前取消訂閱。",
+    "section3Title": "三、例外情況",
+    "section3Body1": "若因平台重大系統錯誤，導致已付款服務在合理期間內無法使用，得提出退款申請。",
+    "section3Body2": "我們將依實際情況審核，可能提供全額或部分退款，或等值服務補償。",
+    "section3Body3": "是否符合例外退款條件，以我們審核結果與系統紀錄為準。",
+    "section4Title": "四、取消訂閱",
+    "section4Body1": "您可隨時於帳戶或訂閱管理流程取消訂閱。",
+    "section5Title": "五、聯絡方式",
+    "section5Body1": "如需申請退款或詢問帳務問題，請透過聯絡頁面與我們聯繫。",
+    "section5EmailLabel": "電子郵件：",
+    "section5ContactLabel": "聯絡頁面："
+  },
+  "terms": {
+    "title": "使用條款",
+    "lead1": "本使用條款規範您存取、使用 TW Market Data 時，與本平台營運方之間的權利義務、授權範圍與責任限制。請您於使用本服務前，詳閱本條款全部內容。",
+    "lead2": "當您註冊帳號、建立 API 金鑰、存取本服務、呼叫本服務 API，或以其他方式使用本服務時，即表示您已閱讀、理解並同意受本條款拘束；如您不同意本條款之全部或部分內容，請停止使用本服務。",
+    "scope": {
+      "title": "一、適用範圍",
+      "p1": "本條款適用於您對本平台網站、資料集、API、文件、控制台、下載內容及相關功能之使用。",
+      "p2": "本平台得就特定功能、方案、促銷、測試功能或企業合作另行公告補充規則；該等補充規則一經公告，即構成本條款之一部分。"
+    },
+    "definitions": {
+      "title": "二、名詞定義",
+      "p1": "除上下文另有說明外，本條款所稱用語定義如下。",
+      "b1": "帳號：指使用者為使用本服務所建立之會員身分。",
+      "b2": "API 金鑰：指用於驗證使用者呼叫本服務 API 之存取憑證。",
+      "b3": "方案：指本平台針對不同資料範圍、配額、功能與授權條件所設定之服務層級。",
+      "b4": "資料集：指本平台提供查詢、下載、分析或串接之市場、公司、財務、事件、分類、量化或其他資料集合。",
+      "b5": "商業使用：指以營利、對外提供付費服務、商業化產品整合、企業營運分析、客戶服務、內部商業決策支援或其他具有商業目的之使用情境。",
+      "b6": "第三方資料：指非由本平台原始產生，而係來自公開來源、官方來源或其他第三方提供者之資料、內容或資訊。"
+    },
+    "service": {
+      "title": "三、服務內容",
+      "p1": "本平台提供台股資料 API、資料集存取能力、控制台、文件與相關產品介面。",
+      "p2": "本服務實際可用之資料集、功能、存取邊界、配額、速率限制、授權範圍及其他使用條件，應以您當前帳號方案、產品介面、訂閱頁面或個別約定為準。",
+      "p3": "本平台得依產品發展、來源可用性、法規要求、技術維護或其他合理因素，新增、調整、暫停、下架或更換部分資料集、欄位、功能、配額、速率限制或產品內容，並得以網站公告、控制台通知、電子郵件或其他合理方式通知使用者。"
+    },
+    "account": {
+      "title": "四、帳號與 API 金鑰",
+      "p1": "您應妥善管理帳號與 API 金鑰之安全，不得將帳號或 API 金鑰轉讓、出售、共享、出租、出借，或以其他方式提供第三人未經授權使用。",
+      "p2": "您並應自行負責帳號及 API 金鑰項下之一切活動與請求。",
+      "p3": "如您發現帳號、API 金鑰疑似外洩、遭未授權存取、異常使用或有其他安全疑慮，應立即通知本平台，並採取必要之停用、重設或輪替措施。",
+      "p4": "本平台得基於資訊安全、濫用防制、系統穩定性、法規遵循或合理風險控管需要，暫停、限制、撤銷、重設或要求更換特定帳號或 API 金鑰。",
+      "b1": "API 呼叫與資料存取",
+      "b2": "配額耗用與速率使用",
+      "b3": "帳號相關設定、管理與操作"
+    },
+    "license": {
+      "title": "五、授權範圍與使用限制",
+      "p1": "本平台依您所適用之方案，授予您可撤回、非專屬、不可轉讓、不可再授權之使用權，以於授權範圍內存取與使用本服務。",
+      "b1": "不得規避、干擾、繞過或測試本平台之驗證、配額、速率限制、授權控制或其他保護機制。",
+      "b2": "不得未經授權大量下載、鏡像、重建、轉售、轉授權、再散布或建立與本平台高度可替代之資料服務。",
+      "b3": "不得使用本服務從事違法、侵權、詐欺、濫發請求、壓力測試、系統干擾或其他不當用途。",
+      "b4": "不得以爬蟲、批次程序或其他方式，超出方案授權範圍使用本服務。",
+      "b5": "不得將僅供測試、評估、研究或非商業用途之方案，直接或間接用於商業使用。",
+      "b6": "Free 與 Developer 方案僅授權非商業使用。",
+      "b7": "Pro、Team 與 Enterprise 方案得於授權範圍內進行商業使用。"
+    },
+    "plans": {
+      "title": "六、方案、費用與訂閱",
+      "p1": "付費方案之價格、計費週期、授權範圍、資料集可用性、配額、速率限制、API 金鑰數量及相關功能，以您訂閱或購買當時於網站、控制台、訂單或其他正式頁面所載內容為準。",
+      "p2": "本平台得基於產品、成本、法規或營運需要調整方案價格、功能內容、配額、速率限制、資料集範圍或其他方案條件，並以合理方式公告或通知後生效。",
+      "p3": "若您未依約付款、付款失敗、發生退款爭議或有其他合理必要情形，本平台得限制、暫停或終止您對部分或全部服務之使用。",
+      "p4": "方案升降級、生效時間、資料存取範圍與帳號權限切換方式，應以當時產品介面與方案規則為準。"
+    },
+    "dataSources": {
+      "title": "七、資料來源與第三方資料",
+      "p1": "本平台所提供之資料，可能包含來自官方來源、公開來源、第三方來源，或由本平台依一定方法整理、標準化、結構化或衍生加工後之內容。不同資料來源可能受其原始授權條件、可用性、更新頻率、技術限制、延遲、修正與中斷影響。",
+      "p2": "您了解並同意，第三方資料之持續供應、內容品質與合法可用性，可能受第三方因素影響。",
+      "p3": "您仍應自行判斷資料是否適合您的使用目的，並確認是否符合適用法令、第三方權利與您的內部合規要求。",
+      "p4": "本平台不保證任何第三方資料將永久持續提供、完全不變或可於任何情況下不受限制使用。"
+    },
+    "disclaimerGeneral": {
+      "title": "八、免責聲明",
+      "p1": "本服務及其所有資料、內容、文件、欄位、指標、事件、模型輸出與相關資訊，均按「現況」及「可用」基礎提供。",
+      "p2": "在適用法令允許範圍內，本平台不就正確性、完整性、即時性、持續可用性、無錯誤、無中斷、適合特定用途或與您預期完全一致作任何明示或默示保證。",
+      "p3": "您了解資料可能發生延遲、缺漏、修正、更正、重述、補檔、暫停、下架或來源中斷等情形。"
+    },
+    "notInvestmentAdvice": {
+      "title": "九、非投資建議聲明",
+      "p1": "本平台所提供之資料、欄位、指標、事件、新聞、估值資訊、衍生資訊、文件內容或任何說明，均不構成投資建議、投資招攬、買賣建議、保證收益承諾、法律意見、會計意見或稅務意見。",
+      "p2": "您不應將本平台之資料或內容視為任何金融商品之推薦、邀約或背書。",
+      "p3": "任何投資、交易、資產配置、風險控管或商業決策，均應由您自行判斷並承擔風險；必要時，您應自行諮詢專業顧問。"
+    },
+    "suspension": {
+      "title": "十、暫停、限制與終止",
+      "p1": "如有下列情形之一，本平台得在必要範圍內暫停、限制或終止您對本服務之全部或部分存取。",
+      "b1": "違反本條款或其他適用規則。",
+      "b2": "有影響本平台安全、穩定或其他使用者權益之行為。",
+      "b3": "疑似濫用、繞過限制、未授權分享帳號或 API 金鑰。",
+      "b4": "違反適用法令、第三方權利或監理要求。",
+      "b5": "付款失敗、帳務異常、訂閱失效或其他合理營運需要。",
+      "b6": "您亦得依產品流程停止使用、取消訂閱或終止帳號。帳號終止後，部分資料、記錄、日誌、帳務資訊或法定保存內容，仍可能依法令、合規或營運需求而保留。"
+    },
+    "ip": {
+      "title": "十一、知識產權",
+      "p1": "本平台網站、介面、程式碼、設計、文件、商標、資料整理方式、資料結構、文字內容及其他相關內容之智慧財產權，除另有說明外，均屬本平台或其合法權利人所有。",
+      "p2": "除本條款明示授權外，您不因使用本服務而取得任何其他智慧財產權、所有權、再授權權利或資料重製、散布、公開傳輸、改作之權利。"
+    },
+    "privacy": {
+      "title": "十二、隱私與資料保護",
+      "p1": "本平台重視使用者隱私。您使用本服務所涉個人資料之蒐集、處理與利用，依本平台隱私政策辦理。",
+      "p2": "請您於使用前詳閱隱私政策，以了解本平台之資料處理方式與您的權利。"
+    },
+    "serviceChanges": {
+      "title": "十三、服務變更、維護與測試功能",
+      "p1": "本平台得基於維護、升級、安全、效能、測試、修正或架構調整需要，對本服務進行部分或全部之變更。",
+      "p2": "維護、更新、測試或故障排除期間，服務可能短暫中斷、延遲、受限或產生部分功能不可用之情形。",
+      "p3": "本平台將盡合理努力降低對使用者之影響，但不保證本服務於任何時間均不受中斷或異常影響。"
+    },
+    "liability": {
+      "title": "十四、責任限制",
+      "p1": "在適用法令允許範圍內，本平台對於因使用、無法使用、資料延遲、資料錯誤、資料缺漏、服務中斷、功能限制、第三方資料異常或其他與本服務相關情形所生之任何間接、附帶、特別、衍生或懲罰性損害，不負任何責任。",
+      "p2": "在法律允許範圍內，本平台對您之總責任上限，以損害事件發生前十二個月內，您就本服務實際支付予本平台之費用總額為上限；如您未支付任何費用，則以法律最低要求範圍為準。"
+    },
+    "governingLaw": {
+      "title": "十五、準據法與爭議處理",
+      "p1": "本條款之解釋、效力與適用，應依中華民國法律處理。",
+      "p2": "因本條款或本服務所生或與之相關之任何爭議，雙方應先以誠信協商方式處理；協商不成時，除法律另有強制規定外，雙方同意以台灣台北地方法院為第一審管轄法院。"
+    },
+    "contact": {
+      "title": "十六、聯絡方式",
+      "p1": "如您對本條款、本服務或帳號使用有任何問題，請透過本平台官網聯絡頁與我們聯繫。"
+    }
+  },
+  "privacy": {
+    "title": "隱私政策",
+    "intro": "本隱私政策說明 TW Market Data 如何蒐集、使用、保護與處理您在使用本平台與相關服務時提供之資訊。請您於使用前詳閱本政策內容。",
+    "collect": {
+      "title": "一、蒐集之資訊類型",
+      "intro": "我們可能蒐集下列資訊。",
+      "account": "帳號資訊：例如姓名、電子郵件、公司名稱、登入資訊或帳號識別資訊。",
+      "usage": "使用資訊：例如 API 呼叫紀錄、使用時間、功能操作紀錄、控制台互動、裝置與瀏覽器資訊。",
+      "payment": "付款與訂閱資訊：例如方案、付款狀態、訂閱紀錄、帳務資訊。",
+      "contact": "聯絡資訊：例如您透過表單、電子郵件或支援流程提供的內容。"
+    },
+    "use": {
+      "title": "二、資訊使用目的",
+      "intro": "我們可能將蒐集之資訊用於下列目的。",
+      "provide": "提供、維護與改善本服務。",
+      "verify": "驗證帳號與 API 金鑰。",
+      "quota": "管理配額、速率限制與授權邊界。",
+      "billing": "處理訂閱、付款、帳務與支援請求。",
+      "abuse": "偵測異常活動、濫用或安全事件。",
+      "notify": "發送與服務相關之重要通知。",
+      "internal": "進行內部分析、產品優化與合規管理。"
+    },
+    "share": {
+      "title": "三、資料分享與揭露",
+      "intro": "除下列情況外，我們不會任意出售或揭露您的個人資料。",
+      "consent": "經您同意。",
+      "vendors": "為履行服務所必要，與付款、雲端、分析、客服或技術供應商合作。",
+      "legal": "為遵循法律義務、法院命令或主管機關要求。",
+      "protect": "為保護本平台、使用者或第三人之權利、安全或合法利益。"
+    },
+    "retention": {
+      "title": "四、資料保存與安全",
+      "security": "我們採取合理技術與管理措施保護您的資訊安全，包括但不限於權限控管、驗證、記錄與其他合理保護措施。然而，任何網路傳輸或儲存方式均無法保證絕對安全，您仍應妥善管理帳號與 API 金鑰。",
+      "period": "我們將依資料性質、法令要求、合規需求與服務目的，在合理必要期間內保存您的資訊。"
+    },
+    "cookies": {
+      "title": "五、Cookie 與類似技術",
+      "body": "本平台可能使用 Cookie 或類似技術，以維持登入狀態、改善體驗、分析流量與支援網站功能。您得依瀏覽器設定管理 Cookie，但部分功能可能因此受影響。"
+    },
+    "rights": {
+      "title": "六、您的權利",
+      "body": "在適用法令範圍內，您可能享有查詢、更正、刪除、限制處理或其他相關權利。若您欲行使相關權利，請透過本平台聯絡頁與我們聯繫，我們將於合理期間內處理。"
+    },
+    "updates": {
+      "title": "七、政策更新",
+      "body": "我們可能因法令、服務或產品調整更新本隱私政策。更新後版本將公布於網站，並自公告或標示之生效日起生效。"
+    },
+    "contact": {
+      "title": "八、聯絡方式",
+      "body": "如您對本隱私政策有任何疑問，請透過官網聯絡頁與我們聯繫。"
+    },
+    "analytics": {
+      "title": "Analytics & Cookies（產品分析）",
+      "body": "我們使用必要 cookies 維持登入、安全與網站功能。我們也可能使用分析 cookies 了解產品使用情況，例如登入流程、API key 操作、文件瀏覽與 gateway 錯誤事件。",
+      "noAdTracking": "不用於廣告追蹤。",
+      "noSell": "不出售個人資料。",
+      "noSecrets": "不蒐集 raw API key、token、密碼或資料庫連線字串。",
+      "userChoice": "使用者可在 cookie 提示中選擇拒絕或允許分析 cookies。"
+    }
+  },
+  "compare": {
+    "h1": "台股資料 API 怎麼選？FinMind vs TEJ vs TW Market Data",
+    "intro": "台股資料 API 常見三種取向，對應不同預算與精細度需求。這篇誠實對照，幫你按情境選對工具。",
+    "positioningTitle": "三家定位一句話",
+    "positioning": {
+      "finmind": "<strong>FinMind</strong>——免費額度大、社群生態強、籌碼面深。適合入門、個人研究、快速原型。",
+      "tej": "<strong>TEJ（台灣經濟新報）</strong>——機構級、資料極乾淨、point-in-time 完整、含下市股。台灣的「Bloomberg/Compustat」，但價格高、對個人開發者門檻高。",
+      "twmd": "<strong>TW Market Data</strong>——官方第一手逐值可追溯、每筆帶 knowledge_date（PIT）、data_gaps 誠實、免 key 即試、平價。定位在 FinMind 的可近性與 TEJ 的嚴謹之間。"
+    },
+    "tableTitle": "對照表",
+    "tableHeaderAspect": "面向",
+    "tableCaption": "表中僅標各家公開定位；實際欄位與方案請以各官網為準。TW Market Data 欄僅列已上線能力，覆蓋逐集透明標示。",
+    "rows": {
+      "officialSource": {
+        "aspect": "官方第一手來源",
+        "finmind": "部分",
+        "tej": "✓",
+        "twmd": "✓（TWSE/TPEx/MOPS/TAIFEX）"
+      },
+      "reconciliation": {
+        "aspect": "逐值對官方對帳",
+        "finmind": "—",
+        "tej": "—",
+        "twmd": "✓（對帳機制，可追溯）"
+      },
+      "pit": {
+        "aspect": "Point-in-time / knowledge_date",
+        "finmind": "靠公布日近似",
+        "tej": "✓（完整）",
+        "twmd": "✓（每筆帶 knowledge_date）"
+      },
+      "delisted": {
+        "aspect": "含已下市股",
+        "finmind": "部分",
+        "tej": "✓",
+        "twmd": "✓（{stoppedStocks} 檔價史，回溯 {startYear}）"
+      },
+      "dataGaps": {
+        "aspect": "data_gaps 誠實揭露",
+        "finmind": "—",
+        "tej": "—",
+        "twmd": "✓（不臆測補值）"
+      },
+      "freeTrial": {
+        "aspect": "免費 / 免 key 試用",
+        "finmind": "✓（免費額度）",
+        "tej": "✗",
+        "twmd": "✓（5 檔免 key）"
+      },
+      "aiAgent": {
+        "aspect": "AI-agent 整合（llms.txt/openapi）",
+        "finmind": "✓（llms.txt+skill）",
+        "tej": "—",
+        "twmd": "✓（llms.txt/llms-full/openapi）"
+      },
+      "pricing": {
+        "aspect": "個人開發者友善價格",
+        "finmind": "✓",
+        "tej": "✗（偏高）",
+        "twmd": "✓"
+      },
+      "chipDepth": {
+        "aspect": "籌碼面深度",
+        "finmind": "✓（強）",
+        "tej": "✓",
+        "twmd": "✓（逐日逐檔）"
+      }
+    },
+    "scenariosTitle": "按情境怎麼選",
+    "scenarios": {
+      "finmind": "<strong>入門 / 個人研究 / 免費探索</strong> → FinMind。",
+      "tej": "<strong>機構級、預算充足、要最完整 PIT 與下市股</strong> → TEJ。",
+      "twmd": "<strong>要官方可追溯 + point-in-time，但 TEJ 太貴 / 對個人不友善，又想餵給 AI agent</strong> → <link>TW Market Data</link>（免 key 先試 2330 再決定）。"
+    },
+    "traceabilityTitle": "為什麼「可追溯」對回測特別重要",
+    "traceabilityBody": "量化回測最怕前視偏差（look-ahead bias）與生存者偏差（survivorship bias）。前者需要 point-in-time——知道「當時」已公布什麼；後者需要含已下市股的資料。TW Market Data 每筆帶 knowledge_date 支援 as-of 重放，並保留 {stoppedStocks} 檔已停止交易股票的價史，兩個偏差都能對應；缺口以 data_gaps 明示而非隱式補值。",
+    "faqTitle": "常見問題",
+    "faq": {
+      "otherApis": {
+        "question": "FinMind 以外還有哪些台股資料 API？",
+        "answer": "常見選擇包括 TEJ（機構級 PIT）、TW Market Data（官方對帳+PIT+平價+AI-agent）、Fugle/Shioaji（券商即時+下單）、TWSE/TPEx OpenAPI（官方免費）。"
+      },
+      "bestForPit": {
+        "question": "哪個台股 API 最適合 point-in-time 回測？",
+        "answer": "TEJ 提供最完整的機構級 PIT；若要平價且對個人/AI-agent 友善的 PIT，TW Market Data 每筆帶 knowledge_date、含下市股、data_gaps 誠實。"
+      },
+      "vsFinmind": {
+        "question": "TW Market Data 和 FinMind 差在哪？",
+        "answer": "FinMind 免費、社群生態強；TW Market Data 強調官方逐值可追溯、point-in-time 契約與 data_gaps 誠實揭露，並為 AI agent 提供 llms.txt/openapi 探索入口。兩者可並用。"
+      }
+    },
+    "relatedAiAgents": "台股資料 API for AI Agents",
+    "relatedDatasets": "瀏覽資料集目錄"
+  },
+  "connect": {
+    "h1": "接入你的 AI",
+    "intro": "選一層開始接台股官方第一手資料——免費試玩、開發整合，或在聊天裡付費使用。",
+    "tier1Label": "第一層",
+    "tier1Title": "30 秒試玩（零認證零註冊）",
+    "tier1PasteLead": "把這句貼給你的 AI：",
+    "tier1Tickers": "任何 agent 都能用免 key 五檔（2330 台積電 / 2317 鴻海 / 2454 聯發科 / 0050 元大台灣50 / 2603 長榮）立即拿到真資料。",
+    "tier2Label": "第二層",
+    "tier2Title": "開發者正式通道（API key）",
+    "tier2Body": "Claude Code / Cursor / 自建 agent：於帳戶頁取 API key，走 REST，按用量計費。",
+    "tier2KeyWarning": "請為每個 agent 開<b>專用 key</b>（見 <link>key 安全</link>），別把主 key 貼進對話。",
+    "tier3Label": "第三層",
+    "tier3Title": "消費者聊天（MCP connector，OAuth）",
+    "tier3Body": "在 Claude.ai / ChatGPT 裡付費使用的<b>唯一正道</b>、也是工具呼叫最穩的方式：加入 TW Market Data connector 授權即用。",
+    "tier3Note": "若你在 Claude.ai 裡貼「一句話」卻拿不到付費資料，<b>不是產品壞掉</b>——消費者聊天請走這層 connector。",
+    "linkKeySafety": "key 安全指引",
+    "linkWhichTier": "哪一層適合我",
+    "summary": "一句話總結：<b>免費試玩走一句話，開發整合走 API key，消費者聊天付費走 connector。</b>"
+  },
+  "authLogin": {
+    "welcomeBack": "歡迎回來",
+    "errorGeneric": "登入失敗，請稍後再試一次。",
+    "passwordResetNotice": "密碼已更新，請重新登入。",
+    "divider": "或",
+    "googleNotConfigured": "本機未設定 Google OAuth，請使用 Email 與密碼登入。",
+    "agreementNotice": "登入即表示同意<terms>Terms</terms>與<privacy>Privacy</privacy>",
+    "errorInvalidCredentials": "帳號或密碼錯誤，請重新確認。",
+    "errorUnavailable": "目前無法登入，請稍後再試。",
+    "passwordLabel": "密碼",
+    "passwordPlaceholder": "至少 8 碼",
+    "submitting": "登入中...",
+    "submit": "使用 Email 登入",
+    "forgotPassword": "忘記密碼？",
+    "noAccount": "還沒有帳戶？",
+    "register": "註冊",
+    "devTitle": "本機開發用",
+    "devDescription": "dev-login：以指定 userId 建立 session（userId = sandbox 訂閱的 externalCustomerId）。僅本機。",
+    "devEmailPlaceholder": "email（如 anthonyiaaan@gmail.com）",
+    "devUserIdPlaceholder": "userId = sandbox sub externalId",
+    "devSubmit": "Dev 登入",
+    "devHint": "設 `ALLOW_DEV_LOGIN=1`（僅 .env.local）可用 dev-login 表單；或設定 Google OAuth。",
+    "phrases": {
+      "p1": {
+        "primary": "為 AI agent 提供",
+        "secondary": "可驗證的台股資料"
+      },
+      "p2": {
+        "primary": "把價格、財報與事件",
+        "secondary": "接進同一條資料流程"
+      },
+      "p3": {
+        "primary": "讓量化研究與自動化",
+        "secondary": "共用同一份資料底座"
+      },
+      "p4": {
+        "primary": "用結構化資料",
+        "secondary": "建立可重複的研究流程"
+      },
+      "p5": {
+        "primary": "讓模型讀到的不是雜訊",
+        "secondary": "而是可追溯的市場資料"
+      }
+    }
+  },
+  "authGoogle": {
+    "signingIn": "登入中...",
+    "signInWithGoogle": "使用 Google 登入"
+  },
+  "authRegister": {
+    "hero": {
+      "title": "建立你的 TW Market Data 帳戶",
+      "subtitle": "註冊後會寄送 6 位數驗證碼，完成 email 驗證即可登入控制台與資料平台。"
+    },
+    "heading": "建立帳戶",
+    "or": "或",
+    "termsNotice": "註冊即表示同意<terms>Terms</terms>與<privacy>Privacy</privacy>",
+    "emailLabel": "Email",
+    "passwordLabel": "密碼",
+    "passwordPlaceholder": "至少 8 碼",
+    "confirmPasswordLabel": "確認密碼",
+    "confirmPasswordPlaceholder": "再次輸入密碼",
+    "submit": "註冊並取得驗證碼",
+    "submitting": "送出中...",
+    "haveAccount": "已經有帳戶？",
+    "login": "登入",
+    "goToLogin": "前往登入",
+    "forgotPassword": "忘記密碼",
+    "errors": {
+      "passwordTooShort": "密碼至少需要 8 碼",
+      "passwordMismatch": "兩次輸入的密碼不一致",
+      "emailServiceNotConfigured": "註冊信件服務尚未設定，請稍後再試。",
+      "emailDeliveryFailed": "驗證碼寄送失敗，請稍後再試。",
+      "invalidInput": "請確認 email 與密碼格式。",
+      "unavailable": "目前無法完成註冊，請稍後再試。",
+      "loginOrReset": "如果這個 Email 已經註冊，請直接登入或使用忘記密碼。"
+    }
+  },
+  "authVerify": {
+    "hero": {
+      "title": "完成 Email 驗證",
+      "description": "我們已寄出 6 位數驗證碼。輸入後即可建立 session 並進入控制台。"
+    },
+    "heading": "驗證 Email",
+    "subheading": "驗證碼 10 分鐘內有效。若未收到可重新寄送。",
+    "codeLabel": "6 位數驗證碼",
+    "submit": "驗證並登入",
+    "submitLoading": "驗證中...",
+    "resend": "重新寄送驗證碼",
+    "resendLoading": "寄送中...",
+    "resendSuccess": "若信箱可驗證，驗證碼已重新寄出。請檢查收件匣。",
+    "backTo": "回到",
+    "loginLink": "登入",
+    "errors": {
+      "tooManyAttempts": "驗證失敗次數過多，請重新寄送驗證碼後再試。",
+      "codeExpired": "驗證碼已過期，請重新寄送。",
+      "invalidCode": "驗證碼不正確，請重新確認。",
+      "verifyFailed": "目前無法完成驗證，請稍後再試。",
+      "resendFailed": "目前無法重新寄送驗證碼，請稍後再試。"
+    }
+  },
+  "authForgot": {
+    "heroTitle": "忘記密碼",
+    "heroSubtitle": "輸入帳戶 Email，我們會寄送重設密碼連結。",
+    "formTitle": "重設密碼",
+    "formSubtitle": "請輸入你的帳戶 Email。",
+    "infoSent": "如果此 Email 已註冊，我們會寄出重設密碼連結。",
+    "submit": "寄送重設密碼信",
+    "submitting": "寄送中...",
+    "backTo": "回到",
+    "login": "登入"
+  },
+  "authReset": {
+    "heroTitle": "設定新密碼",
+    "heroSubtitle": "請輸入新密碼完成重設。",
+    "formTitle": "重設密碼",
+    "invalidLink": "連結無效，請重新申請重設密碼。",
+    "goToForgot": "前往忘記密碼",
+    "passwordLabel": "新密碼",
+    "passwordPlaceholder": "至少 8 碼",
+    "confirmLabel": "確認密碼",
+    "confirmPlaceholder": "再次輸入密碼",
+    "errorTooShort": "密碼至少需要 8 碼",
+    "errorMismatch": "兩次輸入的密碼不一致",
+    "errorExpired": "重設連結已失效，請重新申請。",
+    "errorInvalidFormat": "請確認密碼格式（至少 8 碼）。",
+    "errorGeneric": "目前無法重設密碼，請稍後再試。",
+    "submit": "重設密碼",
+    "submitting": "處理中...",
+    "backTo": "回到",
+    "login": "登入"
+  },
+  "connectWhichTier": {
+    "h1": "哪一層適合我",
+    "colWho": "你是…",
+    "colTier": "走哪層",
+    "colHow": "怎麼開始",
+    "rows": {
+      "try": {
+        "who": "只想試看看 / 給 AI 貼一句",
+        "tier": "第一層 · 免 key",
+        "how": "貼 /skill.md 那句，用五檔試"
+      },
+      "developer": {
+        "who": "開發者 / 自建 agent / 量化",
+        "tier": "第二層 · API key",
+        "how": "帳戶頁取 key，走 REST 計費"
+      },
+      "consumer": {
+        "who": "在 Claude.ai / ChatGPT 裡要付費用",
+        "tier": "第三層 · MCP connector",
+        "how": "加 connector、OAuth 授權"
+      }
+    },
+    "summary": "一句話總結：<b>免費試玩走一句話，開發整合走 API key，消費者聊天付費走 connector。</b>",
+    "backLink": "回接入你的 AI"
+  },
+  "connectKeySafety": {
+    "title": "為你的 AI 建一把專用 key",
+    "points": {
+      "oneKeyPerAgent": {
+        "term": "一個 agent 一把 key",
+        "desc": "到帳戶頁「API Keys」新增一把，命名（如 claude-desktop、research-bot）方便日後辨識。"
+      },
+      "independentRevoke": {
+        "term": "可獨立撤銷",
+        "desc": "某把 key 外洩或不再用，直接撤銷該把，不影響其他 agent、不必換主 key。"
+      },
+      "neverPasteMainKey": {
+        "term": "絕不貼主 key 進對話",
+        "desc": "對話紀錄可能被保存；只給 agent 專用副 key。"
+      },
+      "rotate": {
+        "term": "定期輪換",
+        "desc": "高頻或公開場景的 key 建議定期換發。"
+      }
+    },
+    "capabilityNote": "能力對照：系統已支援一帳號多把可命名、可獨立撤銷的 key（<keyLabel></keyLabel> / <revokedAt></revokedAt> / <createdByCustomer></createdByCustomer>）。若帳戶頁尚未開放「新增多把」，此為待補的小前置。",
+    "backToConnect": "回接入你的 AI"
+  },
+  "helpCenter": {
+    "statusBadge": "Self-serve support",
+    "searchLabel": "搜尋常見問題",
+    "searchPlaceholder": "搜尋問題、API、SDK、帳單、錯誤碼…",
+    "searchHint": "可直接搜尋 401、502、requestId、credits、SDK、MCP 等關鍵字",
+    "faqSectionTitle": "常見問題分類",
+    "allCategories": "全部分類",
+    "topicSectionTitle": "問題清單",
+    "resultsCount": "找到 {count} 筆結果",
+    "topicsCount": "共 {count} 個問題",
+    "emptyState": "找不到相符結果，請換個關鍵字或直接聯繫我們。"
+  },
+  "blog": {
+    "title": "觀點文章",
+    "subtitle": "台股資料 API、資料工程、量化研究與 AI agent workflow 的產品筆記。",
+    "searchLabel": "搜尋文章",
+    "emptyState": "找不到符合條件的文章，請調整分類或關鍵字。",
+    "categories": {
+      "all": "全部",
+      "productUpdates": "產品更新",
+      "dataEngineering": "資料工程",
+      "apiTutorials": "API 教學",
+      "quantResearch": "量化研究",
+      "aiAgent": "AI Agent",
+      "productization": "產品化"
+    },
+    "tableOfContents": "本文目錄",
+    "keyTakeaways": "重點摘要",
+    "backToBlog": "返回觀點文章",
+    "backToList": "返回觀點文章列表",
+    "englishNotice": "本文目前僅提供中文版，英文版將陸續推出。"
+  },
+  "answers": {
+    "eyebrow": "解答",
+    "title": "問答",
+    "subtitle": "關於台股市場資料與 API 常見問題的直接解答。",
+    "empty": "問答頁面準備中。",
+    "related": "相關連結",
+    "apiDocs": "API 文件"
+  },
+  "datasets": {
+    "listEyebrow": "Datasets",
+    "datasetEyebrow": "Dataset",
+    "heroTitle": "台股資料集，為 API 與研究流程設計",
+    "heroBody": "TW Market Data 將台股價格、財報三表、月營收與三大法人買賣超整理成可追溯、可重跑、可接入 workflow 的 API 產品，每筆回應附來源 lineage 並保留揭露的 data_gaps。目前公開定位為 TWSE-first verified baseline；TPEx 歷史深度與 full-market claim 尚未開放。",
+    "viewApiDocs": "查看 API 文件",
+    "viewPricing": "查看方案",
+    "usageTitle": "股票分析如何使用這些資料",
+    "catalogTitle": "資料集目錄",
+    "familyTablistLabel": "資料集家族",
+    "datasetOverview": "資料集介紹",
+    "apiDocs": "API 文件",
+    "breadcrumbRoot": "資料集",
+    "downloadSampleCsv": "下載樣本 CSV（2330）",
+    "sampleCaption": "零註冊即可下載：以免 key 五檔之一（2330 台積電）為示範標的的樣本資料。",
+    "whatItIsTitle": "這是什麼資料",
+    "useCasesTitle": "資料用途",
+    "whyItMattersTitle": "為什麼對股票分析重要",
+    "coverageTitle": "Coverage / Freshness / Source Policy",
+    "developerTitle": "Developer 入口",
+    "developerApiDocsLabel": "API 文件：",
+    "developerOpenApiLabel": "OpenAPI：",
+    "relatedLinksTitle": "相關連結",
+    "catalogOverview": "資料集總覽",
+    "coveragePrefix": "涵蓋範圍：",
+    "freshnessPrefix": "更新頻率：",
+    "sourcePolicyPrefix": "資料來源政策：",
+    "badgeGreenTitle": "每個值逐值對官方來源可追溯；此日期為最後一次對帳通過的日期。",
+    "badgeGreenLabel": "最後對官方對帳通過：",
+    "badgePendingTitle": "對帳流程進行中，通過日期尚未產生。",
+    "badgePending": "對帳校驗中"
+  },
+  "docs": {
+    "navHeading": "文件導覽",
+    "docLabel": "文件",
+    "sidebarTitle": "文件總覽",
+    "onThisPage": "本頁章節",
+    "noSections": "本頁目前沒有章節目錄。",
+    "expand": "展開",
+    "collapse": "收合",
+    "breadcrumbHome": "首頁",
+    "aiHint": "AI agent？先讀 <llms>/llms.txt</llms> 取得全站索引。",
+    "englishNotice": "本文件頁目前僅提供中文版，英文版將陸續推出。"
+  },
+  "docsDemo": {
+    "copy": "複製",
+    "copied": "已複製",
+    "copyCode": "複製程式碼",
+    "requestExample": "請求範例",
+    "sidePanel": {
+      "statusCodes": "狀態碼"
+    },
+    "coverage": {
+      "heading": "覆蓋範圍",
+      "instruments": "標的數",
+      "startYear": "起始年",
+      "updateTiming": "更新時點",
+      "includesDelisted": "含已下市",
+      "comingValue": "尚未提供（coming）",
+      "caption": "數字為 DB 實測；未列者以 <nowrap>docs coverage</nowrap> 為準（coming），不逐格編造。"
+    },
+    "limitations": {
+      "heading": "限制與注意",
+      "items": [
+        "覆蓋非全市場、全期間；實際範圍以上方覆蓋小表與回應中的 data_gaps 為準。",
+        "資料有缺會如實標記，不以推測值補洞。",
+        "本平台聚焦日頻與基本面資料；不提供即時報價、盤中分K與加密貨幣。",
+        "TWSE 為 verified baseline；TPEx 歷史深度與還原股價目前為 beta / deferred，逐集標示。"
+      ]
+    },
+    "liveDemo": {
+      "heading": "Live Demo（TWSE Daily Price）",
+      "description": "這個示範會直接呼叫本機 API：",
+      "placeholder": "例如 2330",
+      "loading": "Loading...",
+      "fetchData": "Fetch Data",
+      "errorEnterSymbol": "請先輸入 symbol。",
+      "errorRequestFailed": "API 請求失敗。",
+      "errorConnect": "無法連線到本機 API（http://127.0.0.1:8011）。",
+      "planLimitedTitle": "目前方案僅顯示前 {count} 筆資料",
+      "planLimitedUpgrade": "升級後可取得最多 5000 筆資料",
+      "upgradePlan": "升級方案"
+    },
+    "playground": {
+      "run": "Run",
+      "running": "Running...",
+      "close": "關閉",
+      "selectLanguage": "選擇請求範例語言",
+      "tryTitle": "試跑 API 請求",
+      "tryDescription": "填入參數後可呼叫真實 API，並在此查看即時回應。",
+      "required": "必填",
+      "optional": "選填",
+      "enterApiKey": "輸入 X-API-Key",
+      "copyResult": "複製結果",
+      "copiedResult": "已複製結果",
+      "downloadResult": "下載結果 JSON",
+      "download": "下載",
+      "notRunYet": "尚未執行。點擊 Run 後會在此顯示執行結果。",
+      "responseUpdated": "Response updated.",
+      "noStatusExample": "此 endpoint 尚未提供對應狀態範例，請參考文件正文。",
+      "errorEnterKey": "請先輸入 API key。",
+      "errorInvalidKey": "請輸入有效 API key，而不是範例或遮罩文字。",
+      "errorMissingParams": "缺少必填參數，請補齊後再執行。",
+      "errorConnect": "無法連線到 API，請稍後再試。"
+    }
+  },
+  "docsContent": {
+    "landing": {
+      "intro1": "TW Market Data 把 TWSE、TPEx、MOPS、TAIFEX 的官方資料，整理成一致、好串接的 REST API。所有資料都由我們直接從官方來源收錄、解析後供應，不經二手。",
+      "intro2": "每一筆回應都附上來源與 knowledge_date；資料有缺就如實標記，絕不用推估值把洞補起來。",
+      "access": {
+        "heading": "可存取的資料",
+        "intro": "上市個股日線最早回溯到 <y>{year} 年</y>，並保留 <c>{count} 檔</c>已停止交易（下市／長期停牌）股票的完整價史，讓回測不被存活者偏差灌水。目前提供：",
+        "betaNote": "上櫃（TPEx）日線與還原股價目前為 beta，覆蓋範圍逐集標示。"
+      },
+      "dataFormat": {
+        "heading": "資料格式"
+      },
+      "builtFor": {
+        "heading": "為誰而建",
+        "b1": "需要餵資料的 AI 金融 agent 與 LLM 流程",
+        "b2": "量化研究與因子開發",
+        "b3": "回測與自動化交易系統",
+        "b4": "fintech 產品的內部資料層"
+      },
+      "designPrinciples": {
+        "heading": "設計原則"
+      },
+      "ready": "準備好了嗎？→ <link>快速開始</link>"
+    },
+    "quickStart": {
+      "step0": {
+        "heading": "步驟 0 · 零註冊先試一筆（免 key）",
+        "intro": "這 5 檔可直接打、不用金鑰：2330 台積電 / 2317 鴻海 / 2454 聯發科 / 0050 / 2603。貼給你的 AI 或直接 curl：",
+        "note": "（其他股票 / 其他資料集才需要下面的 API key。）"
+      },
+      "getKey": {
+        "heading": "1. 拿一把 API 金鑰",
+        "body": "到 <dash>儀表板</dash> 註冊，並在後台建立一把 API 金鑰。金鑰放在請求標頭，別放進網址。"
+      },
+      "firstRequest": {
+        "heading": "2. 打第一個請求",
+        "body": "每個資料端點都是 <endpoint></endpoint>，用 <key></key> 標頭帶上金鑰。"
+      },
+      "seeResponse": {
+        "heading": "3. 看回應",
+        "body": "回傳 typed JSON，每筆都帶來源；缺的資料如實留空，不會亂補。欄位說明在各 <link>資料集頁</link>。"
+      },
+      "whatsNext": {
+        "heading": "接下來",
+        "pickIntro": "挑一個資料集開始：",
+        "separator": "、",
+        "pickEnd": "。",
+        "quota": "想看額度與方案 → <link>方案價格</link>。",
+        "next": "下一步 → <link>認證</link>"
+      },
+      "datasets": {
+        "twse-daily-price": "上市日線",
+        "monthly-revenue": "月營收",
+        "institutional-flow": "三大法人",
+        "income-statement": "財報三表"
+      }
+    },
+    "auth": {
+      "intro": "每個請求都帶 <code></code> 標頭。金鑰在 <dash>儀表板</dash> 自己建立、輪替、撤銷，不用聯絡我們。",
+      "habitsHeading": "幾個習慣",
+      "habit1": {
+        "term": "金鑰只放標頭，別放網址",
+        "desc": "免得留在伺服器日誌或瀏覽紀錄裡。"
+      },
+      "habit2": {
+        "term": "一個環境一把金鑰",
+        "desc": "開發跟正式分開，哪把外洩就撤哪把（多把金鑰依方案提供）。"
+      },
+      "habit3": {
+        "term": "額度看方案",
+        "desc": "每把金鑰的每分鐘請求數與每月用量依方案計。"
+      },
+      "errorsHeading": "常見錯誤",
+      "error1": "<code></code> — 金鑰沒帶或無效（免 key 五檔 2330/2317/2454/0050/2603 除外，直接回 200）。",
+      "error2": "<code></code> — 你的方案沒有這個資料集的權限（付費牆）。",
+      "error3": "<code></code> — 超出配額 / 速率限制。",
+      "next": "下一步 → <link>來源政策</link>"
+    }
   },
   "common": {
-    "englishComingSoon": "English version coming soon."
+    "englishComingSoon": "English version coming soon.",
+    "illustrativeData": "示意資料，非即時行情",
+    "enLegalReference": "本頁英文翻譯僅供參考，以中文版為準。"
   }
 }
