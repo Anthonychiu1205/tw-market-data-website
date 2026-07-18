@@ -254,6 +254,292 @@
     "section5EmailLabel": "Email: ",
     "section5ContactLabel": "Contact page: "
   },
+  "terms": {
+    "title": "Terms of Use",
+    "lead1": "These Terms of Use govern the rights, obligations, scope of license, and limitations of liability between you and the platform operator when you access and use TW Market Data. Please read these Terms in full before using the Service.",
+    "lead2": "When you register an account, create an API key, access the Service, call the Service API, or otherwise use the Service, you represent that you have read, understood, and agree to be bound by these Terms; if you do not agree to all or part of these Terms, please stop using the Service.",
+    "scope": {
+      "title": "1. Scope",
+      "p1": "These Terms apply to your use of the platform website, datasets, API, documentation, console, downloadable content, and related features.",
+      "p2": "The platform may separately publish supplementary rules for specific features, plans, promotions, beta features, or enterprise partnerships; once published, such supplementary rules form part of these Terms."
+    },
+    "definitions": {
+      "title": "2. Definitions",
+      "p1": "Unless the context otherwise requires, the terms used in these Terms are defined as follows.",
+      "b1": "Account: the member identity created by a user in order to use the Service.",
+      "b2": "API Key: the access credential used to authenticate a user's calls to the Service API.",
+      "b3": "Plan: the service tier set by the platform for different data scopes, quotas, features, and license conditions.",
+      "b4": "Dataset: a collection of market, company, financial, event, classification, quantitative, or other data made available by the platform for query, download, analysis, or integration.",
+      "b5": "Commercial Use: use for profit, providing paid services to third parties, integration into commercialized products, enterprise operational analysis, customer service, internal commercial decision support, or any other use scenario with a commercial purpose.",
+      "b6": "Third-Party Data: data, content, or information not originally produced by the platform but obtained from public sources, official sources, or other third-party providers."
+    },
+    "service": {
+      "title": "3. Service Content",
+      "p1": "The platform provides a Taiwan stock data API, dataset access capabilities, a console, documentation, and related product interfaces.",
+      "p2": "The datasets, features, access boundaries, quotas, rate limits, license scope, and other conditions of use actually available under the Service are governed by your current account plan, the product interface, the subscription page, or any individual agreement.",
+      "p3": "The platform may, based on product development, source availability, regulatory requirements, technical maintenance, or other reasonable factors, add, adjust, suspend, remove, or replace certain datasets, fields, features, quotas, rate limits, or product content, and may notify users by website announcement, console notice, email, or other reasonable means."
+    },
+    "account": {
+      "title": "4. Account and API Key",
+      "p1": "You shall properly safeguard the security of your account and API key, and shall not transfer, sell, share, rent, lend, or otherwise provide your account or API key for unauthorized use by any third party.",
+      "p2": "You are solely responsible for all activity and requests made under your account and API key.",
+      "p3": "If you discover that your account or API key is suspected of being leaked, subject to unauthorized access, used abnormally, or presents any other security concern, you shall immediately notify the platform and take necessary measures to disable, reset, or rotate it.",
+      "p4": "The platform may, based on information security, abuse prevention, system stability, regulatory compliance, or reasonable risk control needs, suspend, restrict, revoke, reset, or require replacement of a specific account or API key.",
+      "b1": "API calls and data access",
+      "b2": "Quota consumption and rate usage",
+      "b3": "Account-related settings, management, and operations"
+    },
+    "license": {
+      "title": "5. License Scope and Use Restrictions",
+      "p1": "Subject to the plan applicable to you, the platform grants you a revocable, non-exclusive, non-transferable, non-sublicensable right of use to access and use the Service within the scope of the license.",
+      "b1": "You may not circumvent, interfere with, bypass, or test the platform's authentication, quotas, rate limits, license controls, or other protection mechanisms.",
+      "b2": "You may not, without authorization, bulk-download, mirror, reconstruct, resell, sublicense, redistribute, or build a data service that is highly substitutable for the platform.",
+      "b3": "You may not use the Service for illegal, infringing, fraudulent, request-flooding, stress-testing, system-interference, or other improper purposes.",
+      "b4": "You may not use crawlers, batch programs, or other means to use the Service beyond the scope authorized by your plan.",
+      "b5": "You may not, directly or indirectly, use a plan intended solely for testing, evaluation, research, or non-commercial use for Commercial Use.",
+      "b6": "The Free and Developer plans are licensed for non-commercial use only.",
+      "b7": "The Pro, Team, and Enterprise plans may be used for Commercial Use within the scope of the license."
+    },
+    "plans": {
+      "title": "6. Plans, Fees, and Subscriptions",
+      "p1": "The price, billing cycle, license scope, dataset availability, quotas, rate limits, number of API keys, and related features of a paid plan are governed by the content set out on the website, console, order, or other official page at the time you subscribe or purchase.",
+      "p2": "The platform may, based on product, cost, regulatory, or operational needs, adjust plan prices, feature content, quotas, rate limits, dataset scope, or other plan conditions, taking effect after announcement or notice by reasonable means.",
+      "p3": "If you fail to pay as agreed, a payment fails, a refund dispute arises, or there are other reasonably necessary circumstances, the platform may restrict, suspend, or terminate your use of part or all of the Service.",
+      "p4": "Plan upgrades and downgrades, effective times, data access scope, and the manner of switching account permissions are governed by the product interface and plan rules in effect at the time."
+    },
+    "dataSources": {
+      "title": "7. Data Sources and Third-Party Data",
+      "p1": "The data provided by the platform may include content from official sources, public sources, third-party sources, or content compiled, standardized, structured, or derived by the platform according to certain methods. Different data sources may be affected by their original license conditions, availability, update frequency, technical limitations, latency, corrections, and interruptions.",
+      "p2": "You understand and agree that the continued supply, content quality, and lawful availability of Third-Party Data may be affected by third-party factors.",
+      "p3": "You remain responsible for judging whether the data is suitable for your intended purpose, and for confirming whether it complies with applicable laws, third-party rights, and your internal compliance requirements.",
+      "p4": "The platform does not guarantee that any Third-Party Data will be provided perpetually and continuously, will remain entirely unchanged, or may be used without restriction under any circumstances."
+    },
+    "disclaimerGeneral": {
+      "title": "8. Disclaimer of Warranties",
+      "p1": "The Service and all of its data, content, documentation, fields, indicators, events, model outputs, and related information are provided on an \"as is\" and \"as available\" basis.",
+      "p2": "To the extent permitted by applicable law, the platform makes no express or implied warranty as to accuracy, completeness, timeliness, continuous availability, freedom from error, freedom from interruption, fitness for a particular purpose, or full conformity with your expectations.",
+      "p3": "You understand that data may experience delay, omission, correction, amendment, restatement, backfill, suspension, removal, or source interruption."
+    },
+    "notInvestmentAdvice": {
+      "title": "9. Not Investment Advice",
+      "p1": "The data, fields, indicators, events, news, valuation information, derived information, documentation content, or any explanation provided by the platform do not constitute investment advice, investment solicitation, buy/sell recommendations, guarantees of returns, legal opinions, accounting opinions, or tax opinions.",
+      "p2": "You should not treat the platform's data or content as a recommendation, offer, or endorsement of any financial product.",
+      "p3": "Any investment, trading, asset allocation, risk management, or business decision shall be made at your own judgment and risk; where necessary, you should consult your own professional advisors."
+    },
+    "suspension": {
+      "title": "10. Suspension, Restriction, and Termination",
+      "p1": "If any of the following circumstances occurs, the platform may, to the extent necessary, suspend, restrict, or terminate your access to all or part of the Service.",
+      "b1": "Violation of these Terms or other applicable rules.",
+      "b2": "Conduct affecting the security or stability of the platform or the rights of other users.",
+      "b3": "Suspected abuse, circumvention of restrictions, or unauthorized sharing of an account or API key.",
+      "b4": "Violation of applicable laws, third-party rights, or regulatory requirements.",
+      "b5": "Payment failure, billing anomalies, subscription lapse, or other reasonable operational needs.",
+      "b6": "You may also stop using the Service, cancel your subscription, or terminate your account through the product flow. After account termination, certain data, records, logs, billing information, or content subject to statutory retention may still be retained in accordance with law, compliance, or operational needs."
+    },
+    "ip": {
+      "title": "11. Intellectual Property",
+      "p1": "The intellectual property rights in the platform website, interfaces, code, design, documentation, trademarks, data compilation methods, data structures, textual content, and other related content, except as otherwise stated, belong to the platform or its lawful rights holders.",
+      "p2": "Except as expressly licensed under these Terms, you acquire no other intellectual property right, ownership, sublicensing right, or right to reproduce, distribute, publicly transmit, or adapt the data by using the Service."
+    },
+    "privacy": {
+      "title": "12. Privacy and Data Protection",
+      "p1": "The platform values user privacy. The collection, processing, and use of personal data involved in your use of the Service are handled in accordance with the platform's Privacy Policy.",
+      "p2": "Please read the Privacy Policy carefully before use to understand how the platform processes data and your rights."
+    },
+    "serviceChanges": {
+      "title": "13. Service Changes, Maintenance, and Beta Features",
+      "p1": "The platform may change part or all of the Service based on maintenance, upgrade, security, performance, testing, correction, or architectural adjustment needs.",
+      "p2": "During maintenance, updates, testing, or troubleshooting, the Service may be briefly interrupted, delayed, restricted, or render certain features unavailable.",
+      "p3": "The platform will make reasonable efforts to minimize the impact on users, but does not guarantee that the Service will be free from interruption or anomaly at all times."
+    },
+    "liability": {
+      "title": "14. Limitation of Liability",
+      "p1": "To the extent permitted by applicable law, the platform shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from use, inability to use, data delay, data error, data omission, service interruption, feature restriction, Third-Party Data anomaly, or other circumstances related to the Service.",
+      "p2": "To the extent permitted by law, the platform's total liability to you shall be capped at the total fees you actually paid to the platform for the Service in the twelve months preceding the event giving rise to the damage; if you have paid no fees, the minimum extent required by law shall govern."
+    },
+    "governingLaw": {
+      "title": "15. Governing Law and Dispute Resolution",
+      "p1": "The interpretation, validity, and application of these Terms shall be governed by the laws of the Republic of China (Taiwan).",
+      "p2": "For any dispute arising from or in connection with these Terms or the Service, the parties shall first seek to resolve it through good-faith negotiation; if negotiation fails, then unless otherwise mandatorily required by law, the parties agree that the Taiwan Taipei District Court shall be the court of first instance with jurisdiction."
+    },
+    "contact": {
+      "title": "16. Contact",
+      "p1": "If you have any questions about these Terms, the Service, or account use, please contact us via the contact page on the platform's official website."
+    }
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "intro": "This Privacy Policy explains how TW Market Data collects, uses, protects, and processes the information you provide when using this platform and its related services. Please read this policy carefully before using the service.",
+    "collect": {
+      "title": "1. Types of Information We Collect",
+      "intro": "We may collect the following information.",
+      "account": "Account information: such as name, email, company name, login credentials, or account identifiers.",
+      "usage": "Usage information: such as API call logs, usage timestamps, feature activity logs, console interactions, and device and browser information.",
+      "payment": "Payment and subscription information: such as plan, payment status, subscription records, and billing information.",
+      "contact": "Contact information: such as content you provide through forms, email, or support channels."
+    },
+    "use": {
+      "title": "2. How We Use Information",
+      "intro": "We may use the information we collect for the following purposes.",
+      "provide": "To provide, maintain, and improve this service.",
+      "verify": "To verify accounts and API keys.",
+      "quota": "To manage quotas, rate limits, and authorization boundaries.",
+      "billing": "To process subscriptions, payments, billing, and support requests.",
+      "abuse": "To detect anomalous activity, abuse, or security incidents.",
+      "notify": "To send important notices related to the service.",
+      "internal": "To conduct internal analytics, product optimization, and compliance management."
+    },
+    "share": {
+      "title": "3. Data Sharing and Disclosure",
+      "intro": "Except in the following circumstances, we do not arbitrarily sell or disclose your personal data.",
+      "consent": "With your consent.",
+      "vendors": "As necessary to perform the service, working with payment, cloud, analytics, customer support, or technical vendors.",
+      "legal": "To comply with legal obligations, court orders, or requirements of competent authorities.",
+      "protect": "To protect the rights, safety, or legitimate interests of this platform, its users, or third parties."
+    },
+    "retention": {
+      "title": "4. Data Retention and Security",
+      "security": "We adopt reasonable technical and administrative measures to protect the security of your information, including but not limited to access controls, authentication, logging, and other reasonable safeguards. However, no method of transmission or storage over the internet can guarantee absolute security, and you should still properly manage your account and API keys.",
+      "period": "We will retain your information for a reasonable and necessary period based on the nature of the data, legal requirements, compliance needs, and the purposes of the service."
+    },
+    "cookies": {
+      "title": "5. Cookies and Similar Technologies",
+      "body": "This platform may use cookies or similar technologies to maintain your login state, improve your experience, analyze traffic, and support website functionality. You may manage cookies through your browser settings, but some features may be affected as a result."
+    },
+    "rights": {
+      "title": "6. Your Rights",
+      "body": "Within the scope of applicable law, you may have the right to access, correct, delete, restrict the processing of, or exercise other related rights over your data. If you wish to exercise these rights, please contact us through the platform's contact page, and we will process your request within a reasonable period."
+    },
+    "updates": {
+      "title": "7. Policy Updates",
+      "body": "We may update this Privacy Policy in response to legal, service, or product changes. The updated version will be published on the website and takes effect from the effective date announced or indicated."
+    },
+    "contact": {
+      "title": "8. Contact Us",
+      "body": "If you have any questions about this Privacy Policy, please contact us through the official website's contact page."
+    },
+    "analytics": {
+      "title": "Analytics & Cookies (Product Analytics)",
+      "body": "We use necessary cookies to maintain login, security, and website functionality. We may also use analytics cookies to understand product usage, such as login flows, API key operations, documentation browsing, and gateway error events.",
+      "noAdTracking": "Not used for ad tracking.",
+      "noSell": "We do not sell personal data.",
+      "noSecrets": "We do not collect raw API keys, tokens, passwords, or database connection strings.",
+      "userChoice": "Users can choose to decline or allow analytics cookies in the cookie prompt."
+    }
+  },
+  "compare": {
+    "h1": "How to choose a Taiwan stock data API: FinMind vs TEJ vs TW Market Data",
+    "intro": "Taiwan stock data APIs come in three common flavors, matching different budgets and levels of granularity. This is an honest comparison to help you pick the right tool for your scenario.",
+    "positioningTitle": "Three products, one line each",
+    "positioning": {
+      "finmind": "<strong>FinMind</strong> — large free tier, strong community ecosystem, deep chip-flow data. Good for getting started, personal research, and quick prototypes.",
+      "tej": "<strong>TEJ (Taiwan Economic Journal)</strong> — institutional-grade, extremely clean data, complete point-in-time, includes delisted stocks. Taiwan's \"Bloomberg/Compustat\", but expensive with a high barrier for individual developers.",
+      "twmd": "<strong>TW Market Data</strong> — first-party official value-by-value traceability, knowledge_date on every record (PIT), honest data_gaps, no-key instant trial, affordable. Positioned between FinMind's accessibility and TEJ's rigor."
+    },
+    "tableTitle": "Comparison table",
+    "tableHeaderAspect": "Aspect",
+    "tableCaption": "The table marks each provider's public positioning only; refer to each provider's own site for actual fields and plans. The TW Market Data column lists shipped capabilities only, with coverage transparently marked per dataset.",
+    "rows": {
+      "officialSource": {
+        "aspect": "First-party official source",
+        "finmind": "Partial",
+        "tej": "✓",
+        "twmd": "✓ (TWSE/TPEx/MOPS/TAIFEX)"
+      },
+      "reconciliation": {
+        "aspect": "Value-by-value reconciliation against official sources",
+        "finmind": "—",
+        "tej": "—",
+        "twmd": "✓ (reconciliation mechanism, traceable)"
+      },
+      "pit": {
+        "aspect": "Point-in-time / knowledge_date",
+        "finmind": "Approximated from publish date",
+        "tej": "✓ (complete)",
+        "twmd": "✓ (knowledge_date on every record)"
+      },
+      "delisted": {
+        "aspect": "Includes delisted stocks",
+        "finmind": "Partial",
+        "tej": "✓",
+        "twmd": "✓ ({stoppedStocks} tickers of price history, back to {startYear})"
+      },
+      "dataGaps": {
+        "aspect": "Honest data_gaps disclosure",
+        "finmind": "—",
+        "tej": "—",
+        "twmd": "✓ (no guessed backfill)"
+      },
+      "freeTrial": {
+        "aspect": "Free / no-key trial",
+        "finmind": "✓ (free tier)",
+        "tej": "✗",
+        "twmd": "✓ (5 tickers, no key)"
+      },
+      "aiAgent": {
+        "aspect": "AI-agent integration (llms.txt/openapi)",
+        "finmind": "✓ (llms.txt + skill)",
+        "tej": "—",
+        "twmd": "✓ (llms.txt/llms-full/openapi)"
+      },
+      "pricing": {
+        "aspect": "Indie-developer-friendly pricing",
+        "finmind": "✓",
+        "tej": "✗ (expensive)",
+        "twmd": "✓"
+      },
+      "chipDepth": {
+        "aspect": "Institutional / chip-flow depth",
+        "finmind": "✓ (strong)",
+        "tej": "✓",
+        "twmd": "✓ (per-day, per-ticker)"
+      }
+    },
+    "scenariosTitle": "How to choose by scenario",
+    "scenarios": {
+      "finmind": "<strong>Getting started / personal research / free exploration</strong> → FinMind.",
+      "tej": "<strong>Institutional-grade, ample budget, want the most complete PIT and delisted stocks</strong> → TEJ.",
+      "twmd": "<strong>Want official traceability + point-in-time, but TEJ is too expensive / unfriendly to individuals, and you also want to feed an AI agent</strong> → <link>TW Market Data</link> (try 2330 with no key before deciding)."
+    },
+    "traceabilityTitle": "Why \"traceability\" matters especially for backtesting",
+    "traceabilityBody": "Quantitative backtesting fears look-ahead bias and survivorship bias most. The former needs point-in-time — knowing what had been published \"at the time\"; the latter needs data that includes delisted stocks. TW Market Data carries knowledge_date on every record to support as-of replay, and retains price history for {stoppedStocks} stocks that have stopped trading, covering both biases; gaps are shown explicitly via data_gaps rather than implicitly backfilled.",
+    "faqTitle": "FAQ",
+    "faq": {
+      "otherApis": {
+        "question": "What Taiwan stock data APIs are there besides FinMind?",
+        "answer": "Common choices include TEJ (institutional-grade PIT), TW Market Data (official reconciliation + PIT + affordable + AI-agent), Fugle/Shioaji (broker real-time + order placement), and TWSE/TPEx OpenAPI (official, free)."
+      },
+      "bestForPit": {
+        "question": "Which Taiwan stock API is best for point-in-time backtesting?",
+        "answer": "TEJ offers the most complete institutional-grade PIT; for affordable PIT that is friendly to individuals and AI agents, TW Market Data carries knowledge_date on every record, includes delisted stocks, and is honest about data_gaps."
+      },
+      "vsFinmind": {
+        "question": "How does TW Market Data differ from FinMind?",
+        "answer": "FinMind is free with a strong community ecosystem; TW Market Data emphasizes official value-by-value traceability, a point-in-time contract, and honest data_gaps disclosure, and gives AI agents llms.txt/openapi discovery entry points. The two can be used together."
+      }
+    },
+    "relatedAiAgents": "Taiwan Stock Data API for AI Agents",
+    "relatedDatasets": "Browse the dataset catalog"
+  },
+  "connect": {
+    "h1": "Connect your AI",
+    "intro": "Pick a tier to start pulling first-hand official Taiwan market data — try it free, integrate as a developer, or use it inside paid chat.",
+    "tier1Label": "Tier 1",
+    "tier1Title": "30-second trial (no auth, no signup)",
+    "tier1PasteLead": "Paste this to your AI:",
+    "tier1Tickers": "Any agent can pull real data instantly with the five key-free tickers (2330 TSMC / 2317 Hon Hai / 2454 MediaTek / 0050 Yuanta Taiwan 50 / 2603 Evergreen).",
+    "tier2Label": "Tier 2",
+    "tier2Title": "Developer channel (API key)",
+    "tier2Body": "Claude Code / Cursor / your own agent: get an API key from your account page, call the REST API, and pay by usage.",
+    "tier2KeyWarning": "Open a <b>dedicated key</b> for each agent (see <link>key safety</link>), and never paste your primary key into a conversation.",
+    "tier3Label": "Tier 3",
+    "tier3Title": "Consumer chat (MCP connector, OAuth)",
+    "tier3Body": "The <b>only supported way</b> to pay for access inside Claude.ai / ChatGPT, and the most reliable path for tool calls: add the TW Market Data connector, authorize, and go.",
+    "tier3Note": "If you paste the one-liner in Claude.ai but can't get paid data, <b>the product isn't broken</b> — consumer chat goes through this connector tier.",
+    "linkKeySafety": "Key safety guide",
+    "linkWhichTier": "Which tier is right for me",
+    "summary": "In short: <b>free trial goes through the one-liner, developer integration goes through an API key, paid consumer chat goes through the connector.</b>"
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }
