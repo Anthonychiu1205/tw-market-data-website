@@ -127,7 +127,15 @@ export function getTwFeatureEngineBaseUrl(): string | null {
 async function safeFetchServiceJson(path: string): Promise<{ ok: boolean; payload: unknown | null }> {
   const baseUrl = getTwFeatureEngineBaseUrl();
   const token = process.env.BACKEND_API_TOKEN;
-  if (!baseUrl || !token) return { ok: false, payload: null };
+  if (!baseUrl || !token) {
+    // Observability: when config is missing the homepage market card renders NOTHING (rule 2 — never
+    // fabricate). Log WHICH piece is missing so a silent empty card is diagnosable from Vercel logs
+    // instead of guessed at. No token value is ever logged.
+    console.warn(
+      `[homepage-market] fetch skipped for ${path}: missing ${!baseUrl ? "BACKEND_API_BASE_URL" : ""}${!baseUrl && !token ? " + " : ""}${!token ? "BACKEND_API_TOKEN" : ""}`,
+    );
+    return { ok: false, payload: null };
+  }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -138,9 +146,19 @@ async function safeFetchServiceJson(path: string): Promise<{ ok: boolean; payloa
       signal: controller.signal,
       next: { revalidate: REVALIDATE_SECONDS },
     });
-    if (!res.ok) return { ok: false, payload: null };
+    if (!res.ok) {
+      // Upstream returned non-2xx → card renders nothing this request. Log the status (not the body,
+      // which may carry sensitive detail) so a transient outage is visible rather than silent.
+      console.warn(`[homepage-market] upstream ${path} responded ${res.status} ${res.statusText}`);
+      return { ok: false, payload: null };
+    }
     return { ok: true, payload: await res.json() };
-  } catch {
+  } catch (error) {
+    // Timeout (AbortError after FETCH_TIMEOUT_MS) or network failure → card renders nothing. Log the
+    // error name/message (never the token or full request) so intermittent disappearances are traceable.
+    const name = error instanceof Error ? error.name : "UnknownError";
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`[homepage-market] fetch ${path} failed: ${name}: ${message}`);
     return { ok: false, payload: null };
   } finally {
     clearTimeout(timeout);
@@ -179,10 +197,18 @@ export async function getHomepageMarketSnapshot(): Promise<HomepageMarketSnapsho
   const result = await safeFetchServiceJson("/v2/homepage/market-indices");
 
   if (result.ok && isRecord(result.payload) && Array.isArray(result.payload.indices)) {
+    const rawCount = result.payload.indices.length;
     const items = result.payload.indices
       .filter(isRecord)
       .map(itemFromApiRow)
       .filter((item): item is HomepageMarketItem => item !== null);
+
+    // Observability: upstream answered 200 but nothing survived parsing — the card renders NOTHING.
+    // This is the schema-drift signature (e.g. the API renamed `key`/`value`), which reads as a
+    // persistent empty card. Log it (with the raw row count) so it is not mistaken for "no data".
+    if (items.length === 0) {
+      console.warn(`[homepage-market] upstream returned ${rawCount} row(s) but 0 parsed into usable indices — card will render nothing (possible schema drift)`);
+    }
 
     if (items.length > 0) {
       const asOf =
@@ -197,6 +223,13 @@ export async function getHomepageMarketSnapshot(): Promise<HomepageMarketSnapsho
         updatedAt: asOf || null,
       };
     }
+  }
+
+  // Upstream succeeded but the payload was not the expected `{ indices: [...] }` shape — another
+  // silent way the card ends up empty. safeFetchServiceJson already logged fetch-level failures; this
+  // covers the "200 but wrong shape" case so every empty-card cause is traceable.
+  if (result.ok && !(isRecord(result.payload) && Array.isArray(result.payload.indices))) {
+    console.warn("[homepage-market] upstream 200 but payload has no `indices` array — unexpected shape, card will render nothing");
   }
 
   // No live data → render nothing. Showing a stale demo index is worse than showing none.
