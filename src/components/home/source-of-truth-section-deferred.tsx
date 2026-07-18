@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
+import type { SourceOfTruthRealData } from "@/src/lib/homepage/demo-real-data-types";
 
 const SourceOfTruthSection = dynamic(
   () => import("./source-of-truth-section").then((module) => module.SourceOfTruthSection),
@@ -24,7 +25,7 @@ function SourceOfTruthSectionSkeleton() {
   );
 }
 
-export function SourceOfTruthSectionDeferred() {
+export function SourceOfTruthSectionDeferred({ realById }: { realById?: SourceOfTruthRealData["byId"] }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
 
@@ -50,5 +51,5 @@ export function SourceOfTruthSectionDeferred() {
     return () => observer.disconnect();
   }, [shouldLoad]);
 
-  return <div ref={hostRef}>{shouldLoad ? <SourceOfTruthSection /> : <SourceOfTruthSectionSkeleton />}</div>;
+  return <div ref={hostRef}>{shouldLoad ? <SourceOfTruthSection realById={realById} /> : <SourceOfTruthSectionSkeleton />}</div>;
 }

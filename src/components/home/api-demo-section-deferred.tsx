@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
+import type { ApiDemoRealData } from "@/src/lib/homepage/demo-real-data-types";
 
 const ApiDemoSection = dynamic(
   () => import("./api-demo-section").then((module) => module.ApiDemoSection),
@@ -27,7 +28,7 @@ function ApiDemoSectionSkeleton() {
   );
 }
 
-export function ApiDemoSectionDeferred() {
+export function ApiDemoSectionDeferred({ data }: { data?: ApiDemoRealData }) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
 
@@ -53,5 +54,5 @@ export function ApiDemoSectionDeferred() {
     return () => observer.disconnect();
   }, [shouldLoad]);
 
-  return <div ref={hostRef}>{shouldLoad ? <ApiDemoSection /> : <ApiDemoSectionSkeleton />}</div>;
+  return <div ref={hostRef}>{shouldLoad ? <ApiDemoSection data={data} /> : <ApiDemoSectionSkeleton />}</div>;
 }

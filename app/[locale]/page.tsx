@@ -16,6 +16,7 @@ import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 import type { AppLocale } from "@/src/i18n/locales";
 import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 import { getHomepageCoverageMetrics } from "@/src/lib/homepage/homepage-market-data";
+import { getHomepageDemoData } from "@/src/lib/homepage/demo-real-data";
 
 const softwareApplicationLd = {
   "@context": "https://schema.org",
@@ -72,6 +73,9 @@ export default async function HomePage() {
   const t = await getTranslations("home");
   const coverageMetrics = await getHomepageCoverageMetrics();
   const coverageByKey = Object.fromEntries(coverageMetrics.map((metric) => [metric.key, metric.value])) as Record<string, string>;
+  // Real values for the demo panels, fetched server-side (daily ISR). Only serialized data crosses to
+  // the client — the service token never leaves this server module (demo-real-data is `server-only`).
+  const demoData = await getHomepageDemoData();
 
   return (
     <>
@@ -137,9 +141,9 @@ export default async function HomePage() {
       <MarketCoverageShowcase />
       <AgentWorkflowShowcase />
       <AgentDocumentsShowcase />
-      <SourceOfTruthSectionDeferred />
+      <SourceOfTruthSectionDeferred realById={demoData.sourceOfTruth.byId} />
       <AiAgentWorkflowSection />
-      <ApiDemoSectionDeferred />
+      <ApiDemoSectionDeferred data={demoData.apiDemo} />
 
       <section className="bg-white py-14">
         <MarketingContainer>

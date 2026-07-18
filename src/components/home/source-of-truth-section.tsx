@@ -6,6 +6,7 @@ import { Copy } from "lucide-react";
 
 import { cn } from "@/src/lib/cn";
 import { HOME_SOURCE_OF_TRUTH_ITEMS } from "@/src/content/home-source-of-truth";
+import type { SourceOfTruthRealData } from "@/src/lib/homepage/demo-real-data-types";
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 
 const DEFAULT_ACTIVE_ID = "monthly_revenue";
@@ -90,7 +91,7 @@ function tokenClass(type: TokenType) {
   }
 }
 
-export function SourceOfTruthSection() {
+export function SourceOfTruthSection({ realById }: { realById?: SourceOfTruthRealData["byId"] }) {
   const t = useTranslations("home.sourceOfTruth");
   const tc = useTranslations("common");
   const [activeId, setActiveId] = useState<string>(DEFAULT_ACTIVE_ID);
@@ -108,6 +109,12 @@ export function SourceOfTruthSection() {
     () => publicItems.find((item) => item.id === activeId) ?? publicItems[0],
     [activeId, publicItems],
   );
+
+  // Real response for the active item (server-fetched, passed down). When present we show the REAL
+  // JSON + its real as_of; otherwise we fall back to the item's illustrative code with no date claim.
+  const activeReal = realById?.[activeItem.id];
+  const activeCode = activeReal?.code ?? activeItem.code;
+  const activeAsOf = activeReal?.asOf ?? "";
 
   const updateScrollState = useCallback(() => {
     const container = scrollContainerRef.current;
@@ -209,14 +216,18 @@ export function SourceOfTruthSection() {
                 <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700">{activeItem.status}</span>
                 <span className="text-slate-400">•</span>
                 <span className="font-medium tracking-tight text-slate-700">{activeItem.responseTitle}</span>
-                <span className="rounded-full bg-amber-50 px-2 py-0.5 font-medium text-amber-700 ring-1 ring-amber-200">{tc("illustrativeData")}</span>
+                {activeAsOf ? (
+                  <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700 ring-1 ring-emerald-200">{tc("realDataAsOf", { date: activeAsOf })}</span>
+                ) : (
+                  <span className="rounded-full bg-amber-50 px-2 py-0.5 font-medium text-amber-700 ring-1 ring-amber-200">{tc("illustrativeData")}</span>
+                )}
                 <span className="text-slate-400">•</span>
                 <span className="font-mono text-[11px] text-slate-500">{activeItem.responseLabel}</span>
               </div>
               <button
                 type="button"
                 aria-label={t("copyResponse")}
-                onClick={() => navigator.clipboard.writeText(activeItem.code)}
+                onClick={() => navigator.clipboard.writeText(activeCode)}
                 className="inline-flex items-center justify-center bg-transparent p-0 text-slate-400 transition-colors hover:text-slate-700"
               >
                 <Copy className="h-4 w-4" />
@@ -225,7 +236,7 @@ export function SourceOfTruthSection() {
             <div className="flex-1 bg-slate-50">
               <pre className="h-full overflow-x-auto overflow-y-auto bg-slate-50 px-4 py-3 text-xs leading-6">
                 <code>
-                  {activeItem.code.split("\n").map((line, lineIndex) => (
+                  {activeCode.split("\n").map((line, lineIndex) => (
                     <span key={`${activeItem.id}-${lineIndex}`} className="block">
                       {tokenizeJsonLine(line).map((token, tokenIndex) => (
                         <span key={`${activeItem.id}-${lineIndex}-${tokenIndex}`} className={tokenClass(token.type)}>
