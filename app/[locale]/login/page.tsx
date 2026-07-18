@@ -8,11 +8,26 @@ import { GoogleSignInButton } from "@/src/components/auth/google-sign-in-button"
 import { PasswordLoginForm } from "@/src/components/auth/password-login-form";
 import { EncryptedTextRotator, type LoginHeadlinePhrase } from "@/src/components/ui/encrypted-text-rotator";
 import { getSafeRedirectTarget } from "@/src/lib/security/safe-redirect";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
-export const metadata: Metadata = {
-  title: "登入",
-  description: "登入控制台。",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
+  const isEn = l === "en";
+  const title = isEn ? "Log In" : "登入";
+  const description = isEn ? "Log in to the console." : "登入控制台。";
+  return {
+    title,
+    description,
+    robots: { index: false, follow: false },
+    alternates: buildAlternates(l, "/login"),
+    openGraph: { title, description, locale: OG_LOCALE[l] },
+  };
+}
 
 type LoginPageProps = {
   searchParams: Promise<{ error?: string; next?: string; reset?: string }>;

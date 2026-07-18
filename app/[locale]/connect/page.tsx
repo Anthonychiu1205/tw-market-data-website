@@ -6,21 +6,32 @@ import { AlertTriangle, Lightbulb } from "lucide-react";
 import { Link } from "@/src/i18n/navigation";
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
+import type { AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
 // FRICTION-01 B-0 / §C-2 — public (white-zone) three-tier connect funnel. Reachable without login
 // (the site middleware gates only /dashboard|/billing|/usage|/settings|/account).
-export const metadata: Metadata = {
-  title: "接入你的 AI",
-  description:
-    "三層接入 TW Market Data：一句話零認證試玩、開發者 API key、消費者聊天 MCP connector。",
-  alternates: { canonical: "/connect" },
-  openGraph: {
-    title: "接入你的 AI | TW Market Data",
-    description: "一句話試玩、API key、MCP connector — 選一層開始接台股資料。",
-    url: "/connect",
-    images: [getAbsoluteUrl(siteConfig.ogImagePath)],
-  },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  const isEn = l === "en";
+  return {
+    title: isEn ? "Connect Your AI" : "接入你的 AI",
+    description: isEn
+      ? "Three ways to connect to TW Market Data: a one-line zero-auth trial, a developer API key, and a consumer chat MCP connector."
+      : "三層接入 TW Market Data：一句話零認證試玩、開發者 API key、消費者聊天 MCP connector。",
+    alternates: buildAlternates(l, "/connect"),
+    openGraph: {
+      locale: OG_LOCALE[l],
+      title: isEn ? "Connect Your AI | TW Market Data" : "接入你的 AI | TW Market Data",
+      description: isEn
+        ? "One-line trial, API key, MCP connector — pick a tier to start connecting to Taiwan stock data."
+        : "一句話試玩、API key、MCP connector — 選一層開始接台股資料。",
+      url: "/connect",
+      images: [getAbsoluteUrl(siteConfig.ogImagePath)],
+    },
+  };
+}
 
 const pasteLine = "Read https://twmarketdata.com/skill.md and connect to TW Market Data. 先用 2330 試一筆。";
 const curlLine =

@@ -6,11 +6,26 @@ import { getSession } from "@/src/auth/session";
 import { GoogleSignInButton } from "@/src/components/auth/google-sign-in-button";
 import { RegisterForm } from "@/src/components/auth/register-form";
 import { Link } from "@/src/i18n/navigation";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
-export const metadata: Metadata = {
-  title: "註冊",
-  description: "建立 TW Market Data 帳戶。",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
+  const isEn = l === "en";
+  const title = isEn ? "Sign Up" : "註冊";
+  const description = isEn ? "Create your TW Market Data account." : "建立 TW Market Data 帳戶。";
+  return {
+    title,
+    description,
+    robots: { index: false, follow: false },
+    alternates: buildAlternates(l, "/register"),
+    openGraph: { title, description, locale: OG_LOCALE[l] },
+  };
+}
 
 export default async function RegisterPage() {
   const session = await getSession();

@@ -13,7 +13,8 @@ import { buttonClass } from "@/src/components/ui/button";
 import { SourceOfTruthSectionDeferred } from "@/src/components/home/source-of-truth-section-deferred";
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
-import { EN_HOMEPAGE_READY, hreflangLanguages } from "@/src/config/i18n";
+import type { AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 import { getHomepageCoverageMetrics } from "@/src/lib/homepage/homepage-market-data";
 
 const softwareApplicationLd = {
@@ -27,31 +28,38 @@ const softwareApplicationLd = {
     "以 TWSE 上市資料為核心的台股資料 API，提供已驗證資料集並揭露 coverage 與限制，適合系統、量化研究與 AI agent workflow。",
 };
 
-export const metadata: Metadata = {
-  title: "台股資料 API 基礎設施",
-  description:
-    "TWSE-first verified Taiwan financial data API，提供已驗證資料集並明確標示 coverage window、來源與限制。",
-  alternates: {
-    canonical: "/",
-    // Reciprocal hreflang cluster with /en — only emitted once the English homepage is
-    // content-complete (EN_HOMEPAGE_READY), so we never point hreflang at a noindex draft.
-    ...(EN_HOMEPAGE_READY ? { languages: hreflangLanguages("/", "/en") } : {}),
-  },
-  openGraph: {
-    title: "台股資料 API 基礎設施 | TW Market Data",
-    description:
-      "為系統、量化研究與 AI agent financial data workflow 提供可追溯、結構一致的台股資料 API。",
-    url: "/",
-    images: [getAbsoluteUrl(siteConfig.ogImagePath)],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "台股資料 API 基礎設施 | TW Market Data",
-    description:
-      "以 TWSE 上市資料為核心的台股資料平台，公開揭露資料 coverage 與限制，支援量化研究與 AI agent workflow。",
-    images: [getAbsoluteUrl(siteConfig.ogImagePath)],
-  },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  const isEn = l === "en";
+  return {
+    title: isEn ? "Taiwan Stock Market Data API Infrastructure" : "台股資料 API 基礎設施",
+    description: isEn
+      ? "TWSE-first verified Taiwan financial data API — verified datasets with explicitly labeled coverage windows, sources, and limitations."
+      : "TWSE-first verified Taiwan financial data API，提供已驗證資料集並明確標示 coverage window、來源與限制。",
+    alternates: buildAlternates(l, "/"),
+    openGraph: {
+      title: isEn
+        ? "Taiwan Stock Market Data API Infrastructure | TW Market Data"
+        : "台股資料 API 基礎設施 | TW Market Data",
+      description: isEn
+        ? "A traceable, structurally consistent Taiwan stock data API for systems, quant research, and AI agent financial data workflows."
+        : "為系統、量化研究與 AI agent financial data workflow 提供可追溯、結構一致的台股資料 API。",
+      url: "/",
+      images: [getAbsoluteUrl(siteConfig.ogImagePath)],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: isEn
+        ? "Taiwan Stock Market Data API Infrastructure | TW Market Data"
+        : "台股資料 API 基礎設施 | TW Market Data",
+      description: isEn
+        ? "A Taiwan stock data platform centered on TWSE-listed data, publicly disclosing data coverage and limitations, for quant research and AI agent workflows."
+        : "以 TWSE 上市資料為核心的台股資料平台，公開揭露資料 coverage 與限制，支援量化研究與 AI agent workflow。",
+      images: [getAbsoluteUrl(siteConfig.ogImagePath)],
+    },
+  };
+}
 
 const PILLARS = [
   { key: "twseFirst", metricKey: "twse_first", metricFallback: "TWSE official-first" },

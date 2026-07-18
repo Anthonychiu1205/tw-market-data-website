@@ -4,12 +4,13 @@ import { notFound } from "next/navigation";
 import { BlogArticle } from "@/src/components/blog/blog-article";
 import { siteConfig } from "@/src/config/site";
 import { getAllBlogPosts, getBlogPostBySlug } from "@/src/content/blog-posts";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
 // Static (generateStaticParams), revalidated hourly — repo-driven markdown, no backend.
 export const revalidate = 3600;
 
 type BlogDetailPageProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 };
 
 function toAbsoluteUrl(pathname: string) {
@@ -25,7 +26,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: BlogDetailPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
   const post = getBlogPostBySlug(slug);
 
   if (!post) {
@@ -39,14 +41,13 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
     description: post.description,
     keywords: post.keywords,
     authors: [{ name: post.author }],
-    alternates: {
-      canonical: canonicalPath,
-    },
+    alternates: buildAlternates(l, canonicalPath),
     openGraph: {
       type: "article",
       title: post.seoTitle,
       description: post.description,
       url: canonicalPath,
+      locale: OG_LOCALE[l],
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
       authors: [post.author],

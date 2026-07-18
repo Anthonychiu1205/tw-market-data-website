@@ -6,7 +6,8 @@ import type { Metadata } from "next";
 import { AuthSessionProvider } from "@/src/components/providers/auth-session-provider";
 import { SiteShell } from "@/src/components/layout/site-shell";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
-import { HTML_LANG } from "@/src/i18n/locales";
+import { HTML_LANG, type AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 import { routing } from "@/src/i18n/routing";
 
 import "../globals.css";
@@ -28,40 +29,49 @@ const websiteLd = {
   description: "台股資料 API,為系統、量化研究與 AI agent workflow 而設計",
 };
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
-  title: {
-    default: "TW Market Data Platform | 台股資料基礎設施",
-    template: "%s | TW Market Data Platform",
-  },
-  description: siteConfig.description,
-  openGraph: {
-    title: "TW Market Data Platform",
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  return {
+    metadataBase: new URL(siteConfig.url),
+    title: {
+      default: "TW Market Data Platform | 台股資料基礎設施",
+      template: "%s | TW Market Data Platform",
+    },
     description: siteConfig.description,
-    url: siteConfig.url,
-    siteName: "TW Market Data Platform",
-    locale: "zh_TW",
-    type: "website",
-    images: [
-      {
-        url: getAbsoluteUrl(siteConfig.ogImagePath),
-        width: 1200,
-        height: 630,
-        alt: "TW Market Data",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "TW Market Data Platform",
-    description: siteConfig.description,
-    images: [getAbsoluteUrl(siteConfig.ogImagePath)],
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+    alternates: buildAlternates(l, "/"),
+    openGraph: {
+      title: "TW Market Data Platform",
+      description: siteConfig.description,
+      url: siteConfig.url,
+      siteName: "TW Market Data Platform",
+      locale: OG_LOCALE[l],
+      type: "website",
+      images: [
+        {
+          url: getAbsoluteUrl(siteConfig.ogImagePath),
+          width: 1200,
+          height: 630,
+          alt: "TW Market Data",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "TW Market Data Platform",
+      description: siteConfig.description,
+      images: [getAbsoluteUrl(siteConfig.ogImagePath)],
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
 // Pre-render both locale shells at build time (§1.6: keep pages static).
 export function generateStaticParams() {

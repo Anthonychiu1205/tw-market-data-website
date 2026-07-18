@@ -5,11 +5,28 @@ import { getTranslations } from "next-intl/server";
 import { getSession } from "@/src/auth/session";
 import { VerifyEmailForm } from "@/src/components/auth/verify-email-form";
 import { normalizeEmail } from "@/src/lib/auth/email-verification";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
-export const metadata: Metadata = {
-  title: "驗證 Email",
-  description: "輸入驗證碼啟用帳戶。",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
+  const isEn = l === "en";
+  const title = isEn ? "Verify Email" : "驗證 Email";
+  const description = isEn
+    ? "Enter your verification code to activate your account."
+    : "輸入驗證碼啟用帳戶。";
+  return {
+    title,
+    description,
+    robots: { index: false, follow: false },
+    alternates: buildAlternates(l, "/verify-email"),
+    openGraph: { title, description, locale: OG_LOCALE[l] },
+  };
+}
 
 type VerifyEmailPageProps = {
   searchParams: Promise<{ email?: string }>;

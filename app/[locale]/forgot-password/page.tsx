@@ -4,11 +4,26 @@ import { getTranslations } from "next-intl/server";
 
 import { getSession } from "@/src/auth/session";
 import { ForgotPasswordForm } from "@/src/components/auth/forgot-password-form";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
-export const metadata: Metadata = {
-  title: "忘記密碼",
-  description: "寄送重設密碼連結。",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
+  const isEn = l === "en";
+  const title = isEn ? "Forgot Password" : "忘記密碼";
+  const description = isEn ? "Send a password reset link." : "寄送重設密碼連結。";
+  return {
+    title,
+    description,
+    robots: { index: false, follow: false },
+    alternates: buildAlternates(l, "/forgot-password"),
+    openGraph: { title, description, locale: OG_LOCALE[l] },
+  };
+}
 
 export default async function ForgotPasswordPage() {
   const session = await getSession();

@@ -7,11 +7,27 @@ import { Card } from "@/src/components/ui/card";
 import { aboutSections } from "@/src/content/docs";
 import { getSourcePolicy } from "@/src/content/site";
 import type { AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
-export const metadata: Metadata = {
-  title: "關於",
-  description: "來源政策與可信任設計。",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  const isEn = l === "en";
+  const title = isEn ? "About" : "關於";
+  const description = isEn
+    ? "Source policy and trustworthy-by-design principles."
+    : "來源政策與可信任設計。";
+  return {
+    title,
+    description,
+    alternates: buildAlternates(l, "/about"),
+    openGraph: { title, description, locale: OG_LOCALE[l] },
+  };
+}
 
 export default async function AboutPage() {
   const t = await getTranslations("about");

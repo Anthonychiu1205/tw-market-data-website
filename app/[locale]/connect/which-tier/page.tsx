@@ -4,13 +4,23 @@ import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/src/i18n/navigation";
 import { Container } from "@/src/components/ui/container";
+import type { AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
 // FRICTION-01 B-0c / §C-4 — "哪一層適合我" routing guide (public).
-export const metadata: Metadata = {
-  title: "哪一層適合我",
-  description: "只想試看看走免 key、開發者走 API key、Claude.ai/ChatGPT 付費走 MCP connector。",
-  alternates: { canonical: "/connect/which-tier" },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  const isEn = l === "en";
+  return {
+    title: isEn ? "Which Tier Is Right for Me" : "哪一層適合我",
+    description: isEn
+      ? "Just exploring? Go key-free. Developers use an API key. Paid Claude.ai/ChatGPT users go through the MCP connector."
+      : "只想試看看走免 key、開發者走 API key、Claude.ai/ChatGPT 付費走 MCP connector。",
+    alternates: buildAlternates(l, "/connect/which-tier"),
+    openGraph: { locale: OG_LOCALE[l] },
+  };
+}
 
 const ROW_KEYS = ["try", "developer", "consumer"] as const;
 

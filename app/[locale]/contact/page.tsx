@@ -2,11 +2,27 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { Container } from "@/src/components/ui/container";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
-export const metadata: Metadata = {
-  title: "聯繫我們",
-  description: "企業合作、資料授權、技術支援或方案諮詢聯繫入口。",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
+  const isEn = l === "en";
+  const title = isEn ? "Contact Us" : "聯繫我們";
+  const description = isEn
+    ? "Get in touch for enterprise partnerships, data licensing, technical support, or plan inquiries."
+    : "企業合作、資料授權、技術支援或方案諮詢聯繫入口。";
+  return {
+    title,
+    description,
+    alternates: buildAlternates(l, "/contact"),
+    openGraph: { title, description, locale: OG_LOCALE[l] },
+  };
+}
 
 export default async function ContactPage() {
   const t = await getTranslations("contact");

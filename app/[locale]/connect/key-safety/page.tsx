@@ -3,13 +3,23 @@ import { getTranslations } from "next-intl/server";
 
 import { Link } from "@/src/i18n/navigation";
 import { Container } from "@/src/components/ui/container";
+import type { AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
 // FRICTION-01 B-0b / §C-3 — key safety guidance (public).
-export const metadata: Metadata = {
-  title: "為你的 AI 建一把專用 key",
-  description: "一個 agent 一把 key、可獨立撤銷、絕不貼主 key 進對話、定期輪換。",
-  alternates: { canonical: "/connect/key-safety" },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  const isEn = l === "en";
+  return {
+    title: isEn ? "Create a Dedicated Key for Your AI" : "為你的 AI 建一把專用 key",
+    description: isEn
+      ? "One key per agent, independently revocable, never paste your main key into a chat, and rotate regularly."
+      : "一個 agent 一把 key、可獨立撤銷、絕不貼主 key 進對話、定期輪換。",
+    alternates: buildAlternates(l, "/connect/key-safety"),
+    openGraph: { locale: OG_LOCALE[l] },
+  };
+}
 
 const POINT_KEYS = ["oneKeyPerAgent", "independentRevoke", "neverPasteMainKey", "rotate"] as const;
 

@@ -4,6 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { PricingShell } from "@/src/components/pricing/pricing-shell";
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
+import type { AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 import { toMajor } from "@/src/lib/billing/money";
 import { getPricingPlanViews } from "@/src/lib/billing/plans";
 
@@ -54,28 +56,35 @@ const offersLd = {
   offers: pricingOffers,
 };
 
-export const metadata: Metadata = {
-  title: "方案",
-  description:
-    "台股資料 API 方案與能力比較，採 TWSE-first verified baseline，並揭露資料 coverage 與限制。",
-  alternates: {
-    canonical: "/pricing",
-  },
-  openGraph: {
-    title: "方案價格 | TW Market Data",
-    description:
-      "比較台股 API 方案與配額，依 dataset coverage 與資料狀態規劃使用範圍。",
-    url: "/pricing",
-    images: [getAbsoluteUrl(siteConfig.ogImagePath)],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "方案價格 | TW Market Data",
-    description:
-      "台股資料 API 方案比較，支援量化研究與 AI agent financial data workflow。",
-    images: [getAbsoluteUrl(siteConfig.ogImagePath)],
-  },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  const isEn = l === "en";
+  return {
+    title: isEn ? "Pricing" : "方案",
+    description: isEn
+      ? "Taiwan stock data API plans and capability comparison — a TWSE-first verified baseline, with disclosed data coverage and limitations."
+      : "台股資料 API 方案與能力比較，採 TWSE-first verified baseline，並揭露資料 coverage 與限制。",
+    alternates: buildAlternates(l, "/pricing"),
+    openGraph: {
+      locale: OG_LOCALE[l],
+      title: isEn ? "Pricing | TW Market Data" : "方案價格 | TW Market Data",
+      description: isEn
+        ? "Compare Taiwan stock API plans and quotas, and plan your usage scope by dataset coverage and data status."
+        : "比較台股 API 方案與配額，依 dataset coverage 與資料狀態規劃使用範圍。",
+      url: "/pricing",
+      images: [getAbsoluteUrl(siteConfig.ogImagePath)],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: isEn ? "Pricing | TW Market Data" : "方案價格 | TW Market Data",
+      description: isEn
+        ? "Taiwan stock data API plan comparison, supporting quant research and AI agent financial data workflows."
+        : "台股資料 API 方案比較，支援量化研究與 AI agent financial data workflow。",
+      images: [getAbsoluteUrl(siteConfig.ogImagePath)],
+    },
+  };
+}
 
 const SELF_SERVE_CARDS = [
   { titleKey: "selfServe.instantTitle", descKey: "selfServe.instantDesc" },
