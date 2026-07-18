@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Menu, X } from "lucide-react";
 
 import { Link } from "@/src/i18n/navigation";
-import { productMegaMenuColumns } from "../../content/mega-menu-links";
+import { getProductMegaMenuColumns } from "../../content/mega-menu-links";
 import { MarketingContainer } from "../ui/marketing-container";
 import { buttonClass } from "../ui/button";
 
@@ -36,6 +36,8 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ onContactClick }: SiteHeaderProps) {
   const t = useTranslations("nav");
+  const locale = useLocale();
+  const productMegaMenuColumns = getProductMegaMenuColumns(locale === "en" ? "en" : "zh-TW");
   const [isProductsMenuOpen, setIsProductsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const hasHydratedRef = useRef(false);

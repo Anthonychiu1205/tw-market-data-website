@@ -31,6 +31,84 @@
     "decline": "拒絕",
     "acceptAll": "允許所有 cookies"
   },
+  "home": {
+    "marketPanel": {
+      "indicators": "市場指標",
+      "news": "市場新聞",
+      "viewAll": "查看全部資料",
+      "viewMore": "查看更多"
+    },
+    "hero": {
+      "title": "台股資料 API，為系統與量化流程而設計",
+      "subhead1": "為 AI agent、自動化流程與量化研究提供一致的台股資料 API。",
+      "subhead2": "以 TWSE 上市資料為核心，已驗證資料集會清楚標示 coverage window、來源與限制。"
+    },
+    "infra": {
+      "heading": "台股資料基礎設施",
+      "subheading": "從官方來源取得資料，整理成穩定、可查詢、可追溯的 API。"
+    },
+    "pillars": {
+      "twseFirst": {
+        "value": "TWSE 優先",
+        "label": "已驗證基準",
+        "description": "以上市資料為核心，逐步擴充其他市場 coverage。"
+      },
+      "lowLatency": {
+        "value": "低延遲查詢",
+        "label": "面向 API 與 agent workflow",
+        "description": "以自動化查詢與研究流程為目標，持續優化讀取體驗。"
+      },
+      "officialFirst": {
+        "value": "官方來源優先",
+        "label": "保留 lineage 與 data gaps",
+        "description": "以 TWSE、TPEx、MOPS 與官方公開來源為優先，避免來源混雜。"
+      },
+      "clearBoundary": {
+        "value": "邊界清楚",
+        "label": "不做過度宣稱",
+        "description": "不宣稱 full-market、adjusted price、survivorship-safe 或投資建議。"
+      }
+    },
+    "finalCta": {
+      "heading": "立即開始使用",
+      "body1": "從行情、財報到公司事件，快速接入台股資料 API。",
+      "body2": "註冊後即可自助選擇方案、自行建立 API key，依方案提供資料存取與使用配額。"
+    },
+    "cta": {
+      "signIn": "登入",
+      "register": "註冊"
+    },
+    "aiAgentWorkflow": {
+      "title": "AI Agent 使用流程",
+      "intro": "從任務規劃到取得可靠資料，專為 AI Agent / Quant 工作流程設計，讓資料可驗證、可追溯、可程式化使用。",
+      "step1Title": "任務理解與規劃",
+      "step1Description": "AI Agent 解析使用者問題，規劃所需資料與指標。",
+      "step2Title": "找對資料集與欄位",
+      "step2Description": "透過資料目錄與 schema，精準選擇資料集與欄位。",
+      "step3Title": "調用 API 取得資料",
+      "step3Description": "以標準化 API 取得資料，回應包含來源與 lineage。",
+      "step4Title": "驗證與品質檢查",
+      "step4Description": "檢查 freshness、來源層級與欄位完整性，確保可靠性。",
+      "step5Title": "資料處理與分析",
+      "step5Description": "進行指標計算、特徵工程或分析，產生可溯源結論。",
+      "step6Title": "輸出結果與可追溯性",
+      "step6Description": "回傳結果並保留來源、時間與 lineage，可驗證、可稽核。",
+      "footnote": "可追溯、可驗證、可程式化，適合 agent workflow。"
+    },
+    "agentWorkflowShowcase": {
+      "title": "讓 AI agent 直接讀取可追溯的台股資料",
+      "description": "將股價、財報與公告接入 agent workflow。使用一致的回應結構與 source_role / lineage，讓資料可讀也可驗證。"
+    },
+    "agentDocumentsShowcase": {
+      "title": "讓 AI agent 直接理解公告與財報內容",
+      "description": "將重大訊息、公告與財報附註轉為可分析的文字 context。讓 agent 不只讀取數值，也能理解公司實際揭露了什麼。"
+    },
+    "marketCoverage": {
+      "heading": "跨上市／上櫃股票與 ETF、權證等標的進行查詢",
+      "description": "涵蓋台股市場主要資料主題，包括股價、財報、營運指標與公司事件。支援跨股票、跨時間與多資料集查詢，讓 agent 可在單一資料層完成分析與篩選。公開定位採 TWSE-first verified baseline，不宣稱 full-market historical coverage。",
+      "exploreDatasets": "探索資料集"
+    }
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }

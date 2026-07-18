@@ -154,3 +154,11 @@ API field names, ticker symbols (e.g. `2330`).
 - **Legal disclaimer EN** (`INVESTMENT_DISCLAIMER_EN` in `src/lib/legal/disclaimer.ts`): faithful
   translation of the canonical zh non-investment-advice line; needs legal sign-off. zh string is
   unchanged (STORE-01 masters still match byte-for-byte).
+- **🔴 CLAUDE.md 鐵律 2 landmine (pre-existing, surfaced by i18n):**
+  `src/components/home/market-coverage-showcase.tsx` → `MARKET_COVERAGE_DEMO_CONFIG` renders
+  **fabricated stats on real tickers** on the homepage: `2330 台積電` with 營收成長 18.2% / 毛利率
+  53.1% / 營收 $2.89T, plus 2454/2317/2308/3711/3231 rows. This violates "禁假數字貼真實 ticker".
+  The i18n pass deliberately did NOT localize this block (translating it would entrench the fake
+  numbers into English too). **Decision needed:** replace with real values, switch to obviously-fake
+  placeholder tickers, or remove the demo — THEN localize. Until then the demo table headers
+  (股票/營收成長/毛利率/營收) stay zh on the /en site.

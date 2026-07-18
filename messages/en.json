@@ -31,6 +31,84 @@
     "decline": "Decline",
     "acceptAll": "Allow all cookies"
   },
+  "home": {
+    "marketPanel": {
+      "indicators": "Market indicators",
+      "news": "Market news",
+      "viewAll": "View all data",
+      "viewMore": "View more"
+    },
+    "hero": {
+      "title": "A Taiwan market data API built for systems and quant workflows",
+      "subhead1": "A consistent Taiwan stock data API for AI agents, automation, and quantitative research.",
+      "subhead2": "Centered on TWSE-listed data, with verified datasets that clearly state their coverage window, sources, and limits."
+    },
+    "infra": {
+      "heading": "Taiwan market data infrastructure",
+      "subheading": "Sourced from official providers and shaped into a stable, queryable, traceable API."
+    },
+    "pillars": {
+      "twseFirst": {
+        "value": "TWSE-first",
+        "label": "Verified baseline",
+        "description": "Centered on listed-market data, expanding coverage to other markets over time."
+      },
+      "lowLatency": {
+        "value": "Low-latency queries",
+        "label": "Built for API & agent workflows",
+        "description": "Tuned for automated queries and research pipelines, with a continually improved read path."
+      },
+      "officialFirst": {
+        "value": "Official-source first",
+        "label": "Lineage & data gaps preserved",
+        "description": "Prioritizes TWSE, TPEx, MOPS, and official public sources — no mixed provenance."
+      },
+      "clearBoundary": {
+        "value": "Clear boundaries",
+        "label": "No overclaiming",
+        "description": "No claims of full-market, adjusted prices, survivorship-safety, or investment advice."
+      }
+    },
+    "finalCta": {
+      "heading": "Get started",
+      "body1": "From prices and financials to corporate events, connect to the Taiwan market data API in minutes.",
+      "body2": "After signing up you can choose a plan, create your own API keys, and get data access and usage quota by plan."
+    },
+    "cta": {
+      "signIn": "Sign in",
+      "register": "Sign up"
+    },
+    "aiAgentWorkflow": {
+      "title": "AI agent workflow",
+      "intro": "From task planning to reliable data retrieval — built for AI agent and quant workflows, so data is verifiable, traceable, and programmatically usable.",
+      "step1Title": "Task understanding and planning",
+      "step1Description": "The AI agent parses the user's question and plans the required data and metrics.",
+      "step2Title": "Find the right dataset and fields",
+      "step2Description": "Use the data catalog and schema to select the exact dataset and fields.",
+      "step3Title": "Call the API to retrieve data",
+      "step3Description": "Retrieve data through a standardized API; responses include source and lineage.",
+      "step4Title": "Validation and quality checks",
+      "step4Description": "Check freshness, source tier, and field completeness to ensure reliability.",
+      "step5Title": "Data processing and analysis",
+      "step5Description": "Compute metrics, engineer features, or run analysis to produce traceable conclusions.",
+      "step6Title": "Output results with traceability",
+      "step6Description": "Return results while retaining source, timestamp, and lineage — verifiable and auditable.",
+      "footnote": "Traceable, verifiable, and programmatic — built for agent workflows."
+    },
+    "agentWorkflowShowcase": {
+      "title": "Let AI agents read traceable Taiwan stock data directly",
+      "description": "Wire prices, financials, and disclosures into your agent workflow. A consistent response structure with source_role / lineage keeps the data both readable and verifiable."
+    },
+    "agentDocumentsShowcase": {
+      "title": "Give AI agents direct understanding of filings and financial reports",
+      "description": "Turn material announcements, filings, and financial-statement notes into analyzable text context, so agents don't just read the numbers — they understand what a company actually disclosed."
+    },
+    "marketCoverage": {
+      "heading": "Query across TWSE- and TPEx-listed stocks, ETFs, warrants, and more",
+      "description": "Covers the Taiwan market's main data themes — prices, financial statements, operating metrics, and corporate events. Supports queries across stocks, time, and multiple datasets, so agents can run analysis and screening in a single data layer. Positioned publicly as a TWSE-first verified baseline; makes no claim to full-market historical coverage.",
+      "exploreDatasets": "Explore datasets"
+    }
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }
