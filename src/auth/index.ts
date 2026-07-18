@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 
 import { prisma } from "@/src/lib/auth/prisma";
@@ -38,21 +39,52 @@ const trustHost =
   process.env.NODE_ENV !== "production" ||
   isLocalhostUrl(authUrlCandidate);
 
-const providers =
-  googleClientId && googleClientSecret
+// SBX-63 dev-only login bypass — LOCAL SANDBOX ACCEPTANCE ONLY, never in production.
+// Double-gated: NODE_ENV !== "production" AND ALLOW_DEV_LOGIN === "1". ALLOW_DEV_LOGIN must live
+// ONLY in .env.local — never in .env.production or Vercel env. Depends on NO prod credentials
+// (DB upsert only). NextAuth Credentials requires JWT sessions, so the strategy below switches to
+// "jwt" when this is on (prod always stays database sessions). authorize() upserts the user by the
+// GIVEN id, so session.user.id === that id (= the Polar sandbox subscription's externalCustomerId) —
+// which solves the externalCustomerId mapping directly, no separate mapping fix needed.
+const allowDevLogin = process.env.NODE_ENV !== "production" && process.env.ALLOW_DEV_LOGIN === "1";
+
+const providers = [
+  ...(googleClientId && googleClientSecret
+    ? [Google({ clientId: googleClientId, clientSecret: googleClientSecret })]
+    : []),
+  ...(allowDevLogin
     ? [
-        Google({
-          clientId: googleClientId,
-          clientSecret: googleClientSecret,
+        Credentials({
+          id: "dev-login",
+          name: "Dev Login（本機 sandbox 驗收）",
+          credentials: {
+            email: { label: "email", type: "text" },
+            userId: { label: "userId（= sandbox sub externalId）", type: "text" },
+          },
+          async authorize(credentials) {
+            const email = String(credentials?.email ?? "").trim().toLowerCase();
+            const userId = String(credentials?.userId ?? "").trim();
+            if (!email || !userId) return null;
+            // Upsert by id so session.user.id is exactly the given id (= sandbox externalCustomerId).
+            const record = await prisma.user.upsert({
+              where: { id: userId },
+              create: { id: userId, email },
+              update: {},
+              select: { id: true, email: true, role: true },
+            });
+            return { id: record.id, email: record.email, role: record.role };
+          },
         }),
       ]
-    : [];
+    : []),
+];
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET,
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: "database",
+    // Prod always uses database sessions; dev-login(Credentials) requires JWT, so switch only then.
+    strategy: allowDevLogin ? "jwt" : "database",
   },
   // BM-9: only override the session cookie so it is sent to all first-party
   // subdomains. Do NOT touch csrfToken / any __Host- cookie (the __Host- spec forbids
@@ -92,10 +124,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       });
       return true;
     },
-    session({ session, user }) {
+    async jwt({ token, user }) {
+      // Only invoked under the jwt strategy (dev-login). Persist id/role onto the token.
+      if (user) {
+        token.id = user.id;
+        token.role = (user as { role?: string }).role ?? "user";
+      }
+      return token;
+    },
+    session({ session, user, token }) {
       if (session.user) {
-        session.user.id = user.id;
-        session.user.role = user.role ?? "user";
+        // database strategy provides `user`; jwt strategy (dev-login) provides `token`.
+        session.user.id = (user?.id ?? (token?.id as string | undefined) ?? token?.sub) as string;
+        session.user.role = (user?.role ?? (token?.role as string | undefined) ?? "user") as string;
       }
       return session;
     },
