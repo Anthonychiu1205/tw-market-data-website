@@ -3,18 +3,10 @@
 import Link from "next/link";
 import { Fragment, useMemo, useState } from "react";
 import { Download } from "lucide-react";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
 import { buttonClass } from "@/src/components/ui/button";
 import { DashboardCard } from "@/src/components/dashboard/dashboard-card";
+import { OverviewUsageChart } from "@/src/components/dashboard/overview-usage-chart";
 import type { UsageRequestsSummary, UsageSummary } from "@/src/lib/backend-adapter";
 import { trackEvent } from "@/src/lib/analytics/client";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
@@ -298,32 +290,10 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
               </button>
             </div>
           </div>
+          {/* Reuse the overview「活動與用量」smooth-line chart. It keys X on `date`, so map the
+              MM/DD label onto that field. buildMonthPoints already trims future days. */}
           <div className="mt-6 h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={dailyRequests} margin={{ top: 8, right: 8, left: -16, bottom: 4 }}>
-                <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 4" vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} axisLine={false} domain={[0, "auto"]} allowDecimals={false} width={40} />
-                <Tooltip
-                  cursor={{ fill: "#f1f5f9" }}
-                  contentStyle={{
-                    border: "1px solid #e2e8f0",
-                    borderRadius: "10px",
-                    backgroundColor: "#ffffff",
-                    fontSize: "12px",
-                    color: "#334155",
-                  }}
-                  formatter={(value) => {
-                    const rawValue = Array.isArray(value) ? value[0] : value;
-                    const numericValue = typeof rawValue === "number" ? rawValue : Number(rawValue ?? 0);
-                    const safeValue = Number.isFinite(numericValue) ? numericValue : 0;
-                    return [safeValue.toLocaleString(), "請求數"];
-                  }}
-                  labelFormatter={(label) => `日期 ${label}`}
-                />
-                <Bar dataKey="requests" fill="#334155" radius={[3, 3, 0, 0]} maxBarSize={22} />
-              </BarChart>
-            </ResponsiveContainer>
+            <OverviewUsageChart data={dailyRequests.map((point) => ({ date: point.label, requests: point.requests }))} />
           </div>
         </DashboardCard>
 
