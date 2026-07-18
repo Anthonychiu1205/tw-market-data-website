@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 import { DocsLayout } from "@/src/components/docs/docs-layout";
 import { SectionHeading } from "@/src/components/docs/section-heading";
@@ -11,22 +12,24 @@ export const metadata: Metadata = {
   description: "來源政策與可信任設計。",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const t = await getTranslations("about");
+
   return (
     <DocsLayout
-      title="信任與來源政策"
-      description="台股資料平台的來源原則與可追溯設計。"
+      title={t("title")}
+      description={t("description")}
       sections={aboutSections}
     >
       <Card className="fade-in">
-        <SectionHeading id="trust-model">信任模型</SectionHeading>
+        <SectionHeading id="trust-model">{t("trustModel.heading")}</SectionHeading>
         <p className="mt-3 text-sm leading-7 text-slate-600">
-          以 canonical、fallback、helper 分層，避免來源混用；回應保留 lineage 與 freshness。
+          {t("trustModel.body")}
         </p>
       </Card>
 
       <Card className="fade-in">
-        <SectionHeading id="source-policy">來源政策</SectionHeading>
+        <SectionHeading id="source-policy">{t("sourcePolicy.heading")}</SectionHeading>
         <div className="mt-3 grid gap-2">
           {sourcePolicy.map((line) => (
             <p key={line} className="rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
@@ -37,9 +40,9 @@ export default function AboutPage() {
       </Card>
 
       <Card className="fade-in">
-        <SectionHeading id="why-us">為什麼是這個產品</SectionHeading>
+        <SectionHeading id="why-us">{t("whyUs.heading")}</SectionHeading>
         <p className="mt-3 text-sm leading-7 text-slate-600">
-          對研究、量化與開發流程來說，重點不是抓到資料，而是資料可追溯、可驗證、可持續交付。
+          {t("whyUs.body")}
         </p>
       </Card>
     </DocsLayout>

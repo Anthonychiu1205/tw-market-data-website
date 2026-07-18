@@ -150,6 +150,29 @@ canonical terms in the glossary below.
 `TW Market Data`, `TWMD`, `TWSE`, `TPEx`, `MCP`, `OHLCV`, dataset `slug`s, `as_of`, `data_gaps`,
 API field names, ticker symbols (e.g. `2330`).
 
+## 5.0 Progress ledger (I18N-01)
+
+**Done (bilingual, tsc-verified, committed):**
+- Infra: next-intl + `app/[locale]` migration + `proxy.ts` locale/auth merge (PR #81).
+- Chrome: header, footer, contact-modal, cookie-banner; legal disclaimer EN selector.
+- Home: homepage body + hero + all `home/*` sections + all `home/*` demos (chrome only) + mega-menu content data.
+- Pricing: page + shell + comparison table (plan-card copy deferred — see §5.1).
+- Public pages: contact, about, product, refund.
+
+**Remaining content-data files (need `*_en` fields + locale selector, spec §1.6):**
+- `src/content/site.ts` — `platformCapabilities` (product page).
+- about-page content data (`aboutSections`, `sourcePolicy`).
+- `src/content/help-center.ts` (349) — faq / help / help-center cluster (+ `help-center-shell`).
+- `src/content/datasets.ts` (337) — dataset catalog EN prose (~18 fields × 10 datasets) — dedicated phase.
+- `src/content/answer-pages.ts` (458), `src/content/blog-posts.tsx` (220), `src/content/docs-*` (esp. `docs-pages.ts` **12,149 lines**), `src/content/dashboard.ts` (146, PR3).
+- Landmine demo files (home-source-of-truth.ts etc.) — blocked on owner decision (§5).
+
+**Remaining component clusters:** docs/* (12), auth/* (6), blog/* (3), datasets/* (2), help/* (1), dashboard/* (20, PR3).
+
+**Remaining page bodies:** terms, privacy, compare, connect (+which-tier/key-safety), answers (+[slug]), blog (+[slug]), login/register/verify-email/forgot/reset, datasets (+[slug]), docs (+[...slug]), faq/help/help-center.
+
+**Remaining cross-cutting:** page `metadata`/`generateMetadata` + hreflang/canonical/JSON-LD/`sitemap.ts`/`robots.ts` (PR4 SEO); missing-page fallback + missing-key telemetry (PR4).
+
 ## 5.1 Deferred: billing-SSOT copy localization (`plans.ts`)
 `src/lib/billing/plans.ts` holds plan-card **display copy** in zh: `summary`, `highlights[].text`,
 `ctaLabel`, and `datasetLimit` for all 6 tiers (+ `getRequestLimitLabel`, `formatPlanPrice` fallback

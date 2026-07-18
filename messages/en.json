@@ -200,6 +200,60 @@
       "month1": "1 month"
     }
   },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "Contact us",
+    "intro": "For enterprise partnerships, data licensing, technical support, or plan questions, email us:"
+  },
+  "about": {
+    "title": "Trust & source policy",
+    "description": "Source principles and traceable design for the Taiwan-stock data platform.",
+    "trustModel": {
+      "heading": "Trust model",
+      "body": "Layered as canonical, fallback, and helper to avoid mixing sources; responses retain lineage and freshness."
+    },
+    "sourcePolicy": {
+      "heading": "Source policy"
+    },
+    "whyUs": {
+      "heading": "Why this product",
+      "body": "For research, quant, and development workflows, what matters isn't just getting the data — it's that the data is traceable, verifiable, and continuously deliverable."
+    }
+  },
+  "product": {
+    "eyebrow": "Product",
+    "title": "TWSE-first verified data API product",
+    "lead": "The current public positioning is a TWSE-first verified baseline; TPEx historical coverage and the full-market claim remain managed as deferred / blocked.",
+    "codeWindowTitle": "Product surface",
+    "verifiedHeading": "Verified baseline / publicly claimable",
+    "deferredHeading": "Deferred / blocked claims",
+    "gettingStarted": {
+      "heading": "Getting started",
+      "body": "Start with the Quickstart and the docs, then integrate from a verified baseline dataset. Treat each dataset's coverage/status notes as the source of truth for any data claim.",
+      "quickstartLink": "Open the Quickstart",
+      "docsLink": "View the docs"
+    }
+  },
+  "refund": {
+    "title": "Refund Policy",
+    "intro": "This policy explains the refund principles for TW Market Data subscriptions and digital services, and serves as important reference before subscribing and paying.",
+    "section1Title": "1. Nature of digital services",
+    "section1Body1": "This service is a digital-content and API subscription service; once activated, you can access the platform features and data.",
+    "section1Body2": "Because digital services are delivered instantly, the return model for ordinary physical goods does not, as a rule, apply.",
+    "section2Title": "2. General refund principle",
+    "section2Body1": "Except as otherwise provided in this policy, subscription fees or usage fees already collected are, as a rule, non-refundable.",
+    "section2Body2": "If you do not wish to renew, please cancel your subscription before the next billing cycle.",
+    "section3Title": "3. Exceptions",
+    "section3Body1": "If a major platform system error renders a paid service unusable within a reasonable period, you may submit a refund request.",
+    "section3Body2": "We will review each case on its actual circumstances and may provide a full or partial refund, or equivalent-value service compensation.",
+    "section3Body3": "Whether an exceptional refund condition is met is determined by our review results and system records.",
+    "section4Title": "4. Cancelling your subscription",
+    "section4Body1": "You may cancel your subscription at any time through your account or the subscription management flow.",
+    "section5Title": "5. Contact",
+    "section5Body1": "To request a refund or ask about billing questions, please contact us via the contact page.",
+    "section5EmailLabel": "Email: ",
+    "section5ContactLabel": "Contact page: "
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }

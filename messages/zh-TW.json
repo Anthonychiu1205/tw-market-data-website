@@ -200,6 +200,60 @@
       "month1": "1 個月"
     }
   },
+  "contact": {
+    "eyebrow": "Contact",
+    "title": "聯繫我們",
+    "intro": "企業合作、資料授權、技術支援或方案諮詢，請來信："
+  },
+  "about": {
+    "title": "信任與來源政策",
+    "description": "台股資料平台的來源原則與可追溯設計。",
+    "trustModel": {
+      "heading": "信任模型",
+      "body": "以 canonical、fallback、helper 分層，避免來源混用；回應保留 lineage 與 freshness。"
+    },
+    "sourcePolicy": {
+      "heading": "來源政策"
+    },
+    "whyUs": {
+      "heading": "為什麼是這個產品",
+      "body": "對研究、量化與開發流程來說，重點不是抓到資料，而是資料可追溯、可驗證、可持續交付。"
+    }
+  },
+  "product": {
+    "eyebrow": "產品",
+    "title": "TWSE-first verified 資料 API 產品",
+    "lead": "目前公開定位為 TWSE-first verified baseline；TPEx 歷史覆蓋與 full-market claim 仍採 deferred / blocked 管理。",
+    "codeWindowTitle": "產品面向",
+    "verifiedHeading": "Verified baseline / 可公開主張",
+    "deferredHeading": "Deferred / blocked claims",
+    "gettingStarted": {
+      "heading": "開始使用",
+      "body": "建議先閱讀 Quickstart 與文件，再從 verified baseline dataset 開始整合。所有資料主張請以各 dataset coverage/status 註記為準。",
+      "quickstartLink": "前往 Quickstart",
+      "docsLink": "查看文件"
+    }
+  },
+  "refund": {
+    "title": "退款政策",
+    "intro": "本政策說明 TW Market Data 訂閱與數位服務之退款原則，作為訂閱與付款前的重要參考。",
+    "section1Title": "一、數位服務性質",
+    "section1Body1": "本服務屬於數位內容與 API 訂閱服務，開通後即可存取平台功能與資料。",
+    "section1Body2": "由於數位服務具即時交付特性，原則上不適用一般實體商品退貨模式。",
+    "section2Title": "二、一般退款原則",
+    "section2Body1": "除本政策另有規定外，已收取之訂閱費用或使用費用原則上不提供退款。",
+    "section2Body2": "若您不希望續訂，請於下一計費週期前取消訂閱。",
+    "section3Title": "三、例外情況",
+    "section3Body1": "若因平台重大系統錯誤，導致已付款服務在合理期間內無法使用，得提出退款申請。",
+    "section3Body2": "我們將依實際情況審核，可能提供全額或部分退款，或等值服務補償。",
+    "section3Body3": "是否符合例外退款條件，以我們審核結果與系統紀錄為準。",
+    "section4Title": "四、取消訂閱",
+    "section4Body1": "您可隨時於帳戶或訂閱管理流程取消訂閱。",
+    "section5Title": "五、聯絡方式",
+    "section5Body1": "如需申請退款或詢問帳務問題，請透過聯絡頁面與我們聯繫。",
+    "section5EmailLabel": "電子郵件：",
+    "section5ContactLabel": "聯絡頁面："
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }
