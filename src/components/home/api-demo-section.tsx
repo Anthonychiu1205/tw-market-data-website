@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
@@ -9,10 +10,10 @@ type EndpointId = "monthlyRevenue" | "twseDailyPrice" | "incomeStatement" | "tec
 type CodeLanguage = "python" | "typescript" | "curl";
 
 const endpointOptions = [
-  { id: "monthlyRevenue", label: "月營收", path: "/v2/datasets/monthly-revenue", dataset: "monthly_revenue" },
-  { id: "twseDailyPrice", label: "TWSE 日線價格", path: "/v2/datasets/twse-daily-price", dataset: "twse_daily_price" },
-  { id: "incomeStatement", label: "財報損益表", path: "/v2/datasets/income-statement", dataset: "income_statement" },
-  { id: "technicalIndicators", label: "技術指標", path: "/v2/datasets/technical-indicators", dataset: "technical_indicators" },
+  { id: "monthlyRevenue", labelKey: "endpoints.monthlyRevenue", path: "/v2/datasets/monthly-revenue", dataset: "monthly_revenue" },
+  { id: "twseDailyPrice", labelKey: "endpoints.twseDailyPrice", path: "/v2/datasets/twse-daily-price", dataset: "twse_daily_price" },
+  { id: "incomeStatement", labelKey: "endpoints.incomeStatement", path: "/v2/datasets/income-statement", dataset: "income_statement" },
+  { id: "technicalIndicators", labelKey: "endpoints.technicalIndicators", path: "/v2/datasets/technical-indicators", dataset: "technical_indicators" },
 ] as const;
 
 const tickerOptions = [
@@ -196,6 +197,7 @@ function DemoSelect({
 }
 
 export function ApiDemoSection() {
+  const t = useTranslations("home.apiDemo");
   const [draftEndpointId, setDraftEndpointId] = useState<EndpointId>("monthlyRevenue");
   const [draftTicker, setDraftTicker] = useState("2330");
   const [activeEndpointId, setActiveEndpointId] = useState<EndpointId>("monthlyRevenue");
@@ -212,8 +214,8 @@ export function ApiDemoSection() {
   const activeTickerMeta = tickerOptions.find((item) => item.value === activeTicker) ?? tickerOptions[0];
 
   const endpointSelectOptions = useMemo(
-    () => endpointOptions.map((option) => ({ value: option.id, label: option.label })),
-    []
+    () => endpointOptions.map((option) => ({ value: option.id, label: t(option.labelKey) })),
+    [t]
   );
   const tickerSelectOptions = useMemo(
     () => tickerOptions.map((option) => ({ value: option.value, label: option.label })),
@@ -278,17 +280,17 @@ export function ApiDemoSection() {
     <section className="bg-white py-24">
       <MarketingContainer>
         <div className="mb-12">
-          <h2 className="text-3xl font-semibold tracking-tight text-slate-950">乾淨、直接的台股資料 API</h2>
+          <h2 className="text-3xl font-semibold tracking-tight text-slate-950">{t("heading")}</h2>
           <p className="mt-3 max-w-[900px] text-lg leading-8 text-slate-600">
-            用一致的 endpoint 與回應格式，快速把行情、財報、營收與事件資料接進你的系統。
+            {t("description")}
           </p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="min-h-[460px] rounded-[2rem] border border-slate-200/60 bg-slate-50/80 p-8">
             <div className="relative z-20 mb-10 grid gap-4 md:grid-cols-[1.2fr_0.8fr_auto]">
-              <DemoSelect label="Endpoint" value={draftEndpointId} options={endpointSelectOptions} onChange={(value) => setDraftEndpointId(value as EndpointId)} />
-              <DemoSelect label="Ticker" value={draftTicker} options={tickerSelectOptions} onChange={setDraftTicker} />
+              <DemoSelect label={t("fields.endpoint")} value={draftEndpointId} options={endpointSelectOptions} onChange={(value) => setDraftEndpointId(value as EndpointId)} />
+              <DemoSelect label={t("fields.ticker")} value={draftTicker} options={tickerSelectOptions} onChange={setDraftTicker} />
               <div className="md:self-end">
                 <button
                   type="button"
@@ -298,7 +300,7 @@ export function ApiDemoSection() {
                 >
                   <span className="inline-flex items-center gap-2">
                     {isRunning ? <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" /> : null}
-                    {isRunning ? "Running" : "Run"}
+                    {isRunning ? t("running") : t("run")}
                   </span>
                 </button>
               </div>
@@ -326,18 +328,18 @@ export function ApiDemoSection() {
           <div className="min-h-[460px] rounded-[2rem] border border-slate-200/60 bg-slate-50/80 p-8">
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
-                <span className="tracking-[0.08em]">RESPONSE</span>
+                <span className="tracking-[0.08em]">{t("response")}</span>
                 <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-emerald-700">200 OK</span>
                 <span>
                   {activeTickerMeta.symbol} {activeTickerMeta.name}
                 </span>
-                <span>{activeEndpointMeta.label}</span>
+                <span>{t(activeEndpointMeta.labelKey)}</span>
               </div>
             </div>
 
             {isRunning && visibleLineCount === 0 ? (
               <div className="space-y-3 pt-2">
-                <p className="text-sm text-slate-500">正在產生回應...</p>
+                <p className="text-sm text-slate-500">{t("generating")}</p>
                 <div className="h-3 w-32 animate-pulse rounded-full bg-slate-200" />
                 <div className="h-3 w-56 animate-pulse rounded-full bg-slate-200" />
                 <div className="h-3 w-44 animate-pulse rounded-full bg-slate-200" />

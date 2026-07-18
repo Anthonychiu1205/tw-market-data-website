@@ -154,11 +154,26 @@ API field names, ticker symbols (e.g. `2330`).
 - **Legal disclaimer EN** (`INVESTMENT_DISCLAIMER_EN` in `src/lib/legal/disclaimer.ts`): faithful
   translation of the canonical zh non-investment-advice line; needs legal sign-off. zh string is
   unchanged (STORE-01 masters still match byte-for-byte).
-- **🔴 CLAUDE.md 鐵律 2 landmine (pre-existing, surfaced by i18n):**
-  `src/components/home/market-coverage-showcase.tsx` → `MARKET_COVERAGE_DEMO_CONFIG` renders
-  **fabricated stats on real tickers** on the homepage: `2330 台積電` with 營收成長 18.2% / 毛利率
-  53.1% / 營收 $2.89T, plus 2454/2317/2308/3711/3231 rows. This violates "禁假數字貼真實 ticker".
-  The i18n pass deliberately did NOT localize this block (translating it would entrench the fake
-  numbers into English too). **Decision needed:** replace with real values, switch to obviously-fake
-  placeholder tickers, or remove the demo — THEN localize. Until then the demo table headers
-  (股票/營收成長/毛利率/營收) stay zh on the /en site.
+- **🔴 CLAUDE.md 鐵律 2 — SYSTEMIC homepage-demo landmine (pre-existing, surfaced by i18n).**
+  The entire homepage demo layer renders **fabricated numbers dressed as real API output on real
+  Taiwan tickers** — "禁假數字貼真實 ticker". Four files, all on the public homepage:
+  1. `src/components/home/market-coverage-showcase.tsx` → `MARKET_COVERAGE_DEMO_CONFIG`:
+     `2330 台積電` 營收成長 18.2% / 毛利率 53.1% / $2.89T, plus 2454/2317/2308/3711/3231.
+  2. `src/components/home/agent-workflow-demo.tsx` → `DEFAULT_CONFIG`: `2330 台積電` full income
+     statement (營收 $2,894.3B / 毛利率 52.4% / etc., 2020–2024 columns).
+  3. `src/content/home-source-of-truth.ts` (rendered by `source-of-truth-section.tsx`): `2330`
+     across **7 sample datasets** (monthly_revenue, twse_daily_price OHLCV, income_statement,
+     technical_indicators, valuation_data, institutional_flow) + `1101 台泥` day-trading-suspension.
+  4. `src/components/home/api-demo-section.tsx` → `buildMockResponse`: fabricated financials for
+     `2330 / 2317 / 2454 / 2308` across monthly_revenue, twse_daily_price, income_statement,
+     technical_indicators.
+  The i18n pass deliberately did NOT localize any of these demo-data blocks (translating them would
+  entrench the fabricated numbers into English too). **Owner decision needed** before localizing:
+  per file — (a) wire to real sourced values, (b) switch to obviously-fake placeholder tickers
+  (e.g. `0000 DEMO CO`), or (c) remove the demo. Until then their in-demo zh labels stay zh on /en.
+- **Pricing comparison-table SSOT duplication (鐵律 1, pre-existing):**
+  `src/components/pricing/pricing-shell.tsx` hardcodes `QUOTA_ROWS` prices/RPM/included-requests
+  ($2,000/$200/$100/$20; 12,000/3,000/1,200/300/60 RPM; 3,000,000/300,000/… included) that
+  duplicate `plans.ts` (the pricing CARDS derive the same numbers from that SSOT via
+  `getPricingPlanViews`). If `plans.ts` changes, the comparison table drifts. Not an i18n issue, but
+  surfaced during the pricing conversion — recommend deriving the table rows from the plan SSOT too.

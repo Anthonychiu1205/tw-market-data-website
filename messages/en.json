@@ -107,6 +107,37 @@
       "heading": "Query across TWSE- and TPEx-listed stocks, ETFs, warrants, and more",
       "description": "Covers the Taiwan market's main data themes — prices, financial statements, operating metrics, and corporate events. Supports queries across stocks, time, and multiple datasets, so agents can run analysis and screening in a single data layer. Positioned publicly as a TWSE-first verified baseline; makes no claim to full-market historical coverage.",
       "exploreDatasets": "Explore datasets"
+    },
+    "agentWorkflowDemo": {
+      "copyResult": "Copy result"
+    },
+    "apiDemo": {
+      "heading": "Clean, direct Taiwan stock market data API",
+      "description": "Consistent endpoints and response formats to quickly integrate market quotes, financial statements, revenue, and event data into your systems.",
+      "fields": {
+        "endpoint": "Endpoint",
+        "ticker": "Ticker"
+      },
+      "run": "Run",
+      "running": "Running",
+      "response": "RESPONSE",
+      "generating": "Generating response...",
+      "endpoints": {
+        "monthlyRevenue": "Monthly revenue",
+        "twseDailyPrice": "TWSE daily price",
+        "incomeStatement": "Income statement",
+        "technicalIndicators": "Technical indicators"
+      }
+    },
+    "sourceOfTruth": {
+      "heading": "A single trusted source of truth",
+      "description": "Sample data topics currently at the public boundary. The public scope uses a TWSE-first verified baseline; TPEx historical coverage, adjusted prices, and a survivorship-safe universe remain deferred / in-progress.",
+      "copyResponse": "Copy example response"
+    },
+    "agentDocumentsDemo": {
+      "pulling": "Agent: pulling company filings and financial notes",
+      "extracting": "Agent: extracting key passages",
+      "complete": "Agent: analysis complete."
     }
   },
   "common": {

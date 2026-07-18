@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { cn } from "@/src/lib/cn";
@@ -136,6 +137,7 @@ const TIMING_SCALE = 0.65;
 const scaleMs = (ms: number) => Math.round(ms * TIMING_SCALE);
 
 export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemoProps) {
+  const t = useTranslations("home.agentWorkflowDemo");
   const { elementRef, isVisible } = useReplayOnVisible<HTMLDivElement>({
     threshold: 0.4,
     rootMargin: "0px 0px -8% 0px",
@@ -334,7 +336,7 @@ export function AgentWorkflowDemo({ config = DEFAULT_CONFIG }: AgentWorkflowDemo
         <span>{config.completionLabel}</span>
         <button
           type="button"
-          aria-label="複製結果"
+          aria-label={t("copyResult")}
           className="ml-auto inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
         >
           <CopyIcon />
