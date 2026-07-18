@@ -4,6 +4,7 @@ import { test } from "node:test";
 import {
   isNotFoundError,
   isOrderOwnedByUser,
+  isPolarCustomerMissing,
   mapPolarOrder,
   mapPolarPaymentMethod,
   mapPolarSubscription,
@@ -141,6 +142,23 @@ test("isNotFoundError detects only a 404 (so missing order == not-yours order â†
   assert.equal(isNotFoundError(new Error("boom")), false);
   assert.equal(isNotFoundError(null), false);
   assert.equal(isNotFoundError(undefined), false);
+});
+
+test("isPolarCustomerMissing detects the no-customer error, not generic failures", () => {
+  // The real Polar shape: 422 PolarRequestValidationError "Customer does not exist." (in body).
+  assert.equal(
+    isPolarCustomerMissing({
+      statusCode: 422,
+      body: '{"error":"PolarRequestValidationError","detail":[{"msg":"Customer does not exist.","loc":["body","external_customer_id"]}]}',
+    }),
+    true,
+  );
+  assert.equal(isPolarCustomerMissing({ statusCode: 404, message: "Customer does not exist." }), true);
+  // Generic failures must NOT be treated as no-customer (so they don't hide a real outage).
+  assert.equal(isPolarCustomerMissing({ statusCode: 500, body: "Internal error" }), false);
+  assert.equal(isPolarCustomerMissing({ statusCode: 422, body: "some other validation error" }), false);
+  assert.equal(isPolarCustomerMissing(new Error("network down")), false);
+  assert.equal(isPolarCustomerMissing(null), false);
 });
 
 test("isOrderOwnedByUser gates order access strictly (blocks cross-account)", () => {
