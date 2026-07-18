@@ -4,8 +4,8 @@ import Link from "next/link";
 import { Fragment, useMemo, useState } from "react";
 import { Download } from "lucide-react";
 import {
-  Area,
-  AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
@@ -44,12 +44,12 @@ function formatTimestamp(raw: string) {
   if (!raw || raw === "-") return "-";
   const date = new Date(raw);
   if (Number.isNaN(date.getTime())) return raw;
-  return date.toLocaleString("en-US", {
-    hour12: true,
+  return date.toLocaleString("zh-TW", {
+    hour12: false,
     year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
   });
@@ -72,6 +72,10 @@ function monthLabel(key: string) {
 function buildMonthPoints(monthKey: string, rows: UsageRequestsSummary["rows"]): DailyRequestPoint[] {
   const [year, month] = monthKey.split("-").map(Number);
   const daysInMonth = new Date(year, month, 0).getDate();
+  // Don't plot future days: for the current month stop at today; past months show all days.
+  const now = new Date();
+  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth() + 1;
+  const lastDay = isCurrentMonth ? Math.min(daysInMonth, now.getDate()) : daysInMonth;
   const dailyCount = new Map<string, number>();
 
   for (const row of rows) {
@@ -84,7 +88,7 @@ function buildMonthPoints(monthKey: string, rows: UsageRequestsSummary["rows"]):
     dailyCount.set(dateKey, (dailyCount.get(dateKey) ?? 0) + 1);
   }
 
-  return Array.from({ length: daysInMonth }, (_, index) => {
+  return Array.from({ length: lastDay }, (_, index) => {
     const day = `${index + 1}`.padStart(2, "0");
     const dateKey = `${monthKey}-${day}`;
     return {
@@ -296,18 +300,12 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
           </div>
           <div className="mt-6 h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={dailyRequests} margin={{ top: 8, right: 8, left: -16, bottom: 4 }}>
-                <defs>
-                  <linearGradient id="dailyRequestsFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#64748b" stopOpacity={0.14} />
-                    <stop offset="100%" stopColor="#64748b" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
+              <BarChart data={dailyRequests} margin={{ top: 8, right: 8, left: -16, bottom: 4 }}>
                 <CartesianGrid stroke="#e2e8f0" strokeDasharray="3 4" vertical={false} />
                 <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} axisLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} tickLine={false} axisLine={false} domain={[0, "auto"]} allowDecimals={false} width={40} />
                 <Tooltip
-                  cursor={{ stroke: "#94a3b8", strokeWidth: 1, strokeDasharray: "4 4" }}
+                  cursor={{ fill: "#f1f5f9" }}
                   contentStyle={{
                     border: "1px solid #e2e8f0",
                     borderRadius: "10px",
@@ -323,16 +321,8 @@ export function UsagePageShell({ usageRequests, usageSummary, creditState, credi
                   }}
                   labelFormatter={(label) => `日期 ${label}`}
                 />
-                <Area
-                  type="monotone"
-                  dataKey="requests"
-                  stroke="#1f2937"
-                  strokeWidth={1.8}
-                  fill="url(#dailyRequestsFill)"
-                  dot={{ r: 2.5, strokeWidth: 0, fill: "#334155" }}
-                  activeDot={{ r: 3.5, fill: "#111827" }}
-                />
-              </AreaChart>
+                <Bar dataKey="requests" fill="#334155" radius={[3, 3, 0, 0]} maxBarSize={22} />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </DashboardCard>
