@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, Loader2, Trash2 } from "lucide-react";
 
 import type { ApiKeyItem } from "@/src/lib/backend-adapter";
@@ -62,6 +62,20 @@ async function copyToClipboard(text: string): Promise<boolean> {
   }
 }
 
+// The full sk_live_ is never in the DOM — copying reveals it on demand via this endpoint
+// (1 round-trip, backend may mint a token + reveal). Shared by click and hover-prefetch.
+async function revealSecret(itemId: string): Promise<{ secret?: string; error?: string }> {
+  const response = await fetch(`/api/dashboard/api-keys/${encodeURIComponent(itemId)}/secret`, {
+    method: "GET",
+    cache: "no-store",
+  });
+  const payload = (await response.json().catch(() => null)) as { secret?: string; error?: string } | null;
+  if (!response.ok || !payload?.secret) {
+    return { error: payload?.error ?? "copy_failed" };
+  }
+  return { secret: payload.secret };
+}
+
 function formatDateTime(raw: string | null | undefined) {
   if (!raw || raw === "-") return "尚未使用";
   const date = new Date(raw);
@@ -96,6 +110,16 @@ export function ApiKeysManager({
   const [showRevoked, setShowRevoked] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const toastCounterRef = useRef(0);
+  // Prefetched full secrets — MEMORY ONLY (never localStorage/sessionStorage), cleared on unmount.
+  const prefetchedSecretsRef = useRef<Map<string, string>>(new Map());
+  const prefetchingRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    const cache = prefetchedSecretsRef.current;
+    return () => {
+      cache.clear();
+    };
+  }, []);
 
   const activeKeys = useMemo(() => keys.filter((item) => item.status !== "revoked"), [keys]);
   const revokedCount = keys.length - activeKeys.length;
@@ -276,54 +300,78 @@ export function ApiKeysManager({
     }
   }
 
+  // Warm the secret on hover/focus so the click can write clipboard instantly. Best-effort:
+  // any failure is swallowed — the click falls back to the normal reveal path, copy never breaks.
+  function prefetchSecret(item: ApiKeyItem) {
+    if (item.status === "revoked") return;
+    if (prefetchedSecretsRef.current.has(item.id) || prefetchingRef.current.has(item.id)) return;
+    prefetchingRef.current.add(item.id);
+    void revealSecret(item.id)
+      .then((result) => {
+        if (result.secret) prefetchedSecretsRef.current.set(item.id, result.secret);
+      })
+      .catch(() => {
+        /* silent — click will reveal */
+      })
+      .finally(() => {
+        prefetchingRef.current.delete(item.id);
+      });
+  }
+
+  function onCopySuccess(item: ApiKeyItem) {
+    setCopiedKeyId(item.id);
+    void trackEvent(
+      {
+        event: "api_key_copied",
+        properties: { keyId: item.id, keyName: item.name },
+        context: { source: "client", page: "/dashboard?section=api-keys" },
+      },
+      { dedupeKey: `api-key-copied:${item.id}`, dedupeMs: 2000 },
+    );
+    pushToast("API key 已複製到剪貼簿");
+    window.setTimeout(() => {
+      setCopiedKeyId((prev) => (prev === item.id ? null : prev));
+    }, 1200);
+  }
+
   async function handleCopy(item: ApiKeyItem) {
     if (item.status === "revoked" || copyingId) return;
-
     setErrorMessage(null);
+
+    // Fast path: hover/focus already revealed the secret → write clipboard with NO fetch await
+    // before writeText, so the user-gesture survives (fixes Safari NotAllowedError) and it's instant.
+    const prefetched = prefetchedSecretsRef.current.get(item.id);
+    if (prefetched) {
+      const copied = await copyToClipboard(prefetched);
+      if (copied) {
+        onCopySuccess(item);
+        return;
+      }
+      // clipboard write failed — fall through to the full reveal path below
+    }
+
     setCopyingId(item.id);
-
     try {
-      const response = await fetch(`/api/dashboard/api-keys/${encodeURIComponent(item.id)}/secret`, {
-        method: "GET",
-        cache: "no-store",
-      });
-
-      const payload = (await response.json().catch(() => null)) as { secret?: string; error?: string } | null;
-
-      if (!response.ok || !payload?.secret) {
-        if (payload?.error === "secret_unavailable") {
+      const result = await revealSecret(item.id);
+      if (!result.secret) {
+        if (result.error === "secret_unavailable") {
           // Only hash-only keys (no retrievable raw) can't be re-copied — regenerate to get one.
           setErrorMessage("此金鑰無法再次複製，請重新產生以取得可複製版本。");
           return;
         }
-        if (payload?.error === "api_key_revoked") {
+        if (result.error === "api_key_revoked") {
           setErrorMessage("已撤銷的金鑰無法複製。");
           return;
         }
         throw new Error("copy_failed");
       }
-
-      const copied = await copyToClipboard(payload.secret);
+      prefetchedSecretsRef.current.set(item.id, result.secret);
+      const copied = await copyToClipboard(result.secret);
       if (!copied) {
         setErrorMessage("無法寫入剪貼簿，請手動複製或檢查瀏覽器權限。");
         return;
       }
-      setCopiedKeyId(item.id);
-      void trackEvent(
-        {
-          event: "api_key_copied",
-          properties: {
-            keyId: item.id,
-            keyName: item.name,
-          },
-          context: { source: "client", page: "/dashboard?section=api-keys" },
-        },
-        { dedupeKey: `api-key-copied:${item.id}`, dedupeMs: 2000 },
-      );
-      pushToast("API key 已複製到剪貼簿");
-      window.setTimeout(() => {
-        setCopiedKeyId((prev) => (prev === item.id ? null : prev));
-      }, 1200);
+      onCopySuccess(item);
     } catch {
       setErrorMessage("無法複製金鑰，請稍後再試或檢查瀏覽器權限。");
     } finally {
@@ -393,6 +441,8 @@ export function ApiKeysManager({
                         <button
                           type="button"
                           onClick={() => void handleCopy(item)}
+                          onMouseEnter={() => prefetchSecret(item)}
+                          onFocus={() => prefetchSecret(item)}
                           disabled={copyDisabled || isCopying}
                           className={cn(
                             "inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-transparent text-slate-500 transition duration-150 ease-out hover:border-slate-200 hover:bg-slate-100 hover:text-slate-700 active:scale-95 active:opacity-80",
