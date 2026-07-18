@@ -32,3 +32,21 @@ export function buildAlternates(locale: AppLocale, pathname: string): Metadata["
     },
   };
 }
+
+/**
+ * Locale-aware metadata for PRIVATE / behind-auth pages (dashboard, billing, usage, admin). These are
+ * noindex — robots.ts already disallows them — so there is no hreflang/canonical cluster; only the
+ * localized <title>/description need to follow the URL locale (fix for /en/dashboard showing a zh title).
+ */
+export function privatePageMetadata(
+  locale: string,
+  titles: { en: string; zh: string },
+  descriptions?: { en: string; zh: string },
+): Metadata {
+  const isEn = locale === "en";
+  return {
+    title: isEn ? titles.en : titles.zh,
+    ...(descriptions ? { description: isEn ? descriptions.en : descriptions.zh } : {}),
+    robots: { index: false, follow: false },
+  };
+}

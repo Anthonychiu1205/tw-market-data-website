@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
+
+import { privatePageMetadata } from "@/src/i18n/seo";
 import { notFound } from "next/navigation";
 
 import { getSession } from "@/src/auth/session";
 import { isAdmin } from "@/src/lib/admin/access";
 import { GrantPlanForm } from "@/src/components/dashboard/admin/grant-plan-form";
 
-export const metadata: Metadata = {
-  title: "Admin · 免費升級用戶",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return privatePageMetadata(locale, { en: "Admin · Grant plan", zh: "Admin · 免費升級用戶" });
+}
 
 export default async function GrantPlanAdminPage() {
   const session = await getSession();

@@ -7,6 +7,7 @@ import { Menu, X } from "lucide-react";
 
 import { Link } from "@/src/i18n/navigation";
 import { getProductMegaMenuColumns } from "../../content/mega-menu-links";
+import { LanguageSwitcher } from "./language-switcher";
 import { MarketingContainer } from "../ui/marketing-container";
 import { buttonClass } from "../ui/button";
 
@@ -188,6 +189,7 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
         </div>
 
           <div className="flex items-center justify-self-end gap-2">
+            <LanguageSwitcher className="hidden h-9 items-center rounded-md border border-slate-200 px-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900 md:inline-flex" />
             <button
               type="button"
               className={buttonClass("secondary")}
@@ -250,6 +252,9 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
             </nav>
 
             <div className="mt-5 space-y-2 border-t border-slate-200 pt-4">
+              <LanguageSwitcher
+                className="flex w-full items-center justify-center rounded-md border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900"
+              />
               <button
                 type="button"
                 onClick={() => {

@@ -36,7 +36,15 @@
       "indicators": "Market indicators",
       "news": "Market news",
       "viewAll": "View all data",
-      "viewMore": "View more"
+      "viewMore": "View more",
+      "asOf": "As of {date}",
+      "names": {
+        "twse_taiex": "TAIEX",
+        "tpex_otci": "TPEx Index",
+        "twii_0050": "Taiwan 50",
+        "sector_ele": "Electronics",
+        "sector_fin": "Finance & Insurance"
+      }
     },
     "hero": {
       "title": "A Taiwan market data API built for systems and quant workflows",
