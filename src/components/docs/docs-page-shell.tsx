@@ -29,20 +29,15 @@ import {
   Waypoints,
   Wrench,
 } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
+
+import { Link, usePathname } from "@/src/i18n/navigation";
 
 import type { DocsSection } from "@/src/content/docs";
 import { normalizeDocsSections } from "@/src/content/docs-sections";
-import {
-  docsSidebarApiGroups,
-  docsSidebarAiAgentItems,
-  docsSidebarGuideItems,
-  docsSidebarHelpItems,
-  docsSidebarOverviewItems,
-  docsSidebarSdkItems,
-} from "@/src/content/docs-sidebar";
+import { getDocsSidebar } from "@/src/content/docs-sidebar";
 import type { DocsSidebarNavGroup, DocsSidebarNavItem } from "@/src/content/docs-sidebar";
+import type { AppLocale } from "@/src/i18n/locales";
 import { cn } from "@/src/lib/cn";
 import { getAbsoluteUrl } from "@/src/config/site";
 import { JsonLd } from "@/src/components/seo/json-ld";
@@ -70,6 +65,9 @@ type DocsPageShellProps = {
   // §G-5 ending guide ("Ready? → Quick Start"). Optional slot rendered after the content; the
   // per-page copy is authored by Cowork. Absent = nothing rendered.
   nextGuide?: React.ReactNode;
+  // §2.5 fallback: an "English coming soon" notice rendered above the content when the page body has
+  // no EN translation and the viewer is on /en. Computed server-side in the [...slug] page.
+  topNotice?: React.ReactNode;
 };
 
 function itemHasActivePath(item: DocsSidebarNavItem, pathname: string): boolean {
@@ -199,7 +197,11 @@ function getHelpItemIcon() {
   return LifeBuoy;
 }
 
-export function DocsPageShell({ page, children, tocSections, rightPanelTitle, rightPanelContent, pageLabel = "文件", nextGuide }: DocsPageShellProps) {
+export function DocsPageShell({ page, children, tocSections, rightPanelTitle, rightPanelContent, pageLabel, nextGuide, topNotice }: DocsPageShellProps) {
+  const t = useTranslations("docs");
+  const locale = useLocale() as AppLocale;
+  const sidebar = useMemo(() => getDocsSidebar(locale), [locale]);
+  const resolvedPageLabel = pageLabel ?? t("docLabel");
   const pathname = usePathname();
   const sections: DocsSection[] = useMemo(
     () => normalizeDocsSections(tocSections ?? page.sections).map((section) => ({ id: section.id, label: section.label })),
@@ -208,8 +210,8 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
   const sidebarScrollRef = useRef<HTMLDivElement | null>(null);
 
   const activeGroupIds = useMemo(
-    () => docsSidebarApiGroups.filter((group) => groupHasActivePath(group, pathname)).map((group) => group.id),
-    [pathname],
+    () => sidebar.apiGroups.filter((group) => groupHasActivePath(group, pathname)).map((group) => group.id),
+    [pathname, sidebar],
   );
 
   const userToggledGroupsRef = useRef<Set<string>>(new Set());
@@ -325,8 +327,8 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "首頁", item: getAbsoluteUrl("/") },
-      { "@type": "ListItem", position: 2, name: "文件", item: getAbsoluteUrl("/docs") },
+      { "@type": "ListItem", position: 1, name: t("breadcrumbHome"), item: getAbsoluteUrl("/") },
+      { "@type": "ListItem", position: 2, name: t("docLabel"), item: getAbsoluteUrl("/docs") },
       { "@type": "ListItem", position: 3, name: page.title, item: getAbsoluteUrl(page.href) },
     ],
   };
@@ -348,18 +350,18 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
               height: sidebarHeight,
             }}
           >
-            <p className="text-xs font-semibold tracking-wide text-slate-500">文件總覽</p>
+            <p className="text-xs font-semibold tracking-wide text-slate-500">{t("sidebarTitle")}</p>
             <nav className="mt-3">
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">OVERVIEW</p>
-              {renderFlatSidebarItems(docsSidebarOverviewItems, "overview")}
+              {renderFlatSidebarItems(sidebar.overviewItems, "overview")}
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">APIS</p>
               <div className="space-y-4">
-                {docsSidebarApiGroups.map((group) => (
+                {sidebar.apiGroups.map((group) => (
                   <div key={group.id}>
                     <button
                       type="button"
-                      aria-label={`${group.label}${openGroupIds.includes(group.id) ? "收合" : "展開"}`}
+                      aria-label={`${group.label}${openGroupIds.includes(group.id) ? t("collapse") : t("expand")}`}
                       className={cn(
                         "flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-950",
                         activeGroupIds.includes(group.id) && "text-slate-950",
@@ -386,16 +388,16 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
               </div>
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">GUIDES</p>
-              {renderFlatSidebarItems(docsSidebarGuideItems, "guides")}
+              {renderFlatSidebarItems(sidebar.guideItems, "guides")}
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">SDKS</p>
-              {renderFlatSidebarItems(docsSidebarSdkItems, "sdks")}
+              {renderFlatSidebarItems(sidebar.sdkItems, "sdks")}
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">AI AGENTS</p>
-              {renderFlatSidebarItems(docsSidebarAiAgentItems, "ai-agents")}
+              {renderFlatSidebarItems(sidebar.aiAgentItems, "ai-agents")}
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">HELP</p>
-              {renderFlatSidebarItems(docsSidebarHelpItems, "help")}
+              {renderFlatSidebarItems(sidebar.helpItems, "help")}
             </nav>
             <div className="h-28 shrink-0" aria-hidden="true" />
           </div>
@@ -405,16 +407,21 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
         <main className={cn("mx-auto w-full min-w-0", mainMaxWidth)}>
           {/* AI-agent hint on every docs page (BENCH-01 §2, FDS per-page practice). */}
           <p className="mb-4 text-xs text-slate-400">
-            AI agent？先讀{" "}
-            <Link href="/llms.txt" className="underline underline-offset-2 hover:text-slate-600">/llms.txt</Link>{" "}
-            取得全站索引。
+            {t.rich("aiHint", {
+              llms: (chunks) => (
+                <Link href="/llms.txt" className="underline underline-offset-2 hover:text-slate-600">
+                  {chunks}
+                </Link>
+              ),
+            })}
           </p>
           <section className="border-b border-slate-200 pb-8">
             {/* eyebrow → H1 → tagline (§B) */}
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{pageLabel}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{resolvedPageLabel}</p>
             <h1 className="mt-2 text-[2rem] font-semibold leading-tight tracking-tight text-slate-900">{page.title}</h1>
             <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">{page.subtitle}</p>
           </section>
+          {topNotice ? <div className="mt-6">{topNotice}</div> : null}
           <div className="text-[15px] leading-7 text-slate-700">{children}</div>
           {nextGuide ? (
             <div className="mt-12 border-t border-slate-200 pt-6 text-sm text-slate-600">{nextGuide}</div>
@@ -423,7 +430,7 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
 
         <aside className="hidden lg:block">
           <div className="sticky top-24">
-            <p className="text-xs font-semibold tracking-wide text-slate-500">{rightPanelTitle ?? "本頁章節"}</p>
+            <p className="text-xs font-semibold tracking-wide text-slate-500">{rightPanelTitle ?? t("onThisPage")}</p>
             {rightPanelContent ? (
               <div className="mt-3">{rightPanelContent}</div>
             ) : (
@@ -439,7 +446,7 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
                     />
                   </nav>
                 ) : (
-                  <p className="mt-3 text-sm text-slate-500">本頁目前沒有章節目錄。</p>
+                  <p className="mt-3 text-sm text-slate-500">{t("noSections")}</p>
                 )}
               </>
             )}

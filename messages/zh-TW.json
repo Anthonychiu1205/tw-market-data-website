@@ -792,6 +792,159 @@
     "badgePendingTitle": "對帳流程進行中，通過日期尚未產生。",
     "badgePending": "對帳校驗中"
   },
+  "docs": {
+    "navHeading": "文件導覽",
+    "docLabel": "文件",
+    "sidebarTitle": "文件總覽",
+    "onThisPage": "本頁章節",
+    "noSections": "本頁目前沒有章節目錄。",
+    "expand": "展開",
+    "collapse": "收合",
+    "breadcrumbHome": "首頁",
+    "aiHint": "AI agent？先讀 <llms>/llms.txt</llms> 取得全站索引。",
+    "englishNotice": "本文件頁目前僅提供中文版，英文版將陸續推出。"
+  },
+  "docsDemo": {
+    "copy": "複製",
+    "copied": "已複製",
+    "copyCode": "複製程式碼",
+    "requestExample": "請求範例",
+    "sidePanel": {
+      "statusCodes": "狀態碼"
+    },
+    "coverage": {
+      "heading": "覆蓋範圍",
+      "instruments": "標的數",
+      "startYear": "起始年",
+      "updateTiming": "更新時點",
+      "includesDelisted": "含已下市",
+      "comingValue": "尚未提供（coming）",
+      "caption": "數字為 DB 實測；未列者以 <nowrap>docs coverage</nowrap> 為準（coming），不逐格編造。"
+    },
+    "limitations": {
+      "heading": "限制與注意",
+      "items": [
+        "覆蓋非全市場、全期間；實際範圍以上方覆蓋小表與回應中的 data_gaps 為準。",
+        "資料有缺會如實標記，不以推測值補洞。",
+        "本平台聚焦日頻與基本面資料；不提供即時報價、盤中分K與加密貨幣。",
+        "TWSE 為 verified baseline；TPEx 歷史深度與還原股價目前為 beta / deferred，逐集標示。"
+      ]
+    },
+    "liveDemo": {
+      "heading": "Live Demo（TWSE Daily Price）",
+      "description": "這個示範會直接呼叫本機 API：",
+      "placeholder": "例如 2330",
+      "loading": "Loading...",
+      "fetchData": "Fetch Data",
+      "errorEnterSymbol": "請先輸入 symbol。",
+      "errorRequestFailed": "API 請求失敗。",
+      "errorConnect": "無法連線到本機 API（http://127.0.0.1:8011）。",
+      "planLimitedTitle": "目前方案僅顯示前 {count} 筆資料",
+      "planLimitedUpgrade": "升級後可取得最多 5000 筆資料",
+      "upgradePlan": "升級方案"
+    },
+    "playground": {
+      "run": "Run",
+      "running": "Running...",
+      "close": "關閉",
+      "selectLanguage": "選擇請求範例語言",
+      "tryTitle": "試跑 API 請求",
+      "tryDescription": "填入參數後可呼叫真實 API，並在此查看即時回應。",
+      "required": "必填",
+      "optional": "選填",
+      "enterApiKey": "輸入 X-API-Key",
+      "copyResult": "複製結果",
+      "copiedResult": "已複製結果",
+      "downloadResult": "下載結果 JSON",
+      "download": "下載",
+      "notRunYet": "尚未執行。點擊 Run 後會在此顯示執行結果。",
+      "responseUpdated": "Response updated.",
+      "noStatusExample": "此 endpoint 尚未提供對應狀態範例，請參考文件正文。",
+      "errorEnterKey": "請先輸入 API key。",
+      "errorInvalidKey": "請輸入有效 API key，而不是範例或遮罩文字。",
+      "errorMissingParams": "缺少必填參數，請補齊後再執行。",
+      "errorConnect": "無法連線到 API，請稍後再試。"
+    }
+  },
+  "docsContent": {
+    "landing": {
+      "intro1": "TW Market Data 把 TWSE、TPEx、MOPS、TAIFEX 的官方資料，整理成一致、好串接的 REST API。所有資料都由我們直接從官方來源收錄、解析後供應，不經二手。",
+      "intro2": "每一筆回應都附上來源與 knowledge_date；資料有缺就如實標記，絕不用推估值把洞補起來。",
+      "access": {
+        "heading": "可存取的資料",
+        "intro": "上市個股日線最早回溯到 <y>{year} 年</y>，並保留 <c>{count} 檔</c>已停止交易（下市／長期停牌）股票的完整價史，讓回測不被存活者偏差灌水。目前提供：",
+        "betaNote": "上櫃（TPEx）日線與還原股價目前為 beta，覆蓋範圍逐集標示。"
+      },
+      "dataFormat": {
+        "heading": "資料格式"
+      },
+      "builtFor": {
+        "heading": "為誰而建",
+        "b1": "需要餵資料的 AI 金融 agent 與 LLM 流程",
+        "b2": "量化研究與因子開發",
+        "b3": "回測與自動化交易系統",
+        "b4": "fintech 產品的內部資料層"
+      },
+      "designPrinciples": {
+        "heading": "設計原則"
+      },
+      "ready": "準備好了嗎？→ <link>快速開始</link>"
+    },
+    "quickStart": {
+      "step0": {
+        "heading": "步驟 0 · 零註冊先試一筆（免 key）",
+        "intro": "這 5 檔可直接打、不用金鑰：2330 台積電 / 2317 鴻海 / 2454 聯發科 / 0050 / 2603。貼給你的 AI 或直接 curl：",
+        "note": "（其他股票 / 其他資料集才需要下面的 API key。）"
+      },
+      "getKey": {
+        "heading": "1. 拿一把 API 金鑰",
+        "body": "到 <dash>儀表板</dash> 註冊，並在後台建立一把 API 金鑰。金鑰放在請求標頭，別放進網址。"
+      },
+      "firstRequest": {
+        "heading": "2. 打第一個請求",
+        "body": "每個資料端點都是 <endpoint></endpoint>，用 <key></key> 標頭帶上金鑰。"
+      },
+      "seeResponse": {
+        "heading": "3. 看回應",
+        "body": "回傳 typed JSON，每筆都帶來源；缺的資料如實留空，不會亂補。欄位說明在各 <link>資料集頁</link>。"
+      },
+      "whatsNext": {
+        "heading": "接下來",
+        "pickIntro": "挑一個資料集開始：",
+        "separator": "、",
+        "pickEnd": "。",
+        "quota": "想看額度與方案 → <link>方案價格</link>。",
+        "next": "下一步 → <link>認證</link>"
+      },
+      "datasets": {
+        "twse-daily-price": "上市日線",
+        "monthly-revenue": "月營收",
+        "institutional-flow": "三大法人",
+        "income-statement": "財報三表"
+      }
+    },
+    "auth": {
+      "intro": "每個請求都帶 <code></code> 標頭。金鑰在 <dash>儀表板</dash> 自己建立、輪替、撤銷，不用聯絡我們。",
+      "habitsHeading": "幾個習慣",
+      "habit1": {
+        "term": "金鑰只放標頭，別放網址",
+        "desc": "免得留在伺服器日誌或瀏覽紀錄裡。"
+      },
+      "habit2": {
+        "term": "一個環境一把金鑰",
+        "desc": "開發跟正式分開，哪把外洩就撤哪把（多把金鑰依方案提供）。"
+      },
+      "habit3": {
+        "term": "額度看方案",
+        "desc": "每把金鑰的每分鐘請求數與每月用量依方案計。"
+      },
+      "errorsHeading": "常見錯誤",
+      "error1": "<code></code> — 金鑰沒帶或無效（免 key 五檔 2330/2317/2454/0050/2603 除外，直接回 200）。",
+      "error2": "<code></code> — 你的方案沒有這個資料集的權限（付費牆）。",
+      "error3": "<code></code> — 超出配額 / 速率限制。",
+      "next": "下一步 → <link>來源政策</link>"
+    }
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }

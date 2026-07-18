@@ -1,6 +1,7 @@
 "use client";
 
 import { Braces, Boxes, Check, ChevronDown, Code2, Coffee, Copy, Download, FileCode2, Gem, Play, Terminal, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CodeBlock, type CodeBlockLanguage } from "@/src/components/docs/code-block";
@@ -243,12 +244,12 @@ function toCompactExampleJson(body: string, status: string) {
   }
 }
 
-function fallbackStatusBody(status: string) {
+function fallbackStatusBody(status: string, message: string) {
   return JSON.stringify(
     {
       error: {
         code: `status_${status.toLowerCase()}`,
-        message: "此 endpoint 尚未提供對應狀態範例，請參考文件正文。",
+        message,
       },
     },
     null,
@@ -257,6 +258,7 @@ function fallbackStatusBody(status: string) {
 }
 
 export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) {
+  const t = useTranslations("docsDemo");
   const [isOpen, setIsOpen] = useState(false);
   const [apiKey, setApiKey] = useState("");
   const [requestLanguage, setRequestLanguage] = useState<RequestLanguage>("curl");
@@ -361,9 +363,9 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   const activeExample = statusExampleMap.get(activeStatus);
   const liveResultIsStale = Boolean(liveResult && liveResult.querySignature !== querySignature);
   const responseCode = useMemo(() => {
-    const raw = activeExample?.body ?? fallbackStatusBody(activeStatus);
+    const raw = activeExample?.body ?? fallbackStatusBody(activeStatus, t("playground.noStatusExample"));
     return toCompactExampleJson(raw, activeStatus);
-  }, [activeExample?.body, activeStatus]);
+  }, [activeExample?.body, activeStatus, t]);
   const liveResultCode = useMemo(() => {
     if (!liveResult) return "";
     return liveResult.body;
@@ -372,19 +374,19 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   async function handleRunLiveRequest() {
     const keyValidation = validateApiKey(apiKey);
     if (!keyValidation.ok) {
-      setRunNotice(keyValidation.reason === "missing" ? "請先輸入 API key。" : "請輸入有效 API key，而不是範例或遮罩文字。");
+      setRunNotice(keyValidation.reason === "missing" ? t("playground.errorEnterKey") : t("playground.errorInvalidKey"));
       return;
     }
 
     const hasMissingRequired = (api.queryParameters ?? []).some((parameter) => parameter.required && !queryValues[parameter.name]?.trim());
     if (hasMissingRequired) {
-      setRunNotice("缺少必填參數，請補齊後再執行。");
+      setRunNotice(t("playground.errorMissingParams"));
       return;
     }
 
     const runUrl = buildRunUrl(api.endpoint, queryEntries);
     setIsRunning(true);
-      setRunNotice("Running...");
+      setRunNotice(t("playground.running"));
     setResultCopied(false);
 
     try {
@@ -396,7 +398,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
         cache: "no-store",
       });
       const rawBody = await response.text();
-      const normalizedBody = toCompactExampleJson(rawBody || fallbackStatusBody(String(response.status)), String(response.status));
+      const normalizedBody = toCompactExampleJson(rawBody || fallbackStatusBody(String(response.status), t("playground.noStatusExample")), String(response.status));
       const statusCode = String(response.status) as ApiStatusExample["status"];
 
       if (RESPONSE_STATUS_ORDER.includes(statusCode as (typeof RESPONSE_STATUS_ORDER)[number])) {
@@ -430,7 +432,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
           requestId,
         });
       }
-      setRunNotice(response.ok ? "Response updated." : notice);
+      setRunNotice(response.ok ? t("playground.responseUpdated") : notice);
     } catch {
       setLiveResult({
         status: "network_error",
@@ -438,7 +440,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
           {
             error: {
               code: "network_error",
-              message: "無法連線到 API，請稍後再試。",
+              message: t("playground.errorConnect"),
             },
           },
           null,
@@ -485,7 +487,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
   const requestHeader = (
     <div className="flex w-full items-center justify-between gap-3">
       <div className="flex items-center gap-2">
-        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">請求範例</span>
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{t("requestExample")}</span>
       </div>
       <div className="relative z-[90]">
         <button
@@ -494,7 +496,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
           className="inline-flex h-8 items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
           aria-haspopup="menu"
           aria-expanded={isLanguageMenuOpen}
-          aria-label="選擇請求範例語言"
+          aria-label={t("playground.selectLanguage")}
         >
           <RequestLanguageIcon className="h-3.5 w-3.5 text-slate-500" />
           <span>{requestLanguageMeta.label}</span>
@@ -568,9 +570,9 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
         type="button"
         onClick={openPlayground}
         className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 text-xs font-semibold text-white transition hover:bg-slate-800"
-        aria-label="Run"
+        aria-label={t("playground.run")}
       >
-        Run
+        {t("playground.run")}
         <Play className="h-3.5 w-3.5" />
       </button>
 
@@ -605,7 +607,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                       disabled={isRunning}
                       className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 text-xs font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
                     >
-                      {isRunning ? "Running..." : "Run"}
+                      {isRunning ? t("playground.running") : t("playground.run")}
                       <Play className="h-3.5 w-3.5" />
                     </button>
                     <button
@@ -613,7 +615,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                       type="button"
                       onClick={() => setIsOpen(false)}
                       className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800"
-                      aria-label="關閉"
+                      aria-label={t("playground.close")}
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -626,9 +628,9 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                 <div className="min-h-0 overflow-y-auto border-b border-slate-200 p-4 md:border-b-0 md:border-r md:p-5">
                   <section className="space-y-1 border-b border-slate-200 pb-3">
                     <h3 id="api-playground-description" className="text-sm font-semibold text-slate-900">
-                      試跑 API 請求
+                      {t("playground.tryTitle")}
                     </h3>
-                    <p className="text-xs leading-5 text-slate-600">填入參數後可呼叫真實 API，並在此查看即時回應。</p>
+                    <p className="text-xs leading-5 text-slate-600">{t("playground.tryDescription")}</p>
                   </section>
 
                   <section className="pt-2">
@@ -639,14 +641,14 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-sm font-semibold text-slate-900">X-API-Key</span>
                             <span className="text-xs text-slate-500">string</span>
-                            <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">必填</span>
+                            <span className="rounded bg-rose-100 px-1.5 py-0.5 text-[10px] font-medium text-rose-700">{t("playground.required")}</span>
                           </div>
                         </div>
                         <input
                           type="password"
                           value={apiKey}
                           onChange={(event) => setApiKey(event.target.value)}
-                          placeholder="輸入 X-API-Key"
+                          placeholder={t("playground.enterApiKey")}
                           className="h-9 w-full rounded-md border border-slate-300 bg-slate-50 px-3 text-xs text-slate-800 outline-none ring-slate-300 placeholder:text-slate-400 focus:bg-white focus:ring-2"
                           autoComplete="off"
                         />
@@ -670,7 +672,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                                     parameter.required ? "bg-rose-100 text-rose-700" : "bg-slate-100 text-slate-600",
                                   )}
                                 >
-                                  {parameter.required ? "必填" : "選填"}
+                                  {parameter.required ? t("playground.required") : t("playground.optional")}
                                 </span>
                               </div>
                               <p className="line-clamp-1 text-sm leading-5 text-slate-600">{parameter.description}</p>
@@ -718,8 +720,8 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                             type="button"
                             onClick={() => void handleCopyResult()}
                             className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-100 hover:text-slate-800"
-                            aria-label={resultCopied ? "已複製結果" : "複製結果"}
-                            title={resultCopied ? "已複製" : "複製"}
+                            aria-label={resultCopied ? t("playground.copiedResult") : t("playground.copyResult")}
+                            title={resultCopied ? t("copied") : t("copy")}
                           >
                             {resultCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                           </button>
@@ -727,8 +729,8 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                             type="button"
                             onClick={handleDownloadResult}
                             className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-100 hover:text-slate-800"
-                            aria-label="下載結果 JSON"
-                            title="下載"
+                            aria-label={t("playground.downloadResult")}
+                            title={t("playground.download")}
                           >
                             <Download className="h-3.5 w-3.5" />
                           </button>
@@ -747,7 +749,7 @@ export function ApiRunPlayground({ api, endpointTitle }: ApiRunPlaygroundProps) 
                     </section>
                   ) : (
                     <section className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-3">
-                      <p className="text-xs text-slate-600">尚未執行。點擊 Run 後會在此顯示執行結果。</p>
+                      <p className="text-xs text-slate-600">{t("playground.notRunYet")}</p>
                     </section>
                   )}
 

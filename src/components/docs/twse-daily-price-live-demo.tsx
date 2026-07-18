@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { CodeBlock } from "@/src/components/docs/code-block";
 import { SectionHeading } from "@/src/components/docs/section-heading";
+import { Link } from "@/src/i18n/navigation";
 
 type DemoRow = {
   symbol: string;
@@ -13,6 +14,7 @@ type DemoRow = {
 };
 
 export function TwseDailyPriceLiveDemo() {
+  const t = useTranslations("docsDemo");
   const [symbol, setSymbol] = useState("2330");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -26,7 +28,7 @@ export function TwseDailyPriceLiveDemo() {
   const handleFetch = async () => {
     const value = symbol.trim();
     if (!value) {
-      setError("請先輸入 symbol。");
+      setError(t("liveDemo.errorEnterSymbol"));
       setRows([]);
       setRaw(null);
       setPlanLimitedMeta({ isLimited: false, rowLimit: null });
@@ -63,7 +65,7 @@ export function TwseDailyPriceLiveDemo() {
 
       if (!response.ok) {
         setRows([]);
-        setError(typeof payload?.detail === "string" ? payload.detail : "API 請求失敗。");
+        setError(typeof payload?.detail === "string" ? payload.detail : t("liveDemo.errorRequestFailed"));
         return;
       }
 
@@ -82,7 +84,7 @@ export function TwseDailyPriceLiveDemo() {
       setRows([]);
       setRaw(null);
       setPlanLimitedMeta({ isLimited: false, rowLimit: null });
-      setError("無法連線到本機 API（http://127.0.0.1:8011）。");
+      setError(t("liveDemo.errorConnect"));
     } finally {
       setLoading(false);
     }
@@ -90,9 +92,9 @@ export function TwseDailyPriceLiveDemo() {
 
   return (
     <section className="space-y-3 border-b border-slate-200 pb-8">
-      <SectionHeading id="live-demo-twse-daily-price">Live Demo（TWSE Daily Price）</SectionHeading>
+      <SectionHeading id="live-demo-twse-daily-price">{t("liveDemo.heading")}</SectionHeading>
       <p className="text-sm leading-7 text-slate-600">
-        這個示範會直接呼叫本機 API：
+        {t("liveDemo.description")}
         <code className="rounded bg-slate-100 px-1 py-0.5 text-xs">GET /v2/datasets/twse-daily-price</code>
       </p>
 
@@ -101,7 +103,7 @@ export function TwseDailyPriceLiveDemo() {
           type="text"
           value={symbol}
           onChange={(e) => setSymbol(e.target.value)}
-          placeholder="例如 2330"
+          placeholder={t("liveDemo.placeholder")}
           className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-800 outline-none focus:border-slate-500 sm:max-w-[220px]"
         />
         <button
@@ -110,7 +112,7 @@ export function TwseDailyPriceLiveDemo() {
           disabled={loading}
           className="inline-flex items-center justify-center rounded-md border border-slate-800 bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? "Loading..." : "Fetch Data"}
+          {loading ? t("liveDemo.loading") : t("liveDemo.fetchData")}
         </button>
       </div>
 
@@ -119,9 +121,9 @@ export function TwseDailyPriceLiveDemo() {
       {planLimitedMeta.isLimited ? (
         <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3">
           <p className="text-sm font-medium text-amber-900">
-            目前方案僅顯示前 {planLimitedMeta.rowLimit ?? 50} 筆資料
+            {t("liveDemo.planLimitedTitle", { count: planLimitedMeta.rowLimit ?? 50 })}
           </p>
-          <p className="mt-1 text-sm text-amber-800">升級後可取得最多 5000 筆資料</p>
+          <p className="mt-1 text-sm text-amber-800">{t("liveDemo.planLimitedUpgrade")}</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <div className="rounded-md border border-amber-200 bg-white px-3 py-2">
               <p className="text-xs font-medium text-slate-700">Free</p>
@@ -136,7 +138,7 @@ export function TwseDailyPriceLiveDemo() {
             href="/billing/subscriptions"
             className="mt-3 inline-flex items-center justify-center rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-xs font-medium text-white transition hover:bg-slate-800"
           >
-            升級方案
+            {t("liveDemo.upgradePlan")}
           </Link>
         </div>
       ) : null}

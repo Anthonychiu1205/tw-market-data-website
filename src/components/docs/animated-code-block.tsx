@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Copy } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { cn } from "@/src/lib/cn";
@@ -21,6 +22,7 @@ const JS_KEYWORDS = /\b(const|let|var|function|return|if|else|for|while|await|as
 const PY_KEYWORDS = /\b(def|class|return|if|elif|else|for|while|import|from|as|try|except|finally|raise|with|lambda|pass|yield|True|False|None)\b/;
 
 export function AnimatedCodeBlock({ tabs, lineDelayMs = 60, className }: AnimatedCodeBlockProps) {
+  const t = useTranslations("docsDemo");
   const [activeTabId, setActiveTabId] = useState(tabs[0]?.id ?? "");
   const [visibleLineCount, setVisibleLineCount] = useState(0);
   const [panelVisible, setPanelVisible] = useState(false);
@@ -186,8 +188,8 @@ export function AnimatedCodeBlock({ tabs, lineDelayMs = 60, className }: Animate
           type="button"
           onClick={() => void onCopy()}
           className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-800"
-          aria-label={copied ? "已複製" : "複製程式碼"}
-          title={copied ? "已複製" : "複製程式碼"}
+          aria-label={copied ? t("copied") : t("copyCode")}
+          title={copied ? t("copied") : t("copyCode")}
         >
           {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
         </button>

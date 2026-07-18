@@ -792,6 +792,159 @@
     "badgePendingTitle": "Reconciliation is in progress; a passing date has not been produced yet.",
     "badgePending": "Reconciliation in progress"
   },
+  "docs": {
+    "navHeading": "Docs navigation",
+    "docLabel": "Docs",
+    "sidebarTitle": "Documentation",
+    "onThisPage": "On this page",
+    "noSections": "This page has no section outline yet.",
+    "expand": " Expand",
+    "collapse": " Collapse",
+    "breadcrumbHome": "Home",
+    "aiHint": "Building an AI agent? Start with <llms>/llms.txt</llms> for the full site index.",
+    "englishNotice": "This documentation page is currently available in Chinese only; English versions are coming soon."
+  },
+  "docsDemo": {
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyCode": "Copy code",
+    "requestExample": "Request example",
+    "sidePanel": {
+      "statusCodes": "Status codes"
+    },
+    "coverage": {
+      "heading": "Coverage",
+      "instruments": "Instruments",
+      "startYear": "Start year",
+      "updateTiming": "Update timing",
+      "includesDelisted": "Includes delisted",
+      "comingValue": "Not yet available (coming)",
+      "caption": "Figures are measured from the DB; unlisted fields defer to <nowrap>docs coverage</nowrap> (coming) — we don't fabricate cell by cell."
+    },
+    "limitations": {
+      "heading": "Limitations & notes",
+      "items": [
+        "Coverage is not the full market or full history; the actual range is defined by the coverage table above and the data_gaps in the response.",
+        "Missing data is flagged honestly — we don't fill gaps with estimated values.",
+        "The platform focuses on daily-frequency and fundamental data; it does not provide real-time quotes, intraday bars, or cryptocurrencies.",
+        "TWSE is the verified baseline; TPEx history depth and adjusted prices are currently beta / deferred, flagged per dataset."
+      ]
+    },
+    "liveDemo": {
+      "heading": "Live Demo (TWSE Daily Price)",
+      "description": "This demo calls the local API directly: ",
+      "placeholder": "e.g. 2330",
+      "loading": "Loading...",
+      "fetchData": "Fetch Data",
+      "errorEnterSymbol": "Enter a symbol first.",
+      "errorRequestFailed": "API request failed.",
+      "errorConnect": "Cannot connect to the local API (http://127.0.0.1:8011).",
+      "planLimitedTitle": "Your current plan shows only the first {count} rows",
+      "planLimitedUpgrade": "Upgrade to retrieve up to 5000 rows",
+      "upgradePlan": "Upgrade plan"
+    },
+    "playground": {
+      "run": "Run",
+      "running": "Running...",
+      "close": "Close",
+      "selectLanguage": "Select request example language",
+      "tryTitle": "Try the API request",
+      "tryDescription": "Fill in the parameters to call the real API and see the live response here.",
+      "required": "Required",
+      "optional": "Optional",
+      "enterApiKey": "Enter X-API-Key",
+      "copyResult": "Copy result",
+      "copiedResult": "Copied result",
+      "downloadResult": "Download result JSON",
+      "download": "Download",
+      "notRunYet": "Not run yet. Click Run to see the result here.",
+      "responseUpdated": "Response updated.",
+      "noStatusExample": "No matching status example is available for this endpoint yet — see the documentation body.",
+      "errorEnterKey": "Enter an API key first.",
+      "errorInvalidKey": "Enter a valid API key, not example or masked text.",
+      "errorMissingParams": "Missing required parameters — fill them in before running.",
+      "errorConnect": "Cannot connect to the API. Please try again later."
+    }
+  },
+  "docsContent": {
+    "landing": {
+      "intro1": "TW Market Data turns official data from TWSE, TPEx, MOPS, and TAIFEX into a consistent, easy-to-integrate REST API. We ingest and parse every dataset directly from the official sources — never second-hand.",
+      "intro2": "Every response carries its source and knowledge_date; gaps are marked honestly, and holes are never filled with estimates.",
+      "access": {
+        "heading": "What you can access",
+        "intro": "Daily prices for individual TWSE-listed stocks go back to <y>{year}</y>, and we keep the full price history of <c>{count}</c> stocks that have stopped trading (delisted / long-term suspended), so backtests aren't inflated by survivorship bias. Currently available:",
+        "betaNote": "TPEx daily bars and adjusted prices are currently in beta, with coverage marked per dataset."
+      },
+      "dataFormat": {
+        "heading": "Data format"
+      },
+      "builtFor": {
+        "heading": "Who it's for",
+        "b1": "AI financial agents and LLM pipelines that need data to feed on",
+        "b2": "Quantitative research and factor development",
+        "b3": "Backtesting and automated trading systems",
+        "b4": "The internal data layer of fintech products"
+      },
+      "designPrinciples": {
+        "heading": "Design principles"
+      },
+      "ready": "Ready to go? → <link>Quick start</link>"
+    },
+    "quickStart": {
+      "step0": {
+        "heading": "Step 0 · Try one call with zero sign-up (no key)",
+        "intro": "These 5 symbols work without a key: 2330 TSMC / 2317 Hon Hai / 2454 MediaTek / 0050 / 2603. Paste this to your AI or run curl directly:",
+        "note": "(Other stocks / other datasets need the API key below.)"
+      },
+      "getKey": {
+        "heading": "1. Get an API key",
+        "body": "Register in the <dash>dashboard</dash> and create an API key there. Put the key in the request header, not in the URL."
+      },
+      "firstRequest": {
+        "heading": "2. Make your first request",
+        "body": "Every data endpoint is <endpoint></endpoint>, with the key passed in the <key></key> header."
+      },
+      "seeResponse": {
+        "heading": "3. Read the response",
+        "body": "You get typed JSON, each record carrying its source; missing data is left empty rather than filled in. Field definitions are on each <link>dataset page</link>."
+      },
+      "whatsNext": {
+        "heading": "What's next",
+        "pickIntro": "Pick a dataset to start: ",
+        "separator": ", ",
+        "pickEnd": ".",
+        "quota": "See quotas and plans → <link>plan pricing</link>.",
+        "next": "Next → <link>Authentication</link>"
+      },
+      "datasets": {
+        "twse-daily-price": "TWSE daily prices",
+        "monthly-revenue": "Monthly revenue",
+        "institutional-flow": "Institutional investors",
+        "income-statement": "Financial statements"
+      }
+    },
+    "auth": {
+      "intro": "Every request carries the <code></code> header. Create, rotate, and revoke keys yourself in the <dash>dashboard</dash> — no need to contact us.",
+      "habitsHeading": "A few habits",
+      "habit1": {
+        "term": "Keep the key in the header, not the URL",
+        "desc": "So it doesn't end up in server logs or browsing history."
+      },
+      "habit2": {
+        "term": "One key per environment",
+        "desc": "Keep development and production separate, so you revoke only the leaked one (multiple keys are available by plan)."
+      },
+      "habit3": {
+        "term": "Quota follows your plan",
+        "desc": "Each key's per-minute requests and monthly usage are metered by plan."
+      },
+      "errorsHeading": "Common errors",
+      "error1": "<code></code> — API key missing or invalid (except the five no-key symbols 2330/2317/2454/0050/2603, which return 200 directly).",
+      "error2": "<code></code> — your plan is not entitled to this dataset (paywall).",
+      "error3": "<code></code> — quota or rate limit exceeded.",
+      "next": "Next → <link>Source policy</link>"
+    }
+  },
   "common": {
     "englishComingSoon": "English version coming soon."
   }
