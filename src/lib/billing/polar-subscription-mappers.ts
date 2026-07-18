@@ -150,3 +150,17 @@ export function selectCurrentSubscription(subs: PolarSubscriptionDetail[]): Pola
 export function sortInvoicesNewestFirst(invoices: PolarInvoice[]): PolarInvoice[] {
   return [...invoices].sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0));
 }
+
+/**
+ * Ownership gate for order-scoped actions (e.g. invoice download): the order's customer
+ * external id must equal the requesting user id. Anything missing/blank/mismatched is a
+ * hard false, so one user can never reach another user's invoice.
+ */
+export function isOrderOwnedByUser(order: unknown, userId: string): boolean {
+  if (!order || typeof order !== "object") return false;
+  if (!userId) return false;
+  const customer = (order as { customer?: unknown }).customer;
+  if (!customer || typeof customer !== "object") return false;
+  const externalId = (customer as { externalId?: unknown }).externalId;
+  return typeof externalId === "string" && externalId.length > 0 && externalId === userId;
+}

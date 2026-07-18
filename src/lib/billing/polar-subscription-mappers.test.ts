@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
+  isOrderOwnedByUser,
   mapPolarOrder,
   mapPolarPaymentMethod,
   mapPolarSubscription,
@@ -130,6 +131,18 @@ test("selectCurrentSubscription breaks ties by furthest period end, and empty â†
   ]);
   assert.equal(chosen?.id, "far");
   assert.equal(selectCurrentSubscription([]), null);
+});
+
+test("isOrderOwnedByUser gates order access strictly (blocks cross-account)", () => {
+  const order = { id: "ord_1", customer: { externalId: "user_a" } };
+  assert.equal(isOrderOwnedByUser(order, "user_a"), true);
+  // Cross-account attempt: another user's id must be rejected.
+  assert.equal(isOrderOwnedByUser(order, "user_b"), false);
+  // Missing / blank / malformed ownership data â†’ hard false.
+  assert.equal(isOrderOwnedByUser({ id: "ord_2", customer: {} }, "user_a"), false);
+  assert.equal(isOrderOwnedByUser({ id: "ord_3" }, "user_a"), false);
+  assert.equal(isOrderOwnedByUser(order, ""), false);
+  assert.equal(isOrderOwnedByUser(null, "user_a"), false);
 });
 
 test("sortInvoicesNewestFirst orders by createdAt descending", () => {
