@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { Link } from "@/src/i18n/navigation";
 import { getHomepageMarketSnapshot } from "@/src/lib/homepage/homepage-market-data";
@@ -8,9 +8,23 @@ import { getMarketMarqueeSnapshotView } from "@/src/lib/market-marquee-snapshot"
 // display strings — they must stay zh or the market-row lookup breaks. Do not translate.
 const MARKET_LABELS = ["加權指數", "櫃買指數", "台灣50", "電子類股", "金融保險"] as const;
 
-// Index ids (item.id) that have a localized display name in home.marketPanel.names. Any other live
-// index falls back to its API-provided name (item.name).
-const LOCALIZED_INDEX_IDS = new Set(["twse_taiex", "tpex_otci", "twii_0050", "sector_ele", "sector_fin"]);
+// Bilingual display names keyed by the snapshot's item.name (the reliable zh name from the API /
+// INDEX_META), NOT by item.id (whose value is API-defined and may not match). A plain lookup with an
+// item.name fallback — never a dynamic t() key, so a name we don't have a translation for degrades to
+// the original zh name and the row ALWAYS renders (REG-1 fix; fallback principle per §1.4).
+const INDEX_NAME_I18N: Record<string, { en: string; zh: string }> = {
+  加權指數: { en: "TAIEX", zh: "加權指數" },
+  櫃買指數: { en: "TPEx Index", zh: "櫃買指數" },
+  台灣50: { en: "Taiwan 50", zh: "台灣50" },
+  電子類股: { en: "Electronics", zh: "電子類股" },
+  金融保險: { en: "Finance & Insurance", zh: "金融保險" },
+};
+
+function indexDisplayName(name: string, locale: string): string {
+  const localized = INDEX_NAME_I18N[name];
+  if (!localized) return name;
+  return locale === "en" ? localized.en : localized.zh;
+}
 
 function toneClass(trend: "up" | "down" | "neutral") {
   // Taiwan convention: 紅漲綠跌 (red = up, green = down), aligned with market-marquee-track.
@@ -29,6 +43,7 @@ function isPublicNewsHref(href: string): boolean {
 export async function HeroMarketIntel() {
   const t = await getTranslations("home.marketPanel");
   const tc = await getTranslations("common");
+  const locale = await getLocale();
   const [marketSnapshot, newsSnapshot] = await Promise.all([
     getHomepageMarketSnapshot(),
     getMarketMarqueeSnapshotView(),
@@ -65,7 +80,7 @@ export async function HeroMarketIntel() {
           <div className="pt-2">
             {marketRows.map((item) => (
               <div key={item.id} className="grid h-10 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 border-b border-slate-100 text-sm last:border-b-0">
-                <p className="truncate font-medium text-slate-800">{LOCALIZED_INDEX_IDS.has(item.id) ? t(`names.${item.id}`) : item.name}</p>
+                <p className="truncate font-medium text-slate-800">{indexDisplayName(item.name, locale)}</p>
                 <p className="font-medium tabular-nums text-slate-700">{item.value}</p>
                 <p className={`font-semibold tabular-nums ${toneClass(item.trend)}`}>{item.percent || item.change}</p>
               </div>
