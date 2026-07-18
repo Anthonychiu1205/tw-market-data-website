@@ -6,6 +6,7 @@ import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 import { Link } from "@/src/i18n/navigation";
 import type { AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
 // Bilingual page content data (spec §1.6): both languages live on the record; projected per locale
 // at render. These families span more datasets than the catalog SSOT (datasets.ts) — TPEx / technical
@@ -272,28 +273,35 @@ function projectAnalysisUsage(locale: AppLocale) {
   }));
 }
 
-export const metadata: Metadata = {
-  title: "台股資料集總覽 | TW Market Data",
-  description:
-    "TWSE-first 資料集總覽：價格、財報、月營收與籌碼資料的 coverage、freshness 與 productization 狀態。",
-  alternates: {
-    canonical: "/datasets",
-  },
-  openGraph: {
-    title: "台股資料集 | TW Market Data",
-    description:
-      "探索 TW Market Data 的 TWSE-first 台股資料集，查看各資料集 coverage / freshness 與限制狀態。",
-    url: "/datasets",
-    siteName: "TW Market Data",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "台股資料集 | TW Market Data",
-    description:
-      "探索 TWSE-first 台股資料集，查看各資料集 coverage / freshness 與限制狀態。",
-  },
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  const isEn = l === "en";
+  return {
+    title: isEn ? "Taiwan Stock Datasets Overview | TW Market Data" : "台股資料集總覽 | TW Market Data",
+    description: isEn
+      ? "A TWSE-first dataset overview: coverage, freshness, and productization status for price, financial-statement, monthly-revenue, and positioning data."
+      : "TWSE-first 資料集總覽：價格、財報、月營收與籌碼資料的 coverage、freshness 與 productization 狀態。",
+    alternates: buildAlternates(l, "/datasets"),
+    openGraph: {
+      locale: OG_LOCALE[l],
+      title: isEn ? "Taiwan Stock Datasets | TW Market Data" : "台股資料集 | TW Market Data",
+      description: isEn
+        ? "Explore TW Market Data's TWSE-first Taiwan stock datasets and review each dataset's coverage / freshness and limitation status."
+        : "探索 TW Market Data 的 TWSE-first 台股資料集，查看各資料集 coverage / freshness 與限制狀態。",
+      url: "/datasets",
+      siteName: "TW Market Data",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: isEn ? "Taiwan Stock Datasets | TW Market Data" : "台股資料集 | TW Market Data",
+      description: isEn
+        ? "Explore TWSE-first Taiwan stock datasets and review each dataset's coverage / freshness and limitation status."
+        : "探索 TWSE-first 台股資料集，查看各資料集 coverage / freshness 與限制狀態。",
+    },
+  };
+}
 
 export default async function DatasetsPage() {
   const locale = await getLocale();

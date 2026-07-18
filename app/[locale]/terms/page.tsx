@@ -3,12 +3,26 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { Container } from "@/src/components/ui/container";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 import { investmentDisclaimer } from "@/src/lib/legal/disclaimer";
 
-export const metadata: Metadata = {
-  title: "使用條款",
-  description: "TW Market Data 使用條款。",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
+  const isEn = l === "en";
+  const title = isEn ? "Terms of Service" : "使用條款";
+  const description = isEn ? "TW Market Data terms of service." : "TW Market Data 使用條款。";
+  return {
+    title,
+    description,
+    alternates: buildAlternates(l, "/terms"),
+    openGraph: { title, description, locale: OG_LOCALE[l] },
+  };
+}
 
 type TermsSection = {
   title: string;

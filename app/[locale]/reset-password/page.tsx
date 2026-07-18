@@ -5,11 +5,26 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/src/i18n/navigation";
 import { getSession } from "@/src/auth/session";
 import { ResetPasswordForm } from "@/src/components/auth/reset-password-form";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
-export const metadata: Metadata = {
-  title: "重設密碼",
-  description: "使用重設連結更新密碼。",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
+  const isEn = l === "en";
+  const title = isEn ? "Reset Password" : "重設密碼";
+  const description = isEn ? "Update your password using the reset link." : "使用重設連結更新密碼。";
+  return {
+    title,
+    description,
+    robots: { index: false, follow: false },
+    alternates: buildAlternates(l, "/reset-password"),
+    openGraph: { title, description, locale: OG_LOCALE[l] },
+  };
+}
 
 type ResetPasswordPageProps = {
   searchParams: Promise<{ token?: string }>;

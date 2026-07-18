@@ -1,24 +1,41 @@
 import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/src/config/site";
-import { EN_HOMEPAGE_READY } from "@/src/config/i18n";
 import { getAllBlogPosts } from "@/src/content/blog-posts";
 import { getPublishedAnswerPages } from "@/src/content/answer-pages";
 import { docsPages } from "@/src/content/docs-pages";
+import { localizedPath } from "@/src/i18n/seo";
+import { LOCALES } from "@/src/i18n/locales";
 
 type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
 
-function toEntry(
-  url: string,
-  changeFrequency: ChangeFrequency,
-  priority: number,
-): MetadataRoute.Sitemap[number] {
-  return {
-    url: `${siteConfig.url}${url}`,
+// Machine / non-page routes that live OUTSIDE the [locale] segment — never locale-prefixed.
+function isMachineRoute(path: string): boolean {
+  return /\.(json|txt|xml)$/.test(path) || path === "/api";
+}
+
+const HREFLANG_KEY: Record<string, string> = { en: "en", "zh-TW": "zh-Hant" };
+
+// One sitemap row per locale for a page, each carrying the full hreflang cluster (zh-Hant + en +
+// x-default=en) so Google sees the bilingual pair. Machine routes emit a single unprefixed row.
+function pageEntries(path: string, changeFrequency: ChangeFrequency, priority: number): MetadataRoute.Sitemap {
+  const languages: Record<string, string> = {
+    "x-default": `${siteConfig.url}${localizedPath("en", path)}`,
+  };
+  for (const locale of LOCALES) {
+    languages[HREFLANG_KEY[locale]] = `${siteConfig.url}${localizedPath(locale, path)}`;
+  }
+  return LOCALES.map((locale) => ({
+    url: `${siteConfig.url}${localizedPath(locale, path)}`,
     lastModified: new Date(),
     changeFrequency,
     priority,
-  };
+    alternates: { languages },
+  }));
+}
+
+function urlEntry(url: string, changeFrequency: ChangeFrequency, priority: number): MetadataRoute.Sitemap[number] {
+  return { url: `${siteConfig.url}${url}`, lastModified: new Date(), changeFrequency, priority };
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -38,7 +55,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/connect/which-tier", changeFrequency: "monthly", priority: 0.5 },
     { path: "/docs", changeFrequency: "weekly", priority: 0.9 },
     { path: "/blog", changeFrequency: "monthly", priority: 0.8 },
-    { path: "/api", changeFrequency: "weekly", priority: 0.85 },
     { path: "/login", changeFrequency: "monthly", priority: 0.4 },
     { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
     { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
@@ -47,6 +63,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/docs/market-coverage", changeFrequency: "weekly", priority: 0.75 },
     { path: "/docs/tools-and-mcp", changeFrequency: "weekly", priority: 0.75 },
     { path: "/docs/openapi-spec", changeFrequency: "weekly", priority: 0.75 },
+    // Machine routes (kept unprefixed by isMachineRoute):
     { path: "/openapi.json", changeFrequency: "weekly", priority: 0.7 },
     { path: "/llms.txt", changeFrequency: "monthly", priority: 0.55 },
     { path: "/llms-full.txt", changeFrequency: "monthly", priority: 0.5 },
@@ -60,44 +77,45 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const blogRoutes = getAllBlogPosts().map((post) => `/blog/${post.slug}`);
 
-  // Only list pages that are actually indexable: the English homepage once content-complete, and
-  // answer-shaped pages once published (drafts are noindex, so they must not appear in the sitemap).
-  const enRoutes = EN_HOMEPAGE_READY ? ["/en"] : [];
-  const publishedAnswerPages = getPublishedAnswerPages();
-  const answerRoutes =
-    publishedAnswerPages.length > 0
-      ? ["/answers", ...publishedAnswerPages.map((page) => `/answers/${page.slug}`)]
-      : [];
-
-  const uniqueRoutes = new Set<string>([
-    ...staticRoutes.map((route) => route.path),
-    ...docsRoutes,
-    ...blogRoutes,
-    ...enRoutes,
-    ...answerRoutes,
-  ]);
-
-  const entries: MetadataRoute.Sitemap = [];
-
-  for (const route of uniqueRoutes) {
-    if (route.startsWith("/blog/")) {
-      entries.push(toEntry(route, "monthly", 0.7));
-      continue;
+  // Answer pages are authored per-locale (distinct slugs); each exists in one locale only, so emit
+  // each at its own locale prefix (no cross-locale hreflang pair).
+  const localeAnswerRows: MetadataRoute.Sitemap = [];
+  for (const locale of LOCALES) {
+    const pages = getPublishedAnswerPages(locale);
+    if (pages.length === 0) continue;
+    for (const path of ["/answers", ...pages.map((page) => `/answers/${page.slug}`)]) {
+      localeAnswerRows.push(urlEntry(localizedPath(locale, path), "monthly", 0.6));
     }
-
-    const staticRoute = staticRoutes.find((item) => item.path === route);
-    if (staticRoute) {
-      entries.push(toEntry(route, staticRoute.changeFrequency, staticRoute.priority));
-      continue;
-    }
-
-    if (route.startsWith("/docs/")) {
-      entries.push(toEntry(route, "weekly", 0.72));
-      continue;
-    }
-
-    entries.push(toEntry(route, "monthly", 0.6));
   }
 
-  return entries;
+  const seen = new Set<string>();
+  const pagePaths: Array<{ path: string; changeFrequency: ChangeFrequency; priority: number }> = [];
+  const machineRows: MetadataRoute.Sitemap = [];
+
+  for (const route of staticRoutes) {
+    if (isMachineRoute(route.path)) {
+      machineRows.push(urlEntry(route.path, route.changeFrequency, route.priority));
+    } else if (!seen.has(route.path)) {
+      seen.add(route.path);
+      pagePaths.push(route);
+    }
+  }
+  for (const path of docsRoutes) {
+    if (!seen.has(path)) {
+      seen.add(path);
+      pagePaths.push({ path, changeFrequency: "weekly", priority: 0.72 });
+    }
+  }
+  for (const path of blogRoutes) {
+    if (!seen.has(path)) {
+      seen.add(path);
+      pagePaths.push({ path, changeFrequency: "monthly", priority: 0.7 });
+    }
+  }
+
+  return [
+    ...pagePaths.flatMap((r) => pageEntries(r.path, r.changeFrequency, r.priority)),
+    ...localeAnswerRows,
+    ...machineRows,
+  ];
 }

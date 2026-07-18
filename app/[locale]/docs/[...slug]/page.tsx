@@ -16,12 +16,13 @@ import { ToolsMcpContent } from "@/src/components/docs/tools-mcp-content";
 import { SectionHeading } from "@/src/components/docs/section-heading";
 import { buttonClass } from "@/src/components/ui/button";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 import { normalizeDocsSections } from "@/src/content/docs-sections";
 import { resolveDocsGroupTargetHref } from "@/src/content/docs-sidebar";
 import { docsPages, getDocsPageBySlug } from "@/src/content/docs-pages";
 
 type DocsDynamicPageProps = {
-  params: Promise<{ slug: string[] }>;
+  params: Promise<{ slug: string[]; locale: string }>;
 };
 
 const docsCanonicalAliases: Record<string, string> = {
@@ -43,26 +44,30 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: DocsDynamicPageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
+  const isEn = l === "en";
   const page = getDocsPageBySlug(slug);
 
   if (!page) {
     return {
-      title: "文件",
+      title: isEn ? "Docs" : "文件",
+      alternates: buildAlternates(l, `/docs/${slug.join("/")}`),
     };
   }
 
+  const canonicalHref = resolveDocsCanonical(page.href);
+
   return {
-    title: `文件｜${page.title}`,
+    title: isEn ? `Docs｜${page.title}` : `文件｜${page.title}`,
     description: page.subtitle,
-    alternates: {
-      canonical: resolveDocsCanonical(page.href),
-    },
+    alternates: buildAlternates(l, canonicalHref),
     openGraph: {
       title: `${page.title} | TW Market Data Docs`,
       description: page.subtitle,
-      url: resolveDocsCanonical(page.href),
+      url: canonicalHref,
       type: "article",
+      locale: OG_LOCALE[l],
       images: [getAbsoluteUrl(siteConfig.ogImagePath)],
     },
     twitter: {

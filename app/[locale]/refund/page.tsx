@@ -4,12 +4,26 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { Container } from "@/src/components/ui/container";
 import { siteConfig } from "@/src/config/site";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 import { CANCELLATION_EFFECTIVE_AT_PERIOD_END } from "@/src/lib/legal/cancellation-copy";
 
-export const metadata: Metadata = {
-  title: "退款政策",
-  description: "TW Market Data 退款政策。",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
+  const isEn = l === "en";
+  const title = isEn ? "Refund Policy" : "退款政策";
+  const description = isEn ? "TW Market Data refund policy." : "TW Market Data 退款政策。";
+  return {
+    title,
+    description,
+    alternates: buildAlternates(l, "/refund"),
+    openGraph: { title, description, locale: OG_LOCALE[l] },
+  };
+}
 
 export default async function RefundPage() {
   const t = await getTranslations("refund");

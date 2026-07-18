@@ -186,7 +186,24 @@ NOT build-static-rendered; live dashboard rendering → Cowork browser-verify li
   `datasetProducts` (site.ts) used only by backend-adapter (not display).
 - 🔴 `ai-research-mock-response.ts` landmine (self-labeled mock + page notFound()s) — owner decision (spec §5).
 
-**Remaining structured phase:**
+**PR4 (SEO) = DONE** (`feat/i18n-seo`, stacked on PR3):
+- `request.ts` missing-key telemetry (onError + getMessageFallback — never crash / leak raw key).
+- `src/i18n/seo.ts` `buildAlternates(locale, path)` → canonical self-ref + hreflang (zh-Hant/en/x-default=en) + `OG_LOCALE`.
+- ~30 pages: static `metadata` → locale-aware `generateMetadata` (EN title/desc + `buildAlternates` + `openGraph.locale`); auth pages noindex.
+- `sitemap.ts` locale-prefixed URLs + hreflang; `robots.ts` `/*/`-prefixed protected/auth disallow; `[locale]/layout` OG-locale.
+- Dead code deleted (rule 1): `src/config/i18n.ts` (legacy hreflang scaffold), `getDatasetBySlug`.
+- html `lang` per locale (layout) + §2.5 fallback (blog/docs) already done.
+
+**I18N-01 mechanical scope COMPLETE.** Merge order: PR1 #81 → PR2 #82 → PR3 #83 → PR4.
+
+**Human-copywriting / owner-decision follow-ups (all §2.5-fallback'd, safe to ship):**
+- Long-form EN rewrites: blog article bodies, docs-pages.ts reference prose, docs.ts aboutSections, docs-guide-content.ts, tools-mcp long prose (in-component zh kept).
+- 🔴 Rule-2 landmines (owner decision): homepage demo layer (4 files) + ai-research-mock-response.ts — fabricated numbers on real tickers.
+- Legal EN sign-off: terms/privacy/refund + INVESTMENT_DISCLAIMER_EN + cancellation clause EN.
+- Rule-1 pre-existing SSOT dups: pricing comparison table vs plans.ts; docs-pages.ts sidebar vs docs-sidebar.ts.
+- Minor: dashboard.ts sidebar labels dead for sidebar; datasetProducts (site.ts) backend-only.
+
+**Superseded remaining line (kept for history):**
 - **PR4 (SEO):** per-page `metadata`/`generateMetadata` + hreflang (zh-Hant/en/x-default) + canonical self-ref +
   JSON-LD bilingual + `sitemap.ts`/`robots.ts` locale URLs + missing-key telemetry + reconcile docs-pages.ts
   sidebar dup (§ flag). Note: html `lang` per locale already done (layout); §2.5 fallback already on blog + docs.

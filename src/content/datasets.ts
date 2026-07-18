@@ -631,10 +631,6 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
   },
 ] as const;
 
-export function getDatasetBySlug(slug: string): DatasetSeoEntry | undefined {
-  return datasetSeoEntries.find((item) => item.slug === slug);
-}
-
 export const datasetSlugSet = new Set(datasetSeoEntries.map((item) => item.slug));
 
 // Project a bilingual source record down to a single locale (spec §1.6, mirrors mega-menu-links.ts).

@@ -2,23 +2,35 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
 // Static, repo-driven reference page — no backend call. Self-contained (does not touch the docs
 // sidebar registry) so it adds a live /docs/webhooks page without changing any existing docs layout.
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: "文件｜Webhooks",
-  description:
-    "TW Market Data Webhooks（Phase A）：Standard Webhooks 簽章、at-least-once 不保序語義、三個事件 payload 與驗簽範例。",
-  alternates: { canonical: "/docs/webhooks" },
-  openGraph: {
-    title: "Webhooks | TW Market Data Docs",
-    description: "Signed HTTPS push for TW market data events — Standard Webhooks, at-least-once, not ordered.",
-    url: "/docs/webhooks",
-    images: [getAbsoluteUrl(siteConfig.ogImagePath)],
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
+  const isEn = l === "en";
+  return {
+    title: isEn ? "Docs｜Webhooks" : "文件｜Webhooks",
+    description: isEn
+      ? "TW Market Data Webhooks (Phase A): Standard Webhooks signatures, at-least-once and unordered delivery semantics, three event payloads, and signature-verification examples."
+      : "TW Market Data Webhooks（Phase A）：Standard Webhooks 簽章、at-least-once 不保序語義、三個事件 payload 與驗簽範例。",
+    alternates: buildAlternates(l, "/docs/webhooks"),
+    openGraph: {
+      title: "Webhooks | TW Market Data Docs",
+      description: "Signed HTTPS push for TW market data events — Standard Webhooks, at-least-once, not ordered.",
+      url: "/docs/webhooks",
+      locale: OG_LOCALE[l],
+      images: [getAbsoluteUrl(siteConfig.ogImagePath)],
+    },
+  };
+}
 
 const REVENUE_PAYLOAD = `{
   "schema_ver": 1,

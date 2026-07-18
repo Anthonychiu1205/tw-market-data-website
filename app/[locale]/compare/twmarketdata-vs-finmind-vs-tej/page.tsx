@@ -7,6 +7,8 @@ import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 import { getAbsoluteUrl } from "@/src/config/site";
 import { coverageFacts } from "@/src/content/coverage-facts";
+import type { AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
 // 篇4 (AEO handoff 2026-07-13). Honest three-way comparison of Taiwan stock data APIs. Honesty
 // guardrails: only shipped TWMD capabilities are claimed; reconciliation is described as
@@ -41,19 +43,30 @@ const faqIds = ["otherApis", "bestForPit", "vsFinmind"] as const;
 
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: PATH },
-  robots: { index: true, follow: true },
-  openGraph: {
-    title: TITLE,
-    description: DESCRIPTION,
-    url: pageUrl,
-    type: "article",
-    locale: "zh_TW",
-  },
-};
+// EN metadata mirrors the zh TITLE/DESCRIPTION facts (three-way comparison, honesty guardrails).
+// The body JSON-LD keeps the zh TITLE/DESCRIPTION constants untouched (SEO PR4 scope).
+const TITLE_EN = "TW Market Data vs FinMind vs TEJ: How to choose a Taiwan stock data API (2026)";
+const DESCRIPTION_EN =
+  "An honest comparison of the three main Taiwan stock data APIs — FinMind (free community), TEJ (institutional PIT), and TW Market Data (official reconciliation + affordable + AI-agent). Includes a comparison table and use-case guidance.";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  const isEn = l === "en";
+  return {
+    title: isEn ? TITLE_EN : TITLE,
+    description: isEn ? DESCRIPTION_EN : DESCRIPTION,
+    alternates: buildAlternates(l, PATH),
+    robots: { index: true, follow: true },
+    openGraph: {
+      title: isEn ? TITLE_EN : TITLE,
+      description: isEn ? DESCRIPTION_EN : DESCRIPTION,
+      url: pageUrl,
+      type: "article",
+      locale: OG_LOCALE[l],
+    },
+  };
+}
 
 export default async function CompareTaiwanStockApisPage() {
   const t = await getTranslations("compare");

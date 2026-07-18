@@ -7,11 +7,27 @@ import { CodeWindow } from "@/src/components/ui/code-window";
 import { Container } from "@/src/components/ui/container";
 import { getPlatformCapabilities } from "@/src/content/site";
 import type { AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 
-export const metadata: Metadata = {
-  title: "產品",
-  description: "TWSE-first verified 台股資料產品能力總覽。",
-};
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  const isEn = l === "en";
+  return {
+    title: isEn ? "Product" : "產品",
+    description: isEn
+      ? "An overview of the TWSE-first verified Taiwan stock data product capabilities."
+      : "TWSE-first verified 台股資料產品能力總覽。",
+    alternates: buildAlternates(l, "/product"),
+    openGraph: {
+      locale: OG_LOCALE[l],
+      title: isEn ? "Product | TW Market Data" : "產品 | TW Market Data",
+      description: isEn
+        ? "An overview of the TWSE-first verified Taiwan stock data product capabilities."
+        : "TWSE-first verified 台股資料產品能力總覽。",
+    },
+  };
+}
 
 export default async function ProductPage() {
   const t = await getTranslations("product");

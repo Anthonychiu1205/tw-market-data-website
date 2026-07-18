@@ -6,14 +6,15 @@ import { buttonClass } from "@/src/components/ui/button";
 import { Container } from "@/src/components/ui/container";
 import { ReconciliationBadge } from "@/src/components/datasets/reconciliation-badge";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
-import { getDatasetBySlug, getDatasetSeoEntry, datasetSeoEntries } from "@/src/content/datasets";
+import { getDatasetSeoEntry, datasetSeoEntries } from "@/src/content/datasets";
 import { datasetTemporalCoverage } from "@/src/content/coverage-facts";
 import { Link } from "@/src/i18n/navigation";
 import type { AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 import { getDatasetReconciliation } from "@/src/lib/reconciliation/dataset-reconciliation";
 
 type PageProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale: string }>;
 };
 
 export function generateStaticParams() {
@@ -25,14 +26,17 @@ export function generateStaticParams() {
 // rebuild — the rest of the page is static content from src/content/datasets.ts.
 export const revalidate = 3600;
 
-// SEO PR4 will localize metadata; until then it reads the zh dataset fields (getDatasetBySlug).
+// Locale-aware metadata: the dataset record is bilingual (§1.6) and projected per locale via
+// getDatasetSeoEntry, so seoTitle/seoDescription/keywords already carry the right language.
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const dataset = getDatasetBySlug(slug);
+  const { slug, locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  const isEn = l === "en";
+  const dataset = getDatasetSeoEntry(slug, l);
 
   if (!dataset) {
     return {
-      title: "資料集不存在 | TW Market Data",
+      title: isEn ? "Dataset not found | TW Market Data" : "資料集不存在 | TW Market Data",
       robots: { index: false, follow: false },
     };
   }
@@ -40,11 +44,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: dataset.seoTitle,
     description: dataset.seoDescription,
-    alternates: {
-      canonical: `/datasets/${dataset.slug}`,
-    },
+    alternates: buildAlternates(l, `/datasets/${dataset.slug}`),
     keywords: dataset.keywords,
     openGraph: {
+      locale: OG_LOCALE[l],
       title: dataset.seoTitle,
       description: dataset.seoDescription,
       url: `/datasets/${dataset.slug}`,

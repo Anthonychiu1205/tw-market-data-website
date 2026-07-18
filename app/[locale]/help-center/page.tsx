@@ -2,17 +2,30 @@ import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 
 import { HelpCenterShell } from "@/src/components/help/help-center-shell";
-import { getHelpCategories, helpCenterPageMeta } from "@/src/content/help-center";
+import { getHelpCategories, getHelpCenterPageMeta } from "@/src/content/help-center";
 import type { AppLocale } from "@/src/i18n/locales";
+import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 import { JsonLd } from "@/src/components/seo/json-ld";
 
-export const metadata: Metadata = {
-  title: `${helpCenterPageMeta.title} | TW Market Data`,
-  description: helpCenterPageMeta.subtitle,
-  alternates: {
-    canonical: "/help-center",
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  const meta = getHelpCenterPageMeta(l);
+  return {
+    title: `${meta.title} | TW Market Data`,
+    description: meta.subtitle,
+    alternates: buildAlternates(l, "/help-center"),
+    openGraph: {
+      title: `${meta.title} | TW Market Data`,
+      description: meta.subtitle,
+      locale: OG_LOCALE[l],
+    },
+  };
+}
 
 export default async function HelpCenterStandalonePage() {
   const locale = await getLocale();
