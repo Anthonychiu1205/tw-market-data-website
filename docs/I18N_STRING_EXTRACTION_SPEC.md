@@ -176,9 +176,17 @@ API field names, ticker symbols (e.g. `2330`).
   fallback on `[...slug]` (docs-pages.ts 12k body stays zh). Thin docs pages are redirects (no work).
 - **PR2 (公開頁) = COMPLETE.** Message catalog: **664 keys, full en/zh parity**. Multiple full production builds green.
 
-**Remaining = the two structured phases (separate PRs):**
-- **PR3 (dashboard):** dashboard/* (20 components) + dashboard.ts + billing/subscription pages + `plans.ts` plan-card
-  copy (§5.1) + cancellation-copy.ts + datasetProducts (site.ts, backend). Protected/dynamic pages.
+**PR3 (dashboard) = DONE** (`feat/i18n-dashboard`, ~1149 keys, tsc-verified — dashboard is dynamic/behind-auth so
+NOT build-static-rendered; live dashboard rendering → Cowork browser-verify list):
+- dashboard shell/nav/console/usage-page/overview-chart; account (profile/keys/delete/grant); billing cluster
+  (landing/subscriptions/credits + cancel/resume/dialog); `plans.ts` §5.1 plan-card copy `*_en` + `getPricingPlanView(s)(locale)`;
+  credits-mode.ts / cancellation-copy.ts / status.ts locale-aware; pricing-shell threads locale; AI-research chrome + §2.5 fallback;
+  request-playground; credits-mode labels threaded into console + usage-page.
+- PR3 loose ends (minor): `dashboard.ts` sidebar labels now dead for the sidebar (bypassed by `dashboard.nav.*`) → dead-code cleanup;
+  `datasetProducts` (site.ts) used only by backend-adapter (not display).
+- 🔴 `ai-research-mock-response.ts` landmine (self-labeled mock + page notFound()s) — owner decision (spec §5).
+
+**Remaining structured phase:**
 - **PR4 (SEO):** per-page `metadata`/`generateMetadata` + hreflang (zh-Hant/en/x-default) + canonical self-ref +
   JSON-LD bilingual + `sitemap.ts`/`robots.ts` locale URLs + missing-key telemetry + reconcile docs-pages.ts
   sidebar dup (§ flag). Note: html `lang` per locale already done (layout); §2.5 fallback already on blog + docs.

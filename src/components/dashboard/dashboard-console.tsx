@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { Link } from "@/src/i18n/navigation";
 import type {
@@ -131,6 +131,8 @@ function UsageActivityCard({
   creditsModeState: CreditsDeductionRuntimeState;
 }) {
   const t = useTranslations("dashboard");
+  const locale = useLocale();
+  const creditsLocale = locale === "en" ? "en" : "zh-TW";
   const hasEvents = usageHasEvents(usage);
   const latestActive = getLatestActiveUsage(usage);
 
@@ -203,7 +205,7 @@ function UsageActivityCard({
       <div className="mt-4 grid gap-3 text-xs text-slate-600 sm:grid-cols-3">
         <p>{t("usageActivity.requestsTodayLine", { count: requestsToday.toLocaleString() })}</p>
         <p>{t("usageActivity.requests30dLine", { count: requests30d.toLocaleString() })}</p>
-        <p>{t("usageActivity.credits30dLine", { label: getCreditsAmountLabel(creditsModeState), value: creditsUsage30dDisplay.toLocaleString() })}</p>
+        <p>{t("usageActivity.credits30dLine", { label: getCreditsAmountLabel(creditsModeState, creditsLocale), value: creditsUsage30dDisplay.toLocaleString() })}</p>
       </div>
 
       {recentErrors.length > 0 ? (
@@ -219,7 +221,7 @@ function UsageActivityCard({
           ? t("usageActivity.latestActive", { date: latestActive?.date ?? "", count: (latestActive?.count ?? 0).toLocaleString() })
           : t("usageActivity.noActivity")}
       </p>
-      <p className="mt-1 text-xs text-slate-500">{getCreditsModeDescription(creditsModeState)}</p>
+      <p className="mt-1 text-xs text-slate-500">{getCreditsModeDescription(creditsModeState, creditsLocale)}</p>
     </DashboardCard>
   );
 }
@@ -240,6 +242,8 @@ function OverviewPanel({
   creditsModeState: CreditsDeductionRuntimeState;
 }) {
   const t = useTranslations("dashboard");
+  const locale = useLocale();
+  const creditsLocale = locale === "en" ? "en" : "zh-TW";
   const activeKeysCount = apiKeys.keys.filter((item) => item.status !== "revoked").length;
   const requestsToday = usage.requestsToday ?? 0;
   const requests30d = usage.requests30d ?? usage.monthlyUsed;
@@ -281,7 +285,7 @@ function OverviewPanel({
             <span className="ml-2 font-semibold text-slate-900">{creditWalletBalance.toLocaleString()}</span>
           </p>
         </div>
-        <p className="mt-2 text-xs text-slate-500">{t("overview.currentMode", { mode: getCreditsModeLabel(creditsModeState) })}</p>
+        <p className="mt-2 text-xs text-slate-500">{t("overview.currentMode", { mode: getCreditsModeLabel(creditsModeState, creditsLocale) })}</p>
       </DashboardCard>
 
       {creditState === "exhausted" ? (
