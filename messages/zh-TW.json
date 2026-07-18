@@ -1634,6 +1634,7 @@
   "common": {
     "englishComingSoon": "English version coming soon.",
     "illustrativeData": "示意資料，非即時行情",
-    "enLegalReference": "本頁英文翻譯僅供參考，以中文版為準。"
+    "enLegalReference": "本頁英文翻譯僅供參考，以中文版為準。",
+    "realDataAsOf": "真實資料 · 資料日期 {date}"
   }
 }

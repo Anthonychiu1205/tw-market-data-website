@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
+import type { ApiDemoRealData } from "@/src/lib/homepage/demo-real-data-types";
 
 type EndpointId = "monthlyRevenue" | "twseDailyPrice" | "incomeStatement" | "technicalIndicators";
 type CodeLanguage = "python" | "typescript" | "curl";
@@ -54,79 +55,19 @@ const data = await response.json();`;
   return `curl "https://api.twmarketdata.com${path}?symbol=${symbol}&limit=12"`;
 }
 
-function buildMockResponse(dataset: string, symbol: string, name: string) {
-  if (dataset === "monthly_revenue") {
-    return {
-      dataset,
-      symbol,
-      name,
-      source: "MOPS",
-      data: [
-        {
-          period: "2026-03",
-          revenue: 195234000000,
-          currency: "TWD",
-          yoy_growth_pct: 34.7,
-          mom_growth_pct: 11.2,
-        },
-      ],
-    };
+// Build the response the panel displays from REAL prefetched data (server-fetched, passed as a prop).
+// No number is ever fabricated: a real row is shown verbatim with its real as_of, and when a combo has
+// no real row available the panel shows an honest note instead of invented figures (rule 2).
+function buildRealResponse(
+  data: ApiDemoRealData | undefined,
+  endpointMeta: (typeof endpointOptions)[number],
+  tickerMeta: (typeof tickerOptions)[number],
+) {
+  const resp = data?.responses?.[endpointMeta.id]?.[tickerMeta.symbol];
+  if (resp) {
+    return { dataset: resp.dataset, symbol: resp.symbol, name: tickerMeta.name, as_of: resp.asOf, data: resp.data };
   }
-
-  if (dataset === "twse_daily_price") {
-    return {
-      dataset,
-      symbol,
-      name,
-      source: "TWSE",
-      data: [
-        {
-          date: "2026-05-05",
-          open: 888,
-          high: 897,
-          low: 883,
-          close: 892,
-          volume: 28451234,
-        },
-      ],
-    };
-  }
-
-  if (dataset === "income_statement") {
-    return {
-      dataset,
-      symbol,
-      name,
-      source: "MOPS",
-      data: [
-        {
-          period: "2025-Q4",
-          revenue: 625000000000,
-          gross_profit: 336000000000,
-          operating_income: 248000000000,
-          net_income: 224000000000,
-          eps: 8.64,
-        },
-      ],
-    };
-  }
-
-  return {
-    dataset,
-    symbol,
-    name,
-    source: "TWSE",
-    data: [
-      {
-        date: "2026-05-05",
-        close: 892,
-        rsi_14: 58.4,
-        macd: 5.31,
-        macd_signal: 4.98,
-        ma_20: 871.4,
-      },
-    ],
-  };
+  return { dataset: endpointMeta.dataset, symbol: tickerMeta.symbol, name: tickerMeta.name, note: "資料暫時無法載入" };
 }
 
 function DemoSelect({
@@ -196,7 +137,7 @@ function DemoSelect({
   );
 }
 
-export function ApiDemoSection() {
+export function ApiDemoSection({ data }: { data?: ApiDemoRealData }) {
   const t = useTranslations("home.apiDemo");
   const tc = useTranslations("common");
   const [draftEndpointId, setDraftEndpointId] = useState<EndpointId>("monthlyRevenue");
@@ -251,7 +192,7 @@ export function ApiDemoSection() {
     setActiveTicker(draftTickerMeta.value);
     setVisibleLineCount(0);
 
-    const nextResponseJson = JSON.stringify(buildMockResponse(draftEndpointMeta.dataset, draftTickerMeta.symbol, draftTickerMeta.name), null, 2);
+    const nextResponseJson = JSON.stringify(buildRealResponse(data, draftEndpointMeta, draftTickerMeta), null, 2);
     const nextResponseLines = nextResponseJson.split("\n");
 
     timeoutRef.current = window.setTimeout(() => {
@@ -272,8 +213,9 @@ export function ApiDemoSection() {
   };
 
   const codeSnippet = buildCodeSnippet(activeEndpointMeta.path, activeTickerMeta.symbol, activeLanguage);
-  const mockResponse = buildMockResponse(activeEndpointMeta.dataset, activeTickerMeta.symbol, activeTickerMeta.name);
-  const responseJson = JSON.stringify(mockResponse, null, 2);
+  const activeResponse = buildRealResponse(data, activeEndpointMeta, activeTickerMeta);
+  const activeAsOf = data?.responses?.[activeEndpointMeta.id]?.[activeTickerMeta.symbol]?.asOf ?? "";
+  const responseJson = JSON.stringify(activeResponse, null, 2);
   const responseLines = responseJson.split("\n");
   const displayedResponse = visibleLineCount === null ? responseJson : responseLines.slice(0, visibleLineCount).join("\n");
 
@@ -327,9 +269,11 @@ export function ApiDemoSection() {
           </div>
 
           <div className="min-h-[460px] rounded-[2rem] border border-slate-200/60 bg-slate-50/80 p-8">
-            <p className="mb-3 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-amber-200">
-              {tc("illustrativeData")}
-            </p>
+            {activeAsOf ? (
+              <p className="mb-3 inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700 ring-1 ring-emerald-200">
+                {tc("realDataAsOf", { date: activeAsOf })}
+              </p>
+            ) : null}
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                 <span className="tracking-[0.08em]">{t("response")}</span>
