@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { Link } from "@/src/i18n/navigation";
 import { Card } from "@/src/components/ui/card";
 import { CodeWindow } from "@/src/components/ui/code-window";
 import { Container } from "@/src/components/ui/container";
-import { platformCapabilities } from "@/src/content/site";
+import { getPlatformCapabilities } from "@/src/content/site";
+import type { AppLocale } from "@/src/i18n/locales";
 
 export const metadata: Metadata = {
   title: "產品",
@@ -14,6 +15,8 @@ export const metadata: Metadata = {
 
 export default async function ProductPage() {
   const t = await getTranslations("product");
+  const locale = (await getLocale()) as AppLocale;
+  const platformCapabilities = getPlatformCapabilities(locale);
   const verifiedBaselineTopics = [
     "twse_daily_price",
     "monthly_revenue",

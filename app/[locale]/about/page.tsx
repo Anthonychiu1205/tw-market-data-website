@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { DocsLayout } from "@/src/components/docs/docs-layout";
 import { SectionHeading } from "@/src/components/docs/section-heading";
 import { Card } from "@/src/components/ui/card";
 import { aboutSections } from "@/src/content/docs";
-import { sourcePolicy } from "@/src/content/site";
+import { getSourcePolicy } from "@/src/content/site";
+import type { AppLocale } from "@/src/i18n/locales";
 
 export const metadata: Metadata = {
   title: "關於",
@@ -14,6 +15,8 @@ export const metadata: Metadata = {
 
 export default async function AboutPage() {
   const t = await getTranslations("about");
+  const locale = (await getLocale()) as AppLocale;
+  const sourcePolicy = getSourcePolicy(locale);
 
   return (
     <DocsLayout

@@ -43,27 +43,76 @@ export const datasetProducts: DatasetProduct[] = [
   { id: "convertible-bond-institutional-flow", name: "convertible-bond-institutional-flow", domain: "可轉債", marketCoverage: "可轉債法人籌碼（Private Beta）", maturity: "v2", readiness: "preview", sourceOrigin: "TPEx official-first", shortUseCase: "aggregate institutional bucket surface only；no bond_code、非 bond-level daily flow", endpoint: "/v2/datasets/convertible-bond-institutional-flow" },
 ];
 
+import type { AppLocale } from "@/src/i18n/locales";
+
 export const sourcePolicy = [
   "TWSE / TPEx / MOPS 優先，official / public-first。",
   "canonical、fallback、helper 角色分離。",
   "lineage / freshness / completeness / auditability 為核心能力。",
 ];
 
-export const platformCapabilities = [
+const sourcePolicyEn = [
+  "TWSE / TPEx / MOPS first, official / public-first.",
+  "Separate canonical, fallback, and helper roles.",
+  "Lineage / freshness / completeness / auditability as core capabilities.",
+];
+
+export function getSourcePolicy(locale: AppLocale): string[] {
+  return locale === "en" ? sourcePolicyEn : sourcePolicy;
+}
+
+type PlatformCapabilityGroup = {
+  title: string;
+  titleEn: string;
+  items: string[];
+  itemsEn: string[];
+};
+
+const platformCapabilitiesSource: PlatformCapabilityGroup[] = [
   {
     title: "資料引擎",
+    titleEn: "Data engine",
     items: ["台股官方來源優先資料層", "available-now 與 preview 分級", "來源分層與可審計"],
+    itemsEn: [
+      "Taiwan official-source-first data layer",
+      "available-now vs preview tiers",
+      "Source layering and auditability",
+    ],
   },
   {
     title: "API 產品",
+    titleEn: "API product",
     items: ["REST API", "API 金鑰 / 配額 / 用量", "Quick Start 與文件導流"],
+    itemsEn: ["REST API", "API keys / quota / usage", "Quick Start and docs onboarding"],
   },
   {
     title: "商業化流程",
+    titleEn: "Commercialization",
     items: ["controlled rollout", "方案分級與用量控管", "public sellable boundary 管理"],
+    itemsEn: [
+      "controlled rollout",
+      "plan tiering and usage control",
+      "public sellable boundary management",
+    ],
   },
   {
     title: "V2 能力",
+    titleEn: "V2 capabilities",
     items: ["query / search", "screener / factor", "MCP / agent workflow"],
+    itemsEn: ["query / search", "screener / factor", "MCP / agent workflow"],
   },
 ];
+
+// Kept for any existing zh reader; product page uses getPlatformCapabilities(locale).
+export const platformCapabilities = platformCapabilitiesSource.map((g) => ({
+  title: g.title,
+  items: g.items,
+}));
+
+export function getPlatformCapabilities(locale: AppLocale): { title: string; items: string[] }[] {
+  const en = locale === "en";
+  return platformCapabilitiesSource.map((g) => ({
+    title: en ? g.titleEn : g.title,
+    items: en ? g.itemsEn : g.items,
+  }));
+}
