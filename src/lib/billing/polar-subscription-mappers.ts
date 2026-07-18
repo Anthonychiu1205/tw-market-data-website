@@ -156,6 +156,14 @@ export function sortInvoicesNewestFirst(invoices: PolarInvoice[]): PolarInvoice[
  * external id must equal the requesting user id. Anything missing/blank/mismatched is a
  * hard false, so one user can never reach another user's invoice.
  */
+/**
+ * True when a thrown Polar error is a 404 (resource not found). Used so a non-existent order and a
+ * not-yours order return the SAME 404 — never reveal whether an order exists to a different user.
+ */
+export function isNotFoundError(error: unknown): boolean {
+  return typeof error === "object" && error !== null && (error as { statusCode?: unknown }).statusCode === 404;
+}
+
 export function isOrderOwnedByUser(order: unknown, userId: string): boolean {
   if (!order || typeof order !== "object") return false;
   if (!userId) return false;

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { auth } from "@/src/auth";
 import { getPolarClient } from "@/src/lib/billing/polar";
-import { isOrderOwnedByUser } from "@/src/lib/billing/polar-subscription-mappers";
+import { isNotFoundError, isOrderOwnedByUser } from "@/src/lib/billing/polar-subscription-mappers";
 
 export const runtime = "nodejs";
 
@@ -53,6 +53,11 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ orderId
 
     return new NextResponse("發票產生中，請稍後再試。", { status: 202 });
   } catch (error) {
+    // A non-existent order (Polar 404) returns the SAME 404 as a not-yours order — never reveal
+    // whether an order exists. Only genuine upstream failures surface as 502.
+    if (isNotFoundError(error)) {
+      return new NextResponse("Not found", { status: 404 });
+    }
     const statusCode = (error as { statusCode?: number })?.statusCode;
     console.warn(`[billing-invoice] order=${orderId} user=${userId} status=${statusCode ?? "n/a"}`);
     return new NextResponse("Invoice unavailable", { status: 502 });

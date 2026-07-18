@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
+  isNotFoundError,
   isOrderOwnedByUser,
   mapPolarOrder,
   mapPolarPaymentMethod,
@@ -131,6 +132,15 @@ test("selectCurrentSubscription breaks ties by furthest period end, and empty â†
   ]);
   assert.equal(chosen?.id, "far");
   assert.equal(selectCurrentSubscription([]), null);
+});
+
+test("isNotFoundError detects only a 404 (so missing order == not-yours order â†’ 404)", () => {
+  assert.equal(isNotFoundError({ statusCode: 404 }), true);
+  assert.equal(isNotFoundError({ statusCode: 500 }), false);
+  assert.equal(isNotFoundError({ statusCode: 403 }), false);
+  assert.equal(isNotFoundError(new Error("boom")), false);
+  assert.equal(isNotFoundError(null), false);
+  assert.equal(isNotFoundError(undefined), false);
 });
 
 test("isOrderOwnedByUser gates order access strictly (blocks cross-account)", () => {

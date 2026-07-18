@@ -38,7 +38,13 @@ npm run dev          # → http://localhost:3000
 6. **Polar down**：暫時改壞 `POLAR_ACCESS_TOKEN` → 付款方式卡顯示錯誤態、不崩、不假數字。
 
 ## 4. 「期末 402 降級」— 部分驗收（缺口）
-- 三態頁 paid/free 判定來自 **read API entitlement**（非 Polar）；cancel/resume/發票/付款方式直讀寫 **Polar sandbox** 可驗 ✅。
-- **但 402 降級**需 read API 收到 **sandbox** 的 `subscription.canceled` webhook 才翻 status；read API 現指 **prod Polar**，看不到 sandbox 取消 → **本機驗不到**。
+- 三態頁 paid/free + 方案**已改由 Polar live 判定**（SSOT，#78）；cancel/resume/發票/付款方式亦直讀寫 **Polar sandbox** → UI 全可驗 ✅。
+- **但 402 降級**（資料集存取）走 **read API entitlement**：需 read API 收到 **sandbox** 的 `subscription.canceled` webhook 才翻 status；read API 現指 **prod Polar**，看不到 sandbox 取消 → **本機驗不到**。
 - **補驗條件**：read API 也指向同一 Polar sandbox（其 Polar env + webhook 設為 sandbox）之日，補跑 REST `/v2/datasets/{付費集}` 回 402 + 同 key MCP `query_dataset` 同集回 402（60s cache 內一致）。
-- 追蹤：read API repo backlog 票（`tw-feature-engine`）。
+- 追蹤：read API repo backlog 票 `tw-feature-engine#98`。
+
+## 5. 驗收結果（2026-07-18，SBX-63 結案）
+**通過**（#78 已合併）。9 項：**6 全過**（三態顯示、訂閱、取消、取消中黃 banner、恢復、跨帳 404）、**1 先前實測**（發票）、**2 部分驗收（留檔）**：
+- **402 期末降級**：本機驗不到（read API 指 prod Polar）→ 待 `tw-feature-engine#98` read API 指向 sandbox 後補跑。
+- **Polar-down 錯誤態**：以壞 token 驗過付款方式錯誤態；完整跨服務 down 情境列部分驗收。
+過程修正併入 #78：dev-login（DB-session 路由 + /login 表單）、Prisma 本機 TCP 分流、三態頁付費/免費改 Polar SSOT。
