@@ -22,6 +22,7 @@ import { AccountProfileForm } from "@/src/components/dashboard/account-profile-f
 import { DeleteAccountCard } from "@/src/components/dashboard/delete-account-card";
 import { ResearchTerminalEntryCard } from "@/src/components/dashboard/research-terminal-entry-card";
 import type { CreditSpendSeries } from "@/src/lib/billing/credits";
+import type { PolarBillingSnapshot } from "@/src/lib/billing/polar-subscription";
 import type { CreditsDeductionRuntimeState } from "@/src/lib/billing/credits-mode";
 import { getCreditsModeDescription, getCreditsModeLabel } from "@/src/lib/billing/credits-mode";
 
@@ -54,6 +55,8 @@ type DashboardConsoleProps = {
     cancelReason: string | null;
     cancelReasonDetail: string | null;
   } | null;
+  /** Live Polar snapshot for /billing/subscriptions; null on free tier / other sections. */
+  polar?: PolarBillingSnapshot | null;
   creditWalletBalance: number;
   spendSeries: CreditSpendSeries;
   creditsModeState: CreditsDeductionRuntimeState;
@@ -475,41 +478,14 @@ export function renderSection(section: DashboardSection, props: DashboardConsole
   if (section === "billing") {
     if (props.currentPath === "/billing/subscriptions") {
       const currentPlanId = props.subscription?.planCode;
-      if (
+      const paidPlanId =
         currentPlanId === "starter" ||
         currentPlanId === "pro" ||
         currentPlanId === "max" ||
         currentPlanId === "developer"
-      ) {
-        return (
-          <BillingSubscriptionsPage
-            currentPlanId={currentPlanId}
-            subscription={
-              props.subscription
-                ? {
-                    status: props.subscription.status,
-                    cancelAtPeriodEnd: props.subscription.cancelAtPeriodEnd,
-                    currentPeriodEnd: props.subscription.currentPeriodEnd,
-                  }
-                : null
-            }
-          />
-        );
-      }
-      return (
-        <BillingSubscriptionsPage
-          currentPlanId={null}
-          subscription={
-            props.subscription
-              ? {
-                  status: props.subscription.status,
-                  cancelAtPeriodEnd: props.subscription.cancelAtPeriodEnd,
-                  currentPeriodEnd: props.subscription.currentPeriodEnd,
-                }
-              : null
-          }
-        />
-      );
+          ? currentPlanId
+          : null;
+      return <BillingSubscriptionsPage currentPlanId={paidPlanId} polar={props.polar ?? null} />;
     }
     if (props.currentPath === "/billing/credits") {
       return (

@@ -9,6 +9,7 @@
     "migrate:status": "prisma migrate status",
     "start": "next start",
     "lint": "eslint",
+  "test": "node --test \"src/**/*.test.ts\"",
     "check:safe-redirect": "node scripts/check_safe_redirect.mjs",
     "check:deployment-env": "node scripts/check_deployment_env.mjs",
     "smoke:gateway-dry-run": "node scripts/smoke_gateway_dry_run.mjs",

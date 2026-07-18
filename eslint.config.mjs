@@ -13,6 +13,9 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "packages/**/dist/**",
+    // Node --test files use explicit .ts import specifiers (native type-stripping);
+    // they run via `npm test`, not the app build, so keep them out of the app lint pass.
+    "**/*.test.ts",
   ]),
 ]);
 
