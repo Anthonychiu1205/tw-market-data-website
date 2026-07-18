@@ -192,6 +192,8 @@ model ApiUsageEvent {
   @@index([datasetSlug])
   @@index([createdAt])
   @@index([requestId])
+  // PERF-01 C: hot path filters userId + createdAt range and orders by createdAt DESC.
+  @@index([userId, createdAt])
 }
 
 // WEBHOOK-01 Phase A — delivery side (webhook台). The events_outbox itself lives in the read API's DB
