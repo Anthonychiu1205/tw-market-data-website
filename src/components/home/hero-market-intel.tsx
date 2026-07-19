@@ -8,7 +8,10 @@ import { getMarketMarqueeSnapshotView } from "@/src/lib/market-marquee-snapshot"
 // NOTE: these are DATA KEYS matched against the live snapshot's item.name (zh from the API), not
 // display strings — they must stay zh or the market-row lookup breaks. Do not translate. Display
 // names resolve through indexDisplayName (SSOT in @/src/lib/homepage/index-names).
-const MARKET_LABELS = ["加權指數", "櫃買指數", "台灣50", "電子類股", "金融保險"] as const;
+// MKTCARD-01: the card is a fixed 4-indicator set in this exact order. 半導體 renders once the
+// curated /v2/homepage/market-indices endpoint emits its sector_semi row (data exists in the TWSE
+// industry index series); until then only the indicators with a real value show.
+const MARKET_LABELS = ["加權指數", "電子類股", "金融保險", "半導體"] as const;
 
 function toneClass(trend: "up" | "down" | "neutral") {
   // Taiwan convention: 紅漲綠跌 (red = up, green = down), aligned with market-marquee-track.
@@ -31,13 +34,11 @@ export async function HeroMarketIntel() {
     getHomepageMarketSnapshot(),
     getMarketMarqueeSnapshotView(locale),
   ]);
-  // Order the live rows by the preferred display order, then append any other live index the API
-  // returns. Nothing is padded with placeholder rows — an index we have no real value for is simply
-  // not shown (this is what removed the stale demo 櫃買/台灣50 numbers).
+  // Render exactly the fixed 4 indicators (MARKET_LABELS), in that order, and ONLY those that carry a
+  // real live value — an index we have no value for is simply omitted. No placeholder rows and no
+  // backfill with a stray index, so the card never shows a number we did not intend (rule 2).
   const byLabel = new Map(marketSnapshot.items.map((item) => [item.name, item]));
-  const ordered = MARKET_LABELS.map((label) => byLabel.get(label)).filter((item) => item !== undefined);
-  const rest = marketSnapshot.items.filter((item) => !MARKET_LABELS.includes(item.name as (typeof MARKET_LABELS)[number]));
-  const marketRows = [...ordered, ...rest].slice(0, 5);
+  const marketRows = MARKET_LABELS.map((label) => byLabel.get(label)).filter((item) => item !== undefined);
   const newsItems = newsSnapshot.news.slice(0, 4);
 
   return (
@@ -53,11 +54,7 @@ export async function HeroMarketIntel() {
               {t("viewAll")} &gt;
             </Link>
           </div>
-          {marketSnapshot.updatedAt ? (
-            <p className="mt-2 text-xs text-slate-500">{t("asOf", { date: marketSnapshot.updatedAt })}</p>
-          ) : null}
-
-          <div className="pt-2">
+          <div className="pt-4">
             {marketRows.map((item) => (
               <div key={item.id} className="grid h-10 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 border-b border-slate-100 text-sm last:border-b-0">
                 <p className="truncate font-medium text-slate-800">{indexDisplayName(item.name, locale)}</p>
