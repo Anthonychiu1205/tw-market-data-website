@@ -5,7 +5,7 @@
     "description": "台股資料 API，為 AI agent、量化研究與金融產品開發設計。此文件提供 machine-readable 的公開資料端點摘要，詳細欄位請以對應 docs endpoint 頁面為準。",
     "version": "0.1.0",
     "x-spec-version": "1.0.0",
-    "x-generated-at": "2026-07-18T20:34:12.744Z"
+    "x-generated-at": "2026-07-19T03:32:03.975Z"
   },
   "servers": [
     {
@@ -184,16 +184,6 @@
               }
             }
           },
-          "402": {
-            "description": "Payment required — plan does not include this dataset. See payment.credits_url in the body to upgrade.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "429": {
             "description": "Rate Limited",
             "content": {
@@ -218,11 +208,7 @@
         "x-data-status": "production",
         "x-data-gaps": "Response may include data_gaps and coverage/freshness caveats.",
         "operationId": "get_tpex_daily_price",
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
+        "security": []
       }
     },
     "/v2/datasets/monthly-revenue": {
@@ -321,10 +307,6 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
-          "402": {
-            "$ref": "#/components/responses/TooManyRequests",
-            "description": "Payment required — plan does not include this dataset. See payment.credits_url in the body to upgrade."
-          },
           "429": {
             "$ref": "#/components/responses/TooManyRequests"
           },
@@ -349,11 +331,7 @@
         "x-docs-page": "https://twmarketdata.com/docs/api/financial-growth/monthly-revenue",
         "x-freshness-note": "Monthly disclosure cadence applies; check freshness before cross-dataset joins.",
         "x-stability": "stable",
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
+        "security": []
       }
     },
     "/v2/datasets/income-statement": {
