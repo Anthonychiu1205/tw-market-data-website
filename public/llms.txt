@@ -3,6 +3,10 @@ not_investment_advice=true
 rule:no_buy_sell_target_price_recommendation
 rule:preserve_data_gaps_and_unknowns
 
+openapi=https://twmarketdata.com/openapi.json
+openapi_yaml=https://twmarketdata.com/openapi.yaml
+skill=https://twmarketdata.com/skill.md
+
 allowed_dataset_ids:
 - balance_sheet
 - block_trade_daily
