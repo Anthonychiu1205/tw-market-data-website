@@ -89,30 +89,5 @@
     "技術指標、估值與財報資料可供 API 查詢",
     "前端僅展示 summary snapshot，不暴露 raw payload"
   ],
-  "news": [
-    {
-      "title": "公開資訊觀測站月營收資料陸續更新，市場關注營收成長動能",
-      "source": "MOPS",
-      "category": "月營收",
-      "href": "/login"
-    },
-    {
-      "title": "電子類股成交比重維持高檔，AI 供應鏈仍為盤面焦點",
-      "source": "TWSE",
-      "category": "市場概況",
-      "href": "/login"
-    },
-    {
-      "title": "上市櫃公司重大訊息與公告資料可供事件研究流程使用",
-      "source": "MOPS",
-      "category": "公司事件",
-      "href": "/login"
-    },
-    {
-      "title": "技術指標、估值與財報資料可供 API 查詢與模型分析",
-      "source": "TWMD",
-      "category": "資料集",
-      "href": "/login"
-    }
-  ]
+  "news": []
 }
