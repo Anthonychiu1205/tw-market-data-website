@@ -2,29 +2,13 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { Link } from "@/src/i18n/navigation";
 import { getHomepageMarketSnapshot } from "@/src/lib/homepage/homepage-market-data";
+import { indexDisplayName } from "@/src/lib/homepage/index-names";
 import { getMarketMarqueeSnapshotView } from "@/src/lib/market-marquee-snapshot";
 
 // NOTE: these are DATA KEYS matched against the live snapshot's item.name (zh from the API), not
-// display strings — they must stay zh or the market-row lookup breaks. Do not translate.
+// display strings — they must stay zh or the market-row lookup breaks. Do not translate. Display
+// names resolve through indexDisplayName (SSOT in @/src/lib/homepage/index-names).
 const MARKET_LABELS = ["加權指數", "櫃買指數", "台灣50", "電子類股", "金融保險"] as const;
-
-// Bilingual display names keyed by the snapshot's item.name (the reliable zh name from the API /
-// INDEX_META), NOT by item.id (whose value is API-defined and may not match). A plain lookup with an
-// item.name fallback — never a dynamic t() key, so a name we don't have a translation for degrades to
-// the original zh name and the row ALWAYS renders (REG-1 fix; fallback principle per §1.4).
-const INDEX_NAME_I18N: Record<string, { en: string; zh: string }> = {
-  加權指數: { en: "TAIEX", zh: "加權指數" },
-  櫃買指數: { en: "TPEx Index", zh: "櫃買指數" },
-  台灣50: { en: "Taiwan 50", zh: "台灣50" },
-  電子類股: { en: "Electronics", zh: "電子類股" },
-  金融保險: { en: "Finance & Insurance", zh: "金融保險" },
-};
-
-function indexDisplayName(name: string, locale: string): string {
-  const localized = INDEX_NAME_I18N[name];
-  if (!localized) return name;
-  return locale === "en" ? localized.en : localized.zh;
-}
 
 function toneClass(trend: "up" | "down" | "neutral") {
   // Taiwan convention: 紅漲綠跌 (red = up, green = down), aligned with market-marquee-track.
@@ -46,7 +30,7 @@ export async function HeroMarketIntel() {
   const locale = await getLocale();
   const [marketSnapshot, newsSnapshot] = await Promise.all([
     getHomepageMarketSnapshot(),
-    getMarketMarqueeSnapshotView(),
+    getMarketMarqueeSnapshotView(locale),
   ]);
   // Order the live rows by the preferred display order, then append any other live index the API
   // returns. Nothing is padded with placeholder rows — an index we have no real value for is simply

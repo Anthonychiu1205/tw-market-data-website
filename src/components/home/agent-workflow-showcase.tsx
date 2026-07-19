@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 import { buildAgentWorkflowConfig } from "@/src/lib/homepage/demo-real-data";
@@ -7,9 +7,10 @@ import { LazyAgentWorkflowDemo } from "./lazy-agent-workflow-demo";
 
 export async function AgentWorkflowShowcase() {
   const t = await getTranslations("home.agentWorkflowShowcase");
+  const locale = await getLocale();
   // Real TSMC last-8-quarters config (daily ISR). Omitted when no real data is available — never a
-  // fabricated table (rule 2).
-  const config = await buildAgentWorkflowConfig();
+  // fabricated table (rule 2). Labels follow locale (I18N-FIX-03 ①).
+  const config = await buildAgentWorkflowConfig(locale);
 
   return (
     <section className="bg-white py-20 lg:py-24">

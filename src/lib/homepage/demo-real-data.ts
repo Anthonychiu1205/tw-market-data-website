@@ -295,8 +295,22 @@ function quarterLabel(row: AnyRecord): string {
 const AGENT_WORKFLOW_TICKER = "2330";
 const AGENT_WORKFLOW_QUARTERS = 8;
 
+// Bilingual demo labels (I18N-FIX-03 ①). Real data VALUES + stock names (e.g. "2330 台積電") stay as
+// they are; only headers / row labels / the query prompt follow locale.
+const DEMO_L = {
+  agentPrompt: { en: "TSMC revenue & gross margin, last 8 quarters", zh: "分析台積電近 8 季營收與毛利率變化" },
+  coveragePrompt: { en: "Screen: stable YoY revenue growth & gross margin", zh: "找出近一年營收成長與毛利率穩定的股票" },
+  revenue: { en: "Revenue", zh: "營收" },
+  grossProfit: { en: "Gross Profit", zh: "營業毛利" },
+  grossMargin: { en: "Gross Margin", zh: "毛利率" },
+  operatingIncome: { en: "Operating Income", zh: "營業利益" },
+  stock: { en: "Stock", zh: "股票" },
+  revenueGrowth: { en: "Revenue Growth", zh: "營收成長" },
+} as const;
+const L = (label: { en: string; zh: string }, locale: string) => (locale === "en" ? label.en : label.zh);
+
 // TSMC last-8-quarters real income table (approved redesign: quarterly, no fabricated R&D row).
-export async function buildAgentWorkflowConfig(): Promise<AgentWorkflowDemoConfig | null> {
+export async function buildAgentWorkflowConfig(locale: string): Promise<AgentWorkflowDemoConfig | null> {
   const result = await getDemoDatasetRows("income-statement", AGENT_WORKFLOW_TICKER, AGENT_WORKFLOW_QUARTERS);
   if (!result || result.rows.length === 0) return null;
   const rows = result.rows; // newest-first
@@ -305,19 +319,19 @@ export async function buildAgentWorkflowConfig(): Promise<AgentWorkflowDemoConfi
     return v === null ? "—" : fmtAmountTWD(v);
   };
   return {
-    queryPrompt: "分析台積電近 8 季營收與毛利率變化",
+    queryPrompt: L(DEMO_L.agentPrompt, locale),
     statusLead: "Agent: searching",
     statusPill: "TW Market Data",
     tableHeaders: ["Item", ...rows.map(quarterLabel)],
     tableRows: [
-      ["營收", ...rows.map((r) => amount(r, ["revenue", "net_revenue", "total_revenue"]))],
-      ["營業毛利", ...rows.map((r) => amount(r, ["gross_profit"]))],
-      ["毛利率", ...rows.map((r) => {
+      [L(DEMO_L.revenue, locale), ...rows.map((r) => amount(r, ["revenue", "net_revenue", "total_revenue"]))],
+      [L(DEMO_L.grossProfit, locale), ...rows.map((r) => amount(r, ["gross_profit"]))],
+      [L(DEMO_L.grossMargin, locale), ...rows.map((r) => {
         const rev = num(r, ["revenue", "net_revenue", "total_revenue"]);
         const gp = num(r, ["gross_profit"]);
         return rev && gp !== null ? fmtPct(gp / rev) : "—";
       })],
-      ["營業利益", ...rows.map((r) => amount(r, ["operating_income"]))],
+      [L(DEMO_L.operatingIncome, locale), ...rows.map((r) => amount(r, ["operating_income"]))],
       ["EPS", ...rows.map((r) => {
         const v = num(r, ["eps"]);
         return v === null ? "—" : v.toFixed(2);
@@ -340,7 +354,7 @@ const COVERAGE_TICKERS: { symbol: string; name: string }[] = [
 
 // Per-ticker real screen: TTM revenue, latest gross margin, YoY revenue growth (latest quarter vs the
 // same quarter a year ago). Each metric is real or "—"; a ticker with no usable data is dropped.
-export async function buildMarketCoverageConfig(): Promise<AgentWorkflowDemoConfig | null> {
+export async function buildMarketCoverageConfig(locale: string): Promise<AgentWorkflowDemoConfig | null> {
   const results = await Promise.all(
     COVERAGE_TICKERS.map(async (tk) => ({ tk, data: await getDemoDatasetRows("income-statement", tk.symbol, 8) })),
   );
@@ -364,10 +378,10 @@ export async function buildMarketCoverageConfig(): Promise<AgentWorkflowDemoConf
   }
   if (tableRows.length === 0) return null;
   return {
-    queryPrompt: "找出近一年營收成長與毛利率穩定的股票",
+    queryPrompt: L(DEMO_L.coveragePrompt, locale),
     statusLead: "Agent: searching",
     statusPill: "TW Market Data",
-    tableHeaders: ["ID", "股票", "營收成長", "毛利率", "營收"],
+    tableHeaders: ["ID", L(DEMO_L.stock, locale), L(DEMO_L.revenueGrowth, locale), L(DEMO_L.grossMargin, locale), L(DEMO_L.revenue, locale)],
     tableRows,
     completionLabel: "Agent: screen complete.",
     tableGridTemplateColumns: "0.6fr 1.2fr repeat(3,minmax(0,1fr))",

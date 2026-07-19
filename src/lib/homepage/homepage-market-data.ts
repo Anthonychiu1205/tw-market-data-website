@@ -279,7 +279,7 @@ export async function getHomepageTickerTape(): Promise<HomepageTickerTape> {
 // monthly-revenue figure is 331,109 rows. Financial-statement row counts and a chip/master count are
 // not in the SSOT yet, so they are intentionally omitted rather than hardcoded — wire them here once
 // A台's stats endpoint (or a coverage-facts update) provides them.
-export async function getHomepageCoverageMetrics(): Promise<HomepageCoverageMetric[]> {
+export async function getHomepageCoverageMetrics(locale = "zh-TW"): Promise<HomepageCoverageMetric[]> {
   const twse = coverageFacts.twseDailyPrice;
   const revenue = coverageFacts.monthlyRevenue;
 
@@ -294,15 +294,21 @@ export async function getHomepageCoverageMetrics(): Promise<HomepageCoverageMetr
   const liveTwseStocks = stats.get("twse_daily_price")?.distinctTickers;
   const liveRevenueRows = stats.get("monthly_revenue")?.rows;
 
+  // Numbers unchanged; the descriptive text follows locale (I18N-FIX-03 ④).
+  const en = locale === "en";
+  const stocks = (liveTwseStocks ?? twse.stocks).toLocaleString("en-US");
+  const rows = (liveRevenueRows ?? revenue.rows).toLocaleString("en-US");
+  const sinceYear = revenue.earliestPeriod.slice(0, 4);
+
   return [
     {
       key: "twse_first",
-      value: `${(liveTwseStocks ?? twse.stocks).toLocaleString("en-US")} 檔上市個股（TWSE）`,
+      value: en ? `${stocks} TWSE-listed stocks` : `${stocks} 檔上市個股（TWSE）`,
       evidence: liveTwseStocks !== undefined ? live : ssot,
     },
     {
       key: "official_first",
-      value: `月營收 ${(liveRevenueRows ?? revenue.rows).toLocaleString("en-US")} 列（自 ${revenue.earliestPeriod.slice(0, 4)}）`,
+      value: en ? `Monthly revenue ${rows} rows (since ${sinceYear})` : `月營收 ${rows} 列（自 ${sinceYear}）`,
       evidence: liveRevenueRows !== undefined ? live : ssot,
     },
   ];
