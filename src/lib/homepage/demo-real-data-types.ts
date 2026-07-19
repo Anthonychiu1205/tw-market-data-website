@@ -5,6 +5,12 @@
 // zero risk of the server-side fetch (or the service token) being pulled into the client bundle. The
 // server adapter (demo-real-data.ts, which IS `server-only`) imports the same types.
 
+// Next.js Data Cache tag on the demo fetches (revalidate:false = cache until deploy). A daily Vercel
+// Cron calls revalidateTag(DEMO_CACHE_TAG) so the keyless demo data refreshes each day (as_of keeps up)
+// at ~1 fetch/combo/day — no per-request cost. Shared here (no server code) so the cron route and the
+// adapter agree on the string.
+export const DEMO_CACHE_TAG = "homepage-demo-data";
+
 export type DemoRecord = Record<string, unknown>;
 
 // A demo panel's data is either a real row + its real as_of date, or null (panel degrades to an

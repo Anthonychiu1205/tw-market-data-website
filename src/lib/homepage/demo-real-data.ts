@@ -2,10 +2,11 @@ import "server-only";
 
 import { getTwFeatureEngineBaseUrl } from "@/src/lib/homepage/homepage-market-data";
 import { pickServableLastGood } from "@/src/lib/homepage/homepage-market-lkg";
-import type {
-  ApiDemoRealData,
-  DemoResponse,
-  HomepageDemoData,
+import {
+  DEMO_CACHE_TAG,
+  type ApiDemoRealData,
+  type DemoResponse,
+  type HomepageDemoData,
 } from "@/src/lib/homepage/demo-real-data-types";
 import type { AgentWorkflowDemoConfig } from "@/src/components/home/agent-workflow-demo";
 
@@ -128,7 +129,7 @@ async function fetchRawRows(slug: string, ticker: string, limit: number): Promis
       method: "GET",
       headers: authHeaders(),
       signal: controller.signal,
-      next: { revalidate: DEMO_FETCH_REVALIDATE },
+      next: { revalidate: DEMO_FETCH_REVALIDATE, tags: [DEMO_CACHE_TAG] },
     });
     if (!res.ok) {
       console.warn(`[demo-real-data] ${slug}/${ticker} upstream responded ${res.status}`);
