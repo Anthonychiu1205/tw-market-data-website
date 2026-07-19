@@ -111,9 +111,11 @@ export function SourceOfTruthSection({ realById }: { realById?: SourceOfTruthRea
   );
 
   // Real response for the active item (server-fetched, passed down). When present we show the REAL
-  // JSON + its real as_of; otherwise we fall back to the item's illustrative code with no date claim.
+  // JSON + its real as_of. When absent (e.g. a keyed dataset the demo has no entitlement for yet) we
+  // show an honest "needs live access" note — NEVER the fabricated sample code (rule 2: no fabricated
+  // numbers on a real ticker like 2330).
   const activeReal = realById?.[activeItem.id];
-  const activeCode = activeReal?.code ?? activeItem.code;
+  const activeCode = activeReal?.code ?? tc("demoDatasetPending");
   const activeAsOf = activeReal?.asOf ?? "";
 
   const updateScrollState = useCallback(() => {
@@ -218,9 +220,7 @@ export function SourceOfTruthSection({ realById }: { realById?: SourceOfTruthRea
                 <span className="font-medium tracking-tight text-slate-700">{activeItem.responseTitle}</span>
                 {activeAsOf ? (
                   <span className="rounded-full bg-emerald-50 px-2 py-0.5 font-medium text-emerald-700 ring-1 ring-emerald-200">{tc("realDataAsOf", { date: activeAsOf })}</span>
-                ) : (
-                  <span className="rounded-full bg-amber-50 px-2 py-0.5 font-medium text-amber-700 ring-1 ring-amber-200">{tc("illustrativeData")}</span>
-                )}
+                ) : null}
                 <span className="text-slate-400">•</span>
                 <span className="font-mono text-[11px] text-slate-500">{activeItem.responseLabel}</span>
               </div>

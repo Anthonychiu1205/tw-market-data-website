@@ -1635,6 +1635,7 @@
     "englishComingSoon": "English version coming soon.",
     "illustrativeData": "示意資料，非即時行情",
     "enLegalReference": "本頁英文翻譯僅供參考，以中文版為準。",
-    "realDataAsOf": "真實資料 · 資料日期 {date}"
+    "realDataAsOf": "真實資料 · 資料日期 {date}",
+    "demoDatasetPending": "此資料集需即時取用(API key);示範暫不顯示樣本值。"
   }
 }

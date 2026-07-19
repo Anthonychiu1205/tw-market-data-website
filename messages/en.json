@@ -1635,6 +1635,7 @@
     "englishComingSoon": "English version coming soon.",
     "illustrativeData": "Illustrative data — not real-time quotes",
     "enLegalReference": "English translation provided for reference; the Chinese version prevails.",
-    "realDataAsOf": "Real data · as of {date}"
+    "realDataAsOf": "Real data · as of {date}",
+    "demoDatasetPending": "This dataset requires live access (API key); sample values are not shown in the demo."
   }
 }
