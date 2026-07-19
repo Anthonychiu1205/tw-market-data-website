@@ -40,6 +40,8 @@ export const siteConfig = {
   shortName: "TWMD",
   description:
     "台股資料 API，為系統、量化研究與 AI agent workflow 提供 official/public-first、可追溯且結構一致的資料能力。",
+  descriptionEn:
+    "A Taiwan stock market data API — official/public-first, traceable, and structurally consistent data for systems, quantitative research, and AI agent workflows.",
   url: siteUrl,
   supportEmail: "avenra.platform@gmail.com",
   ogImagePath: "/og-image.png",

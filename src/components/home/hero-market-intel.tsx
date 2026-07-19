@@ -26,7 +26,6 @@ function isPublicNewsHref(href: string): boolean {
 
 export async function HeroMarketIntel() {
   const t = await getTranslations("home.marketPanel");
-  const tc = await getTranslations("common");
   const locale = await getLocale();
   const [marketSnapshot, newsSnapshot] = await Promise.all([
     getHomepageMarketSnapshot(),
@@ -49,20 +48,14 @@ export async function HeroMarketIntel() {
           <div className="flex items-center justify-between border-b border-slate-200/70 pb-3">
             <div className="flex items-center gap-2">
               <p className="text-base font-semibold text-slate-900">{t("indicators")}</p>
-              {marketSnapshot.updatedAt ? (
-                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700 ring-1 ring-emerald-200">
-                  {tc("realDataAsOf", { date: marketSnapshot.updatedAt })}
-                </span>
-              ) : (
-                <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-amber-200">
-                  {tc("illustrativeData")}
-                </span>
-              )}
             </div>
             <Link href="/datasets" className="text-sm font-medium text-slate-400 transition hover:text-slate-700">
               {t("viewAll")} &gt;
             </Link>
           </div>
+          {marketSnapshot.updatedAt ? (
+            <p className="mt-2 text-xs text-slate-500">{t("asOf", { date: marketSnapshot.updatedAt })}</p>
+          ) : null}
 
           <div className="pt-2">
             {marketRows.map((item) => (

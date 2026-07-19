@@ -1,11 +1,12 @@
 "use client";
 
 import { Check, ChevronDown } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
 import type { ApiDemoRealData } from "@/src/lib/homepage/demo-real-data-types";
+import { tickerDisplayName } from "@/src/lib/homepage/ticker-names";
 
 type EndpointId = "monthlyRevenue" | "twseDailyPrice" | "incomeStatement" | "technicalIndicators";
 type CodeLanguage = "python" | "typescript" | "curl";
@@ -62,12 +63,13 @@ function buildRealResponse(
   data: ApiDemoRealData | undefined,
   endpointMeta: (typeof endpointOptions)[number],
   tickerMeta: (typeof tickerOptions)[number],
+  unavailableNote: string,
 ) {
   const resp = data?.responses?.[endpointMeta.id]?.[tickerMeta.symbol];
   if (resp) {
     return { dataset: resp.dataset, symbol: resp.symbol, name: tickerMeta.name, as_of: resp.asOf, data: resp.data };
   }
-  return { dataset: endpointMeta.dataset, symbol: tickerMeta.symbol, name: tickerMeta.name, note: "資料暫時無法載入" };
+  return { dataset: endpointMeta.dataset, symbol: tickerMeta.symbol, name: tickerMeta.name, note: unavailableNote };
 }
 
 function DemoSelect({
@@ -140,6 +142,7 @@ function DemoSelect({
 export function ApiDemoSection({ data }: { data?: ApiDemoRealData }) {
   const t = useTranslations("home.apiDemo");
   const tc = useTranslations("common");
+  const locale = useLocale();
   const [draftEndpointId, setDraftEndpointId] = useState<EndpointId>("monthlyRevenue");
   const [draftTicker, setDraftTicker] = useState("2330");
   const [activeEndpointId, setActiveEndpointId] = useState<EndpointId>("monthlyRevenue");
@@ -160,8 +163,8 @@ export function ApiDemoSection({ data }: { data?: ApiDemoRealData }) {
     [t]
   );
   const tickerSelectOptions = useMemo(
-    () => tickerOptions.map((option) => ({ value: option.value, label: option.label })),
-    []
+    () => tickerOptions.map((option) => ({ value: option.value, label: tickerDisplayName(option.symbol, option.name, locale) })),
+    [locale]
   );
 
   useEffect(() => {
@@ -192,7 +195,7 @@ export function ApiDemoSection({ data }: { data?: ApiDemoRealData }) {
     setActiveTicker(draftTickerMeta.value);
     setVisibleLineCount(0);
 
-    const nextResponseJson = JSON.stringify(buildRealResponse(data, draftEndpointMeta, draftTickerMeta), null, 2);
+    const nextResponseJson = JSON.stringify(buildRealResponse(data, draftEndpointMeta, draftTickerMeta, tc("dataUnavailable")), null, 2);
     const nextResponseLines = nextResponseJson.split("\n");
 
     timeoutRef.current = window.setTimeout(() => {
@@ -213,8 +216,7 @@ export function ApiDemoSection({ data }: { data?: ApiDemoRealData }) {
   };
 
   const codeSnippet = buildCodeSnippet(activeEndpointMeta.path, activeTickerMeta.symbol, activeLanguage);
-  const activeResponse = buildRealResponse(data, activeEndpointMeta, activeTickerMeta);
-  const activeAsOf = data?.responses?.[activeEndpointMeta.id]?.[activeTickerMeta.symbol]?.asOf ?? "";
+  const activeResponse = buildRealResponse(data, activeEndpointMeta, activeTickerMeta, tc("dataUnavailable"));
   const responseJson = JSON.stringify(activeResponse, null, 2);
   const responseLines = responseJson.split("\n");
   const displayedResponse = visibleLineCount === null ? responseJson : responseLines.slice(0, visibleLineCount).join("\n");
@@ -269,17 +271,12 @@ export function ApiDemoSection({ data }: { data?: ApiDemoRealData }) {
           </div>
 
           <div className="min-h-[460px] rounded-[2rem] border border-slate-200/60 bg-slate-50/80 p-8">
-            {activeAsOf ? (
-              <p className="mb-3 inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700 ring-1 ring-emerald-200">
-                {tc("realDataAsOf", { date: activeAsOf })}
-              </p>
-            ) : null}
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                 <span className="tracking-[0.08em]">{t("response")}</span>
                 <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-emerald-700">200 OK</span>
                 <span>
-                  {activeTickerMeta.symbol} {activeTickerMeta.name}
+                  {tickerDisplayName(activeTickerMeta.symbol, activeTickerMeta.name, locale)}
                 </span>
                 <span>{t(activeEndpointMeta.labelKey)}</span>
               </div>

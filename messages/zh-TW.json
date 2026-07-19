@@ -133,7 +133,41 @@
     "sourceOfTruth": {
       "heading": "單一可信資料來源",
       "description": "以下展示目前 public boundary 的資料主題範例。公開定位採 TWSE-first verified baseline；TPEx 歷史覆蓋、adjusted prices 與 survivorship-safe universe 仍屬 deferred / in-progress。",
-      "copyResponse": "複製範例回應"
+      "copyResponse": "複製範例回應",
+      "subjects": {
+        "monthly_revenue": {
+          "title": "月營收",
+          "description": "MOPS 月營收、YoY / MoM 成長追蹤"
+        },
+        "twse_daily_price": {
+          "title": "股價日線",
+          "description": "TWSE 日線價格與交易日資料（TPEx 歷史深度 deferred）"
+        },
+        "financial_statements": {
+          "title": "財報三表",
+          "description": "損益表、資產負債表、現金流量表"
+        },
+        "technical_indicators": {
+          "title": "技術指標",
+          "description": "MA、RSI、MACD 等常用技術指標"
+        },
+        "valuation_data": {
+          "title": "估值資料",
+          "description": "PER、PBR、殖利率與市值相關指標"
+        },
+        "capital_flow": {
+          "title": "籌碼與資金",
+          "description": "三大法人買賣、融資融券與資金流向"
+        },
+        "company_events": {
+          "title": "公司事件",
+          "description": "公司基本資料、公告、事件日曆、公司行動與股利"
+        },
+        "market_structure_snapshot": {
+          "title": "市場結構快照",
+          "description": "TWSE 當前快照型資料；需明確保留 current snapshot only 警告"
+        }
+      }
     },
     "agentDocumentsDemo": {
       "pulling": "Agent: pulling 公司公告與財報附註",
@@ -759,7 +793,8 @@
     "subtitle": "關於台股市場資料與 API 常見問題的直接解答。",
     "empty": "問答頁面準備中。",
     "related": "相關連結",
-    "apiDocs": "API 文件"
+    "apiDocs": "API 文件",
+    "englishNotice": "此解答目前僅提供中文版，英文版將陸續推出。"
   },
   "datasets": {
     "listEyebrow": "Datasets",
@@ -1635,7 +1670,7 @@
     "englishComingSoon": "English version coming soon.",
     "illustrativeData": "示意資料，非即時行情",
     "enLegalReference": "本頁英文翻譯僅供參考，以中文版為準。",
-    "realDataAsOf": "真實資料 · 資料日期 {date}",
-    "demoDatasetPending": "此資料集需即時取用(API key);示範暫不顯示樣本值。"
+    "demoDatasetPending": "此資料集需即時取用(API key);示範暫不顯示樣本值。",
+    "dataUnavailable": "資料暫時無法載入"
   }
 }

@@ -239,7 +239,7 @@ export const answerPages: readonly AnswerPageEntry[] = [
     description:
       "What Taiwan's three major institutional investors (foreign, investment trust, dealer) daily net buy/sell data is, and how to access it.",
     shortAnswer:
-      "Taiwan publishes the daily net buy/sell of its three major institutional investors — foreign investors, investment trusts, and dealers (三大法人) — for each stock on every trading day. TW Market Data delivers this as a clean daily series, in contrast to US 13F filings, which are quarterly and arrive with a 45-day delay.",
+      "Taiwan publishes the daily net buy/sell of its three major institutional investors — foreign investors, investment trusts, and dealers — for each stock on every trading day. TW Market Data delivers this as a clean daily series, in contrast to US 13F filings, which are quarterly and arrive with a 45-day delay.",
     sections: [
       {
         heading: "Fields and interpretation",
@@ -258,7 +258,7 @@ export const answerPages: readonly AnswerPageEntry[] = [
       {
         question: "Who are Taiwan's three major institutional investors?",
         answer:
-          "Foreign investors, investment trusts, and dealers — collectively the 三大法人. TW Market Data provides their daily net buy/sell per stock.",
+          "Foreign investors, investment trusts, and dealers — collectively the three major institutional investors. TW Market Data provides their daily net buy/sell per stock.",
       },
       {
         question: "How is this different from US 13F data?",

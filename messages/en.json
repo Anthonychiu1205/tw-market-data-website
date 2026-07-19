@@ -133,7 +133,41 @@
     "sourceOfTruth": {
       "heading": "A single trusted source of truth",
       "description": "Sample data topics currently at the public boundary. The public scope uses a TWSE-first verified baseline; TPEx historical coverage, adjusted prices, and a survivorship-safe universe remain deferred / in-progress.",
-      "copyResponse": "Copy example response"
+      "copyResponse": "Copy example response",
+      "subjects": {
+        "monthly_revenue": {
+          "title": "Monthly Revenue",
+          "description": "MOPS monthly revenue, YoY / MoM growth tracking"
+        },
+        "twse_daily_price": {
+          "title": "Daily Prices",
+          "description": "TWSE daily prices and trading-day data (TPEx history deferred)"
+        },
+        "financial_statements": {
+          "title": "Financial Statements",
+          "description": "Income statement, balance sheet, cash flow statement"
+        },
+        "technical_indicators": {
+          "title": "Technical Indicators",
+          "description": "MA, RSI, MACD and other common technical indicators"
+        },
+        "valuation_data": {
+          "title": "Valuation Data",
+          "description": "P/E, P/B, dividend yield and market-cap metrics"
+        },
+        "capital_flow": {
+          "title": "Chips & Capital Flow",
+          "description": "Institutional net buy/sell, margin & short, and capital flow"
+        },
+        "company_events": {
+          "title": "Company Events",
+          "description": "Company profile, announcements, event calendar, corporate actions and dividends"
+        },
+        "market_structure_snapshot": {
+          "title": "Market Structure Snapshot",
+          "description": "TWSE current snapshot data; explicitly retains a current-snapshot-only warning"
+        }
+      }
     },
     "agentDocumentsDemo": {
       "pulling": "Agent: pulling company filings and financial notes",
@@ -759,7 +793,8 @@
     "subtitle": "Direct answers to common questions about Taiwan stock market data and APIs.",
     "empty": "Answer pages are being prepared.",
     "related": "Related",
-    "apiDocs": "API docs"
+    "apiDocs": "API docs",
+    "englishNotice": "This answer is currently available in Chinese only; an English version is coming soon."
   },
   "datasets": {
     "listEyebrow": "Datasets",
@@ -1635,7 +1670,7 @@
     "englishComingSoon": "English version coming soon.",
     "illustrativeData": "Illustrative data — not real-time quotes",
     "enLegalReference": "English translation provided for reference; the Chinese version prevails.",
-    "realDataAsOf": "Real data · as of {date}",
-    "demoDatasetPending": "This dataset requires live access (API key); sample values are not shown in the demo."
+    "demoDatasetPending": "This dataset requires live access (API key); sample values are not shown in the demo.",
+    "dataUnavailable": "Data temporarily unavailable"
   }
 }

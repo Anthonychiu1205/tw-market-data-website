@@ -36,17 +36,22 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
+  // Locale-aware default metadata so /en pages that don't override it never emit zh title/description
+  // (enforced by scripts/check_en_no_cjk.mjs).
+  const description = l === "en" ? siteConfig.descriptionEn : siteConfig.description;
+  const titleDefault =
+    l === "en" ? "TW Market Data Platform | Taiwan Market Data Infrastructure" : "TW Market Data Platform | 台股資料基礎設施";
   return {
     metadataBase: new URL(siteConfig.url),
     title: {
-      default: "TW Market Data Platform | 台股資料基礎設施",
+      default: titleDefault,
       template: "%s | TW Market Data Platform",
     },
-    description: siteConfig.description,
+    description,
     alternates: buildAlternates(l, "/"),
     openGraph: {
       title: "TW Market Data Platform",
-      description: siteConfig.description,
+      description,
       url: siteConfig.url,
       siteName: "TW Market Data Platform",
       locale: OG_LOCALE[l],
@@ -63,7 +68,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: "TW Market Data Platform",
-      description: siteConfig.description,
+      description,
       images: [getAbsoluteUrl(siteConfig.ogImagePath)],
     },
     robots: {

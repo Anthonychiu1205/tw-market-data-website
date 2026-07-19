@@ -35,11 +35,14 @@ export type BlogPost = {
   // Parallel English fields (I18N-FIX-03 B). When present + locale==="en", the post renders in English
   // and the §2.5 "coming soon" notice is dropped. Absent → /en keeps the zh body + §2.5 fallback.
   title_en?: string;
+  seoTitle_en?: string;
   excerpt_en?: string;
   description_en?: string;
   keyTakeaways_en?: string[];
   tags_en?: string[];
   body_en?: BlogBodyBlock[];
+  disclaimer_en?: string;
+  keywords_en?: string[];
 };
 
 // Locale selector: returns the English fields when locale is "en" and a translation exists, else the
@@ -54,6 +57,8 @@ export function getLocalizedBlogPost(post: BlogPost, locale: string) {
     keyTakeaways: en ? post.keyTakeaways_en ?? post.keyTakeaways : post.keyTakeaways,
     tags: en ? post.tags_en ?? post.tags : post.tags,
     body: en ? post.body_en ?? post.body : post.body,
+    disclaimer: en ? post.disclaimer_en ?? post.disclaimer : post.disclaimer,
+    keywords: en ? post.keywords_en ?? post.keywords : post.keywords,
   };
 }
 
@@ -232,11 +237,14 @@ export const blogPosts: BlogPost[] = [
     ],
     disclaimer: "本文僅說明資料產品與研究流程，不構成投資建議。",
     title_en: "Why Verifiable Data Beats a Better Model in Taiwan Market Research",
+    seoTitle_en: "Why Verifiable Data Beats a Better Model in Taiwan Market Research | TW Market Data",
     excerpt_en:
       "The quality of AI-driven investment research is capped by one thing — whether your data can be traced, replayed, and verified.",
     description_en:
       "AI investment research is only as reliable as its inputs. Here's why source attribution, coverage, freshness, and explicit data gaps in a Taiwan stock market data API matter more to AI agents and quant workflows than any model or prompt.",
     tags_en: ["AI Agent", "Taiwan market data", "Data verification", "Data engineering"],
+    keywords_en: ["AI agent", "Taiwan market data API", "traceable data", "reproducible research", "data gaps", "freshness"],
+    disclaimer_en: "This article describes a data product and research workflow only and does not constitute investment advice.",
     keyTakeaways_en: [
       "The ceiling on AI research quality is set by whether the data is traceable, replayable, and verifiable — not by the model or the prompt.",
       "Productizing Taiwan market data means solving for sources, field contracts, coverage, freshness, gap disclosure, and duplicate auditing — not just shipping endpoints.",

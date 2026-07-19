@@ -16,9 +16,10 @@ export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
   const locale = useLocale();
   const pathname = usePathname();
   const other = locale === "en" ? "zh-TW" : "en";
-  // Show the OTHER language's endonym (same regardless of current locale).
+  // Button text = the OTHER language's endonym ("中文" is the intentional CJK on /en). The aria-label is
+  // written in the CURRENT page locale so a non-Chinese reader on /en never gets a Chinese aria-label.
   const label = other === "en" ? "EN" : "中文";
-  const ariaLabel = other === "en" ? "Switch to English" : "切換為中文";
+  const ariaLabel = locale === "en" ? "Switch to Chinese" : "切換為英文";
 
   return (
     <Link
