@@ -27,7 +27,14 @@ const OUT_YAML = join(root, "public", "openapi.yaml");
 const check = process.argv.includes("--check");
 
 // Endpoints callable without an API key (the skill.md 免-key demo surface). Everything else needs a key.
-const KEYLESS_ENDPOINTS = new Set(["/v2/datasets/twse-daily-price"]);
+// Endpoints that return 200 with NO auth (empirically probed 2026-07-19). issuer-profile / income /
+// technical / valuation / institutional are KEYED (401) — do NOT list them, or a framework would try
+// them keyless and fail. (market-index / return-index / updates are keyless too but not yet in this spec.)
+const KEYLESS_ENDPOINTS = new Set([
+  "/v2/datasets/twse-daily-price",
+  "/v2/datasets/tpex-daily-price",
+  "/v2/datasets/monthly-revenue",
+]);
 const SPEC_VERSION = "1.0.0";
 // TODO(OPENAPI-01 step ④): point externalDocs at /meta/boundaries once the A2 boundaries artifact
 // (greening) ships. Until then link the live docs so the spec never references a 404.
