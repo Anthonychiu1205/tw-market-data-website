@@ -128,7 +128,6 @@ const scaleMs = (ms: number) => Math.round(ms * TIMING_SCALE);
 
 export function AgentWorkflowDemo({ config }: AgentWorkflowDemoProps) {
   const t = useTranslations("home.agentWorkflowDemo");
-  const tc = useTranslations("common");
   const { elementRef, isVisible } = useReplayOnVisible<HTMLDivElement>({
     threshold: 0.4,
     rootMargin: "0px 0px -8% 0px",
@@ -238,15 +237,6 @@ export function AgentWorkflowDemo({ config }: AgentWorkflowDemoProps) {
       ref={elementRef}
       className="w-full rounded-[24px] border border-slate-200 bg-slate-50/60 p-4 shadow-[0_1px_2px_rgba(15,23,42,0.05)] lg:p-4"
     >
-      {config.asOf ? (
-        <p className="mb-2 inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700 ring-1 ring-emerald-200">
-          {tc("realDataAsOf", { date: config.asOf })}
-        </p>
-      ) : (
-        <p className="mb-2 inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-amber-200">
-          {tc("illustrativeData")}
-        </p>
-      )}
       <div
         className={cn(
           "rounded-xl border border-slate-300 bg-white px-4 py-2 font-mono text-[14px] tracking-tight text-slate-800 transition duration-300",

@@ -2,6 +2,7 @@ import "server-only";
 
 import { getTwFeatureEngineBaseUrl } from "@/src/lib/homepage/homepage-market-data";
 import { pickServableLastGood } from "@/src/lib/homepage/homepage-market-lkg";
+import { tickerDisplayName } from "@/src/lib/homepage/ticker-names";
 import {
   DEMO_CACHE_TAG,
   type ApiDemoRealData,
@@ -343,13 +344,13 @@ export async function buildAgentWorkflowConfig(locale: string): Promise<AgentWor
   };
 }
 
-const COVERAGE_TICKERS: { symbol: string; name: string }[] = [
-  { symbol: "2330", name: "2330 台積電" },
-  { symbol: "2454", name: "2454 聯發科" },
-  { symbol: "2317", name: "2317 鴻海" },
-  { symbol: "2308", name: "2308 台達電" },
-  { symbol: "3711", name: "3711 日月光" },
-  { symbol: "3231", name: "3231 緯創" },
+const COVERAGE_TICKERS: { symbol: string; zhName: string }[] = [
+  { symbol: "2330", zhName: "台積電" },
+  { symbol: "2454", zhName: "聯發科" },
+  { symbol: "2317", zhName: "鴻海" },
+  { symbol: "2308", zhName: "台達電" },
+  { symbol: "3711", zhName: "日月光" },
+  { symbol: "3231", zhName: "緯創" },
 ];
 
 // Per-ticker real screen: TTM revenue, latest gross margin, YoY revenue growth (latest quarter vs the
@@ -373,7 +374,7 @@ export async function buildMarketCoverageConfig(locale: string): Promise<AgentWo
     const growth = rev0 !== null && rev4 ? fmtPct((rev0 - rev4) / rev4) : "—";
     const margin = rev0 && gp0 !== null ? fmtPct(gp0 / rev0) : "—";
     const revenue = ttm > 0 ? fmtAmountTWD(ttm) : "—";
-    tableRows.push([String(tableRows.length + 1), tk.name, growth, margin, revenue]);
+    tableRows.push([String(tableRows.length + 1), tickerDisplayName(tk.symbol, tk.zhName, locale), growth, margin, revenue]);
     if (data.asOf > latestAsOf) latestAsOf = data.asOf;
   }
   if (tableRows.length === 0) return null;

@@ -122,7 +122,7 @@ export async function BlogArticle({ post }: BlogArticleProps) {
           <div className="space-y-6">{view.body.map((block, index) => renderBlock(block, index))}</div>
 
           <footer className="space-y-4 border-t border-slate-200 pt-6">
-            <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-700">{post.disclaimer}</p>
+            <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-700">{view.disclaimer}</p>
             <Link href="/blog" className="inline-flex text-sm text-slate-600 hover:text-slate-900">
               ← {t("backToList")}
             </Link>

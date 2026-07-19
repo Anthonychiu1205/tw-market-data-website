@@ -10,7 +10,7 @@ import { coverageFacts } from "@/src/content/coverage-facts";
 import { Link } from "@/src/i18n/navigation";
 
 type PageProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 };
 
 export function generateStaticParams() {
@@ -54,7 +54,7 @@ function ContentSlot({ note }: { note: string }) {
 }
 
 export default async function AnswerPage({ params }: PageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   // Each answer slug is authored for a single locale (en and zh-Hant entries use distinct slugs), so
   // a slug lookup already resolves the current-locale entry; there is no cross-locale variant to
   // prefer, and no slug exists in both locales to fabricate a translation for.
@@ -163,6 +163,11 @@ export default async function AnswerPage({ params }: PageProps) {
         <div className="mx-auto max-w-3xl space-y-8">
           <header className="space-y-4 border-b border-slate-200 pb-8">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("eyebrow")}</p>
+            {locale === "en" && page.locale !== "en" ? (
+              <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+                {t("englishNotice")}
+              </p>
+            ) : null}
             <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{page.question}</h1>
             {page.shortAnswer ? (
               <p className="text-lg leading-8 text-slate-700">{page.shortAnswer}</p>

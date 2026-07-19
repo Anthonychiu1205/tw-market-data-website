@@ -35,41 +35,53 @@ export async function generateMetadata({ params }: BlogDetailPageProps): Promise
   }
 
   const canonicalPath = `/blog/${post.slug}`;
+  // On /en use the post's English metadata (I18N-FIX-04): untranslated posts fall back to zh, which
+  // pairs with the rendered §2.5 notice.
+  const isEn = locale === "en";
+  const seoTitle = isEn ? post.seoTitle_en ?? post.title_en ?? post.seoTitle : post.seoTitle;
+  const metaDescription = isEn ? post.description_en ?? post.description : post.description;
+  const metaTags = isEn ? post.tags_en ?? post.tags : post.tags;
+  const metaKeywords = isEn ? post.keywords_en ?? post.keywords : post.keywords;
 
   return {
-    title: post.seoTitle,
-    description: post.description,
-    keywords: post.keywords,
+    title: seoTitle,
+    description: metaDescription,
+    keywords: metaKeywords,
     authors: [{ name: post.author }],
     alternates: buildAlternates(l, canonicalPath),
     openGraph: {
       type: "article",
-      title: post.seoTitle,
-      description: post.description,
+      title: seoTitle,
+      description: metaDescription,
       url: canonicalPath,
       locale: OG_LOCALE[l],
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
       authors: [post.author],
-      tags: post.tags,
+      tags: metaTags,
       images: [toAbsoluteUrl(post.coverImage)],
     },
     twitter: {
       card: "summary_large_image",
-      title: post.seoTitle,
-      description: post.description,
+      title: seoTitle,
+      description: metaDescription,
       images: [toAbsoluteUrl(post.coverImage)],
     },
   };
 }
 
 export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const post = getBlogPostBySlug(slug);
 
   if (!post) {
     notFound();
   }
+
+  const isEn = locale === "en";
+  const ldTitle = isEn ? post.seoTitle_en ?? post.title_en ?? post.seoTitle : post.seoTitle;
+  const ldDescription = isEn ? post.description_en ?? post.description : post.description;
+  const ldHeadline = isEn ? post.title_en ?? post.title : post.title;
 
   const articlePath = `/blog/${post.slug}`;
   const articleUrl = toAbsoluteUrl(articlePath);
@@ -79,8 +91,9 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   const blogPostingLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    headline: post.seoTitle,
-    description: post.description,
+    headline: ldHeadline,
+    name: ldTitle,
+    description: ldDescription,
     datePublished: post.publishedAt,
     dateModified: post.updatedAt,
     author: {
@@ -97,7 +110,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     },
     url: articleUrl,
     articleSection: post.category,
-    keywords: post.keywords.join(", "),
+    keywords: (isEn ? post.keywords_en ?? post.keywords : post.keywords).join(", "),
     image: toAbsoluteUrl(post.coverImage),
   };
 
@@ -120,7 +133,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       {
         "@type": "ListItem",
         position: 3,
-        name: post.seoTitle,
+        name: ldHeadline,
         item: articleUrl,
       },
     ],
