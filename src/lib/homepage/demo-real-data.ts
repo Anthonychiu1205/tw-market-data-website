@@ -59,13 +59,17 @@ const AS_OF_KEYS = [
 ];
 
 function authHeaders(): Record<string, string> {
-  const token = process.env.BACKEND_API_TOKEN ?? process.env.BACKEND_API_KEY ?? undefined;
   const headers: Record<string, string> = { Accept: "application/json" };
-  if (token) {
-    // Backend accepts either; send both to match the marquee helper that already works in prod.
-    headers["x-api-key"] = token;
-    headers.Authorization = `Bearer ${token}`;
-  }
+  // Entitled key for the metered /v2/datasets/* endpoints (DEMO-FIX). Deliberately NOT
+  // BACKEND_API_TOKEN — that is the homepage-only service token and the metered dataset endpoints
+  // REJECT it with 401 (which silently broke every demo panel). Set DEMO_DATASETS_API_KEY (or the
+  // existing TW_FEATURE_ENGINE_API_KEY) to a service key that carries dataset entitlement.
+  //
+  // When no entitled key is set we send NO auth: the keyless demo endpoints (twse-daily-price,
+  // monthly-revenue, market-index) still return real data, while keyed datasets 401 and their panel
+  // degrades honestly (never fabricates). The moment the key is provisioned, every panel goes real.
+  const key = process.env.DEMO_DATASETS_API_KEY?.trim() || process.env.TW_FEATURE_ENGINE_API_KEY?.trim();
+  if (key) headers["x-api-key"] = key;
   return headers;
 }
 
