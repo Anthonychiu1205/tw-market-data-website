@@ -4,7 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/src/i18n/navigation";
 import { ArticleOutline } from "@/src/components/blog/article-outline";
 import { Container } from "@/src/components/ui/container";
-import type { BlogBodyBlock, BlogPost } from "@/src/content/blog-posts";
+import { getLocalizedBlogPost, type BlogBodyBlock, type BlogPost } from "@/src/content/blog-posts";
 
 type BlogArticleProps = {
   post: BlogPost;
@@ -72,9 +72,10 @@ function renderBlock(block: BlogBodyBlock, index: number) {
 export async function BlogArticle({ post }: BlogArticleProps) {
   const t = await getTranslations("blog");
   const locale = await getLocale();
+  const view = getLocalizedBlogPost(post, locale);
   const outlineSections = [
-    ...(post.keyTakeaways?.length ? [{ id: "key-takeaways", title: t("keyTakeaways") }] : []),
-    ...post.body
+    ...(view.keyTakeaways?.length ? [{ id: "key-takeaways", title: t("keyTakeaways") }] : []),
+    ...view.body
       .filter((block): block is Extract<BlogBodyBlock, { type: "heading" }> => block.type === "heading" && block.level === 2)
       .map((block, idx) => ({
         id: block.id || `section-${idx + 1}`,
@@ -91,21 +92,21 @@ export async function BlogArticle({ post }: BlogArticleProps) {
           </Link>
 
           <header className="space-y-4">
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">{post.title}</h1>
-            <p className="text-base leading-8 text-slate-700">{post.excerpt}</p>
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">{view.title}</h1>
+            <p className="text-base leading-8 text-slate-700">{view.excerpt}</p>
             <div className="text-sm text-slate-500">{post.publishedAt}</div>
-            {locale === "en" ? (
+            {locale === "en" && !view.hasEnglish ? (
               <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
                 {t("englishNotice")}
               </p>
             ) : null}
           </header>
 
-          {post.keyTakeaways?.length ? (
+          {view.keyTakeaways?.length ? (
             <section id="key-takeaways" className="scroll-mt-28 rounded-xl border border-slate-200 bg-slate-50/70 px-5 py-4">
               <h2 className="text-lg font-semibold text-slate-900">{t("keyTakeaways")}</h2>
               <ul className="mt-3 list-disc space-y-2 pl-5 text-base leading-7 text-slate-700">
-                {post.keyTakeaways.map((item) => (
+                {view.keyTakeaways.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
@@ -118,7 +119,7 @@ export async function BlogArticle({ post }: BlogArticleProps) {
             </div>
           </div>
 
-          <div className="space-y-6">{post.body.map((block, index) => renderBlock(block, index))}</div>
+          <div className="space-y-6">{view.body.map((block, index) => renderBlock(block, index))}</div>
 
           <footer className="space-y-4 border-t border-slate-200 pt-6">
             <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-700">{post.disclaimer}</p>

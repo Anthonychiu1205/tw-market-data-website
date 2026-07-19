@@ -136,16 +136,19 @@ function curatedFallbackNews(locale: string): MarketMarqueeNewsItem[] {
   }));
 }
 
-const CURATED_FALLBACK_NEWS: MarketMarqueeNewsItem[] = curatedFallbackNews("zh");
 
-function buildNewsList(news: MarketMarqueeNewsItem[]): MarketMarqueeNewsItem[] {
+// Real news only (valid rows, deduped). Used for STORAGE so the zh sample is never baked into a
+// stored snapshot — the sample is a view-only, locale-aware fallback.
+function cleanNews(news: MarketMarqueeNewsItem[]): MarketMarqueeNewsItem[] {
   // href is optional (public source URL only); rows without one still render as text.
   const cleaned = news.filter((item) => item.title && item.source && item.category);
-  const newsCandidates = [...cleaned, ...CURATED_FALLBACK_NEWS];
-  const uniqueNews = Array.from(
-    new Map(newsCandidates.map((item) => [item.title, item])).values()
-  ).slice(0, 4);
-  return uniqueNews;
+  return Array.from(new Map(cleaned.map((item) => [item.title, item])).values());
+}
+
+// View list: real news padded up to 4 with the LOCALIZED sample (so /en never shows the zh sample).
+function buildNewsList(news: MarketMarqueeNewsItem[], locale: string): MarketMarqueeNewsItem[] {
+  const candidates = [...cleanNews(news), ...curatedFallbackNews(locale)];
+  return Array.from(new Map(candidates.map((item) => [item.title, item])).values()).slice(0, 4);
 }
 
 function getNewsRows(payload: unknown): AnyRecord[] {
@@ -282,7 +285,7 @@ export async function fetchBackendNewsSnapshot(options: {
   );
 
   const merged = results.flatMap((result) => (result.status === "fulfilled" ? result.value : []));
-  return buildNewsList(merged);
+  return cleanNews(merged);
 }
 
 const CURATED_FALLBACK_SNAPSHOT: MarketMarqueeSnapshot = {
@@ -312,7 +315,7 @@ const CURATED_FALLBACK_SNAPSHOT: MarketMarqueeSnapshot = {
     "技術指標、估值與財報資料可供 API 查詢",
     "前端僅展示 summary snapshot，不暴露 raw payload",
   ],
-  news: CURATED_FALLBACK_NEWS,
+  news: [],
 };
 
 let memorySnapshot: MarketMarqueeSnapshot | null = null;
@@ -583,8 +586,10 @@ function asView(snapshot: MarketMarqueeSnapshot | null, isFallback: boolean, loc
   const normalized = snapshot ?? CURATED_FALLBACK_SNAPSHOT;
   const stale = isSnapshotStale(normalized);
   const summary = normalized.summary.length > 0 ? normalized.summary : buildSnapshotSummary(normalized, stale);
-  // Sample/fallback news follows locale (I18N-FIX-03 ③); real backend news is passed through as-is.
-  const news = isFallback ? curatedFallbackNews(locale) : buildNewsList(normalized.news);
+  // I18N-FIX-03 ③: real backend news (any language) passes through; the sample padding/fallback is
+  // filled in here at the VIEW layer, LOCALIZED — so /en never shows the zh sample. (The sample is
+  // never baked into the stored snapshot; `normalized.news` is real-or-empty.)
+  const news = buildNewsList(normalized.news, locale);
 
   const items: MarketMarqueeViewItem[] = normalized.items.map((item) => ({
     id: `${item.metric ?? "market"}-${item.label}`,
@@ -731,7 +736,8 @@ export async function getMarketMarqueePublicSnapshot() {
   const snapshot = rawSnapshot ?? CURATED_FALLBACK_SNAPSHOT;
   const stale = isSnapshotStale(snapshot);
   const summary = snapshot.summary.length > 0 ? snapshot.summary : buildSnapshotSummary(snapshot, stale);
-  const news = buildNewsList(snapshot.news);
+  // Public JSON API (not rendered on /en); default the sample padding to zh.
+  const news = buildNewsList(snapshot.news, "zh");
 
   return {
     asOf: snapshot.asOf,
@@ -828,7 +834,7 @@ export async function refreshMarketMarqueeSnapshot(options?: {
       ? CURATED_FALLBACK_SNAPSHOT.items.map((fallbackItem) => currentMap.get(fallbackItem.label) ?? fallbackItem)
       : previous.items,
     summary: [],
-    news: buildNewsList(refreshNews && backendNews.length > 0 ? backendNews : previous.news),
+    news: cleanNews(refreshNews && backendNews.length > 0 ? backendNews : previous.news),
   };
 
   snapshot.summary = buildSnapshotSummary(snapshot, false);
