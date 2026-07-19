@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { BlogCard } from "@/src/components/blog/blog-card";
 import { Container } from "@/src/components/ui/container";
-import { BLOG_CATEGORIES, type BlogCategory, type BlogPost } from "@/src/content/blog-posts";
+import { BLOG_CATEGORIES, getLocalizedBlogPost, type BlogCategory, type BlogPost } from "@/src/content/blog-posts";
 
 type BlogIndexProps = {
   posts: BlogPost[];
@@ -33,16 +33,21 @@ export function BlogIndex({ posts }: BlogIndexProps) {
     const normalizedQuery = query.trim().toLowerCase();
 
     return posts.filter((post) => {
+      const view = getLocalizedBlogPost(post, locale);
       const categoryMatch = selectedCategory === "全部" || post.category === selectedCategory;
       const queryMatch =
         !normalizedQuery ||
-        post.title.toLowerCase().includes(normalizedQuery) ||
-        post.excerpt.toLowerCase().includes(normalizedQuery) ||
-        post.tags.some((tag) => tag.toLowerCase().includes(normalizedQuery));
+        view.title.toLowerCase().includes(normalizedQuery) ||
+        view.excerpt.toLowerCase().includes(normalizedQuery) ||
+        (view.tags ?? []).some((tag) => tag.toLowerCase().includes(normalizedQuery));
 
       return categoryMatch && queryMatch;
     });
-  }, [posts, query, selectedCategory]);
+  }, [posts, query, selectedCategory, locale]);
+
+  // §2.5 notice only when at least one listed post has no English translation yet.
+  const showEnglishNotice =
+    locale === "en" && filteredPosts.some((post) => !getLocalizedBlogPost(post, locale).hasEnglish);
 
   return (
     <Container className="py-12 sm:py-14">
@@ -52,7 +57,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
           <p className="max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
             {t("subtitle")}
           </p>
-          {locale === "en" ? (
+          {showEnglishNotice ? (
             <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
               {t("englishNotice")}
             </p>
@@ -97,7 +102,7 @@ export function BlogIndex({ posts }: BlogIndexProps) {
         {filteredPosts.length > 0 ? (
           <section className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {filteredPosts.map((post) => (
-              <BlogCard key={post.slug} post={post} />
+              <BlogCard key={post.slug} post={post} locale={locale} />
             ))}
           </section>
         ) : (

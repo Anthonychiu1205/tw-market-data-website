@@ -57,6 +57,8 @@
 | 來源血緣 / lineage | **source lineage** | 保留 `lineage` 原字 |
 | 反存活者偏差 | **survivorship-bias-free** | 錢詞；連字號固定 |
 | 資料新鮮度 | **freshness** | |
+| 可驗證 | **verifiable** | 全文一致；TWMD 核心賣點,勿用 "checkable/validatable" |
+| 還原價 | **adjusted price** | 除權息還原;`price_adjustment_factor` |
 | 現況快照（僅當期） | **current snapshot only** | 對應 `no_historical_completeness` 警告 |
 | 不宣稱全市場 | **no full-market claim** | 誠實邊界，須保留 |
 | 已驗證基線 | **verified baseline** | "TWSE-first verified baseline" |

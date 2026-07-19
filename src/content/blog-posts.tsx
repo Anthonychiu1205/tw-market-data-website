@@ -32,7 +32,30 @@ export type BlogPost = {
   keyTakeaways?: string[];
   body: BlogBodyBlock[];
   disclaimer: string;
+  // Parallel English fields (I18N-FIX-03 B). When present + locale==="en", the post renders in English
+  // and the §2.5 "coming soon" notice is dropped. Absent → /en keeps the zh body + §2.5 fallback.
+  title_en?: string;
+  excerpt_en?: string;
+  description_en?: string;
+  keyTakeaways_en?: string[];
+  tags_en?: string[];
+  body_en?: BlogBodyBlock[];
 };
+
+// Locale selector: returns the English fields when locale is "en" and a translation exists, else the
+// zh fields. `hasEnglish` drives dropping the §2.5 notice.
+export function getLocalizedBlogPost(post: BlogPost, locale: string) {
+  const en = locale === "en" && post.body_en != null;
+  return {
+    hasEnglish: en,
+    title: en ? post.title_en ?? post.title : post.title,
+    excerpt: en ? post.excerpt_en ?? post.excerpt : post.excerpt,
+    description: en ? post.description_en ?? post.description : post.description,
+    keyTakeaways: en ? post.keyTakeaways_en ?? post.keyTakeaways : post.keyTakeaways,
+    tags: en ? post.tags_en ?? post.tags : post.tags,
+    body: en ? post.body_en ?? post.body : post.body,
+  };
+}
 
 export const BLOG_CATEGORIES: Array<"全部" | BlogCategory> = [
   "全部",
@@ -208,6 +231,115 @@ export const blogPosts: BlogPost[] = [
       },
     ],
     disclaimer: "本文僅說明資料產品與研究流程，不構成投資建議。",
+    title_en: "Why Verifiable Data Beats a Better Model in Taiwan Market Research",
+    excerpt_en:
+      "The quality of AI-driven investment research is capped by one thing — whether your data can be traced, replayed, and verified.",
+    description_en:
+      "AI investment research is only as reliable as its inputs. Here's why source attribution, coverage, freshness, and explicit data gaps in a Taiwan stock market data API matter more to AI agents and quant workflows than any model or prompt.",
+    tags_en: ["AI Agent", "Taiwan market data", "Data verification", "Data engineering"],
+    keyTakeaways_en: [
+      "The ceiling on AI research quality is set by whether the data is traceable, replayable, and verifiable — not by the model or the prompt.",
+      "Productizing Taiwan market data means solving for sources, field contracts, coverage, freshness, gap disclosure, and duplicate auditing — not just shipping endpoints.",
+      "TW Market Data is official/public-first by design: get the trusted data layer and the API contract right first, then wire in the AI research workflow.",
+      "An AI agent should consume structured data, evidence, confidence, and data_gaps — not emit trade actions or guaranteed prices.",
+    ],
+    body_en: [
+      { type: "heading", level: 2, id: "before-models-verify-data", text: "Verify the data before you reach for a model" },
+      {
+        type: "paragraph",
+        text:
+          "In AI agents, quantitative research, and research-automation pipelines, the model is the part that gets the attention — but it's rarely the part you should optimize first. For most Taiwan-market use cases, the real ceiling on your conclusions is the reliability of the inputs. The moment a workflow pulls prices, monthly revenue, financial statements, institutional flow, technical indicators, and event data together, a strong model can't save you if the sources, field semantics, and update cadences don't line up — it will just produce a fluent-sounding summary on shaky ground.",
+      },
+      {
+        type: "paragraph",
+        text:
+          "Plenty of teams mistake “readable” for “trustworthy.” A cleanly written research note that can't be traced back to its source, can't confirm whether the data is the latest revision, and can't explain its missing fields or imputation rules is a poor foundation for a real decision. That's especially true in Taiwan, where TWSE, TPEx, MOPS, and the other public-disclosure systems each move on their own schedule, name their fields differently, and publish at different times. Without a normalized schema and clear source attribution, the cost of downstream comparison and debugging climbs fast.",
+      },
+      {
+        type: "paragraph",
+        text:
+          "So if you're putting an AI agent into a research workflow, the first move isn't more elaborate prompt orchestration — it's a market-data contract you can actually verify: explicitly defined fields, source, update time, gap status, and the evidence needed to replay a result. Only once the data-engineering layer is inspectable does optimizing the model layer mean anything. Otherwise every output is just an unreproducible guess.",
+      },
+      { type: "heading", level: 2, id: "what-is-verifiable-market-data", text: "What “verifiable” actually means" },
+      {
+        type: "paragraph",
+        text:
+          "A verifiable Taiwan market data API isn't “done” because it has endpoints, and it isn't usable just because it returns JSON. Truly verifiable means any single research input can answer: where did this come from, how is the field defined, how current is it, which tickers does it cover, where are the gaps, and can I replay it and get the same result? These look like engineering details. They're actually the core of both research quality and product trust.",
+      },
+      {
+        type: "list",
+        style: "bullet",
+        items: [
+          "Source attribution: every record traces back to an official or public source, with the time it was captured.",
+          "Normalized schema: field semantics stay consistent across datasets, so you never hit same-name/different-meaning (or the reverse).",
+          "Coverage: tickers, dates, and quarters are quantified, not represented by a single happy-path example.",
+          "Freshness: last-updated time, latency, and staleness are all trackable.",
+          "Data gaps: missing data is stated explicitly; nothing is zero-filled to fake completeness, and “unavailable” is never hidden.",
+          "Duplicate audit: logical primary keys can be checked for duplication, so downstream metrics don't drift.",
+          "Reproducible artifacts: meaningful backfills, validations, and gate decisions leave a traceable record.",
+        ],
+      },
+      {
+        type: "paragraph",
+        text:
+          "Together these make a trustworthy data foundation. When the data layer is verifiable, the agent can spend its effort framing the research, comparing scenarios, and surfacing risk — instead of endlessly patching over inconsistent inputs. For a data company, this is also the line between an internal tool and an API you can actually sell.",
+      },
+      { type: "heading", level: 2, id: "why-tw-market-needs-source-first", text: "Why Taiwan market data specifically needs to be source-first" },
+      {
+        type: "paragraph",
+        text:
+          "Taiwan market data comes with well-defined public-disclosure rules and with sources that each carry their own format and cadence. Prices, monthly revenue, financial statements, institutional flow, and event data all sit under the “market data” umbrella, but their source contracts and refresh cycles aren't the same. Flatten those source semantics at the data layer and the workflow loses its inspectability — you can no longer tell whether a problem lives in the data, the mapping, or the model.",
+      },
+      {
+        type: "paragraph",
+        text:
+          "The value of source-first isn't claiming you have the most data — it's disclosing status honestly: which datasets ship reliably, which are still filling out coverage, and which can only go out as beta or deferred for now. That's friendlier to the developers building on the API, because they can design around data gaps and build fallback paths up front, instead of letting uncertainty surface only in production.",
+      },
+      { type: "heading", level: 2, id: "what-ai-agent-should-read", text: "What an AI agent should actually read" },
+      {
+        type: "paragraph",
+        text:
+          "An AI agent's job in a research workflow is to organize and compare — not to invent conclusions. To get there, the input has to graduate from plain-text summaries to a structured research packet. For Taiwan research, the common building blocks are prices, monthly revenue, income statement, balance sheet, institutional flow, technical indicators, and valuation scenarios, plus an event layer of news metadata and official events.",
+      },
+      {
+        type: "paragraph",
+        text:
+          "Beyond the raw numbers, the workflow needs evidence, confidence, and data_gaps. Evidence lets every statement be traced back; confidence tells the user how much uncertainty is in play; data_gaps make the missing pieces visible. That matters more than producing a conclusion that merely looks complete. Without those fields, an agent will happily package the unknown as certainty — and the output ends up complete on the surface but unusable in practice.",
+      },
+      { type: "heading", level: 2, id: "tw-market-data-product-direction", text: "Where TW Market Data is headed" },
+      {
+        type: "paragraph",
+        text:
+          "The current order of operations is to get the data layer solid first, then extend the research layer. Priority one is coverage and contract consistency for the core datasets — TWSE daily price, monthly revenue, income statement, balance sheet, institutional flow. These are the smallest common set behind most research tasks; only once they're stable can the API and dashboard stay consistent across use cases.",
+      },
+      {
+        type: "paragraph",
+        text:
+          "The second layer fills in margin and short-interest data, valuation source proof, and technical indicators, plus a planned metadata-first News Intelligence layer (roadmap, not yet live). For anything not yet stable, we keep the status transparent rather than dressing it up — and the docs and API examples have to match the backend contract, so the product description never drifts from the actual output. An AI report viewer is on the roadmap too: it returns to the dashboard for real planning once coverage and the core capabilities are stable, rather than shipping as a demo-first flourish.",
+      },
+      { type: "heading", level: 2, id: "from-api-to-research-workflow", text: "From data API to research workflow" },
+      {
+        type: "paragraph",
+        text:
+          "For a developer, a good Taiwan market data API isn't about endpoint count — it's whether it can answer the questions that matter: what does this field mean, where's it from, how current is it, how far does coverage go, how are gaps represented, and can the same result be replayed. When those have clear answers, AI agents, quant research, and internal analysis tools can share one set of data semantics — which cuts both rework and risk.",
+      },
+      {
+        type: "paragraph",
+        text:
+          "Once the data layer is stable, the research workflow can focus on scenario comparison and hypothesis management. You might map a ticker's structured data into an evidence-oriented packet and let an agent draft a reviewable research note — with source, confidence, and gaps preserved end to end, not just the conclusion. That productizes far better, because every output can be traced, verified, and iterated.",
+      },
+      { type: "heading", level: 2, id: "conclusion", text: "Closing" },
+      {
+        type: "paragraph",
+        text:
+          "TW Market Data's priorities are explicit: trustworthy data first, a usable API second, docs that match third, an observable dashboard fourth, and deep AI-workflow integration only fifth. It's a road that doesn't chase short-term spectacle; it puts verifiability first. For teams maintaining a research workflow over the long run, this cadence is slower — but more sustainable.",
+      },
+      {
+        type: "paragraph",
+        text:
+          "If market data is going to be an engineering capability rather than one-off material, data-quality governance can't be a side task. When source attribution, coverage, freshness, data gaps, and a normalized schema are default capabilities, AI agents and quant research finally have a stable input base — and the product moves closer to a data platform you can run for the long haul. This article describes a data product and research workflow only; it is not investment advice.",
+      },
+    ],
   },
 ];
 
