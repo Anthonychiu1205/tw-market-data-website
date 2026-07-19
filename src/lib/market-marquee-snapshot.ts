@@ -1,6 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
+import { indexDisplayName } from "@/src/lib/homepage/index-names";
+
 const MARKET_INDEX_ITEMS = [
   { label: "加權指數", metric: "TAIEX", symbol: "TAIEX" },
   { label: "櫃買指數", metric: "TPEx", symbol: "OTCI" },
@@ -84,32 +86,57 @@ export type MarketMarqueeViewPayload = {
 // renders them as plain, non-clickable rows. Never point these at /login: a login wall is a
 // dead end for visitors and, for crawlers, an indexable auth page (GSC flags it). Backend feeds
 // may still supply a real public source_url (MOPS/TWSE), which is honored as an external link.
-const CURATED_FALLBACK_NEWS: MarketMarqueeNewsItem[] = [
+// Curated SAMPLE news (shown when the backend feed has none). Sample prose must follow locale
+// (I18N-FIX-03 ③) — real backend news titles are passed through untranslated. `category` is also
+// bilingual so nothing zh reaches /en.
+const CURATED_FALLBACK_NEWS_I18N: {
+  zh: string;
+  en: string;
+  source: string;
+  categoryZh: string;
+  categoryEn: string;
+}[] = [
   {
-    title: "公開資訊觀測站月營收資料陸續更新，市場關注營收成長動能",
+    zh: "公開資訊觀測站月營收資料陸續更新，市場關注營收成長動能",
+    en: "MOPS monthly-revenue disclosures rolling in; focus on revenue-growth momentum",
     source: "MOPS",
-    category: "月營收",
-    href: "",
+    categoryZh: "月營收",
+    categoryEn: "Monthly revenue",
   },
   {
-    title: "電子類股成交比重維持高檔，AI 供應鏈仍為盤面焦點",
+    zh: "電子類股成交比重維持高檔，AI 供應鏈仍為盤面焦點",
+    en: "Electronics keep a high share of turnover; the AI supply chain stays in focus",
     source: "TWSE",
-    category: "市場概況",
-    href: "",
+    categoryZh: "市場概況",
+    categoryEn: "Market overview",
   },
   {
-    title: "上市櫃公司重大訊息與公告資料可供事件研究流程使用",
+    zh: "上市櫃公司重大訊息與公告資料可供事件研究流程使用",
+    en: "Listed-company material announcements available for event-study workflows",
     source: "MOPS",
-    category: "公司事件",
-    href: "",
+    categoryZh: "公司事件",
+    categoryEn: "Company events",
   },
   {
-    title: "技術指標、估值與財報資料可供 API 查詢與模型分析",
+    zh: "技術指標、估值與財報資料可供 API 查詢與模型分析",
+    en: "Technicals, valuation and financials available via API for model analysis",
     source: "TWMD",
-    category: "資料集",
-    href: "",
+    categoryZh: "資料集",
+    categoryEn: "Datasets",
   },
 ];
+
+function curatedFallbackNews(locale: string): MarketMarqueeNewsItem[] {
+  const en = locale === "en";
+  return CURATED_FALLBACK_NEWS_I18N.map((n) => ({
+    title: en ? n.en : n.zh,
+    source: n.source,
+    category: en ? n.categoryEn : n.categoryZh,
+    href: "",
+  }));
+}
+
+const CURATED_FALLBACK_NEWS: MarketMarqueeNewsItem[] = curatedFallbackNews("zh");
 
 function buildNewsList(news: MarketMarqueeNewsItem[]): MarketMarqueeNewsItem[] {
   // href is optional (public source URL only); rows without one still render as text.
@@ -552,15 +579,17 @@ function buildSnapshotSummary(snapshot: MarketMarqueeSnapshot, stale: boolean): 
   return [revenueLine, marketLine, coverageLine, freshnessLine];
 }
 
-function asView(snapshot: MarketMarqueeSnapshot | null, isFallback: boolean): MarketMarqueeViewPayload {
+function asView(snapshot: MarketMarqueeSnapshot | null, isFallback: boolean, locale: string): MarketMarqueeViewPayload {
   const normalized = snapshot ?? CURATED_FALLBACK_SNAPSHOT;
   const stale = isSnapshotStale(normalized);
   const summary = normalized.summary.length > 0 ? normalized.summary : buildSnapshotSummary(normalized, stale);
-  const news = buildNewsList(normalized.news);
+  // Sample/fallback news follows locale (I18N-FIX-03 ③); real backend news is passed through as-is.
+  const news = isFallback ? curatedFallbackNews(locale) : buildNewsList(normalized.news);
 
   const items: MarketMarqueeViewItem[] = normalized.items.map((item) => ({
     id: `${item.metric ?? "market"}-${item.label}`,
-    name: item.label,
+    // Index display name via the shared SSOT (I18N-FIX-03 ②); unknown labels degrade to the zh name.
+    name: indexDisplayName(item.label, locale),
     metric: item.metric ?? "Market",
     value: item.value,
     change: item.change ?? "",
@@ -689,12 +718,12 @@ export async function getMarketMarqueeSnapshotRaw(): Promise<MarketMarqueeSnapsh
   return null;
 }
 
-export async function getMarketMarqueeSnapshotView(): Promise<MarketMarqueeViewPayload> {
+export async function getMarketMarqueeSnapshotView(locale = "zh-TW"): Promise<MarketMarqueeViewPayload> {
   const snapshot = await getMarketMarqueeSnapshotRaw();
   if (!snapshot || snapshot.items.length === 0) {
-    return asView(CURATED_FALLBACK_SNAPSHOT, true);
+    return asView(CURATED_FALLBACK_SNAPSHOT, true, locale);
   }
-  return asView(snapshot, false);
+  return asView(snapshot, false, locale);
 }
 
 export async function getMarketMarqueePublicSnapshot() {

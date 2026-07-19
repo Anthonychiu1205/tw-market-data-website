@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { Link } from "@/src/i18n/navigation";
 import { MarketingContainer } from "@/src/components/ui/marketing-container";
@@ -9,9 +9,10 @@ import { LazyAgentWorkflowDemo } from "./lazy-agent-workflow-demo";
 
 export async function MarketCoverageShowcase() {
   const t = await getTranslations("home.marketCoverage");
+  const locale = await getLocale();
   // Real per-ticker screen (TTM revenue / gross margin / YoY growth), daily ISR. The fabricated
-  // 6-stock table is gone; omitted when no real data is available (rule 2).
-  const config = await buildMarketCoverageConfig();
+  // 6-stock table is gone; omitted when no real data is available (rule 2). Labels follow locale (①).
+  const config = await buildMarketCoverageConfig(locale);
   return (
     <section className="bg-white py-20 lg:py-24">
       <MarketingContainer>

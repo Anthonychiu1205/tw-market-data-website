@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { Link } from "@/src/i18n/navigation";
 import { AgentDocumentsShowcase } from "@/src/components/home/agent-documents-showcase";
@@ -71,7 +71,8 @@ const PILLARS = [
 
 export default async function HomePage() {
   const t = await getTranslations("home");
-  const coverageMetrics = await getHomepageCoverageMetrics();
+  const locale = await getLocale();
+  const coverageMetrics = await getHomepageCoverageMetrics(locale);
   const coverageByKey = Object.fromEntries(coverageMetrics.map((metric) => [metric.key, metric.value])) as Record<string, string>;
   // Real values for the demo panels, fetched server-side (daily ISR). Only serialized data crosses to
   // the client — the service token never leaves this server module (demo-real-data is `server-only`).
