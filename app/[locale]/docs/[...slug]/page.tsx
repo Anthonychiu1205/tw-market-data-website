@@ -18,8 +18,13 @@ import { buttonClass } from "@/src/components/ui/button";
 import { getAbsoluteUrl, siteConfig } from "@/src/config/site";
 import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 import { normalizeDocsSections } from "@/src/content/docs-sections";
-import { resolveDocsGroupTargetHref } from "@/src/content/docs-sidebar";
+import { findDocsSidebarLink, resolveDocsGroupTargetHref } from "@/src/content/docs-sidebar";
 import { docsPages, getDocsPageBySlug } from "@/src/content/docs-pages";
+import { DatasetDocPage, isDatasetDocSlug } from "@/src/components/docs/dataset-doc-page";
+import { DocsArticlePage } from "@/src/components/docs/docs-article-page";
+import { DOCS_DATASET_CATALOG } from "@/src/content/docs/dataset-catalog";
+import { getDatasetDocContent } from "@/src/content/docs/dataset-pages";
+import { articleSlugs, getArticlePage } from "@/src/content/docs/article-pages";
 
 type DocsDynamicPageProps = {
   params: Promise<{ slug: string[]; locale: string }>;
@@ -40,13 +45,45 @@ function resolveDocsCanonical(href: string) {
 export const revalidate = 3600;
 
 export async function generateStaticParams() {
-  return docsPages.map((page) => ({ slug: page.slug }));
+  return [
+    ...docsPages.map((page) => ({ slug: page.slug })),
+    // v5 dataset endpoint pages: /docs/api/<domain>/<slug>
+    ...DOCS_DATASET_CATALOG.map((d) => ({ slug: ["api", d.domain, d.slug] })),
+    // v5 overview + guide article pages
+    ...articleSlugs().map((slug) => ({ slug })),
+  ];
 }
 
 export async function generateMetadata({ params }: DocsDynamicPageProps): Promise<Metadata> {
   const { slug, locale } = await params;
   const l = (locale === "en" ? "en" : "zh-TW") as import("@/src/i18n/locales").AppLocale;
   const isEn = l === "en";
+
+  // v5 dataset endpoint page metadata (from the catalog + bilingual content).
+  if (isDatasetDocSlug(slug)) {
+    const datasetSlug = slug[2];
+    const entry = DOCS_DATASET_CATALOG.find((d) => d.slug === datasetSlug);
+    const content = getDatasetDocContent(datasetSlug);
+    const title = entry ? (isEn ? entry.en : entry.zh) : datasetSlug;
+    const description = content ? (isEn ? content.description.en : content.description.zh) : undefined;
+    return {
+      title: isEn ? `Docs | ${title}` : `文件｜${title}`,
+      description,
+      alternates: buildAlternates(l, `/docs/api/${slug[1]}/${datasetSlug}`),
+    };
+  }
+
+  // v5 overview / guide article metadata.
+  const article = getArticlePage(slug);
+  if (article) {
+    const title = isEn ? article.title.en : article.title.zh;
+    return {
+      title: isEn ? `Docs | ${title}` : `文件｜${title}`,
+      description: isEn ? article.subtitle.en : article.subtitle.zh,
+      alternates: buildAlternates(l, `/docs/${slug.join("/")}`),
+    };
+  }
+
   const page = getDocsPageBySlug(slug);
 
   if (!page) {
@@ -81,9 +118,27 @@ export async function generateMetadata({ params }: DocsDynamicPageProps): Promis
 
 export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) {
   const { slug } = await params;
+
+  // v5 dataset endpoint pages (/docs/api/<domain>/<slug>) render the bilingual dataset template.
+  if (isDatasetDocSlug(slug)) {
+    const locale = await getLocale();
+    return <DatasetDocPage slugParts={slug} locale={locale} />;
+  }
+
+  // v5 bilingual overview / guide article pages.
+  if (getArticlePage(slug)) {
+    const locale = await getLocale();
+    return <DocsArticlePage slugParts={slug} locale={locale} />;
+  }
+
   const page = getDocsPageBySlug(slug);
 
   if (!page) {
+    // A v5 sidebar link whose page is not built yet → bilingual "being written" placeholder, not a 404.
+    if (findDocsSidebarLink(`/docs/${slug.join("/")}`)) {
+      const locale = await getLocale();
+      return <DocsArticlePage slugParts={slug} locale={locale} />;
+    }
     notFound();
   }
   const pageForShell = { ...page, apiReferenceFactory: undefined };

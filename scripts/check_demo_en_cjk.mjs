@@ -85,6 +85,8 @@ const EN_KEY_FILES = [
   "src/lib/homepage/index-names.ts",          // INDEX_NAME_I18N (marquee index names)
   "src/lib/market-marquee-snapshot.ts",       // CURATED_FALLBACK_NEWS_I18N (news fallback sample)
   "src/components/home/agent-documents-demo.tsx", // filings agent demo (I18N-FIX-06)
+  "src/lib/docs/dataset-grade.ts",                // DATASET_GRADE_LABELS (分級對外命名 map, DOCS-01)
+  "src/content/docs/dataset-catalog.ts",          // DOCS_DOMAINS + dataset display names (DOCS-01)
 ];
 for (const rel of EN_KEY_FILES) {
   try {
