@@ -24,7 +24,9 @@ export async function GET(request: Request): Promise<Response> {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
   }
 
-  revalidateTag(DEMO_CACHE_TAG);
+  // Next 16 requires a cache-life profile as the 2nd arg; { expire: 0 } purges the tag immediately so
+  // the next homepage render re-fetches the demo data (as_of catches up to the latest trading day).
+  revalidateTag(DEMO_CACHE_TAG, { expire: 0 });
   console.warn(`[refresh-demo] revalidated tag ${DEMO_CACHE_TAG}`);
   return NextResponse.json({ ok: true, tag: DEMO_CACHE_TAG });
 }
