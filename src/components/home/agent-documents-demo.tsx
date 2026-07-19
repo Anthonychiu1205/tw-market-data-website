@@ -2,19 +2,41 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { cn } from "@/src/lib/cn";
 import { useReplayOnVisible } from "@/src/hooks/use-replay-on-visible";
 
-const QUERY_PROMPT = "分析台積電近 5 年公告中的資本支出與先進製程重點";
-const DOCUMENTS = ["2025 年報", "2024 年報", "2024Q4 法說摘要", "重大訊息", "財報附註"];
-const RESULT_ROWS = [
-  { year: "2025", source: "年報", summary: "持續擴大先進封裝產能" },
-  { year: "2024", source: "法說摘要", summary: "資本支出維持高檔" },
-  { year: "2023", source: "重大訊息", summary: "海外擴產進度更新" },
-  { year: "2022", source: "年報", summary: "製程升級帶動毛利改善" },
-];
+// I18N-FIX-06: this demo renders client-side (ssr:false) so the server-HTML CJK guard can't see it —
+// the sample data must be localized by locale (like news' curatedFallback), not hardcoded zh. The
+// English sample is a SEMANTIC rewrite (not an official English original, not literal machine
+// translation). `{ en, zh }` shape lets the data-layer guard (check_demo_en_cjk.mjs) scan `en:` values.
+const QUERY_PROMPT_I18N = {
+  en: "Analyze TSMC's capex and advanced-process highlights across 5 years of filings",
+  zh: "分析台積電近 5 年公告中的資本支出與先進製程重點",
+};
+const DOCUMENTS_I18N = {
+  en: ["2025 Annual report", "2024 Annual report", "2024Q4 Earnings-call summary", "Material announcement", "Financial-statement notes"],
+  zh: ["2025 年報", "2024 年報", "2024Q4 法說摘要", "重大訊息", "財報附註"],
+};
+const RESULT_ROWS_I18N = {
+  en: [
+    { year: "2025", source: "Annual report", summary: "Expanding advanced-packaging capacity" },
+    { year: "2024", source: "Earnings-call summary", summary: "Capex staying elevated" },
+    { year: "2023", source: "Material announcement", summary: "Overseas expansion progress update" },
+    { year: "2022", source: "Annual report", summary: "Process upgrades lifting gross margin" },
+  ],
+  zh: [
+    { year: "2025", source: "年報", summary: "持續擴大先進封裝產能" },
+    { year: "2024", source: "法說摘要", summary: "資本支出維持高檔" },
+    { year: "2023", source: "重大訊息", summary: "海外擴產進度更新" },
+    { year: "2022", source: "年報", summary: "製程升級帶動毛利改善" },
+  ],
+};
+const TABLE_HEADERS_I18N = {
+  en: ["Year", "Source", "Summary"],
+  zh: ["年度", "來源", "摘要"],
+};
 
 const TIMING_SCALE = 0.65;
 const scaleMs = (ms: number) => Math.round(ms * TIMING_SCALE);
@@ -56,6 +78,12 @@ function CheckIcon() {
 
 export function AgentDocumentsDemo() {
   const t = useTranslations("home.agentDocumentsDemo");
+  const locale = useLocale();
+  const isEn = locale === "en";
+  const QUERY_PROMPT = isEn ? QUERY_PROMPT_I18N.en : QUERY_PROMPT_I18N.zh;
+  const DOCUMENTS = useMemo(() => (isEn ? DOCUMENTS_I18N.en : DOCUMENTS_I18N.zh), [isEn]);
+  const RESULT_ROWS = useMemo(() => (isEn ? RESULT_ROWS_I18N.en : RESULT_ROWS_I18N.zh), [isEn]);
+  const TABLE_HEADERS = isEn ? TABLE_HEADERS_I18N.en : TABLE_HEADERS_I18N.zh;
   const { elementRef, isVisible } = useReplayOnVisible<HTMLDivElement>({
     threshold: 0.4,
     rootMargin: "0px 0px -8% 0px",
@@ -135,9 +163,9 @@ export function AgentDocumentsDemo() {
     return () => {
       clearAllTimers();
     };
-  }, [isVisible]);
+  }, [isVisible, QUERY_PROMPT, DOCUMENTS, RESULT_ROWS]);
 
-  const typedPrompt = useMemo(() => QUERY_PROMPT.slice(0, typedLength), [typedLength]);
+  const typedPrompt = useMemo(() => QUERY_PROMPT.slice(0, typedLength), [QUERY_PROMPT, typedLength]);
 
   return (
     <div
@@ -196,7 +224,7 @@ export function AgentDocumentsDemo() {
       <div className="mt-3 w-full overflow-hidden rounded-xl border border-slate-300 bg-white">
         <div className={cn("border-b border-slate-200 transition duration-300", tableHeaderVisible ? "opacity-100" : "opacity-0")}>
           <div className="grid w-full grid-cols-[0.8fr_0.9fr_2.2fr] font-mono text-xs font-semibold tracking-wide text-slate-600">
-            {["年度", "來源", "摘要"].map((head, index) => (
+            {TABLE_HEADERS.map((head, index) => (
               <div key={head} className={cn("px-3.5 py-2", index > 0 ? "border-l border-slate-200" : "")}>
                 {head}
               </div>
