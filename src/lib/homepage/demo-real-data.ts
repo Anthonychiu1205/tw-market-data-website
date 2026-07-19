@@ -18,7 +18,13 @@ import type { AgentWorkflowDemoConfig } from "@/src/components/home/agent-workfl
 
 type AnyRecord = Record<string, unknown>;
 
-const REVALIDATE_SECONDS = 86400; // daily ISR
+// Cost-hardening: the demo panels don't need intraday freshness, and every fetch to a KEYED dataset
+// could cost credits (if the entitled key is a metered key). `false` = cache in Vercel's shared Data
+// Cache until the next deploy, so a (dataset,ticker) is fetched ~once per DEPLOY instead of
+// per-24h-per-region — cost/freshness profile of a build-time bake, without duplicating the fetch +
+// config logic into a separate script (rule 1). Deploys refresh the data; each row still shows its
+// own real as_of date.
+const DEMO_FETCH_REVALIDATE: number | false = false;
 const FETCH_TIMEOUT_MS = 4500;
 
 // Fields that are backend bookkeeping / noise, not part of the data a caller cares to see. Stripped
@@ -122,7 +128,7 @@ async function fetchRawRows(slug: string, ticker: string, limit: number): Promis
       method: "GET",
       headers: authHeaders(),
       signal: controller.signal,
-      next: { revalidate: REVALIDATE_SECONDS },
+      next: { revalidate: DEMO_FETCH_REVALIDATE },
     });
     if (!res.ok) {
       console.warn(`[demo-real-data] ${slug}/${ticker} upstream responded ${res.status}`);
