@@ -325,9 +325,9 @@ export function PricingShell() {
           <table className="w-full min-w-[900px] table-fixed text-sm leading-5">
             <thead className="text-slate-600">
               <tr>
-                <th className="w-[24%] border-b border-slate-200 px-4 py-3 text-left align-middle font-semibold" aria-label={t("featureColumnAria")} />
+                <th scope="col" className="w-[24%] border-b border-slate-200 px-4 py-3 text-left align-middle font-semibold" aria-label={t("featureColumnAria")} />
                 {COMPARISON_TIERS.map((tier) => (
-                  <th key={tier.key} className="border-b border-slate-200 px-4 py-3 text-center align-middle font-semibold text-slate-900">{tier.label}</th>
+                  <th key={tier.key} scope="col" className="border-b border-slate-200 px-4 py-3 text-center align-middle font-semibold text-slate-900">{tier.label}</th>
                 ))}
               </tr>
             </thead>
@@ -344,7 +344,7 @@ export function PricingShell() {
                   </tr>
                   {group.rows.map((row) => (
                     <tr key={row.labelKey} className="text-slate-700">
-                      <td className="border-b border-slate-100 px-4 py-3 text-left align-middle font-medium text-slate-900">{t(row.labelKey)}</td>
+                      <th scope="row" className="border-b border-slate-100 px-4 py-3 text-left align-middle font-medium text-slate-900">{t(row.labelKey)}</th>
                       {COMPARISON_TIERS.map((tier) => (
                         <td key={tier.key} className="border-b border-slate-100 px-4 py-3 text-center align-middle">{translateCell(row.values[tier.key])}</td>
                       ))}

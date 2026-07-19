@@ -403,8 +403,10 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
           </div>
         </aside>
 
-        {/* Content column centered at ~760px (§A) with generous line-height for scan-reading (§B). */}
-        <main className={cn("mx-auto w-full min-w-0", mainMaxWidth)}>
+        {/* Content column centered at ~760px (§A) with generous line-height for scan-reading (§B).
+            A <div> (not <main>): the site shell already provides the single <main> landmark; a nested
+            <main> here gave docs pages two main regions (breaks the a11y tree for computer-use agents). */}
+        <div className={cn("mx-auto w-full min-w-0", mainMaxWidth)}>
           {/* AI-agent hint on every docs page (BENCH-01 §2, FDS per-page practice). */}
           <p className="mb-4 text-xs text-slate-400">
             {t.rich("aiHint", {
@@ -426,7 +428,7 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
           {nextGuide ? (
             <div className="mt-12 border-t border-slate-200 pt-6 text-sm text-slate-600">{nextGuide}</div>
           ) : null}
-        </main>
+        </div>
 
         <aside className="hidden lg:block">
           <div className="sticky top-24">
