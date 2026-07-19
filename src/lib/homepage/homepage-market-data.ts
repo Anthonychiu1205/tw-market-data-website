@@ -56,6 +56,11 @@ const INDEX_META: Record<string, { name: string; metric: string }> = {
   twii_0050: { name: "台灣50", metric: "Index" },
   sector_ele: { name: "電子類股", metric: "Sector Index" },
   sector_fin: { name: "金融保險", metric: "Sector Index" },
+  // MKTCARD-01: semiconductor sector index. Real data exists in the TWSE industry index series
+  // (industry_name 半導體類, e.g. 1449.47 on 2026-07-17). This row renders once the curated
+  // /v2/homepage/market-indices endpoint emits a `sector_semi` key with a real value — same source
+  // family and cadence as sector_ele / sector_fin. Until then it is simply absent (never fabricated).
+  sector_semi: { name: "半導體", metric: "Sector Index" },
 };
 
 function isRecord(v: unknown): v is AnyRecord {

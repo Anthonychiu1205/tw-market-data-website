@@ -10,6 +10,7 @@ export const INDEX_NAME_I18N: Record<string, { en: string; zh: string }> = {
   台灣50: { en: "Taiwan 50", zh: "台灣50" },
   電子類股: { en: "Electronics", zh: "電子類股" },
   金融保險: { en: "Finance & Insurance", zh: "金融保險" },
+  半導體: { en: "Semiconductor", zh: "半導體" },
 };
 
 export function indexDisplayName(name: string, locale: string): string {
