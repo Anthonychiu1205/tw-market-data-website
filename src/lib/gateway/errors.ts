@@ -1,31 +1,10 @@
 import "server-only";
 
-export type GatewayErrorCode =
-  | "missing_api_key"
-  | "invalid_api_key"
-  | "api_key_lookup_unavailable"
-  | "api_key_revoked"
-  | "dataset_not_allowed"
-  | "plan_not_entitled"
-  | "insufficient_credits"
-  | "dataset_not_found"
-  | "upstream_timeout"
-  | "upstream_error"
-  | "internal_error";
+// The code union + default messages live in ./error-codes (no server-only import) so the docs can
+// document the real error bodies from this same source rather than a hand-typed copy.
+import { GATEWAY_DEFAULT_MESSAGES as DEFAULT_MESSAGES, type GatewayErrorCode } from "./error-codes";
 
-const DEFAULT_MESSAGES: Record<GatewayErrorCode, string> = {
-  missing_api_key: "API key is required.",
-  invalid_api_key: "Invalid API key.",
-  api_key_lookup_unavailable: "API key verification is temporarily unavailable.",
-  api_key_revoked: "API key is revoked.",
-  dataset_not_allowed: "Dataset is not allowed.",
-  plan_not_entitled: "Current plan is not entitled for this dataset.",
-  insufficient_credits: "Insufficient credits.",
-  dataset_not_found: "Dataset not found.",
-  upstream_timeout: "Upstream request timed out.",
-  upstream_error: "Upstream service error.",
-  internal_error: "Internal service error.",
-};
+export type { GatewayErrorCode };
 
 export class GatewayHttpError extends Error {
   status: number;
