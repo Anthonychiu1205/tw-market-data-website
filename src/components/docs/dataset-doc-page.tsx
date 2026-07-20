@@ -1,5 +1,6 @@
 import { DocsPageShell } from "@/src/components/docs/docs-page-shell";
 import { CodeBlock } from "@/src/components/docs/code-block";
+import { DatasetApiPanel } from "@/src/components/docs/dataset-api-panel";
 import { SectionHeading } from "@/src/components/docs/section-heading";
 import { DOCS_DATASET_CATALOG, DOCS_DOMAINS } from "@/src/content/docs/dataset-catalog";
 import { getDatasetDocContent, type Bi, type DatasetDocContent } from "@/src/content/docs/dataset-pages";
@@ -83,8 +84,29 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
   const pageLabel = domain ? (en ? domain.en : domain.zh) : "Dataset API";
   const tocSections = SECTIONS.map((s) => ({ id: s.id, label: en ? s.en : s.zh }));
 
+  // The sticky Request/Response panel makes this a data-API page: the shell switches to the wide
+  // right column and drops the TOC (article pages keep the TOC and stay single-column).
+  const apiPanel = content ? (
+    <DatasetApiPanel
+      locale={locale}
+      datasetSlug={entry.slug}
+      backendPath={entry.backendPath}
+      params={content.params}
+      exampleJson={typeof content.exampleJson === "string" ? content.exampleJson : bi(content.exampleJson, locale)}
+      planCode={entry.requiredPlan}
+      creditsCost={entry.creditsCost}
+      hasRealCoverage={content.coverage !== null}
+    />
+  ) : undefined;
+
   return (
-    <DocsPageShell page={{ title, subtitle, href, sections: tocSections }} tocSections={tocSections} pageLabel={pageLabel}>
+    <DocsPageShell
+      page={{ title, subtitle, href, sections: tocSections }}
+      tocSections={tocSections}
+      pageLabel={pageLabel}
+      rightPanelTitle={en ? "Request & Response" : "請求與回應"}
+      rightPanelContent={apiPanel}
+    >
       {/* Grade badge + real facts line (agency / plan / price). The 對帳 verification section is
           intentionally deferred until the backend produces real verified dates. */}
       <div className="mt-6 flex flex-wrap items-center gap-2 text-sm">
