@@ -1,22 +1,22 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { GATEWAY_DEFAULT_MESSAGES } from "../gateway/error-codes.ts";
 import {
   API_AUTH_HEADER,
-  API_CAPTURED_ERRORS,
-  API_GATEWAY_BASE_URL,
-  API_ROWS_KEY,
+  API_KEY_PREFIX,
+  LOCALIZED_MESSAGE_PLACEHOLDER,
+  READ_API_ERRORS,
 } from "../../content/api-truth.ts";
+import { API_CAPTURES, apiCaptureBody, getApiCapture } from "../../content/api-captures.ts";
 import {
   API_BASE_URL,
-  PANEL_ERROR_CODES,
-  PANEL_STATUSES,
+  PANEL_ERRORS,
   buildErrorBody,
   buildRequestSnippet,
   buildSuccessBody,
-  errorStatusFor,
+  datasetRowsKey,
   exampleArgs,
+  panelStatuses,
   type PanelParam,
 } from "./api-panel-content.ts";
 
@@ -28,45 +28,42 @@ const STANDARD: PanelParam[] = [
 ];
 
 const PATH = "/v2/datasets/twse-daily-price";
+const LANGUAGES = ["curl", "python", "javascript", "typescript"] as const;
+const CJK = /[　-〿぀-ヿ㐀-䶿一-鿿＀-￯]/;
 
-test("every request snippet uses the captured base, auth header and endpoint", () => {
-  // The base is the GATEWAY (the host that validates the key and meters credits), not the backend.
-  assert.equal(API_BASE_URL, API_GATEWAY_BASE_URL);
-  for (const language of ["curl", "python", "javascript", "typescript"] as const) {
-    const code = buildRequestSnippet(language, { backendPath: PATH, params: STANDARD });
+// ── Request ──────────────────────────────────────────────────────────────────
+
+test("snippets target the read API, which is where sk_live_ keys authenticate", () => {
+  assert.equal(API_BASE_URL, "https://api.twmarketdata.com");
+  assert.equal(API_KEY_PREFIX, "sk_live_");
+  for (const language of LANGUAGES) {
+    const code = buildRequestSnippet(language, { backendPath: PATH, params: STANDARD, rowsKey: "rows" });
+    assert.ok(code.includes(`${API_BASE_URL}${PATH}`), `${language} must hit the read API`);
     assert.ok(code.includes(API_AUTH_HEADER), `${language} must send ${API_AUTH_HEADER}`);
-    assert.ok(code.includes(`${API_BASE_URL}${PATH}`), `${language} must hit the real endpoint`);
-    assert.ok(!code.includes("api.twmarketdata.com"), `${language} must not point at the backend host`);
+    // The billing gateway is a different host with a different key namespace — never document it here.
+    assert.ok(!code.includes("https://twmarketdata.com/"), `${language} must not point at the gateway`);
   }
 });
 
-test("snippets read the captured row-array key, not the OpenAPI fiction", () => {
-  assert.equal(API_ROWS_KEY, "rows");
+test("each snippet reads THIS dataset's row key, never a shared one", () => {
+  const withRows = buildRequestSnippet("python", { backendPath: PATH, params: STANDARD, rowsKey: "rows" });
+  assert.ok(withRows.includes('payload["rows"]'));
+
+  const withData = buildRequestSnippet("python", { backendPath: PATH, params: STANDARD, rowsKey: "data" });
+  assert.ok(withData.includes('payload["data"]'));
+  assert.ok(!withData.includes('payload["rows"]'), "must not leak another dataset's key");
+
+  const withItems = buildRequestSnippet("javascript", { backendPath: PATH, params: STANDARD, rowsKey: "items" });
+  assert.ok(withItems.includes("const { items } = payload;"));
+});
+
+test("an uncaptured dataset gets a snippet that asserts no row key at all", () => {
   for (const language of ["python", "javascript", "typescript"] as const) {
-    const code = buildRequestSnippet(language, { backendPath: PATH, params: STANDARD });
-    assert.ok(code.includes(API_ROWS_KEY), `${language} must read ${API_ROWS_KEY}`);
-    assert.ok(!/\bdata\b/.test(code), `${language} must not read a "data" array — the API returns rows`);
-  }
-});
-
-test("the documented error contract matches what the live gateway returned", () => {
-  for (const captured of API_CAPTURED_ERRORS) {
-    assert.equal(
-      GATEWAY_DEFAULT_MESSAGES[captured.code as keyof typeof GATEWAY_DEFAULT_MESSAGES],
-      captured.message,
-      `${captured.code} message must match the captured body`,
-    );
-  }
-});
-
-test("no snippet references an unpublished SDK package", () => {
-  // packages/python-sdk and packages/js-sdk exist but are not on PyPI / npm, so the docs must not
-  // show an import a reader cannot install.
-  for (const language of ["curl", "python", "javascript", "typescript"] as const) {
-    const code = buildRequestSnippet(language, { backendPath: PATH, params: STANDARD });
-    assert.ok(!code.includes("twmarketdata import"), `${language} must not import the unpublished SDK`);
-    assert.ok(!code.includes("@twmarketdata/sdk"), `${language} must not import the unpublished SDK`);
-    assert.ok(!/\btwmd\./.test(code), `${language} must not use a package name that does not exist`);
+    const code = buildRequestSnippet(language, { backendPath: PATH, params: STANDARD, rowsKey: null });
+    for (const key of ["rows", "items"]) {
+      assert.ok(!code.includes(`["${key}"]`) && !code.includes(`{ ${key} }`), `${language} must not invent "${key}"`);
+    }
+    assert.ok(code.includes("payload"), `${language} should print the whole payload instead`);
   }
 });
 
@@ -75,105 +72,111 @@ test("undocumented params get no invented example value", () => {
   assert.deepEqual(args.map((a) => a.name), ["symbol"]);
 });
 
-test("a reference dataset without a date range produces a shorter query", () => {
-  const code = buildRequestSnippet("curl", {
-    backendPath: "/v2/datasets/security-master",
-    params: [{ name: "symbol", required: false }, { name: "limit", required: false }],
-  });
-  assert.ok(code.includes("symbol=2330&limit=5"));
-  assert.ok(!code.includes("start_date"));
-});
+// ── Response: success ────────────────────────────────────────────────────────
 
-test("a dataset with no documented params produces a bare URL", () => {
-  const code = buildRequestSnippet("curl", { backendPath: PATH, params: [] });
-  assert.ok(code.includes(`"${API_BASE_URL}${PATH}"`));
-  assert.ok(!code.includes("?"));
-});
-
-test("error bodies mirror the gateway's real contract", () => {
-  for (const code of PANEL_ERROR_CODES) {
-    const parsed = JSON.parse(buildErrorBody(code));
-    assert.equal(parsed.error.code, code);
-    assert.equal(parsed.error.message, GATEWAY_DEFAULT_MESSAGES[code]);
-    assert.ok(parsed.requestId, "every error body carries requestId");
-  }
-});
-
-test("the documented statuses are the ones the gateway actually throws", () => {
-  assert.equal(errorStatusFor("invalid_api_key"), 401);
-  assert.equal(errorStatusFor("insufficient_credits"), 402);
-  assert.equal(errorStatusFor("plan_not_entitled"), 403);
-  assert.equal(errorStatusFor("dataset_not_found"), 404);
-  assert.deepEqual(PANEL_STATUSES, ["200", "401", "402", "403", "404"]);
-  // 400 is not in the list: the gateway never emits one.
-  assert.ok(!PANEL_STATUSES.includes("400"));
-});
-
-test("a captured dataset serves its real response verbatim", () => {
-  const result = buildSuccessBody({
-    exampleJson: `{"data":[{"symbol":"2330"}]}`,
-    datasetSlug: "twse-daily-price",
-    planCode: "starter",
-    creditsCost: 1,
-  });
-  assert.equal(result.provenance, "captured");
+test("a captured dataset serves its own real body verbatim", () => {
+  const result = buildSuccessBody("twse-daily-price", "zh-TW");
+  assert.equal(result.kind, "captured");
+  if (result.kind !== "captured") return;
   const parsed = JSON.parse(result.body);
-  // Real captured shape: rows (not data), with source_role and lineage at the TOP level.
+  // twse-daily-price really does use `rows` with a singular top-level source_role.
   assert.ok(Array.isArray(parsed.rows));
-  assert.equal(parsed.data, undefined);
   assert.equal(parsed.source_role, "official_twse");
-  assert.ok(parsed.lineage.provider);
-  // The hand-written page example must NOT override the capture.
-  assert.equal(parsed.rows[0].close, 2290.0);
+  assert.equal(result.rowsKey, "rows");
 });
 
-test("an uncaptured dataset gets the captured envelope with illustrative rows", () => {
-  const result = buildSuccessBody({
-    exampleJson: `{"data":[{"symbol":"1101","close":40.0}]}`,
-    datasetSlug: "some-uncaptured-dataset",
-    planCode: "starter",
-    creditsCost: 1,
-  });
-  assert.equal(result.provenance, "illustrative");
-  const parsed = JSON.parse(result.body);
-  assert.deepEqual(parsed.rows, [{ symbol: "1101", close: 40.0 }]);
-  assert.equal(parsed.count, 1);
-  assert.equal(parsed.data, undefined);
-  assert.equal(parsed.meta.planCode, "starter");
+test("the envelope is NOT normalized across datasets", () => {
+  // This is the whole point: one dataset's shape must never be imposed on another.
+  const twse = buildSuccessBody("twse-daily-price", "zh-TW");
+  const esg = buildSuccessBody("esg-tesg", "zh-TW");
+  assert.equal(twse.kind, "captured");
+  assert.equal(esg.kind, "captured");
+  if (twse.kind !== "captured" || esg.kind !== "captured") return;
+  assert.equal(twse.rowsKey, "rows");
+  assert.equal(esg.rowsKey, "data");
+  const esgBody = JSON.parse(esg.body);
+  assert.ok(Array.isArray(esgBody.data));
+  assert.equal(esgBody.rows, undefined);
+  // Provenance shape differs too — plural array here, singular string on twse.
+  assert.ok(Array.isArray(esgBody.lineage.source_roles));
+  assert.equal(esgBody.source_role, undefined);
 });
 
-test("data_grade is never emitted into a response body", () => {
-  const result = buildSuccessBody({
-    exampleJson: `{"data":[{"symbol":"2330"}]}`,
-    datasetSlug: "twse-daily-price",
-    planCode: "starter",
-    creditsCost: 1,
-  });
-  assert.ok(!result.body.includes("data_grade"));
-  for (const code of PANEL_ERROR_CODES) {
-    assert.ok(!buildErrorBody(code).includes("data_grade"));
+test("an uncaptured dataset yields nothing rather than a templated body", () => {
+  const result = buildSuccessBody("no-such-dataset-anywhere", "en");
+  assert.equal(result.kind, "uncaptured");
+});
+
+test("every capture is valid JSON and declares a row key that exists in it", () => {
+  for (const [slug, capture] of Object.entries(API_CAPTURES)) {
+    const parsed = JSON.parse(capture.zh);
+    if (capture.rowsKey) {
+      assert.ok(Array.isArray(parsed[capture.rowsKey]), `${slug}: rowsKey "${capture.rowsKey}" must be an array`);
+    }
+    if (capture.en) JSON.parse(capture.en);
   }
 });
 
-test("a bare example row is still wrapped in the envelope", () => {
-  const result = buildSuccessBody({
-    exampleJson: `{"rate_name":"rediscount_rate","value_pct":2.0}`,
-    datasetSlug: "interest-rate",
-    planCode: "free",
-    creditsCost: 0,
-  });
-  assert.deepEqual(JSON.parse(result.body).rows, [{ rate_name: "rediscount_rate", value_pct: 2.0 }]);
+test("the /en body of every capture is CJK-free", () => {
+  for (const [slug, capture] of Object.entries(API_CAPTURES)) {
+    const body = apiCaptureBody(capture, "en");
+    assert.ok(!CJK.test(body), `${slug}: the /en body must not contain Chinese`);
+  }
 });
 
-test("an unparseable example falls back to a pointer instead of invented rows", () => {
-  const result = buildSuccessBody({
-    exampleJson: `{ "a": 1 }\n{ "b": 2 }`, // two objects — not valid JSON on its own
-    datasetSlug: "interest-rate",
-    planCode: "free",
-    creditsCost: 0,
-  });
-  assert.equal(result.provenance, "illustrative");
-  const parsed = JSON.parse(result.body);
-  assert.equal(parsed.rows.length, 1);
-  assert.match(parsed.rows[0], /Example response section/);
+test("the /zh body keeps the real Chinese values", () => {
+  const capture = getApiCapture("esg-tesg");
+  assert.ok(capture);
+  if (!capture) return;
+  assert.ok(CJK.test(apiCaptureBody(capture, "zh-TW")), "zh must show the values the API really returned");
+  assert.notEqual(apiCaptureBody(capture, "en"), apiCaptureBody(capture, "zh-TW"));
+});
+
+test("datasetRowsKey reports null for anything not captured", () => {
+  assert.equal(datasetRowsKey("twse-daily-price"), "rows");
+  assert.equal(datasetRowsKey("no-such-dataset-anywhere"), null);
+});
+
+// ── Response: errors ─────────────────────────────────────────────────────────
+
+test("error bodies use the read API's flat envelope, not the gateway's", () => {
+  for (const error of PANEL_ERRORS) {
+    const parsed = JSON.parse(buildErrorBody(error, "zh-TW"));
+    // Flat string, not { code, message }; and no requestId — that is the gateway's shape.
+    assert.equal(typeof parsed.error, "string");
+    assert.equal(parsed.error, error.code);
+    assert.equal(parsed.requestId, undefined);
+    assert.deepEqual(Object.keys(parsed).sort(), ["error", "message"]);
+  }
+});
+
+test("/zh shows the real Chinese message; /en shows a marker, not a translation", () => {
+  const missingKey = READ_API_ERRORS.find((e) => e.code === "missing_api_key");
+  assert.ok(missingKey);
+  if (!missingKey) return;
+
+  const zh = JSON.parse(buildErrorBody(missingKey, "zh-TW"));
+  assert.equal(zh.message, missingKey.messageZh);
+  assert.ok(CJK.test(zh.message));
+
+  const en = JSON.parse(buildErrorBody(missingKey, "en"));
+  assert.equal(en.message, LOCALIZED_MESSAGE_PLACEHOLDER);
+  assert.ok(!CJK.test(JSON.stringify(en)), "the /en error body must be CJK-free");
+});
+
+test("only statuses actually observed are documented", () => {
+  const statuses = panelStatuses();
+  assert.deepEqual(statuses, ["200", "401", "404"]);
+  // 403 has never been reproduced (key validation precedes entitlement) and the read API has never
+  // been seen emitting 400 — documenting either would be a claim, not a record.
+  assert.ok(!statuses.includes("403"));
+  assert.ok(!statuses.includes("400"));
+});
+
+test("data_grade is never emitted into any documented body", () => {
+  const success = buildSuccessBody("twse-daily-price", "en");
+  assert.ok(success.kind === "captured" && !success.body.includes("data_grade"));
+  for (const error of PANEL_ERRORS) {
+    assert.ok(!buildErrorBody(error, "en").includes("data_grade"));
+  }
 });

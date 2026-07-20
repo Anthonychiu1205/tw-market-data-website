@@ -4,34 +4,36 @@ import { useMemo, useState } from "react";
 
 import { CodeBlock, type CodeBlockLanguage } from "@/src/components/docs/code-block";
 import {
-  PANEL_ERROR_CODES,
+  API_KEY_PREFIX,
+  PANEL_ERRORS,
   REQUEST_LANGUAGES,
   buildErrorBody,
   buildRequestSnippet,
   buildSuccessBody,
-  errorStatusFor,
+  datasetRowsKey,
+  panelStatuses,
   type PanelParam,
   type RequestLanguage,
 } from "@/src/lib/docs/api-panel-content";
+import { API_AUTH_HEADER } from "@/src/content/api-truth";
 import { cn } from "@/src/lib/cn";
 
 // The sticky right-hand panel on a data-API page (DOCS-03): a Request card with language tabs and a
 // Response card with status tabs. Bilingual inline like the rest of the v5 dataset pages, so /en is
 // genuinely English and the CJK guards can scan it.
 //
-// Honesty (rule 2): the 200 body re-uses the dataset's OWN documented example row — this panel never
-// introduces a field the page does not already publish, and never shows a live value it does not have.
-// A dataset whose real values are not obtainable yet (no entitled key, coverage still TODO) is
-// labelled as illustrative right on the card.
+// Honesty (rule 2):
+//  - the 200 body is THIS dataset's own captured response, or nothing. There is no shared template,
+//    because the envelope genuinely differs per dataset (data / rows / items).
+//  - an uncaptured dataset says so, rather than showing a plausible body nobody has observed.
+//  - error bodies are the read API's real ones. Their `message` is Chinese; /en shows a marker in its
+//    place rather than an English translation the API never sends.
 
 type DatasetApiPanelProps = {
   locale: string;
   datasetSlug: string;
   backendPath: string;
   params: PanelParam[];
-  exampleJson: string;
-  planCode: string;
-  creditsCost: number;
 };
 
 const LANGUAGE_SYNTAX: Record<RequestLanguage, CodeBlockLanguage> = {
@@ -41,36 +43,23 @@ const LANGUAGE_SYNTAX: Record<RequestLanguage, CodeBlockLanguage> = {
   typescript: "typescript",
 };
 
-export function DatasetApiPanel({
-  locale,
-  datasetSlug,
-  backendPath,
-  params,
-  exampleJson,
-  planCode,
-  creditsCost,
-}: DatasetApiPanelProps) {
+export function DatasetApiPanel({ locale, datasetSlug, backendPath, params }: DatasetApiPanelProps) {
   const en = locale === "en";
   const [language, setLanguage] = useState<RequestLanguage>("curl");
   const [status, setStatus] = useState<string>("200");
 
+  const rowsKey = useMemo(() => datasetRowsKey(datasetSlug), [datasetSlug]);
   const requestCode = useMemo(
-    () => buildRequestSnippet(language, { backendPath, params }),
-    [language, backendPath, params],
+    () => buildRequestSnippet(language, { backendPath, params, rowsKey }),
+    [language, backendPath, params, rowsKey],
   );
+  const success = useMemo(() => buildSuccessBody(datasetSlug, locale), [datasetSlug, locale]);
+  const statuses = useMemo(() => panelStatuses(), []);
 
-  const success = useMemo(
-    () => buildSuccessBody({ exampleJson, datasetSlug, planCode, creditsCost }),
-    [exampleJson, datasetSlug, planCode, creditsCost],
-  );
-
-  const errorTabs = useMemo(
-    () => PANEL_ERROR_CODES.map((code) => ({ code, status: String(errorStatusFor(code)) })),
-    [],
-  );
-
-  const activeError = errorTabs.find((tab) => tab.status === status);
-  const responseBody = activeError ? buildErrorBody(activeError.code) : success.body;
+  // Several errors share status 401, so the tab selects the first error with that status and the rest
+  // are listed underneath — the status code alone is not a unique key.
+  const errorsForStatus = PANEL_ERRORS.filter((e) => String(e.status) === status);
+  const isSuccessTab = status === "200";
 
   return (
     <div className="space-y-5">
@@ -107,8 +96,8 @@ export function DatasetApiPanel({
         />
         <p className="text-[11px] leading-5 text-slate-400">
           {en
-            ? "Authenticate with the X-API-Key header. Keys are issued in the dashboard."
-            : "以 X-API-Key 標頭認證，金鑰於儀表板發放。"}
+            ? `Authenticate with the ${API_AUTH_HEADER} header, using a ${API_KEY_PREFIX} key issued in the dashboard.`
+            : `以 ${API_AUTH_HEADER} 標頭認證，使用儀表板發放的 ${API_KEY_PREFIX} 金鑰。`}
         </p>
       </section>
 
@@ -118,7 +107,7 @@ export function DatasetApiPanel({
           {en ? "Response" : "回應"}
         </p>
         <div className="flex flex-wrap gap-1">
-          {["200", ...errorTabs.map((tab) => tab.status)].map((code) => {
+          {statuses.map((code) => {
             const isActive = status === code;
             return (
               <button
@@ -136,38 +125,55 @@ export function DatasetApiPanel({
             );
           })}
         </div>
-        <CodeBlock
-          code={responseBody}
-          language="json"
-          copyButtonVariant="icon"
-          header={<span className="text-[11px] font-medium text-slate-500">JSON</span>}
-        />
-        {activeError ? (
-          <p className="text-[11px] leading-5 text-slate-400">
-            {en
-              ? `Error code ${activeError.code}. Every error body carries requestId — quote it when contacting support.`
-              : `錯誤碼 ${activeError.code}。每個錯誤回應都帶 requestId，聯繫支援時請一併提供。`}
-          </p>
-        ) : (
-          <div className="space-y-1 text-[11px] leading-5 text-slate-400">
-            <p>
+
+        {isSuccessTab ? (
+          success.kind === "captured" ? (
+            <>
+              <CodeBlock
+                code={success.body}
+                language="json"
+                copyButtonVariant="icon"
+                header={<span className="text-[11px] font-medium text-slate-500">JSON</span>}
+              />
+              <div className="space-y-1 text-[11px] leading-5 text-slate-400">
+                <p className="text-emerald-700">
+                  {en
+                    ? "Captured from a real call to this endpoint — not written by hand."
+                    : "擷取自對此端點的真實呼叫，非手寫。"}
+                </p>
+                <p>
+                  {en
+                    ? `This dataset returns its rows under "${success.rowsKey ?? "-"}". The envelope differs between datasets, so read this one rather than reusing another page's shape.`
+                    : `此資料集的資料列在 "${success.rowsKey ?? "-"}" 之下。各資料集的信封不同，請以本頁為準，勿沿用其他頁的形狀。`}
+                </p>
+              </div>
+            </>
+          ) : (
+            <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-5 text-amber-800">
               {en
-                ? "meta is injected by the gateway on every response: requestId, planCode, creditsCost and dryRun."
-                : "meta 由 gateway 於每次回應注入：requestId、planCode、creditsCost 與 dryRun。"}
+                ? "TODO — no response has been captured for this dataset yet (it needs an entitled key, or its required parameters are not yet known). No example is shown rather than an invented one."
+                : "TODO —— 尚未擷取到此資料集的真實回應（需要有權限的金鑰，或其必填參數尚未確認）。寧可不顯示範例，也不編造。"}
             </p>
-            {success.provenance === "captured" ? (
-              <p className="text-emerald-700">
-                {en
-                  ? "This body was captured from a real call to the API, not written by hand."
-                  : "此回應擷取自對 API 的真實呼叫，非手寫。"}
+          )
+        ) : (
+          <div className="space-y-3">
+            {errorsForStatus.map((error) => (
+              <div key={error.code} className="space-y-1">
+                <CodeBlock
+                  code={buildErrorBody(error, locale)}
+                  language="json"
+                  copyButtonVariant="icon"
+                  header={<span className="text-[11px] font-medium text-slate-500">{error.code}</span>}
+                />
+                <p className="text-[11px] leading-5 text-slate-400">{en ? error.when.en : error.when.zh}</p>
+              </div>
+            ))}
+            {en ? (
+              <p className="text-[11px] leading-5 text-slate-400">
+                The API returns <code>message</code> in Chinese; the placeholder above stands in for it
+                rather than an English translation the API does not send.
               </p>
-            ) : (
-              <p className="text-amber-700">
-                {en
-                  ? "Envelope is the captured shape; the rows are illustrative — this dataset has not been captured yet."
-                  : "信封為實測擷取的結構；資料列僅示意——此資料集尚未實測擷取。"}
-              </p>
-            )}
+            ) : null}
           </div>
         )}
       </section>

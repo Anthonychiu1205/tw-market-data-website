@@ -5,15 +5,16 @@ import { SectionHeading } from "@/src/components/docs/section-heading";
 import { DOCS_DATASET_CATALOG, DOCS_DOMAINS } from "@/src/content/docs/dataset-catalog";
 import { getDatasetDocContent, type Bi, type DatasetDocContent } from "@/src/content/docs/dataset-pages";
 import { DATASET_GRADE_COLORS, datasetGradeLabel } from "@/src/lib/docs/dataset-grade";
-import { API_AUTH_HEADER, API_GATEWAY_BASE_URL, API_ROWS_KEY } from "@/src/content/api-truth";
+import { API_AUTH_HEADER, API_BASE_URL as CAPTURED_BASE_URL, API_KEY_PREFIX, API_TRUTH_CAPTURED_AT } from "@/src/content/api-truth";
+import { apiCaptureBody, getApiCapture } from "@/src/content/api-captures";
 
 // Bilingual renderer for a v5 dataset endpoint page. Genuinely en + zh (no "coming soon" banner) so
 // /en is fully usable and the CJK guards can scan it. All facts come from the catalog (grade / agency /
 // plan / price) and the dataset-pages content (real coverage numbers or explicit TODO markers).
 
-// Base, auth header and the row-array key all come from the captured API truth — the in-body examples
-// must not contradict the Request/Response panel beside them.
-const API_BASE = API_GATEWAY_BASE_URL;
+// Base and auth header come from the captured API truth — the in-body examples must not contradict
+// the Request/Response panel beside them. The row-array key is per dataset (see api-captures.ts).
+const API_BASE = CAPTURED_BASE_URL;
 
 type Locale = string;
 
@@ -21,35 +22,34 @@ function bi(value: Bi, locale: Locale): string {
   return locale === "en" ? value.en : value.zh;
 }
 
-function pythonBasic(backendPath: string): string {
+function pythonBasic(backendPath: string, rowsKey: string | null): string {
   return `import requests
 
 resp = requests.get(
     "${API_BASE}${backendPath}",
     params={"symbol": "2330", "limit": 5},
-    headers={"${API_AUTH_HEADER}": "sk_live_..."},
+    headers={"${API_AUTH_HEADER}": "${API_KEY_PREFIX}..."},
 )
 resp.raise_for_status()
-print(resp.json()["${API_ROWS_KEY}"])`;
+${rowsKey ? `print(resp.json()["${rowsKey}"])` : "print(resp.json())"}`;
 }
 
-function pythonFiltered(backendPath: string): string {
+function pythonFiltered(backendPath: string, rowsKey: string | null): string {
   return `import requests
 
 # Same call, narrowed to a date range.
 resp = requests.get(
     "${API_BASE}${backendPath}",
     params={"symbol": "2330", "start_date": "2026-01-01", "end_date": "2026-06-30"},
-    headers={"${API_AUTH_HEADER}": "sk_live_..."},
+    headers={"${API_AUTH_HEADER}": "${API_KEY_PREFIX}..."},
 )
 resp.raise_for_status()
-for row in resp.json()["${API_ROWS_KEY}"]:
-    print(row)`;
+${rowsKey ? `for row in resp.json()["${rowsKey}"]:\n    print(row)` : "print(resp.json())"}`;
 }
 
 function curlExample(backendPath: string): string {
   return `curl "${API_BASE}${backendPath}?symbol=2330&limit=5" \\
-  -H "${API_AUTH_HEADER}: sk_live_..."`;
+  -H "${API_AUTH_HEADER}: ${API_KEY_PREFIX}..."`;
 }
 
 const SECTIONS = [
@@ -86,6 +86,9 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
   const subtitle = content ? bi(content.description, locale) : entry.slug;
   const pageLabel = domain ? (en ? domain.en : domain.zh) : "Dataset API";
   const tocSections = SECTIONS.map((s) => ({ id: s.id, label: en ? s.en : s.zh }));
+  // Per-dataset row-array key from its own capture; null when this dataset has not been captured.
+  const capture = getApiCapture(entry.slug);
+  const rowsKey = capture?.rowsKey ?? null;
 
   // The sticky Request/Response panel makes this a data-API page: the shell switches to the wide
   // right column and drops the TOC (article pages keep the TOC and stay single-column).
@@ -95,9 +98,6 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
       datasetSlug={entry.slug}
       backendPath={entry.backendPath}
       params={content.params}
-      exampleJson={typeof content.exampleJson === "string" ? content.exampleJson : bi(content.exampleJson, locale)}
-      planCode={entry.requiredPlan}
-      creditsCost={entry.creditsCost}
     />
   ) : undefined;
 
@@ -213,14 +213,36 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
           {/* Example response */}
           <section className="mt-10">
             <SectionHeading id="example">{en ? "Example response" : "範例回應"}</SectionHeading>
-            <p className="mt-3 text-sm text-slate-500">
-              {en
-                ? "Each row carries its source fields (source_role / lineage) so a value is verifiable, not opaque."
-                : "每一列都帶來源欄位（source_role／lineage），數值可驗證而非黑箱。"}
-            </p>
-            <div className="mt-3">
-              <CodeBlock code={typeof content.exampleJson === "string" ? content.exampleJson : bi(content.exampleJson, locale)} language="json" />
-            </div>
+            {capture ? (
+              <>
+                <p className="mt-3 text-sm text-slate-500">
+                  {en
+                    ? `A real response from this endpoint. Rows are returned under "${capture.rowsKey ?? "-"}", and provenance is carried in the shape shown below — it is not identical across datasets, so read this page's rather than assuming another's.`
+                    : `此為本端點的真實回應。資料列位於 "${capture.rowsKey ?? "-"}" 之下，來源資訊如下方所示；各資料集形狀不盡相同，請以本頁為準。`}
+                </p>
+                <div className="mt-3">
+                  <CodeBlock code={apiCaptureBody(capture, locale)} language="json" />
+                </div>
+                <p className="mt-2 text-xs text-emerald-700">
+                  {en
+                    ? `Captured from the live API on ${API_TRUTH_CAPTURED_AT}.`
+                    : `擷取自 ${API_TRUTH_CAPTURED_AT} 的線上 API。`}
+                </p>
+                {capture.en ? (
+                  <p className="mt-1 text-xs text-slate-400">
+                    {en
+                      ? "Chinese data values are shown as a marker here so this page stays in English; the /zh page shows them verbatim."
+                      : "本頁顯示原始中文值；英文頁會以標記取代，以維持全英文。"}
+                  </p>
+                ) : null}
+              </>
+            ) : (
+              <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                {en
+                  ? "TODO — no real response has been captured for this dataset yet. It needs an entitled API key, or its required parameters are not yet known. Rather than show an example nobody has observed, this section stays empty."
+                  : "TODO —— 尚未擷取到此資料集的真實回應（需要有權限的 API 金鑰，或其必填參數尚未確認）。寧可留白，也不顯示未經實測的範例。"}
+              </p>
+            )}
           </section>
 
           {/* Getting started */}
@@ -229,7 +251,7 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
             <ol className="mt-3 list-decimal space-y-2 pl-5 text-slate-600">
               <li>{en ? `Put your key in the ${API_AUTH_HEADER} header.` : `把你的金鑰放進 ${API_AUTH_HEADER} 標頭。`}</li>
               <li>{en ? "Add query parameters (symbol, date range, limit)." : "加上查詢參數（symbol、日期區間、limit）。"}</li>
-              <li>{en ? `Send the request and read the ${API_ROWS_KEY} array.` : `送出請求並讀取 ${API_ROWS_KEY} 陣列。`}</li>
+              <li>{rowsKey ? (en ? `Send the request and read the ${rowsKey} array.` : `送出請求並讀取 ${rowsKey} 陣列。`) : (en ? "Send the request and read the returned payload." : "送出請求並讀取回傳內容。")}</li>
             </ol>
             <div className="mt-4">
               <CodeBlock code={curlExample(entry.backendPath)} language="bash" />
@@ -267,9 +289,9 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
           <section className="mt-10">
             <SectionHeading id="python">{en ? "Python" : "Python 範例"}</SectionHeading>
             <p className="mt-3 text-sm text-slate-500">{en ? "A first call:" : "第一個呼叫："}</p>
-            <div className="mt-2"><CodeBlock code={pythonBasic(entry.backendPath)} language="python" /></div>
+            <div className="mt-2"><CodeBlock code={pythonBasic(entry.backendPath, rowsKey)} language="python" /></div>
             <p className="mt-4 text-sm text-slate-500">{en ? "With a date-range filter:" : "帶日期區間篩選："}</p>
-            <div className="mt-2"><CodeBlock code={pythonFiltered(entry.backendPath)} language="python" /></div>
+            <div className="mt-2"><CodeBlock code={pythonFiltered(entry.backendPath, rowsKey)} language="python" /></div>
           </section>
 
           {/* OpenAPI */}
