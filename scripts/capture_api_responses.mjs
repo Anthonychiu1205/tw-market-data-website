@@ -38,15 +38,92 @@ const ROW_KEYS = ["data", "rows", "items"];
 // 2330 is TWSE-listed, so a TPEx-only dataset answers 200 with an EMPTY row array for it; 6488 is a
 // real TPEx ticker and is tried next. Some datasets name the parameter `ticker` rather than `symbol`
 // (they answer 422 "ticker: Field required"), so both spellings are attempted.
+// limit=50 is for FIELD DETECTION, not for the page: the stored example is trimmed to 2 rows, but a
+// sparse column (e.g. security-master.industry_category, populated in ~2.6% of rows) would look like a
+// phantom if only 2 rows were inspected. The larger sample is the anti-false-positive measure.
+const FIELD_SAMPLE_LIMIT = 50;
 const PARAM_ATTEMPTS = [
-  "?symbol=2330&limit=2",
-  "?ticker=2330&limit=2",
-  "?symbol=6488&limit=2",
-  "?ticker=6488&limit=2",
-  "?limit=2",
+  `?symbol=2330&limit=${FIELD_SAMPLE_LIMIT}`,
+  `?ticker=2330&limit=${FIELD_SAMPLE_LIMIT}`,
+  `?symbol=6488&limit=${FIELD_SAMPLE_LIMIT}`,
+  `?ticker=6488&limit=${FIELD_SAMPLE_LIMIT}`,
+  `?limit=${FIELD_SAMPLE_LIMIT}`,
   "",
   "?symbol=2330",
 ];
+
+// ── Ghost-field detection ───────────────────────────────────────────────────────────────────────
+// Each docs page DECLARES a field table (`fields: [...]` in src/content/docs/dataset-pages.ts). Those
+// tables were hand-written before anything was captured, so some describe fields the API does not
+// actually return ("ghost fields") and miss fields it does. Since we are already calling every
+// endpoint, diff the two while we are here.
+//
+// dataset-pages.ts is TypeScript with `@/` alias imports, so it cannot be imported from plain node —
+// the declarations are extracted textually instead. A parse miss shows up as an empty declared-set
+// (reported as "declared: 0"), never as a wrong diff.
+function readDeclaredFields() {
+  const src = readFileSync(join(root, "src/content/docs/dataset-pages.ts"), "utf8");
+  const declared = new Map();
+  const entryRe = /\n {2}"([a-z0-9-]+)":\s*\{/g;
+  const entries = [...src.matchAll(entryRe)];
+
+  entries.forEach((m, idx) => {
+    const slug = m[1];
+    const blockEnd = idx + 1 < entries.length ? entries[idx + 1].index : src.length;
+    const start = src.indexOf("fields: [", m.index);
+    if (start === -1 || start > blockEnd) return;
+
+    // Walk to the matching ] so the `params:` array further down is never scooped up.
+    let depth = 0;
+    let i = start + "fields: ".length;
+    for (; i < src.length; i += 1) {
+      if (src[i] === "[") depth += 1;
+      else if (src[i] === "]" && --depth === 0) break;
+    }
+    declared.set(slug, [...src.slice(start, i).matchAll(/name:\s*"([^"]+)"/g)].map((f) => f[1]));
+  });
+  return declared;
+}
+
+// Field presence, collected with three anti-false-positive rules the backend learned the hard way:
+//
+//   1. ANY DEPTH. Keys are collected recursively, so a field living inside a nested object
+//      (lineage.source_family, fundamentals_context.*) is not reported as missing just because it is
+//      not at the row's top level.
+//   2. ENVELOPE INCLUDED. The envelope's own keys count as present, so envelope-level fields
+//      (not_investment_advice, data_gaps, lineage) documented in a page's field table are not phantoms.
+//   3. NULL IS NOT ABSENT. Presence is judged by the KEY existing, never by its value. A serializer
+//      emitting `null` still proves the field exists. Fields that are present but null in every
+//      sampled row are reported separately as "always-null" — informational, never phantom.
+//
+// Returns { present:Set, nullOnly:Set, rowsSampled:number }.
+function collectFieldPresence(parsedBody, rowsKey) {
+  const seen = new Map(); // key -> { any: boolean(non-null seen) }
+
+  function walk(value) {
+    if (Array.isArray(value)) {
+      for (const v of value) walk(v);
+      return;
+    }
+    if (value && typeof value === "object") {
+      for (const [k, v] of Object.entries(value)) {
+        const entry = seen.get(k) ?? { nonNull: false };
+        if (v !== null && v !== undefined) entry.nonNull = true;
+        seen.set(k, entry);
+        walk(v);
+      }
+    }
+  }
+
+  walk(parsedBody); // rule 1 + rule 2: whole envelope, all depths
+
+  const rows = rowsKey && Array.isArray(parsedBody[rowsKey]) ? parsedBody[rowsKey] : [];
+  return {
+    present: new Set(seen.keys()),
+    nullOnly: new Set([...seen.entries()].filter(([, v]) => !v.nonNull).map(([k]) => k)),
+    rowsSampled: rows.length,
+  };
+}
 
 function readSlugs() {
   const src = readFileSync(join(root, "src/lib/gateway/dataset-policies.ts"), "utf8");
@@ -113,7 +190,14 @@ async function capture({ slug, path }) {
     const masked = JSON.stringify(mask(trimmed), null, 2);
     if (CJK.test(masked)) throw new Error(`${slug}: CJK survived masking (a KEY may be Chinese)`);
 
-    return { slug, ok: true, query, rowsKey, zh, en: masked === zh ? null : masked };
+    const presence = collectFieldPresence(parsed, rowsKey); // parsed, NOT trimmed — full sample
+    return {
+      slug, ok: true, query, rowsKey, zh,
+      en: masked === zh ? null : masked,
+      present: [...presence.present],
+      nullOnly: [...presence.nullOnly],
+      rowsSampled: presence.rowsSampled,
+    };
   }
 
   let reason = `HTTP ${last.status}`;
@@ -209,6 +293,55 @@ console.error(`\nCAPTURED (${ok.length}):`);
 for (const r of ok) console.error(`  ${r.slug.padEnd(34)} rowsKey=${String(r.rowsKey).padEnd(6)} ${r.query || "(no params)"}`);
 console.error(`\nLEFT AS TODO (${failed.length}):`);
 for (const r of failed) console.error(`  ${r.slug.padEnd(34)} ${r.reason}`);
+
+// ── Declared-vs-actual field diff ───────────────────────────────────────────────────────────────
+const declaredFields = readDeclaredFields();
+const fieldDiff = ok.map((r) => {
+  const declared = declaredFields.get(r.slug) ?? [];
+  const present = new Set(r.present ?? []);
+  return {
+    slug: r.slug,
+    rowsSampled: r.rowsSampled ?? 0,
+    declared: declared.length,
+    // PHANTOM: documented but the key never appeared, at any depth, anywhere in the envelope, across
+    // the whole sample. Still stated as "not observed in N rows" rather than "does not exist" — with a
+    // small sample a genuinely sparse column can hide, so this is a review queue, not an auto-delete.
+    phantom: declared.filter((f) => !present.has(f)),
+    // Present but null in every sampled row. NOT a phantom — the field exists; it is just unpopulated
+    // in this sample. Kept separate precisely so nobody deletes a real sparse column.
+    alwaysNull: declared.filter((f) => (r.nullOnly ?? []).includes(f)),
+    // Returned but not documented — the page is incomplete rather than wrong.
+    undocumented: [...present].filter((f) => !declared.includes(f)),
+  };
+});
+
+const withGhosts = fieldDiff.filter((d) => d.phantom.length > 0);
+const withUndocumented = fieldDiff.filter((d) => d.undocumented.length > 0);
+const withNullOnly = fieldDiff.filter((d) => d.alwaysNull.length > 0);
+
+console.error(`\n\n=== FIELD DIFF (declared in docs vs returned by the API) ===`);
+console.error(`checked ${fieldDiff.length} captured dataset(s); ${withGhosts.length} have phantom field(s)`);
+console.error(`keys matched recursively at any depth, envelope included; null counts as PRESENT\n`);
+console.error(`PHANTOM — documented, never seen at any depth in the sample (${withGhosts.length}):`);
+if (withGhosts.length === 0) console.error("  none");
+for (const d of withGhosts) console.error(`  ${d.slug.padEnd(34)} [${d.rowsSampled} rows] ${d.phantom.join(", ")}`);
+
+console.error(`\nALWAYS-NULL — field EXISTS but unpopulated in the sample; NOT a phantom (${withNullOnly.length}):`);
+if (withNullOnly.length === 0) console.error("  none");
+for (const d of withNullOnly) console.error(`  ${d.slug.padEnd(34)} ${d.alwaysNull.join(", ")}`);
+
+console.error(`\nUNDOCUMENTED — returned but not in the docs table (${withUndocumented.length}):`);
+if (withUndocumented.length === 0) console.error("  none");
+for (const d of withUndocumented) console.error(`  ${d.slug.padEnd(34)} ${d.undocumented.join(", ")}`);
+
+const notChecked = failed.map((f) => f.slug);
+console.error(`\nNOT CHECKED (no capture, so nothing to compare): ${notChecked.length}`);
+
+const diffOut = process.argv.find((a) => a.startsWith("--diff-out="))?.split("=")[1];
+if (diffOut) {
+  writeFileSync(diffOut, JSON.stringify({ checkedAt: new Date().toISOString().slice(0, 10), fieldDiff, notChecked }, null, 2));
+  console.error(`wrote ${diffOut}`);
+}
 
 if (DRY_RUN) {
   console.error("\n--dry-run: nothing written.");
