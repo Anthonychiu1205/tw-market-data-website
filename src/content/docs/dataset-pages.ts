@@ -6,7 +6,12 @@
 // Real-data discipline (Part 0): coverage totals come from the coverage-facts SSOT (imported, not
 // re-typed). Where a real coverage number is not obtainable for this dataset yet (e.g. the doc-build
 // key is not entitled to query it, or no full-table count exists), the field is a `coverageTodo`
-// marker — never a fabricated number. Example rows are REAL values pulled from the live API.
+// marker — never a fabricated number.
+//
+// Example RESPONSES no longer live here. They were hand-written and their shape turned out not to
+// match the API (they assumed a `data` array with per-row provenance for every dataset; the real
+// envelope varies per dataset). They are now real captures in src/content/api-captures.ts, and a
+// dataset without a capture shows an honest TODO rather than a templated body.
 
 import { COVERAGE_FACTS_SNAPSHOT_DATE, coverageFacts } from "@/src/content/coverage-facts";
 
@@ -26,9 +31,6 @@ export type DatasetDocContent = {
   description: Bi; // one-line blockquote
   overview: Bi[]; // paragraphs
   fields: FieldDoc[]; // key response fields (includes provenance fields to show verifiability)
-  // A REAL example response row. Bilingual when the row carries Chinese values (e.g. a company name):
-  // /en shows the romanized/English form so the page stays CJK-free, /zh shows the native value.
-  exampleJson: string | Bi;
   coverage: CoverageFact | null; // null → show coverageTodo instead (never a fake number)
   coverageTodo?: Bi;
   params: ParamDoc[];
@@ -76,23 +78,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_canonical", type: "string", desc: { en: "Canonical source id (e.g. official_twse).", zh: "正規來源識別（如 official_twse）。" } },
       { name: "updated_at", type: "string", desc: { en: "When this row was last refreshed.", zh: "此列最後更新時間。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-16",
-      "open": 2495.0,
-      "high": 2500.0,
-      "low": 2465.0,
-      "close": 2470.0,
-      "volume_shares": 30538604,
-      "turnover": 74750491934,
-      "source_canonical": "official_twse",
-      "source_name": "twse_stock_day_all_openapi",
-      "updated_at": "2026-07-17"
-    }
-  ]
-}`,
     coverage: {
       rows: fmt(twse.rows),
       symbols: fmt(twse.stocks),
@@ -128,22 +113,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_monthly_revenue).", zh: "正規來源角色（official_mops_monthly_revenue）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream endpoint + authority (e.g. MOPS t187ap05).", zh: "上游端點與權威來源（如 MOPS t187ap05）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "period": "2026-05",
-      "revenue": 416975163,
-      "source_role": "official_mops_monthly_revenue",
-      "lineage": {
-        "endpoint_name": "t187ap05",
-        "source_authority": "MOPS t187ap05",
-        "payload_date": "2026-05-01"
-      },
-      "is_placeholder": false
-    }
-  ]
-}`,
     coverage: {
       rows: fmt(rev.rows),
       symbols: fmt(rev.stocks),
@@ -180,19 +149,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "dealer_net", type: "number", desc: { en: "Dealer net (shares).", zh: "自營商買賣超（股）。" } },
       { name: "source_role", type: "string", desc: { en: "official_twse_t86.", zh: "official_twse_t86。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-17",
-      "foreign_net": -8123000,
-      "trust_net": 415000,
-      "dealer_net": 122000,
-      "source_role": "official_twse_t86",
-      "lineage": { "source_authority": "TWSE T86" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE T86 daily report (present through the latest trading day).",
@@ -226,12 +182,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "as_of", type: "string", desc: { en: "Date the rate took effect.", zh: "利率生效日期。" } },
       { name: "source_role", type: "string", desc: { en: "cbc_official.", zh: "cbc_official。" } },
     ],
-    exampleJson: `{
-  "data": [
-    { "rate_name": "rediscount_rate", "value_pct": 2.000, "as_of": "2026-05-27", "source_role": "cbc_official" },
-    { "rate_name": "rediscount_with_collateral", "value_pct": 2.375, "as_of": "2026-05-27", "source_role": "cbc_official" }
-  ]
-}`,
     coverage: {
       rows: undefined,
       window: { en: "Latest set values (as of 2026-05-27)", zh: "最新設定值（截至 2026-05-27）" },
@@ -260,32 +210,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "industry", type: "string", desc: { en: "Industry classification.", zh: "產業分類。" } },
       { name: "source_role", type: "string", desc: { en: "official_twse_issuer_profile.", zh: "official_twse_issuer_profile。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "name": "TSMC",
-      "board": "TWSE",
-      "industry": "Semiconductor",
-      "source_role": "official_twse_issuer_profile",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "name": "台積電",
-      "board": "TWSE",
-      "industry": "半導體業",
-      "source_role": "official_twse_issuer_profile",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-    },
     coverage: {
       window: { en: "Active securities (current snapshot)", zh: "現用證券（當前快照）" },
       frequency: { en: "Snapshot", zh: "快照" },
@@ -319,30 +243,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "title", type: "string", desc: { en: "Event title.", zh: "事件標題。" } },
       { name: "source_role", type: "string", desc: { en: "official_mops_major_event.", zh: "official_mops_major_event。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "6990",
-      "event_date": "2026-07-18",
-      "event_type": "material_announcement",
-      "title": "Material announcement",
-      "source_role": "official_mops_major_event"
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "6990",
-      "event_date": "2026-07-18",
-      "event_type": "material_announcement",
-      "title": "重大訊息公告",
-      "source_role": "official_mops_major_event"
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact event counts and the coverage window are pending a measured snapshot; the source is the official MOPS / TWSE / TPEx announcement venues (present through the latest disclosure).",
@@ -371,11 +271,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "open_interest", type: "number", desc: { en: "Open interest.", zh: "未平倉量。" } },
       { name: "source_role", type: "string", desc: { en: "official_taifex.", zh: "official_taifex。" } },
     ],
-    exampleJson: `{
-  "data": [
-    { "contract": "TXF", "date": "TODO", "settlement_price": null, "open_interest": null, "source_role": "official_taifex" }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — real example values, exact row counts and the coverage window are pending an entitled key at doc-build time. The data exists (TAIFEX futures, daily, coverage from the late 1990s) but was not queryable from this build session, so no numbers are shown rather than fabricated ones.",
@@ -409,11 +304,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "issuer", type: "string", desc: { en: "Issuing institution.", zh: "發行機構。" } },
       { name: "fund_type", type: "string", desc: { en: "Fund / ETF type.", zh: "基金／ETF 類型。" } },
     ],
-    exampleJson: `{
-  "data": [
-    { "symbol": "TODO", "name": "TODO", "issuer": "TODO", "fund_type": "TODO" }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — real example values and exact counts are pending a measured snapshot / entitled key at doc-build time; the dataset is issuer-sourced fund & ETF reference metadata.",
@@ -446,24 +336,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "eps", type: "number", desc: { en: "Basic earnings per share (TWD).", zh: "基本每股盈餘(新台幣元)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_income_statement).", zh: "正規來源角色(official_mops_income_statement)。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "period": "2026-Q1",
-      "revenue": 839254000,
-      "operating_income": 411800000,
-      "net_income": 361560000,
-      "eps": 13.94,
-      "source_role": "official_mops_income_statement",
-      "lineage": {
-        "endpoint_name": "income_statement",
-        "source_authority": "MOPS (income statement)",
-        "payload_date": "2026-05-15"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS income-statement filings (present through the latest disclosed reporting period). No counts are shown rather than fabricated ones.",
@@ -499,23 +371,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "total_equity", type: "number", desc: { en: "Total equity (TWD thousands).", zh: "權益總額(新台幣仟元)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_balance_sheet).", zh: "正規來源角色(official_mops_balance_sheet)。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "period": "2026-Q1",
-      "total_assets": 7150000000,
-      "total_liabilities": 2050000000,
-      "total_equity": 5100000000,
-      "source_role": "official_mops_balance_sheet",
-      "lineage": {
-        "endpoint_name": "balance_sheet",
-        "source_authority": "MOPS (balance sheet)",
-        "payload_date": "2026-05-15"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS balance-sheet filings (present through the latest disclosed reporting period). No counts are shown rather than fabricated ones.",
@@ -551,23 +406,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "financing_cash_flow", type: "number", desc: { en: "Net cash from financing activities (TWD thousands).", zh: "籌資活動之淨現金流量(新台幣仟元)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_cash_flow_statement).", zh: "正規來源角色(official_mops_cash_flow_statement)。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "period": "2026-Q1",
-      "operating_cash_flow": 485000000,
-      "investing_cash_flow": -298000000,
-      "financing_cash_flow": -142000000,
-      "source_role": "official_mops_cash_flow_statement",
-      "lineage": {
-        "endpoint_name": "cash_flow_statement",
-        "source_authority": "MOPS (cash-flow statement)",
-        "payload_date": "2026-05-15"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS cash-flow-statement filings (present through the latest disclosed reporting period). No counts are shown rather than fabricated ones.",
@@ -604,23 +442,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "operating_cash_flow", type: "number", desc: { en: "Operating cash flow from the cash-flow statement (TWD thousands).", zh: "現金流量表營業活動淨現金流量(新台幣仟元)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_financial_statements).", zh: "正規來源角色(official_mops_financial_statements)。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "period": "2026-Q1",
-      "revenue": 839254000,
-      "net_income": 361560000,
-      "total_assets": 7150000000,
-      "operating_cash_flow": 485000000,
-      "source_role": "official_mops_financial_statements",
-      "lineage": {
-        "source_authority": "MOPS financial statements",
-        "payload_date": "2026-05-15"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS financial-statement filings (present through the latest disclosed reporting period). No counts are shown rather than fabricated ones.",
@@ -657,24 +478,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "roe", type: "number", desc: { en: "Return on equity for the period (ratio).", zh: "當期股東權益報酬率(比值)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_mops_financial_metrics).", zh: "正規來源角色(derived_mops_financial_metrics)。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "period": "2026-Q1",
-      "gross_margin": 0.582,
-      "operating_margin": 0.491,
-      "net_margin": 0.431,
-      "roe": 0.071,
-      "source_role": "derived_mops_financial_metrics",
-      "lineage": {
-        "derived_from": "official_mops_income_statement + official_mops_balance_sheet",
-        "source_authority": "MOPS financial statements",
-        "computed_at": "2026-05-16"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the ratios are computed from the official MOPS income-statement and balance-sheet filings (present through the latest disclosed reporting period). No counts are shown rather than fabricated ones.",
@@ -711,24 +514,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "ttm_revenue", type: "number", desc: { en: "Trailing-twelve-month revenue (TWD thousands).", zh: "近十二個月營收(新台幣仟元)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_mops_monthly_revenue_enhanced).", zh: "正規來源角色(derived_mops_monthly_revenue_enhanced)。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "period": "2026-05",
-      "revenue": 416975163,
-      "yoy": 0.382,
-      "mom": 0.041,
-      "ttm_revenue": 3210458000,
-      "source_role": "derived_mops_monthly_revenue_enhanced",
-      "lineage": {
-        "derived_from": "official_mops_monthly_revenue",
-        "source_authority": "MOPS t187ap05",
-        "computed_at": "2026-06-10"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the metrics are computed from the official MOPS monthly-revenue disclosure (present through the latest disclosed month). No counts are shown rather than fabricated ones.",
@@ -764,23 +549,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "ex_dividend_date", type: "string", desc: { en: "Ex-dividend date.", zh: "除息(權)日。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_dividend_policy).", zh: "正規來源角色(official_mops_dividend_policy)。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "fiscal_year": "2025",
-      "cash_dividend": 16.5,
-      "stock_dividend": 0.0,
-      "ex_dividend_date": "2026-03-19",
-      "source_role": "official_mops_dividend_policy",
-      "lineage": {
-        "endpoint_name": "dividend_policy",
-        "source_authority": "MOPS (dividends)",
-        "payload_date": "2026-02-20"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS dividend-policy filings (present through the latest disclosed distribution). No counts are shown rather than fabricated ones.",
@@ -815,21 +583,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_ndc_business_indicator).", zh: "正規來源角色（official_ndc_business_indicator）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream endpoint + authority (e.g. NDC business-cycle monitoring release).", zh: "上游端點與權威來源（如 NDC 景氣對策信號發布）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "indicator": "monitoring_signal",
-      "period": "2026-05",
-      "value": 30,
-      "unit": "score",
-      "source_role": "official_ndc_business_indicator",
-      "lineage": {
-        "source_authority": "NDC business-cycle indicators",
-        "payload_date": "2026-06-27"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact indicator / row counts and the coverage window are pending a measured snapshot; the source is the official NDC monthly business-cycle release (present through the latest published month). No counts are shown rather than fabricated ones.",
@@ -869,22 +622,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (international_macro).", zh: "正規來源角色（international_macro）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream international body + release for the value.", zh: "數值所屬的上游國際機構與發布。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "indicator": "gdp_growth",
-      "country": "US",
-      "period": "2026-Q1",
-      "value": 2.1,
-      "unit": "percent",
-      "source_role": "international_macro",
-      "lineage": {
-        "source_authority": "international statistical body",
-        "payload_date": "2026-04-30"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact indicator / country / row counts and the coverage window are pending a measured snapshot; the source is international statistical bodies (present through their latest releases). No counts are shown rather than fabricated ones.",
@@ -924,23 +661,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (worldbank_indicator).", zh: "正規來源角色（worldbank_indicator）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream World Bank indicator + release for the value.", zh: "數值所屬的上游世界銀行指標與發布。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "indicator": "NY.GDP.MKTP.CD",
-      "country": "TW",
-      "year": 2025,
-      "value": 802000000000,
-      "unit": "USD",
-      "source_role": "worldbank_indicator",
-      "lineage": {
-        "source_authority": "World Bank",
-        "indicator_code": "NY.GDP.MKTP.CD",
-        "payload_date": "2026-04-15"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact indicator / country / row counts and the coverage window are pending a measured snapshot; the source is the World Bank (present through its latest published year). No counts are shown rather than fabricated ones.",
@@ -980,34 +700,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "listing_date", type: "string", desc: { en: "Date the security was listed.", zh: "上市櫃日期。" } },
       { name: "source_role", type: "string", desc: { en: "official_twse_issuer_profile.", zh: "official_twse_issuer_profile。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "company_name": "TSMC",
-      "industry": "Semiconductor",
-      "board": "TWSE",
-      "listing_date": "1994-09-05",
-      "source_role": "official_twse_issuer_profile",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "company_name": "台積電",
-      "industry": "半導體業",
-      "board": "TWSE",
-      "listing_date": "1994-09-05",
-      "source_role": "official_twse_issuer_profile",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact issuer counts and the active-snapshot window are pending a measured snapshot; the source is the official TWSE / TPEx issuer registers (current listed companies).",
@@ -1042,32 +734,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "branch_name", type: "string", desc: { en: "Branch name.", zh: "分點名稱。" } },
       { name: "source_role", type: "string", desc: { en: "official_twse_broker_branch.", zh: "official_twse_broker_branch。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "branch_code": "9800",
-      "broker_code": "9800",
-      "broker_name": "Yuanta Securities",
-      "branch_name": "Yuanta Securities - Head Office",
-      "source_role": "official_twse_broker_branch",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "branch_code": "9800",
-      "broker_code": "9800",
-      "broker_name": "元大證券",
-      "branch_name": "元大證券－總公司",
-      "source_role": "official_twse_broker_branch",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact broker / branch counts and the active-snapshot window are pending a measured snapshot; the source is the official TWSE broker-branch register (current active branches).",
@@ -1102,32 +768,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "level", type: "number", desc: { en: "Depth in the taxonomy tree.", zh: "分類樹層級深度。" } },
       { name: "source_role", type: "string", desc: { en: "twmd_theme_taxonomy.", zh: "twmd_theme_taxonomy。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "theme_id": "ai-supply-chain",
-      "theme_name": "AI Supply Chain",
-      "parent_id": "semiconductor",
-      "level": 2,
-      "source_role": "twmd_theme_taxonomy",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "theme_id": "ai-supply-chain",
-      "theme_name": "AI 供應鏈",
-      "parent_id": "semiconductor",
-      "level": 2,
-      "source_role": "twmd_theme_taxonomy",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact theme-node counts and the taxonomy version window are pending a measured snapshot; the source is the TWMD-maintained theme taxonomy (current curated tree).",
@@ -1162,30 +802,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "as_of", type: "string", desc: { en: "Data date the screen was computed against.", zh: "本次篩選計算所依據的資料日期。" } },
       { name: "source_role", type: "string", desc: { en: "twmd_derived_screener.", zh: "twmd_derived_screener。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "name": "TSMC",
-      "matched_filters": ["market_cap_gt_1t", "pe_lt_30"],
-      "as_of": "2026-07-17",
-      "source_role": "twmd_derived_screener"
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "name": "台積電",
-      "matched_filters": ["market_cap_gt_1t", "pe_lt_30"],
-      "as_of": "2026-07-17",
-      "source_role": "twmd_derived_screener"
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — the size of the screenable universe and the data window are pending a measured snapshot; the screen is computed over official TWSE / TPEx market and financial data (current trading day).",
@@ -1221,34 +837,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "last_trading_date", type: "string", desc: { en: "Last trading date of the warrant.", zh: "權證最後交易日。" } },
       { name: "source_role", type: "string", desc: { en: "official_twse_warrant_master.", zh: "official_twse_warrant_master。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "030001",
-      "warrant_name": "TSMC Yuanta Call 01",
-      "underlying_symbol": "2330",
-      "warrant_type": "call",
-      "last_trading_date": "2026-12-15",
-      "source_role": "official_twse_warrant_master",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "030001",
-      "warrant_name": "台積電元大購01",
-      "underlying_symbol": "2330",
-      "warrant_type": "call",
-      "last_trading_date": "2026-12-15",
-      "source_role": "official_twse_warrant_master",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact warrant counts and the active-snapshot window are pending a measured snapshot; the source is the official TWSE / TPEx warrant register (currently listed warrants).",
@@ -1289,23 +877,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_tpex).", zh: "正規來源角色（official_tpex）。" } },
       { name: "updated_at", type: "string", desc: { en: "When this row was last refreshed.", zh: "此列最後更新時間。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "5483",
-      "date": "2026-07-16",
-      "open": 148.5,
-      "high": 151.0,
-      "low": 147.0,
-      "close": 150.5,
-      "volume_shares": 4821000,
-      "turnover": 723160500,
-      "source_role": "official_tpex",
-      "lineage": { "source_authority": "TPEx" },
-      "updated_at": "2026-07-17"
-    }
-  ]
-}`,
     coverage: {
       rows: fmt(coverageFacts.tpexDailyPrice.rows),
       symbols: fmt(coverageFacts.tpexDailyPrice.stocks),
@@ -1346,23 +917,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "turnover", type: "number", desc: { en: "Turnover value (TWD).", zh: "成交金額（新台幣）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse / official_tpex).", zh: "正規來源角色（official_twse／official_tpex）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-16",
-      "board": "TWSE",
-      "open": 2495.0,
-      "high": 2500.0,
-      "low": 2465.0,
-      "close": 2470.0,
-      "volume_shares": 30538604,
-      "turnover": 74750491934,
-      "source_role": "official_twse",
-      "lineage": { "source_authority": "TWSE" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — the combined row / symbol counts and coverage window are pending a measured snapshot; the sources are the official TWSE and TPEx daily quote feeds (present through the latest trading day). The per-board totals are documented on the twse-daily-price and tpex-daily-price pages; no combined number is shown rather than a fabricated one.",
@@ -1393,25 +947,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "vwap", type: "number", desc: { en: "Turnover / volume weighted average price (derived).", zh: "成交金額／成交量之成交均價（推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_price_enhanced).", zh: "正規來源角色（derived_price_enhanced）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-16",
-      "close": 2470.0,
-      "change": -25.0,
-      "change_pct": -1.002,
-      "amplitude_pct": 1.402,
-      "vwap": 2447.6,
-      "source_role": "derived_price_enhanced",
-      "lineage": {
-        "derived_from": "official_twse / official_tpex daily price",
-        "source_authority": "TWSE / TPEx",
-        "computed_at": "2026-07-17"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the fields are computed from the official TWSE / TPEx daily price (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -1447,23 +982,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "adj_factor", type: "number", desc: { en: "Cumulative adjustment factor applied.", zh: "所套用之累積還原係數。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_adjusted_prices).", zh: "正規來源角色（derived_adjusted_prices）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-16",
-      "close": 2470.0,
-      "adj_close": 2453.8,
-      "adj_factor": 0.99344,
-      "source_role": "derived_adjusted_prices",
-      "lineage": {
-        "derived_from": "official_twse daily price + official corporate actions",
-        "source_authority": "TWSE / TPEx",
-        "computed_at": "2026-07-17"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the adjusted series is computed from the official TWSE / TPEx daily price and corporate-action inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -1498,20 +1016,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "open", type: "number", desc: { en: "Index opening level.", zh: "指數開盤水準。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_index).", zh: "正規來源角色（official_twse_index）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "index_code": "IX0001",
-      "date": "2026-07-16",
-      "open": 23180.5,
-      "high": 23310.2,
-      "low": 23120.0,
-      "close": 23255.4,
-      "source_role": "official_twse_index",
-      "lineage": { "source_authority": "TWSE MI_INDEX" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact index / row counts and the coverage window are pending a measured snapshot; the source is the official TWSE index publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -1547,19 +1051,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "change_pct", type: "number", desc: { en: "Percent change vs previous session.", zh: "較前一交易日之漲跌幅。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_index).", zh: "正規來源角色（official_twse_index）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "index_code": "IX0001",
-      "date": "2026-07-16",
-      "value": 23255.4,
-      "change": 74.9,
-      "change_pct": 0.323,
-      "source_role": "official_twse_index",
-      "lineage": { "source_authority": "TWSE MI_INDEX" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact index / row counts and the coverage window are pending a measured snapshot; the source is the official TWSE index publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -1594,32 +1085,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "family", type: "string", desc: { en: "Index family the code belongs to.", zh: "指數代碼所屬家族。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_index_master).", zh: "正規來源角色（official_twse_index_master）。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "index_code": "IX0001",
-      "index_name": "TAIEX",
-      "category": "broad-market",
-      "family": "TWSE composite",
-      "source_role": "official_twse_index_master",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "index_code": "IX0001",
-      "index_name": "發行量加權股價指數",
-      "category": "大盤",
-      "family": "TWSE 綜合指數",
-      "source_role": "official_twse_index_master",
-      "as_of": "2026-05-28"
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact index counts and the classification-snapshot window are pending a measured snapshot; the source is the official TWSE index register (current published indices).",
@@ -1654,22 +1119,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "as_of", type: "string", desc: { en: "Data date the membership was resolved against.", zh: "成分解析所依據的資料日期。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_index_constituents).", zh: "正規來源角色（derived_index_constituents）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "index_code": "IX0001",
-      "symbol": "2330",
-      "weight_pct": 38.42,
-      "as_of": "2026-07-16",
-      "source_role": "derived_index_constituents",
-      "lineage": {
-        "derived_from": "official_twse index definition + official_twse market data",
-        "source_authority": "TWSE",
-        "computed_at": "2026-07-17"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact index / constituent counts and the coverage window are pending a measured snapshot; membership comes from the official TWSE index definition and weights are computed from official market data (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -1704,22 +1153,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "change_pct", type: "number", desc: { en: "Percent change vs previous session (derived).", zh: "較前一交易日之漲跌幅（推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_return_index).", zh: "正規來源角色（derived_return_index）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "index_code": "IR0001",
-      "date": "2026-07-16",
-      "return_index": 41880.7,
-      "change_pct": 0.331,
-      "source_role": "derived_return_index",
-      "lineage": {
-        "derived_from": "official_twse price index + official corporate actions",
-        "source_authority": "TWSE MI_INDEX",
-        "computed_at": "2026-07-17"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact index / row counts and the coverage window are pending a measured snapshot; the return index is computed from the official TWSE price index and corporate-action inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -1755,19 +1188,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "volume_shares", type: "number", desc: { en: "Shares traded in the session.", zh: "當日成交股數。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_snapshot).", zh: "正規來源角色（official_twse_snapshot）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "snapshot_date": "2026-07-16",
-      "last": 2470.0,
-      "change_pct": -1.002,
-      "volume_shares": 30538604,
-      "source_role": "official_twse_snapshot",
-      "lineage": { "source_authority": "TWSE" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — the size of the snapshot universe and the snapshot window are pending a measured snapshot; the source is the official TWSE quote feed (latest trading day). No counts are shown rather than fabricated ones.",
@@ -1803,21 +1223,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "decliners", type: "number", desc: { en: "Count of declining securities.", zh: "下跌家數。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_market_overview).", zh: "正規來源角色（official_twse_market_overview）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "board": "TWSE",
-      "date": "2026-07-16",
-      "index_close": 23255.4,
-      "total_turnover": 412580000000,
-      "advancers": 512,
-      "decliners": 388,
-      "unchanged": 120,
-      "source_role": "official_twse_market_overview",
-      "lineage": { "source_authority": "TWSE" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx market-summary publication. Coverage is partial while the historical backfill is completed, so no counts are shown rather than fabricated ones.",
@@ -1853,26 +1258,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "ad_ratio", type: "number", desc: { en: "Advance/decline ratio (derived).", zh: "漲跌比（推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_market_breadth).", zh: "正規來源角色（derived_market_breadth）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "board": "TWSE",
-      "date": "2026-07-16",
-      "advancers": 512,
-      "decliners": 388,
-      "unchanged": 120,
-      "ad_ratio": 1.320,
-      "new_highs": 47,
-      "new_lows": 12,
-      "source_role": "derived_market_breadth",
-      "lineage": {
-        "derived_from": "official_twse daily price",
-        "source_authority": "TWSE",
-        "computed_at": "2026-07-17"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the metrics are computed from the official TWSE / TPEx per-security daily prices. Coverage is partial while the historical backfill is completed, so no counts are shown rather than fabricated ones.",
@@ -1908,23 +1293,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "macd", type: "number", desc: { en: "MACD line (derived).", zh: "MACD 線（推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_technical_indicators).", zh: "正規來源角色（derived_technical_indicators）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-16",
-      "sma_20": 2438.6,
-      "rsi_14": 57.2,
-      "macd": 18.4,
-      "source_role": "derived_technical_indicators",
-      "lineage": {
-        "derived_from": "official_twse / official_tpex daily price",
-        "source_authority": "TWSE / TPEx",
-        "computed_at": "2026-07-17"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the indicators are computed from the official TWSE / TPEx daily price (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -1960,19 +1328,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "limit_down", type: "number", desc: { en: "Lower limit price.", zh: "跌停價。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_price_limit).", zh: "正規來源角色（official_twse_price_limit）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-16",
-      "reference_price": 2495.0,
-      "limit_up": 2740.0,
-      "limit_down": 2250.0,
-      "source_role": "official_twse_price_limit",
-      "lineage": { "source_authority": "TWSE" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx price-limit publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -2002,23 +1357,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "dividend_yield", type: "number", desc: { en: "Dividend yield (ratio, derived).", zh: "殖利率（比值,推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_valuation_core).", zh: "正規來源角色（derived_valuation_core）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-16",
-      "per": 22.4,
-      "pbr": 6.1,
-      "dividend_yield": 0.0134,
-      "source_role": "derived_valuation_core",
-      "lineage": {
-        "derived_from": "official_twse daily price + MOPS earnings / dividends",
-        "source_authority": "TWSE / TPEx / MOPS",
-        "computed_at": "2026-07-17"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the ratios are computed from the official TWSE / TPEx daily price and MOPS earnings / dividend inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -2054,25 +1392,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "per", type: "number", desc: { en: "Price-to-earnings ratio (derived).", zh: "本益比（推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_valuation_data).", zh: "正規來源角色（derived_valuation_data）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-16",
-      "market_cap": 64050000000000,
-      "shares_outstanding": 25930380458,
-      "per": 22.4,
-      "pbr": 6.1,
-      "dividend_yield": 0.0134,
-      "source_role": "derived_valuation_data",
-      "lineage": {
-        "derived_from": "official_twse daily price + MOPS financials",
-        "source_authority": "TWSE / TPEx / MOPS",
-        "computed_at": "2026-07-17"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the figures are computed from the official TWSE / TPEx daily price and MOPS financial inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -2108,23 +1427,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "total_net", type: "number", desc: { en: "Combined three-investor net (shares).", zh: "三大法人合計買賣超（股）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_twse_institutional_aggregate).", zh: "正規來源角色（derived_twse_institutional_aggregate）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "date": "2026-07-17",
-      "foreign_net": -412580000,
-      "trust_net": 38150000,
-      "dealer_net": 9420000,
-      "total_net": -365010000,
-      "source_role": "derived_twse_institutional_aggregate",
-      "lineage": {
-        "derived_from": "official_twse_t86",
-        "source_authority": "TWSE T86",
-        "computed_at": "2026-07-18"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the figures are aggregated from the official TWSE T86 daily report (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -2160,19 +1462,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "issued_shares", type: "number", desc: { en: "Total issued shares for the ratio base.", zh: "作為比率分母的已發行股數。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_shareholding).", zh: "正規來源角色（official_twse_shareholding）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-17",
-      "foreign_shares_held": 21870540000,
-      "foreign_holding_ratio": 0.8434,
-      "issued_shares": 25930380000,
-      "source_role": "official_twse_shareholding",
-      "lineage": { "source_authority": "TWSE" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE shareholding disclosure (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -2208,19 +1497,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "margin_quota", type: "number", desc: { en: "Margin balance limit for the stock (shares).", zh: "該股融資限額（股）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_margin).", zh: "正規來源角色（official_twse_margin）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-17",
-      "margin_balance": 3182000,
-      "short_balance": 415000,
-      "margin_quota": 6482595000,
-      "source_role": "official_twse_margin",
-      "lineage": { "source_authority": "TWSE" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE margin trading report. This is a preview surface with partial, snapshot-only coverage, so no counts are shown rather than fabricated ones.",
@@ -2257,24 +1533,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "short_margin_ratio", type: "number", desc: { en: "Short balance as a ratio of margin balance.", zh: "券資比（融券餘額占融資餘額比值）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_twse_margin_enhanced).", zh: "正規來源角色（derived_twse_margin_enhanced）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-17",
-      "margin_balance": 3182000,
-      "margin_utilization": 0.00049,
-      "margin_change": -18000,
-      "short_margin_ratio": 0.1304,
-      "source_role": "derived_twse_margin_enhanced",
-      "lineage": {
-        "derived_from": "official_twse_margin",
-        "source_authority": "TWSE",
-        "computed_at": "2026-07-18"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the metrics are computed from the official TWSE margin trading report (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -2309,18 +1567,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "margin_change", type: "number", desc: { en: "Day-over-day change in total margin balance (TWD thousands).", zh: "融資總餘額日變動（新台幣仟元）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_margin_total).", zh: "正規來源角色（official_twse_margin_total）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "date": "2026-07-17",
-      "total_margin_balance": 285640000,
-      "total_short_balance": 612450,
-      "margin_change": -1840000,
-      "source_role": "official_twse_margin_total",
-      "lineage": { "source_authority": "TWSE" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the source is the official TWSE margin trading report. This is a preview surface with partial, snapshot-only coverage, so no counts are shown rather than fabricated ones.",
@@ -2355,18 +1601,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "lending_balance", type: "number", desc: { en: "Outstanding securities-lending balance (shares).", zh: "借券未償還餘額（股）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_securities_lending).", zh: "正規來源角色（official_twse_securities_lending）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-17",
-      "lending_volume": 1284000,
-      "lending_balance": 58720000,
-      "source_role": "official_twse_securities_lending",
-      "lineage": { "source_authority": "TWSE" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE securities-lending report (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -2402,23 +1636,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "short_change", type: "number", desc: { en: "Day-over-day change in short balance (shares).", zh: "融券餘額日變動（股）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_twse_chip_flows).", zh: "正規來源角色（derived_twse_chip_flows）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "date": "2026-07-17",
-      "institutional_net": -7586000,
-      "margin_change": -18000,
-      "short_change": 12000,
-      "source_role": "derived_twse_chip_flows",
-      "lineage": {
-        "derived_from": "official_twse_t86 + official_twse_margin",
-        "source_authority": "TWSE",
-        "computed_at": "2026-07-18"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the indicators are computed from the official TWSE institutional-flow (T86) and margin trading reports (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -2454,19 +1671,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "shares", type: "number", desc: { en: "Shares held in the tier.", zh: "該級距持有股數。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_tdcc_shareholding_distribution).", zh: "正規來源角色（official_tdcc_shareholding_distribution）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "data_date": "2026-07-11",
-      "holding_tier": "1000001-plus",
-      "holders": 1842,
-      "shares": 19845200000,
-      "source_role": "official_tdcc_shareholding_distribution",
-      "lineage": { "source_authority": "TDCC" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TDCC shareholding-distribution table (present through the latest weekly release). No counts are shown rather than fabricated ones.",
@@ -2502,22 +1706,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "holding_ratio", type: "number", desc: { en: "Director & supervisor holding as a ratio of issued shares (0-1).", zh: "董監持股占已發行股數比率（0-1）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_insider_holding).", zh: "正規來源角色（official_mops_insider_holding）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "period": "2026-06",
-      "director_shares": 168420000,
-      "pledged_shares": 0,
-      "holding_ratio": 0.0065,
-      "source_role": "official_mops_insider_holding",
-      "lineage": {
-        "source_authority": "MOPS (insider holdings)",
-        "payload_date": "2026-07-10"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS director & supervisor holding disclosure (present through the latest disclosed month). No counts are shown rather than fabricated ones.",
@@ -2552,18 +1740,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "reason", type: "string", desc: { en: "Normalized suspension reason code.", zh: "正規化暫停事由代碼。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_day_trading_suspension).", zh: "正規來源角色（official_twse_day_trading_suspension）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "suspension_start": "2026-07-14",
-      "suspension_end": "2026-07-25",
-      "reason": "volatility_threshold",
-      "source_role": "official_twse_day_trading_suspension",
-      "lineage": { "source_authority": "TWSE" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE day-trading suspension announcement. This is a preview surface with partial, snapshot-only coverage, so no counts are shown rather than fabricated ones.",
@@ -2580,7 +1756,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
 
 // ── Companies & Events (7 pages) ──
 
-  // corporate-actions — TWSE / TPEx / MOPS, verified; normalized action stream. Chinese action titles → bilingual exampleJson. No measured coverage snapshot → TODO
+  // corporate-actions — TWSE / TPEx / MOPS, verified; normalized action stream. No measured coverage snapshot → TODO
   "corporate-actions": {
     slug: "corporate-actions",
     description: {
@@ -2601,40 +1777,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "record_date", type: "string", desc: { en: "Shareholder record date.", zh: "股東基準日。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_corporate_action).", zh: "正規來源角色（official_twse_corporate_action）。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "action_type": "cash_dividend",
-      "title": "Cash dividend distribution",
-      "ex_date": "2026-06-18",
-      "record_date": "2026-06-24",
-      "source_role": "official_twse_corporate_action",
-      "lineage": {
-        "source_authority": "MOPS",
-        "payload_date": "2026-05-20"
-      }
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "action_type": "cash_dividend",
-      "title": "現金股利分派",
-      "ex_date": "2026-06-18",
-      "record_date": "2026-06-24",
-      "source_role": "official_twse_corporate_action",
-      "lineage": {
-        "source_authority": "MOPS",
-        "payload_date": "2026-05-20"
-      }
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact action / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx / MOPS corporate-action announcements (present through the latest disclosure). No counts are shown rather than fabricated ones.",
@@ -2671,44 +1813,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "cumulative_factor", type: "number", desc: { en: "Cumulative adjustment factor to date (derived).", zh: "截至當日之累積調整因子（推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_corporate_action_enhanced).", zh: "正規來源角色（derived_corporate_action_enhanced）。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "action_type": "cash_dividend",
-      "title": "Cash dividend distribution",
-      "ex_date": "2026-06-18",
-      "adjustment_factor": 0.9934,
-      "cumulative_factor": 0.8471,
-      "source_role": "derived_corporate_action_enhanced",
-      "lineage": {
-        "derived_from": "official_twse_corporate_action",
-        "source_authority": "MOPS",
-        "computed_at": "2026-06-19"
-      }
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "action_type": "cash_dividend",
-      "title": "現金股利分派",
-      "ex_date": "2026-06-18",
-      "adjustment_factor": 0.9934,
-      "cumulative_factor": 0.8471,
-      "source_role": "derived_corporate_action_enhanced",
-      "lineage": {
-        "derived_from": "official_twse_corporate_action",
-        "source_authority": "MOPS",
-        "computed_at": "2026-06-19"
-      }
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact action / symbol counts and the coverage window are pending a measured snapshot; the adjustment factors are computed from the official TWSE / TPEx / MOPS corporate-action disclosures (present through the latest disclosure). No counts are shown rather than fabricated ones.",
@@ -2723,7 +1827,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
     ],
   },
 
-  // stock-split-par-value-events — TWSE / TPEx, verified; par-value / split events. Numeric fields → plain ASCII exampleJson. No measured coverage snapshot → TODO
+  // stock-split-par-value-events — TWSE / TPEx, verified; par-value / split events. No measured coverage snapshot → TODO
   "stock-split-par-value-events": {
     slug: "stock-split-par-value-events",
     description: {
@@ -2744,23 +1848,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "effective_date", type: "string", desc: { en: "Date the change takes effect.", zh: "變更生效日。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_par_value_event).", zh: "正規來源角色（official_twse_par_value_event）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "6666",
-      "event_type": "par_value_change",
-      "old_par_value": 10.0,
-      "new_par_value": 5.0,
-      "split_ratio": 2.0,
-      "effective_date": "2026-04-15",
-      "source_role": "official_twse_par_value_event",
-      "lineage": {
-        "source_authority": "TWSE",
-        "payload_date": "2026-03-10"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact event / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx split and par-value announcements (present through the latest disclosure). No counts are shown rather than fabricated ones.",
@@ -2796,40 +1883,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "reason", type: "string", desc: { en: "Reason for the status change as disclosed.", zh: "揭露之狀態變更原因。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_delisting_lifecycle).", zh: "正規來源角色（official_twse_delisting_lifecycle）。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "2333",
-      "status": "delisted",
-      "listing_date": "1990-11-05",
-      "delisting_date": "2026-02-27",
-      "reason": "Delisted on net-worth deficiency",
-      "source_role": "official_twse_delisting_lifecycle",
-      "lineage": {
-        "source_authority": "TWSE",
-        "payload_date": "2026-02-27"
-      }
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "2333",
-      "status": "delisted",
-      "listing_date": "1990-11-05",
-      "delisting_date": "2026-02-27",
-      "reason": "淨值不足下市",
-      "source_role": "official_twse_delisting_lifecycle",
-      "lineage": {
-        "source_authority": "TWSE",
-        "payload_date": "2026-02-27"
-      }
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact security counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx listing and delisting records (present through the latest status change). No counts are shown rather than fabricated ones.",
@@ -2865,38 +1918,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_risk_event).", zh: "正規來源角色（official_twse_risk_event）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream authority + release for the flag.", zh: "標記所屬的上游權威來源與發布。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "8888",
-      "event_date": "2026-07-06",
-      "risk_type": "attention",
-      "description": "Attention notice on abnormal price fluctuation",
-      "source_role": "official_twse_risk_event",
-      "lineage": {
-        "source_authority": "TWSE",
-        "payload_date": "2026-07-06"
-      }
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "8888",
-      "event_date": "2026-07-06",
-      "risk_type": "attention",
-      "description": "股價異常波動注意交易資訊",
-      "source_role": "official_twse_risk_event",
-      "lineage": {
-        "source_authority": "TWSE",
-        "payload_date": "2026-07-06"
-      }
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — this is a private-beta preview with partial coverage; exact event / symbol counts and the coverage window are pending a measured snapshot. The source is the official TWSE / TPEx risk-related announcements. No counts are shown rather than fabricated ones.",
@@ -2936,38 +1957,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_disposition).", zh: "正規來源角色（official_twse_disposition）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream authority + release for the disposition.", zh: "處置所屬的上游權威來源與發布。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "8888",
-      "period_start": "2026-07-08",
-      "period_end": "2026-07-21",
-      "measure": "Matched auction every 5 minutes",
-      "source_role": "official_twse_disposition",
-      "lineage": {
-        "source_authority": "TWSE",
-        "payload_date": "2026-07-07"
-      }
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "8888",
-      "period_start": "2026-07-08",
-      "period_end": "2026-07-21",
-      "measure": "每5分鐘分盤集合競價",
-      "source_role": "official_twse_disposition",
-      "lineage": {
-        "source_authority": "TWSE",
-        "payload_date": "2026-07-07"
-      }
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — this is a private-beta preview with partial coverage; exact disposition / symbol counts and the coverage window are pending a measured snapshot. The source is the official TWSE disposition announcements. No counts are shown rather than fabricated ones.",
@@ -2986,7 +1975,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
     ],
   },
 
-  // esg-tesg — TWSE, DERIVED (TESG scores compiled/computed from disclosures). Scores are ASCII → plain exampleJson. No measured coverage snapshot → TODO
+  // esg-tesg — TWSE, DERIVED (TESG scores compiled/computed from disclosures). No measured coverage snapshot → TODO
   "esg-tesg": {
     slug: "esg-tesg",
     description: {
@@ -3008,25 +1997,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "governance_score", type: "number", desc: { en: "Governance pillar score.", zh: "公司治理構面分數。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_twse_tesg).", zh: "正規來源角色（derived_twse_tesg）。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "symbol": "2330",
-      "period": "2025",
-      "tesg_score": 82.4,
-      "environment_score": 80.1,
-      "social_score": 84.7,
-      "governance_score": 82.0,
-      "rating": "A",
-      "source_role": "derived_twse_tesg",
-      "lineage": {
-        "derived_from": "official_twse_esg_disclosure",
-        "source_authority": "TWSE",
-        "computed_at": "2026-06-30"
-      }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — exact company counts and the coverage window are pending a measured snapshot; the scores are compiled from the official TWSE corporate sustainability disclosures (present through the latest assessment period). No counts are shown rather than fabricated ones.",
@@ -3065,20 +2035,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "open_interest", type: "number", desc: { en: "Open interest.", zh: "未平倉量。" } },
       { name: "source_role", type: "string", desc: { en: "official_taifex.", zh: "official_taifex。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "contract": "TXO",
-      "date": "TODO",
-      "strike_price": null,
-      "call_put": "call",
-      "settlement_price": null,
-      "open_interest": null,
-      "source_role": "official_taifex",
-      "lineage": { "source_authority": "TAIFEX" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — real example values, exact row counts and the coverage window are pending an entitled key at doc-build time. The data exists (TAIFEX options, daily) but was not queryable from this build session, so no numbers are shown rather than fabricated ones.",
@@ -3114,19 +2070,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "settlement_price", type: "number", desc: { en: "Official daily settlement price.", zh: "官方每日結算價。" } },
       { name: "source_role", type: "string", desc: { en: "official_taifex.", zh: "official_taifex。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "contract": "TXO",
-      "date": "TODO",
-      "strike_price": null,
-      "call_put": "put",
-      "settlement_price": null,
-      "source_role": "official_taifex",
-      "lineage": { "source_authority": "TAIFEX" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — real example values, exact row counts and the coverage window are pending an entitled key at doc-build time. The data exists (TAIFEX options settlement prices, daily) but was not queryable from this build session, so no numbers are shown rather than fabricated ones.",
@@ -3162,19 +2105,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "dealer_net", type: "number", desc: { en: "Dealer net position (contracts).", zh: "自營商淨部位(口)。" } },
       { name: "source_role", type: "string", desc: { en: "official_taifex.", zh: "official_taifex。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "contract": "TXF",
-      "date": "TODO",
-      "foreign_net": null,
-      "trust_net": null,
-      "dealer_net": null,
-      "source_role": "official_taifex",
-      "lineage": { "source_authority": "TAIFEX" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — real example values, exact row counts and the coverage window are pending an entitled key at doc-build time. The data exists (TAIFEX institutional futures & options positions, daily) but was not queryable from this build session, so no numbers are shown rather than fabricated ones.",
@@ -3210,19 +2140,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "conversion_price", type: "number", desc: { en: "Current conversion price (TWD).", zh: "當前轉換價格(新台幣元)。" } },
       { name: "source_role", type: "string", desc: { en: "official_tpex.", zh: "official_tpex。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "bond_code": "TODO",
-      "date": "TODO",
-      "close": null,
-      "volume": null,
-      "conversion_price": null,
-      "source_role": "official_tpex",
-      "lineage": { "source_authority": "TPEx" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — real example values, exact row / issue counts and the coverage window are pending a measured snapshot; the source is the official TPEx convertible-bond feed (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -3258,19 +2175,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "conversion_price", type: "number", desc: { en: "Reference conversion price (TWD).", zh: "參考轉換價格(新台幣元)。" } },
       { name: "source_role", type: "string", desc: { en: "official_tpex.", zh: "official_tpex。" } },
     ],
-    exampleJson: `{
-  "data": [
-    {
-      "bond_code": "TODO",
-      "issuer_symbol": "TODO",
-      "issue_date": "TODO",
-      "maturity_date": "TODO",
-      "conversion_price": null,
-      "source_role": "official_tpex",
-      "lineage": { "source_authority": "TPEx" }
-    }
-  ]
-}`,
     coverage: null,
     coverageTodo: {
       en: "TODO — real example values and exact issue counts are pending a measured snapshot; this is the TPEx-sourced convertible-bond reference master (present through the latest listed issue). No counts are shown rather than fabricated ones.",
@@ -3306,40 +2210,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (issuer_etf_flow).", zh: "正規來源角色(issuer_etf_flow)。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream issuer + publication date for the value.", zh: "數值所屬的上游發行機構與發布日期。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "0050",
-      "name": "Yuanta Taiwan Top 50 ETF",
-      "date": "2026-07-17",
-      "net_unit_change": 12000000,
-      "units_outstanding": 8765000000,
-      "source_role": "issuer_etf_flow",
-      "lineage": {
-        "source_authority": "Issuer",
-        "payload_date": "2026-07-17"
-      }
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "0050",
-      "name": "元大台灣50",
-      "date": "2026-07-17",
-      "net_unit_change": 12000000,
-      "units_outstanding": 8765000000,
-      "source_role": "issuer_etf_flow",
-      "lineage": {
-        "source_authority": "Issuer",
-        "payload_date": "2026-07-17"
-      }
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact row / ETF counts and the coverage window are pending a measured snapshot; the source is the issuer's ETF fund-flow publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
@@ -3375,42 +2245,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "as_of", type: "string", desc: { en: "Disclosure date of this holdings snapshot.", zh: "此持股快照之揭露日期。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (issuer_etf_holdings).", zh: "正規來源角色(issuer_etf_holdings)。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "symbol": "0050",
-      "name": "Yuanta Taiwan Top 50 ETF",
-      "constituent_symbol": "2330",
-      "constituent_name": "TSMC",
-      "weight_pct": 56.2,
-      "as_of": "2026-07-17",
-      "source_role": "issuer_etf_holdings",
-      "lineage": {
-        "source_authority": "Issuer",
-        "payload_date": "2026-07-17"
-      }
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "symbol": "0050",
-      "name": "元大台灣50",
-      "constituent_symbol": "2330",
-      "constituent_name": "台積電",
-      "weight_pct": 56.2,
-      "as_of": "2026-07-17",
-      "source_role": "issuer_etf_holdings",
-      "lineage": {
-        "source_authority": "Issuer",
-        "payload_date": "2026-07-17"
-      }
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact ETF / constituent-row counts are pending a measured snapshot; the source is issuer holdings disclosure. Note this is an issuer-limited latest snapshot: only ETFs the issuer publishes holdings for, and only the most recent disclosure — not market-wide or historical. No counts are shown rather than fabricated ones.",
@@ -3450,40 +2284,6 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "registered_city", type: "string", desc: { en: "Registered location (city / county).", zh: "登記所在地(縣市)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (moea_business_registration).", zh: "正規來源角色(moea_business_registration)。" } },
     ],
-    exampleJson: {
-      en: `{
-  "data": [
-    {
-      "business_id": "########",
-      "company_name": "TSMC",
-      "registration_status": "active",
-      "paid_in_capital": 259320000000,
-      "registered_city": "Hsinchu",
-      "source_role": "moea_business_registration",
-      "lineage": {
-        "source_authority": "MOEA / data.gov.tw",
-        "payload_date": "2026-06-30"
-      }
-    }
-  ]
-}`,
-      zh: `{
-  "data": [
-    {
-      "business_id": "########",
-      "company_name": "台積電",
-      "registration_status": "核准設立",
-      "paid_in_capital": 259320000000,
-      "registered_city": "新竹",
-      "source_role": "moea_business_registration",
-      "lineage": {
-        "source_authority": "MOEA / data.gov.tw",
-        "payload_date": "2026-06-30"
-      }
-    }
-  ]
-}`,
-    },
     coverage: null,
     coverageTodo: {
       en: "TODO — exact registered-business counts are pending a measured snapshot; the source is the MOEA public business-registration dataset via data.gov.tw. Note this is public business-registration reference only (registered name, status, capital) — not private tax-filing or confidential tax data. No counts are shown rather than fabricated ones.",

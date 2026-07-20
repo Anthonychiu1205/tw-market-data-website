@@ -87,6 +87,8 @@ const EN_KEY_FILES = [
   "src/components/home/agent-documents-demo.tsx", // filings agent demo (I18N-FIX-06)
   "src/lib/docs/dataset-grade.ts",                // DATASET_GRADE_LABELS (分級對外命名 map, DOCS-01)
   "src/content/docs/dataset-catalog.ts",          // DOCS_DOMAINS + dataset display names (DOCS-01)
+  "src/content/api-captures.ts",                  // captured API bodies: the `en` variant must stay ASCII
+  "src/content/api-truth.ts",                     // READ_API_ERRORS `when` captions (DOCS-03)
 ];
 for (const rel of EN_KEY_FILES) {
   try {
