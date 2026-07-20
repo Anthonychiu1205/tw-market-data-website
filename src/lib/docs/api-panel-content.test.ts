@@ -3,6 +3,12 @@ import { test } from "node:test";
 
 import { GATEWAY_DEFAULT_MESSAGES } from "../gateway/error-codes.ts";
 import {
+  API_AUTH_HEADER,
+  API_CAPTURED_ERRORS,
+  API_GATEWAY_BASE_URL,
+  API_ROWS_KEY,
+} from "../../content/api-truth.ts";
+import {
   API_BASE_URL,
   PANEL_ERROR_CODES,
   PANEL_STATUSES,
@@ -23,11 +29,33 @@ const STANDARD: PanelParam[] = [
 
 const PATH = "/v2/datasets/twse-daily-price";
 
-test("every request snippet carries the X-API-Key header and the real endpoint", () => {
+test("every request snippet uses the captured base, auth header and endpoint", () => {
+  // The base is the GATEWAY (the host that validates the key and meters credits), not the backend.
+  assert.equal(API_BASE_URL, API_GATEWAY_BASE_URL);
   for (const language of ["curl", "python", "javascript", "typescript"] as const) {
     const code = buildRequestSnippet(language, { backendPath: PATH, params: STANDARD });
-    assert.ok(code.includes("X-API-Key"), `${language} must send X-API-Key`);
+    assert.ok(code.includes(API_AUTH_HEADER), `${language} must send ${API_AUTH_HEADER}`);
     assert.ok(code.includes(`${API_BASE_URL}${PATH}`), `${language} must hit the real endpoint`);
+    assert.ok(!code.includes("api.twmarketdata.com"), `${language} must not point at the backend host`);
+  }
+});
+
+test("snippets read the captured row-array key, not the OpenAPI fiction", () => {
+  assert.equal(API_ROWS_KEY, "rows");
+  for (const language of ["python", "javascript", "typescript"] as const) {
+    const code = buildRequestSnippet(language, { backendPath: PATH, params: STANDARD });
+    assert.ok(code.includes(API_ROWS_KEY), `${language} must read ${API_ROWS_KEY}`);
+    assert.ok(!/\bdata\b/.test(code), `${language} must not read a "data" array — the API returns rows`);
+  }
+});
+
+test("the documented error contract matches what the live gateway returned", () => {
+  for (const captured of API_CAPTURED_ERRORS) {
+    assert.equal(
+      GATEWAY_DEFAULT_MESSAGES[captured.code as keyof typeof GATEWAY_DEFAULT_MESSAGES],
+      captured.message,
+      `${captured.code} message must match the captured body`,
+    );
   }
 });
 
@@ -81,22 +109,37 @@ test("the documented statuses are the ones the gateway actually throws", () => {
   assert.ok(!PANEL_STATUSES.includes("400"));
 });
 
-test("the 200 body wraps the dataset's own example rows, adding no new fields", () => {
-  const example = `{"data":[{"symbol":"2330","close":2470.0,"source_role":"official_twse"}]}`;
+test("a captured dataset serves its real response verbatim", () => {
   const result = buildSuccessBody({
-    exampleJson: example,
+    exampleJson: `{"data":[{"symbol":"2330"}]}`,
     datasetSlug: "twse-daily-price",
     planCode: "starter",
     creditsCost: 1,
   });
-  assert.equal(result.embeddedExample, true);
+  assert.equal(result.provenance, "captured");
   const parsed = JSON.parse(result.body);
-  // The row is passed through verbatim — same keys, same values, nothing invented.
-  assert.deepEqual(parsed.data, JSON.parse(example).data);
-  assert.equal(parsed.meta.dataset, "twse-daily-price");
+  // Real captured shape: rows (not data), with source_role and lineage at the TOP level.
+  assert.ok(Array.isArray(parsed.rows));
+  assert.equal(parsed.data, undefined);
+  assert.equal(parsed.source_role, "official_twse");
+  assert.ok(parsed.lineage.provider);
+  // The hand-written page example must NOT override the capture.
+  assert.equal(parsed.rows[0].close, 2290.0);
+});
+
+test("an uncaptured dataset gets the captured envelope with illustrative rows", () => {
+  const result = buildSuccessBody({
+    exampleJson: `{"data":[{"symbol":"1101","close":40.0}]}`,
+    datasetSlug: "some-uncaptured-dataset",
+    planCode: "starter",
+    creditsCost: 1,
+  });
+  assert.equal(result.provenance, "illustrative");
+  const parsed = JSON.parse(result.body);
+  assert.deepEqual(parsed.rows, [{ symbol: "1101", close: 40.0 }]);
+  assert.equal(parsed.count, 1);
+  assert.equal(parsed.data, undefined);
   assert.equal(parsed.meta.planCode, "starter");
-  assert.equal(parsed.meta.creditsCost, 1);
-  assert.equal(parsed.meta.dryRun, false);
 });
 
 test("data_grade is never emitted into a response body", () => {
@@ -119,8 +162,7 @@ test("a bare example row is still wrapped in the envelope", () => {
     planCode: "free",
     creditsCost: 0,
   });
-  assert.equal(result.embeddedExample, true);
-  assert.deepEqual(JSON.parse(result.body).data, [{ rate_name: "rediscount_rate", value_pct: 2.0 }]);
+  assert.deepEqual(JSON.parse(result.body).rows, [{ rate_name: "rediscount_rate", value_pct: 2.0 }]);
 });
 
 test("an unparseable example falls back to a pointer instead of invented rows", () => {
@@ -130,8 +172,8 @@ test("an unparseable example falls back to a pointer instead of invented rows", 
     planCode: "free",
     creditsCost: 0,
   });
-  assert.equal(result.embeddedExample, false);
+  assert.equal(result.provenance, "illustrative");
   const parsed = JSON.parse(result.body);
-  assert.equal(parsed.data.length, 1);
-  assert.match(parsed.data[0], /Example response section/);
+  assert.equal(parsed.rows.length, 1);
+  assert.match(parsed.rows[0], /Example response section/);
 });

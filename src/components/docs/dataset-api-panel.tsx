@@ -32,9 +32,6 @@ type DatasetApiPanelProps = {
   exampleJson: string;
   planCode: string;
   creditsCost: number;
-  // true when this dataset has real coverage facts behind it; false → the example is shape-only and
-  // the card says so.
-  hasRealCoverage: boolean;
 };
 
 const LANGUAGE_SYNTAX: Record<RequestLanguage, CodeBlockLanguage> = {
@@ -52,7 +49,6 @@ export function DatasetApiPanel({
   exampleJson,
   planCode,
   creditsCost,
-  hasRealCoverage,
 }: DatasetApiPanelProps) {
   const en = locale === "en";
   const [language, setLanguage] = useState<RequestLanguage>("curl");
@@ -159,13 +155,19 @@ export function DatasetApiPanel({
                 ? "meta is injected by the gateway on every response: requestId, planCode, creditsCost and dryRun."
                 : "meta 由 gateway 於每次回應注入：requestId、planCode、creditsCost 與 dryRun。"}
             </p>
-            {!success.embeddedExample || !hasRealCoverage ? (
+            {success.provenance === "captured" ? (
+              <p className="text-emerald-700">
+                {en
+                  ? "This body was captured from a real call to the API, not written by hand."
+                  : "此回應擷取自對 API 的真實呼叫，非手寫。"}
+              </p>
+            ) : (
               <p className="text-amber-700">
                 {en
-                  ? "Example is illustrative — this dataset's real values are not published yet (coverage TODO)."
-                  : "範例僅示意——此資料集的真實數值尚未發布（coverage TODO）。"}
+                  ? "Envelope is the captured shape; the rows are illustrative — this dataset has not been captured yet."
+                  : "信封為實測擷取的結構；資料列僅示意——此資料集尚未實測擷取。"}
               </p>
-            ) : null}
+            )}
           </div>
         )}
       </section>

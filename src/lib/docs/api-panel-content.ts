@@ -2,35 +2,35 @@
 // so every snippet and body is unit-tested rather than eyeballed.
 //
 // TRUTH SOURCES (rule 2 — nothing here is invented):
-//   - auth header `X-API-Key`  → public/openapi.json securitySchemes (ApiKeyAuth, type apiKey, in header)
+//   - base URL, auth header,   → src/content/api-truth.ts — CAPTURED by calling the API, which is the
+//     envelope + row shape       only reason we know the row array is `rows` (not `data`) and that
+//                                source_role / lineage sit at the TOP level (not per row)
 //   - endpoint path            → DATASET_ACCESS_POLICIES.backendPath (billing SSOT), passed in
 //   - query parameters         → each dataset's documented params (STANDARD/REFERENCE_PARAMS)
-//   - response `meta` keys     → src/lib/gateway/response.ts mergeMetaField, which the gateway
-//                                GUARANTEES it injects on every JSON object response
-//   - error status/code/message→ src/lib/gateway/error-codes.ts (the gateway's own contract)
+//   - gateway `meta` keys      → src/lib/gateway/response.ts mergeMetaField
+//   - error status/code/message→ src/lib/gateway/error-codes.ts, confirmed against live 401/404 bodies
 //
 // NOT documented here, on purpose:
-//   - `data_grade` — it exists nowhere in the product. The grade shown on these pages is the STATIC
-//     docs classification (dataset-grade.ts), rendered as a badge and labelled as such, never as a
-//     response field.
-//   - Any row-level field the page does not already publish. buildSuccessBody only ever re-uses the
-//     dataset's own documented example row, so this panel adds zero new claims about the row shape.
+//   - `data_grade` — it exists nowhere in the product, and the captured response confirms it is not a
+//     response field. The grade on these pages is the STATIC docs classification (dataset-grade.ts),
+//     rendered as a badge and labelled as such.
 //   - The SDKs (packages/python-sdk, packages/js-sdk): real code, but unpublished (`private: true`,
 //     no PyPI release), so the snippets use `requests` / `fetch` — the same raw-HTTP style the rest of
 //     the docs use and the only style a reader can actually run today.
 
-// Relative (not `@/`) so the unit tests can import this module directly under `node --test`.
+// Relative (not `@/`) so the unit tests can import these modules directly under `node --test`.
 import { GATEWAY_DEFAULT_MESSAGES, GATEWAY_ERROR_STATUS, type GatewayErrorCode } from "../gateway/error-codes.ts";
+import {
+  API_AUTH_HEADER,
+  API_CAPTURED_SUCCESS_BODIES,
+  API_GATEWAY_BASE_URL,
+  API_ROWS_KEY,
+} from "../../content/api-truth.ts";
 
-// TODO(owner): the repo documents two different bases and they contradict —
-//   api.twmarketdata.com   (all site content + answer pages + self-serve-client, whose comment calls
-//                           it the backend read API)
-//   twmarketdata.com       (openapi.json `servers`, both SDK defaults, and the actual billing gateway
-//                           route app/v2/datasets/[dataset])
-// Held at api.twmarketdata.com so this panel matches the 64 page bodies rather than creating a third
-// variant. Confirm which one a customer's X-API-Key is meant to hit, then change it HERE and in
-// dataset-doc-page.tsx together.
-export const API_BASE_URL = "https://api.twmarketdata.com";
+// Base + auth header are no longer guessed: they come from the captured API truth (src/content/
+// api-truth.ts), established by calling both hosts. The customer base is the GATEWAY — the one that
+// validates the key, enforces the plan and meters credits.
+export const API_BASE_URL = API_GATEWAY_BASE_URL;
 
 export type PanelParam = { name: string; required: boolean };
 
@@ -79,7 +79,7 @@ export function buildCurlSnippet(backendPath: string, params: PanelParam[]): str
   const query = queryString(params);
   const url = query ? `${API_BASE_URL}${backendPath}?${query}` : `${API_BASE_URL}${backendPath}`;
   return `curl "${url}" \\
-  -H "X-API-Key: $TWMD_API_KEY"`;
+  -H "${API_AUTH_HEADER}: $TWMD_API_KEY"`;
 }
 
 export function buildPythonSnippet(backendPath: string, params: PanelParam[]): string {
@@ -92,11 +92,11 @@ import requests
 
 resp = requests.get(
     "${API_BASE_URL}${backendPath}",${paramsBlock}
-    headers={"X-API-Key": os.environ["TWMD_API_KEY"]},
+    headers={"${API_AUTH_HEADER}": os.environ["TWMD_API_KEY"]},
 )
 resp.raise_for_status()
 
-for row in resp.json()["data"]:
+for row in resp.json()["${API_ROWS_KEY}"]:
     print(row)`;
 }
 
@@ -105,37 +105,37 @@ export function buildJavaScriptSnippet(backendPath: string, params: PanelParam[]
   const url = query ? `${API_BASE_URL}${backendPath}?${query}` : `${API_BASE_URL}${backendPath}`;
   return `const res = await fetch(
   "${url}",
-  { headers: { "X-API-Key": process.env.TWMD_API_KEY } },
+  { headers: { "${API_AUTH_HEADER}": process.env.TWMD_API_KEY } },
 );
 if (!res.ok) throw new Error(\`HTTP \${res.status}\`);
 
-const { data } = await res.json();
-console.log(data);`;
+const { ${API_ROWS_KEY} } = await res.json();
+console.log(${API_ROWS_KEY});`;
 }
 
 export function buildTypeScriptSnippet(backendPath: string, params: PanelParam[]): string {
   const query = queryString(params);
   const url = query ? `${API_BASE_URL}${backendPath}?${query}` : `${API_BASE_URL}${backendPath}`;
-  // `meta` is typed from the keys the gateway is proven to inject (src/lib/gateway/response.ts).
+  // Envelope typed from the captured response; `meta` also carries the keys the gateway injects
+  // (src/lib/gateway/response.ts).
   return `type DatasetResponse<Row> = {
-  data: Row[];
-  meta: {
-    requestId: string;
-    planCode?: string;
-    creditsCost?: number;
-    creditsCharged?: number;
-    dryRun: boolean;
-  };
+  dataset: string;
+  ${API_ROWS_KEY}: Row[];
+  count: number;
+  data_as_of: string;
+  source_role: string;
+  lineage: Record<string, unknown>;
+  meta: { requestId: string; planCode?: string; creditsCost?: number; dryRun: boolean };
 };
 
 const res = await fetch(
   "${url}",
-  { headers: { "X-API-Key": process.env.TWMD_API_KEY! } },
+  { headers: { "${API_AUTH_HEADER}": process.env.TWMD_API_KEY! } },
 );
 if (!res.ok) throw new Error(\`HTTP \${res.status}\`);
 
-const { data, meta }: DatasetResponse<Record<string, unknown>> = await res.json();
-console.log(meta.requestId, data);`;
+const { ${API_ROWS_KEY}, source_role }: DatasetResponse<Record<string, unknown>> = await res.json();
+console.log(source_role, ${API_ROWS_KEY});`;
 }
 
 export function buildRequestSnippet(
@@ -185,47 +185,49 @@ export function buildErrorBody(code: GatewayErrorCode): string {
 
 export type SuccessBodyResult = {
   body: string;
-  // false when the dataset's documented example is not parseable on its own (a few pages show bare
-  // rows rather than a whole envelope). We then render the envelope shape with a pointer to the
-  // page's Example response section instead of inventing rows.
-  embeddedExample: boolean;
+  // "captured" → this exact body came back from the real API; "illustrative" → the envelope is the
+  // captured shape but the rows are the page's own documented example, which has NOT been observed.
+  provenance: "captured" | "illustrative";
 };
 
-// Wraps the dataset's OWN documented example row(s) in the response envelope the gateway really
-// returns. `meta` carries only the keys src/lib/gateway/response.ts is proven to inject.
+// The 200 body for a dataset. If the API was actually called for this dataset, its captured response is
+// returned verbatim. Otherwise the page's own example rows are placed in the CAPTURED envelope shape —
+// and flagged illustrative, because API_TRUTH_GAPS says the row shape of one dataset must not be
+// assumed to generalize.
 export function buildSuccessBody(input: {
   exampleJson: string;
   datasetSlug: string;
   planCode: string;
   creditsCost: number;
 }): SuccessBodyResult {
-  const meta = {
-    dataset: input.datasetSlug,
-    requestId: "req_01J8ZC4W2Q",
-    planCode: input.planCode,
-    creditsCost: input.creditsCost,
-    dryRun: false,
-  };
+  const captured = API_CAPTURED_SUCCESS_BODIES[input.datasetSlug];
+  if (captured) return { body: captured, provenance: "captured" };
 
-  let rows: unknown = null;
+  let rows: unknown[] = [];
   try {
     const parsed: unknown = JSON.parse(input.exampleJson);
     if (Array.isArray(parsed)) {
       rows = parsed;
     } else if (parsed && typeof parsed === "object") {
       const record = parsed as Record<string, unknown>;
-      rows = "data" in record ? record.data : [record];
+      // Older page examples wrap rows in `data`; the real API uses `rows`. Accept either.
+      const inner = API_ROWS_KEY in record ? record[API_ROWS_KEY] : record.data;
+      rows = Array.isArray(inner) ? inner : [record];
     }
   } catch {
-    rows = null;
+    rows = ["<see the Example response section on this page>"];
   }
 
-  if (rows === null) {
-    return {
-      body: JSON.stringify({ data: ["<see the Example response section on this page>"], meta }, null, 2),
-      embeddedExample: false,
-    };
-  }
-
-  return { body: JSON.stringify({ data: rows, meta }, null, 2), embeddedExample: true };
+  const body = {
+    dataset: input.datasetSlug.replace(/-/g, "_"),
+    [API_ROWS_KEY]: rows,
+    count: rows.length,
+    meta: {
+      requestId: "req_01J8ZC4W2Q",
+      planCode: input.planCode,
+      creditsCost: input.creditsCost,
+      dryRun: false,
+    },
+  };
+  return { body: JSON.stringify(body, null, 2), provenance: "illustrative" };
 }

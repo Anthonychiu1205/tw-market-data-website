@@ -5,12 +5,15 @@ import { SectionHeading } from "@/src/components/docs/section-heading";
 import { DOCS_DATASET_CATALOG, DOCS_DOMAINS } from "@/src/content/docs/dataset-catalog";
 import { getDatasetDocContent, type Bi, type DatasetDocContent } from "@/src/content/docs/dataset-pages";
 import { DATASET_GRADE_COLORS, datasetGradeLabel } from "@/src/lib/docs/dataset-grade";
+import { API_AUTH_HEADER, API_GATEWAY_BASE_URL, API_ROWS_KEY } from "@/src/content/api-truth";
 
 // Bilingual renderer for a v5 dataset endpoint page. Genuinely en + zh (no "coming soon" banner) so
 // /en is fully usable and the CJK guards can scan it. All facts come from the catalog (grade / agency /
 // plan / price) and the dataset-pages content (real coverage numbers or explicit TODO markers).
 
-const API_BASE = "https://api.twmarketdata.com";
+// Base, auth header and the row-array key all come from the captured API truth — the in-body examples
+// must not contradict the Request/Response panel beside them.
+const API_BASE = API_GATEWAY_BASE_URL;
 
 type Locale = string;
 
@@ -24,10 +27,10 @@ function pythonBasic(backendPath: string): string {
 resp = requests.get(
     "${API_BASE}${backendPath}",
     params={"symbol": "2330", "limit": 5},
-    headers={"X-API-Key": "sk_live_..."},
+    headers={"${API_AUTH_HEADER}": "sk_live_..."},
 )
 resp.raise_for_status()
-print(resp.json()["data"])`;
+print(resp.json()["${API_ROWS_KEY}"])`;
 }
 
 function pythonFiltered(backendPath: string): string {
@@ -37,16 +40,16 @@ function pythonFiltered(backendPath: string): string {
 resp = requests.get(
     "${API_BASE}${backendPath}",
     params={"symbol": "2330", "start_date": "2026-01-01", "end_date": "2026-06-30"},
-    headers={"X-API-Key": "sk_live_..."},
+    headers={"${API_AUTH_HEADER}": "sk_live_..."},
 )
 resp.raise_for_status()
-for row in resp.json()["data"]:
+for row in resp.json()["${API_ROWS_KEY}"]:
     print(row)`;
 }
 
 function curlExample(backendPath: string): string {
   return `curl "${API_BASE}${backendPath}?symbol=2330&limit=5" \\
-  -H "X-API-Key: sk_live_..."`;
+  -H "${API_AUTH_HEADER}: sk_live_..."`;
 }
 
 const SECTIONS = [
@@ -95,7 +98,6 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
       exampleJson={typeof content.exampleJson === "string" ? content.exampleJson : bi(content.exampleJson, locale)}
       planCode={entry.requiredPlan}
       creditsCost={entry.creditsCost}
-      hasRealCoverage={content.coverage !== null}
     />
   ) : undefined;
 
@@ -225,9 +227,9 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
           <section className="mt-10">
             <SectionHeading id="getting-started">{en ? "Getting started" : "快速開始"}</SectionHeading>
             <ol className="mt-3 list-decimal space-y-2 pl-5 text-slate-600">
-              <li>{en ? "Put your key in the X-API-Key header." : "把你的金鑰放進 X-API-Key 標頭。"}</li>
+              <li>{en ? `Put your key in the ${API_AUTH_HEADER} header.` : `把你的金鑰放進 ${API_AUTH_HEADER} 標頭。`}</li>
               <li>{en ? "Add query parameters (symbol, date range, limit)." : "加上查詢參數（symbol、日期區間、limit）。"}</li>
-              <li>{en ? "Send the request and read the data array." : "送出請求並讀取 data 陣列。"}</li>
+              <li>{en ? `Send the request and read the ${API_ROWS_KEY} array.` : `送出請求並讀取 ${API_ROWS_KEY} 陣列。`}</li>
             </ol>
             <div className="mt-4">
               <CodeBlock code={curlExample(entry.backendPath)} language="bash" />
