@@ -1,0 +1,1881 @@
+{
+  "spec": "PRICING-RETIER-V2",
+  "supersedes": "ab403e34 (v1 ladder)",
+  "generated_utc": "2026-07-20T19:38:00.578536+00:00",
+  "ladder": {
+    "free": {
+      "price_usd_month": 0,
+      "rank": 0
+    },
+    "starter": {
+      "price_usd_month": 20,
+      "rank": 1
+    },
+    "pro": {
+      "price_usd_month": 100,
+      "rank": 2
+    },
+    "max": {
+      "price_usd_month": 200,
+      "rank": 3
+    },
+    "enterprise": {
+      "price_usd_month": 2000,
+      "rank": 4
+    }
+  },
+  "ladder_note": "developer is no longer a premium rung — it merges into starter at $20 as the entry tier, and enterprise takes the $2,000 price point.",
+  "principle": "看 = Pro (reading the market) / 做 = Max (PIT, derivatives, intraday)",
+  "datasets_total": 168,
+  "counts_by_tier": {
+    "free": 28,
+    "starter": 14,
+    "pro": 95,
+    "max": 27,
+    "enterprise": 4
+  },
+  "changed": 39,
+  "tightened": 19,
+  "loosened": 20,
+  "tightened_customer_facing": [
+    {
+      "dataset_id": "options_daily_taifex",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "futures_final_settlement",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "option_final_settlement",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "taifex_institutional_flow",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "derivatives_market",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "features",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "factor_data",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "market_features",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "chip_features",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "futures_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "options_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "futures_institutional_investors_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "options_institutional_investors_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "futures_open_interest_large_traders_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "options_open_interest_large_traders_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "stock_snapshot",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "futures_snapshot",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "options_snapshot",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+    },
+    {
+      "dataset_id": "historical_prices",
+      "before": "free",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)"
+    }
+  ],
+  "populate_01_datasets": [
+    "bond_convertible_reference",
+    "business_indicator_monthly",
+    "disposition_securities_period",
+    "etf_holdings",
+    "fund_etf_metadata",
+    "insider_director_holdings",
+    "market_overview_snapshots",
+    "stock_delisting_lifecycle",
+    "valuation_core_daily",
+    "warrants_reference"
+  ],
+  "populate_01_note": "tier follows what a dataset IS, not how finished it is. These rows carry recoverable missing columns; POPULATE-01 lands before batch listing so what ships is fully wired.",
+  "matrix": [
+    {
+      "dataset_id": "bond_convertible_reference",
+      "family": "discovery_reference",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": [
+        "underlying_ticker"
+      ]
+    },
+    {
+      "dataset_id": "broker_branch_reference",
+      "family": "discovery_reference",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "broker_master",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 100,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "delisting",
+      "family": "market_structure_corporate_actions",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "equity_daily_prices",
+      "family": null,
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "fund_etf_metadata",
+      "family": "discovery_reference",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": [
+        "issuer",
+        "currency"
+      ]
+    },
+    {
+      "dataset_id": "index_classification",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 100,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "index_constituents",
+      "family": "taiwan_macro",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "index_data",
+      "family": "taiwan_macro",
+      "before": "pro",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 100,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "industry_chain",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 100,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "industry_chain_membership",
+      "family": null,
+      "before": "pro",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 100,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "industry_classification",
+      "family": null,
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "issuer_classification",
+      "family": "discovery_reference",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "issuer_profile",
+      "family": "discovery_reference",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "market_index",
+      "family": "taiwan_macro",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "market_prices",
+      "family": "market_technical",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "securities_firm_master",
+      "family": "market_structure_reference",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "security_master",
+      "family": "discovery_reference",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "stock_delisting_lifecycle",
+      "family": "market_structure_corporate_actions",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": [
+        "announcement_date",
+        "suspension_date",
+        "reason_summary"
+      ]
+    },
+    {
+      "dataset_id": "stock_split_par_value_events",
+      "family": "market_structure_corporate_actions",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "theme_taxonomy",
+      "family": "discovery_reference",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "ticker_universe",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 100,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "time_alignment",
+      "family": "market_technical",
+      "before": "pro",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 100,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "tpex_daily_price",
+      "family": "market_technical",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "trading_calendar",
+      "family": null,
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "trading_calendar_daily",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 100,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "twse_daily_price",
+      "family": "market_technical",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "warrants_reference",
+      "family": "discovery_reference",
+      "before": "free",
+      "after": "free",
+      "reason": "raw daily bars or metadata — funnel",
+      "price_before": 0,
+      "price_after": 0,
+      "populate_01_missing": [
+        "issuer",
+        "exercise_ratio",
+        "strike_price"
+      ]
+    },
+    {
+      "dataset_id": "adjusted_prices",
+      "family": "market_technical",
+      "before": "starter",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 20,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "chip_daily",
+      "family": "chip",
+      "before": "pro",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 100,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "historical_prices",
+      "family": null,
+      "before": "free",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 0,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "industry_index",
+      "family": null,
+      "before": "starter",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 20,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "institutional_flow",
+      "family": null,
+      "before": "starter",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 20,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "margin_short",
+      "family": "chip_deep",
+      "before": "starter",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 20,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "market_breadth",
+      "family": "taiwan_macro",
+      "before": "pro",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 100,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "market_value_weight",
+      "family": "market_structure_valuation",
+      "before": "pro",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 100,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "price_adjustment_factor",
+      "family": null,
+      "before": "starter",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 20,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "price_enhanced",
+      "family": "market_technical",
+      "before": "starter",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 20,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "return_index",
+      "family": null,
+      "before": "pro",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 100,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "return_index_daily",
+      "family": "taiwan_macro",
+      "before": "pro",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 100,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "securities_lending",
+      "family": "chip_deep",
+      "before": "starter",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 20,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "total_margin_short",
+      "family": "chip_deep",
+      "before": "pro",
+      "after": "starter",
+      "reason": "raw history + basic reference ($20 entry)",
+      "price_before": 100,
+      "price_after": 20,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "attention_disposal",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "balance_sheet",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "block_trade",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "block_trade_daily",
+      "family": "chip_deep",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "bond_yield_curve",
+      "family": null,
+      "before": "max",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 200,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "broker_trading_daily",
+      "family": "chip_deep",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "broker_trading_daily_agg",
+      "family": "chip_deep",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "business_indicator",
+      "family": null,
+      "before": "max",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 200,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "business_indicator_monthly",
+      "family": "taiwan_macro",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": [
+        "unit"
+      ]
+    },
+    {
+      "dataset_id": "capital_formation_events",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "capital_markets",
+      "family": null,
+      "before": "max",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 200,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "capital_reduction_reference_price_daily",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "cash_flow",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "cash_flow_statement",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "cb_daily",
+      "family": "convertible_bond",
+      "before": "pro",
+      "after": "pro",
+      "reason": "CB = security, not an exchange derivative (§3a upheld)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "cb_info",
+      "family": "convertible_bond",
+      "before": "pro",
+      "after": "pro",
+      "reason": "CB = security, not an exchange derivative (§3a upheld)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "cb_overview",
+      "family": "convertible_bond",
+      "before": "pro",
+      "after": "pro",
+      "reason": "CB = security, not an exchange derivative (§3a upheld)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "chip_flows",
+      "family": "chip_deep",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "company_news",
+      "family": "issuer_official_news",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "company_risk",
+      "family": null,
+      "before": "max",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 200,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "company_risk_events",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "convertible_bond",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "CB = security, not an exchange derivative (§3a upheld)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "convertible_bond_institutional",
+      "family": "market_structure_institutional",
+      "before": "pro",
+      "after": "pro",
+      "reason": "CB = security, not an exchange derivative (§3a upheld)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "convertible_bond_institutional_flow",
+      "family": "convertible_bond",
+      "before": "pro",
+      "after": "pro",
+      "reason": "CB = security, not an exchange derivative (§3a upheld)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "convertible_bond_monthly",
+      "family": "market_structure_custody",
+      "before": "pro",
+      "after": "pro",
+      "reason": "CB = security, not an exchange derivative (§3a upheld)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "convertible_bond_overview",
+      "family": "market_structure_reference",
+      "before": "pro",
+      "after": "pro",
+      "reason": "CB = security, not an exchange derivative (§3a upheld)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "convertible_bonds",
+      "family": "derivatives_daily",
+      "before": "pro",
+      "after": "pro",
+      "reason": "CB = security, not an exchange derivative (§3a upheld)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "corporate_actions",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "corporate_actions_enhanced",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "day_trading",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "day_trading_suspension",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "disposition_securities_period",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": [
+        "industry"
+      ]
+    },
+    {
+      "dataset_id": "dividend_policy",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "dividend_result_daily",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "dividends",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "esg_tesg",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "etf_flow",
+      "family": "taiwan_macro",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "etf_holdings",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": [
+        "holding_market"
+      ]
+    },
+    {
+      "dataset_id": "events",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "ex_dividend_events",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "field_query",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "field_query_examples",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "field_query_fields",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "financial_metrics",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "financial_ratios",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "financials",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "foreign_holding",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "fundamental_balance",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "fundamental_cash",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "fundamental_income",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "fundamentals_balance",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "fundamentals_cashflow",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "fundamentals_income",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "fx",
+      "family": null,
+      "before": "developer",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 2000,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "global_event_news_daily",
+      "family": "global_event_news",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "government_bank_buysell_daily",
+      "family": "chip_deep",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "income_statement",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "insider_director_holdings",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": [
+        "holding_ratio"
+      ]
+    },
+    {
+      "dataset_id": "insider_holding",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "institutional-flow",
+      "family": "chip_deep",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "institutional-flow-market-aggregate",
+      "family": "chip_deep",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "institutional_by_type",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "institutional_ownership",
+      "family": "chip_deep",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "interest_rate",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "interest_rate_snapshot",
+      "family": "taiwan_macro",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "issuer_announcements",
+      "family": "issuer_official_news",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "issuer_official_news_daily",
+      "family": "issuer_official_news",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "macro_global",
+      "family": "global_macro",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "macro_international",
+      "family": null,
+      "before": "developer",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 2000,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "macro_worldbank",
+      "family": "global_macro",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "margin_short_cover_date",
+      "family": "market_structure_margin",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "margin_short_enhanced",
+      "family": "chip_deep",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "market_news",
+      "family": "taiwan_macro",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "market_overview_snapshots",
+      "family": "taiwan_macro",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": [
+        "listed_count"
+      ]
+    },
+    {
+      "dataset_id": "monthly_revenue",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "monthly_revenue_enhanced",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "mops_major_event",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "ownership_distribution",
+      "family": "chip_deep",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "par_value_change_reference_price_daily",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "price_limit_daily",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "screener",
+      "family": "market_technical",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "short_sale_balance_control",
+      "family": "market_structure_margin",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "split_price_daily",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "stock_price_limit_daily",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "structured_events",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "subsidiary_investment",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "suspended_trading_daily",
+      "family": "market_structure_corporate_actions",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "taifex_options_settlement_price",
+      "family": "derivatives_daily",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "taiwan_macro_daily",
+      "family": "taiwan_macro",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "tax_business_registration",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "tdcc_shareholding",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "universal_search",
+      "family": "discovery_reference",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "valuation",
+      "family": null,
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "valuation_core_daily",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": [
+        "shares_outstanding",
+        "market_cap",
+        "trailing_12m_revenue",
+        "ps",
+        "book_value_per_share",
+        "dividend_per_share_ttm"
+      ]
+    },
+    {
+      "dataset_id": "valuation_data",
+      "family": "fundamentals",
+      "before": "pro",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "chip_features",
+      "family": "chip",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "derivatives_market",
+      "family": "derivatives_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "factor_data",
+      "family": "market_technical",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "features",
+      "family": "market_technical",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "futures_daily",
+      "family": "derivatives_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "futures_final_settlement",
+      "family": "derivatives_market_structure",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "futures_institutional_investors_daily",
+      "family": "derivatives_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "futures_open_interest_large_traders_daily",
+      "family": "derivatives_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "futures_snapshot",
+      "family": "realtime_snapshot",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "large_trader_oi",
+      "family": null,
+      "before": "max",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "market_features",
+      "family": "market_technical",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "option_final_settlement",
+      "family": "derivatives_market_structure",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "options_daily",
+      "family": "derivatives_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "options_daily_taifex",
+      "family": "derivatives_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "options_institutional_investors_daily",
+      "family": "derivatives_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "options_open_interest_large_traders_daily",
+      "family": "derivatives_daily",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "options_snapshot",
+      "family": "realtime_snapshot",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "stock_snapshot",
+      "family": "realtime_snapshot",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "taifex_atm_iv",
+      "family": "derivatives_market",
+      "before": "max",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "taifex_final_settlement",
+      "family": null,
+      "before": "max",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "taifex_futures",
+      "family": null,
+      "before": "max",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "taifex_inst_oi",
+      "family": null,
+      "before": "max",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "taifex_institutional_flow",
+      "family": "derivatives_market_structure",
+      "before": "pro",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 100,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "taifex_options",
+      "family": null,
+      "before": "max",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "taifex_options_delta",
+      "family": "derivatives_market_structure",
+      "before": "max",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "taifex_put_call_ratio",
+      "family": "derivatives_market_structure",
+      "before": "max",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "technical_indicators",
+      "family": "market_technical",
+      "before": "max",
+      "after": "max",
+      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "announcements_fulltext",
+      "family": null,
+      "before": "enterprise",
+      "after": "enterprise",
+      "reason": "full-text / serve-layer / commercial",
+      "price_before": 2000,
+      "price_after": 2000,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "factor_serve",
+      "family": null,
+      "before": "enterprise",
+      "after": "enterprise",
+      "reason": "full-text / serve-layer / commercial",
+      "price_before": 2000,
+      "price_after": 2000,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "filings_fulltext",
+      "family": null,
+      "before": "enterprise",
+      "after": "enterprise",
+      "reason": "full-text / serve-layer / commercial",
+      "price_before": 2000,
+      "price_after": 2000,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "transcripts",
+      "family": null,
+      "before": "enterprise",
+      "after": "enterprise",
+      "reason": "full-text / serve-layer / commercial",
+      "price_before": 2000,
+      "price_after": 2000,
+      "populate_01_missing": null
+    }
+  ]
+}
