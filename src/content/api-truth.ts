@@ -60,6 +60,15 @@ export type ReadApiError = {
 
 export const READ_API_ERRORS: ReadApiError[] = [
   {
+    status: 400,
+    code: "missing_required_filter",
+    messageZh: "Missing required filter",
+    when: {
+      en: "A required filter was not supplied. The body does not name which one — supplying the right filter can flip this to 403 if the plan also lacks access.",
+      zh: "缺少必要的篩選參數。回應不會指明是哪一個；補上正確參數後，若方案無權限則會轉為 403。",
+    },
+  },
+  {
     status: 401,
     code: "missing_api_key",
     messageZh: "缺少 API 金鑰。請在 X-API-KEY 標頭帶入金鑰,或改打五檔免金鑰試玩端點。",
@@ -78,12 +87,31 @@ export const READ_API_ERRORS: ReadApiError[] = [
     },
   },
   {
+    status: 403,
+    code: "commercial_use_not_allowed",
+    messageZh:
+      "Developer 僅限個人開發與測試使用,不可用於商業產品或對外服務。 升級至 Pro 或 Enterprise 以用於商業產品與正式環境。",
+    when: {
+      en: "The key is valid but its plan does not cover this dataset. Captured with a Developer-tier key on 2026-07-20.",
+      zh: "金鑰有效,但方案未涵蓋此資料集。2026-07-20 以 Developer 方案金鑰實測擷取。",
+    },
+  },
+  {
     status: 404,
     code: "Not Found",
     messageZh: "Not found",
     when: {
       en: "No dataset exists at this path. This body is generic — it carries no dataset-specific code.",
       zh: "此路徑沒有對應的資料集。此回應為通用格式,不帶資料集專屬錯誤碼。",
+    },
+  },
+  {
+    status: 422,
+    code: "validation_error",
+    messageZh: "ticker: Field required",
+    when: {
+      en: "A parameter is missing or malformed. Unlike 400, this body names the field — several datasets use `ticker` rather than `symbol`.",
+      zh: "參數缺漏或格式錯誤。與 400 不同,此回應會指明欄位 —— 部分資料集用 `ticker` 而非 `symbol`。",
     },
   },
 ];
@@ -99,8 +127,8 @@ export function readApiErrorBody(error: ReadApiError, locale: string): string {
 // ── What is still NOT verified ─────────────────────────────────────────────────
 // Honest gaps, so nothing downstream mistakes this file for complete (rule 2).
 export const API_TRUTH_GAPS = [
-  "403 / entitlement has never been observed. Key validation runs BEFORE entitlement, so a bogus key always returns 401 — reproducing a 403 needs a real sk_live_ key on a plan that lacks the dataset.",
-  "Only 23 of the 64 sellable datasets have been captured. 28 return 401 without an entitled key, 11 return 422 because their required parameters differ from symbol/limit, 1 returns 404 (securities-lending) and 1 failed to connect (institutional-flow-market-aggregate).",
+  "30 of the 64 sellable datasets are captured. The other 34 are blocked by PLAN TIER, not by missing data: the capture key is Developer-tier, and 24 datasets answer 403 commercial_use_not_allowed. Another 9 answer 400/422 first, but supplying the parameter they ask for flips them to the same 403 — so they are plan-blocked too. Re-running the capture script with a Pro/Enterprise key should fill all 33.",
+  "securities-lending answers 404 Not Found — the route does not exist on the read API even though the billing SSOT sells the slug. That is a backend/catalogue mismatch, not a docs gap.",
   "Rate limiting (429) and upstream failures (5xx) have not been observed on the read API.",
 ] as const;
 

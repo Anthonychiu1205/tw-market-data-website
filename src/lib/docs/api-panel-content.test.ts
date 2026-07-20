@@ -54,7 +54,22 @@ test("each snippet reads THIS dataset's row key, never a shared one", () => {
   assert.ok(!withData.includes('payload["rows"]'), "must not leak another dataset's key");
 
   const withItems = buildRequestSnippet("javascript", { backendPath: PATH, params: STANDARD, rowsKey: "items" });
-  assert.ok(withItems.includes("const { items } = payload;"));
+  assert.ok(withItems.includes("payload.items"));
+});
+
+test("a nested rowsKey path renders as chained access, not a broken literal key", () => {
+  // Some datasets nest rows under `envelope`; the snippet must access envelope.data, never
+  // payload["envelope.data"] (which would read a key that does not exist).
+  const py = buildRequestSnippet("python", { backendPath: PATH, params: STANDARD, rowsKey: "envelope.data" });
+  assert.ok(py.includes('payload["envelope"]["data"]'));
+  assert.ok(!py.includes('payload["envelope.data"]'));
+
+  const js = buildRequestSnippet("javascript", { backendPath: PATH, params: STANDARD, rowsKey: "envelope.data" });
+  assert.ok(js.includes("payload.envelope.data"));
+
+  const ts = buildRequestSnippet("typescript", { backendPath: PATH, params: STANDARD, rowsKey: "envelope.data" });
+  assert.ok(ts.includes("payload.envelope.data"));
+  assert.ok(ts.includes("{ envelope: { data: Record<string, unknown>[] } }"));
 });
 
 test("an uncaptured dataset gets a snippet that asserts no row key at all", () => {
@@ -107,11 +122,14 @@ test("an uncaptured dataset yields nothing rather than a templated body", () => 
   assert.equal(result.kind, "uncaptured");
 });
 
-test("every capture is valid JSON and declares a row key that exists in it", () => {
+test("every capture is valid JSON and its rowsKey path resolves to a non-empty array", () => {
   for (const [slug, capture] of Object.entries(API_CAPTURES)) {
     const parsed = JSON.parse(capture.zh);
     if (capture.rowsKey) {
-      assert.ok(Array.isArray(parsed[capture.rowsKey]), `${slug}: rowsKey "${capture.rowsKey}" must be an array`);
+      // rowsKey may be dotted ("envelope.data"); walk the path.
+      const arr = capture.rowsKey.split(".").reduce<unknown>((o, seg) => (o as Record<string, unknown>)?.[seg], parsed);
+      assert.ok(Array.isArray(arr), `${slug}: rowsKey "${capture.rowsKey}" must resolve to an array`);
+      assert.ok((arr as unknown[]).length > 0, `${slug}: rowsKey "${capture.rowsKey}" must be non-empty (no empty examples)`);
     }
     if (capture.en) JSON.parse(capture.en);
   }
@@ -166,11 +184,18 @@ test("/zh shows the real Chinese message; /en shows a marker, not a translation"
 
 test("only statuses actually observed are documented", () => {
   const statuses = panelStatuses();
-  assert.deepEqual(statuses, ["200", "401", "404"]);
-  // 403 has never been reproduced (key validation precedes entitlement) and the read API has never
-  // been seen emitting 400 — documenting either would be a claim, not a record.
-  assert.ok(!statuses.includes("403"));
-  assert.ok(!statuses.includes("400"));
+  // Every one of these was captured live from the read API on 2026-07-20.
+  assert.deepEqual(statuses, ["200", "400", "401", "403", "404", "422"]);
+  // 429 and 5xx have never been observed, so they stay undocumented rather than assumed.
+  assert.ok(!statuses.includes("429"));
+  assert.ok(!statuses.includes("500"));
+});
+
+test("the 403 documents the real read-API code, not the gateway's", () => {
+  const forbidden = READ_API_ERRORS.find((e) => e.status === 403);
+  assert.ok(forbidden);
+  // The gateway calls this plan_not_entitled; the read API does not.
+  assert.equal(forbidden?.code, "commercial_use_not_allowed");
 });
 
 test("data_grade is never emitted into any documented body", () => {
