@@ -4,21 +4,25 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Activity,
+  BadgeCheck,
   Bot,
   BookOpen,
   Braces,
   BrainCircuit,
-  Building2,
+  Calculator,
   CandlestickChart,
   ChevronDown,
   Code2,
-  Compass,
   FileCheck,
   FileCode,
   FileSpreadsheet,
+  FileText,
+  Gauge,
   GitBranch,
+  Globe,
   KeyRound,
   Landmark,
+  Layers,
   LayoutGrid,
   LifeBuoy,
   Megaphone,
@@ -29,16 +33,17 @@ import {
   Search,
   Users,
   Waypoints,
-  Wrench,
+  Webhook,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
-import { Link, usePathname } from "@/src/i18n/navigation";
+import { Link, useRouter, usePathname } from "@/src/i18n/navigation";
 
 import type { DocsSection } from "@/src/content/docs";
 import { normalizeDocsSections } from "@/src/content/docs-sections";
-import { getDocsSidebar } from "@/src/content/docs-sidebar";
-import type { DocsSidebarDescribedItem, DocsSidebarNavGroup, DocsSidebarNavItem } from "@/src/content/docs-sidebar";
+import { getDocsDatasetSearchIndex, getDocsSidebar } from "@/src/content/docs-sidebar";
+import type { DocsIconName, DocsSidebarNavGroup, DocsSidebarNavItem } from "@/src/content/docs-sidebar";
+import { searchDocsDatasets } from "@/src/lib/docs/dataset-search";
 import { DATASET_GRADE_COLORS, datasetGradeLabel } from "@/src/lib/docs/dataset-grade";
 import type { DatasetGrade } from "@/src/lib/docs/dataset-grade";
 import type { AppLocale } from "@/src/i18n/locales";
@@ -113,29 +118,50 @@ function readSidebarScrollTopFromSession(): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
-// API group icons (§F): each distinct, zero duplicates with the item icons below. Only the five
-// groupIcon values actually used by docsSidebarApiGroups are mapped; others render nothing.
-function GroupIcon({ groupIcon, className }: { groupIcon: DocsSidebarNavGroup["groupIcon"]; className?: string }) {
-  switch (groupIcon) {
-    case "line-chart": // 市場與價格
-      return <CandlestickChart className={className} aria-hidden="true" />;
-    case "file-spreadsheet": // 財務與成長
-      return <FileSpreadsheet className={className} aria-hidden="true" />;
-    case "landmark": // 籌碼與資金
-      return <Landmark className={className} aria-hidden="true" />;
-    case "building-2": // 公司與事件
-      return <Megaphone className={className} aria-hidden="true" />;
-    case "network": // 市場結構與參考
-      return <Network className={className} aria-hidden="true" />;
-    case "activity": // 總體經濟
-      return <Activity className={className} aria-hidden="true" />;
-    case "search-code": // 衍生與可轉債
-      return <Search className={className} aria-hidden="true" />;
-    case "book-open": // 基金與企業情報
-      return <BookOpen className={className} aria-hidden="true" />;
-    default:
-      return null;
-  }
+// §F: one lucide component per DocsIconName. The names themselves are declared next to each nav entry
+// in docs-sidebar.ts and are asserted unique there, so this map is a plain 1:1 projection — a
+// duplicate icon is impossible to introduce from this file alone.
+const NAV_ICON_COMPONENTS: Record<DocsIconName, typeof Activity> = {
+  // API groups (the 8 domains)
+  "candlestick-chart": CandlestickChart,
+  "file-spreadsheet": FileSpreadsheet,
+  landmark: Landmark,
+  megaphone: Megaphone,
+  network: Network,
+  activity: Activity,
+  layers: Layers,
+  "book-open": BookOpen,
+  // FOR AI AGENTS
+  plug: Plug,
+  "file-text": FileText,
+  "scroll-text": ScrollText,
+  braces: Braces,
+  bot: Bot,
+  webhook: Webhook,
+  // OVERVIEW
+  "layout-grid": LayoutGrid,
+  rocket: Rocket,
+  "key-round": KeyRound,
+  "file-check": FileCheck,
+  "badge-check": BadgeCheck,
+  waypoints: Waypoints,
+  globe: Globe,
+  // GUIDES
+  calculator: Calculator,
+  users: Users,
+  gauge: Gauge,
+  "brain-circuit": BrainCircuit,
+  // SDKS
+  "git-branch": GitBranch,
+  "file-code": FileCode,
+  "code-2": Code2,
+  // HELP
+  "life-buoy": LifeBuoy,
+};
+
+function NavIcon({ name, className }: { name: DocsIconName; className?: string }) {
+  const Icon = NAV_ICON_COMPONENTS[name];
+  return <Icon className={className} aria-hidden="true" />;
 }
 
 // Low-saturation grade dot (Part 1 色碼). building uses an outline ring; the rest are solid dots.
@@ -155,75 +181,6 @@ function GradeDot({ grade, locale }: { grade: DatasetGrade; locale: string }) {
       aria-label={label}
     />
   );
-}
-
-// §F: every left-nav item gets its own lucide icon — zero duplicates across the whole nav.
-function getOverviewItemIcon(href: string) {
-  switch (href) {
-    case "/docs/introduction":
-      return LayoutGrid;
-    case "/docs/quick-start":
-      return Rocket;
-    case "/docs/authentication":
-      return KeyRound;
-    case "/docs/source-policy":
-      return FileCheck;
-    case "/docs/data-freshness-lineage":
-      return Waypoints;
-    case "/docs/api-model":
-      return Braces;
-    case "/docs/tools-and-mcp":
-      return Wrench;
-    default:
-      return LayoutGrid;
-  }
-}
-
-function getGuideItemIcon(href: string) {
-  switch (href) {
-    case "/docs/workflows/company-fundamentals":
-      return Building2;
-    case "/docs/workflows/capital-flow":
-      return Users;
-    case "/docs/workflows/market-status":
-      return Activity;
-    case "/docs/workflows/fast-data-access":
-      return Compass;
-    case "/docs/workflows/strategy-ai":
-      return BrainCircuit;
-    default:
-      return Compass;
-  }
-}
-
-function getSdkItemIcon(href: string) {
-  switch (href) {
-    case "/docs/sdk/release-status":
-      return GitBranch;
-    case "/docs/sdk/python-sdk":
-      return FileCode;
-    case "/docs/sdk/javascript-sdk":
-      return Code2;
-    default:
-      return FileCode;
-  }
-}
-
-function getAiAgentItemIcon(href: string) {
-  switch (href) {
-    case "/docs/ai-agents/mcp-server-preview":
-      return Plug;
-    case "/docs/ai-agents/tool-manifest":
-      return ScrollText;
-    case "/docs/ai-agents/agent-workflow-examples":
-      return Bot;
-    default:
-      return Bot;
-  }
-}
-
-function getHelpItemIcon() {
-  return LifeBuoy;
 }
 
 export function DocsPageShell({ page, children, tocSections, rightPanelTitle, rightPanelContent, pageLabel, nextGuide, topNotice }: DocsPageShellProps) {
@@ -249,30 +206,61 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
     return Array.from(new Set([...(restored.length ? restored : ["quick-start"]), ...activeGroupIds]));
   });
 
-  // Sidebar search (by dataset name) + grade filter (Part 1: 搜尋框 名稱+分級篩).
+  // Sidebar dataset search: an autocomplete over the catalog (zh name + en name + slug), matching in
+  // both languages regardless of UI locale. Picking a suggestion navigates to that dataset page.
+  const router = useRouter();
+  const searchIndex = useMemo(() => getDocsDatasetSearchIndex(locale), [locale]);
   const [search, setSearch] = useState("");
-  const [gradeFilter, setGradeFilter] = useState<DatasetGrade | null>(null);
-  const query = search.trim().toLowerCase();
-  const isFiltering = query.length > 0 || gradeFilter !== null;
-  const filteredApiGroups = useMemo(
-    () =>
-      sidebar.apiGroups
-        .map((group) => ({
-          ...group,
-          items: group.items.filter(
-            (item) =>
-              (query.length === 0 || item.title.toLowerCase().includes(query)) &&
-              (gradeFilter === null || item.grade === gradeFilter),
-          ),
-        }))
-        .filter((group) => !isFiltering || group.items.length > 0),
-    [sidebar.apiGroups, query, gradeFilter, isFiltering],
-  );
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [highlightIndex, setHighlightIndex] = useState(0);
+  const searchBoxRef = useRef<HTMLDivElement | null>(null);
+  const suggestions = useMemo(() => searchDocsDatasets(searchIndex, search), [searchIndex, search]);
+  const showSuggestions = searchOpen && search.trim().length > 0;
+
+  function goToSuggestion(href: string) {
+    setSearchOpen(false);
+    setSearch("");
+    router.push(href);
+  }
+
+  function onSearchKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Escape") {
+      setSearchOpen(false);
+      return;
+    }
+    if (!showSuggestions || suggestions.length === 0) return;
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setHighlightIndex((i) => (i + 1) % suggestions.length);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setHighlightIndex((i) => (i - 1 + suggestions.length) % suggestions.length);
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      const target = suggestions[Math.min(highlightIndex, suggestions.length - 1)];
+      if (target) goToSuggestion(target.href);
+    }
+  }
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     window.sessionStorage.setItem(SIDEBAR_EXPANDED_GROUPS_KEY, JSON.stringify(openGroupIds));
   }, [openGroupIds]);
+
+  // A new query always re-aims at the first suggestion.
+  useEffect(() => {
+    setHighlightIndex(0);
+  }, [search]);
+
+  // Clicking anywhere outside the search box dismisses the suggestion list.
+  useEffect(() => {
+    if (!showSuggestions) return;
+    function onPointerDown(event: MouseEvent) {
+      if (!searchBoxRef.current?.contains(event.target as Node)) setSearchOpen(false);
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [showSuggestions]);
 
   useEffect(() => {
     setOpenGroupIds((current) => {
@@ -348,20 +336,32 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
     );
   }
 
-  function renderFlatSidebarItems(items: DocsSidebarNavItem[], section: "overview" | "guides" | "sdks" | "ai-agents" | "help") {
+  // One renderer for every flat nav section (OVERVIEW / FOR AI AGENTS / GUIDES / SDKS / HELP): icon +
+  // title, identical spacing. Building (roadmap) entries carry a badge and are not links.
+  function renderFlatSidebarItems(items: DocsSidebarNavItem[]) {
     return (
       <div className="space-y-1">
         {items.map((item) => {
+          if (item.building) {
+            return (
+              <div
+                key={item.href}
+                className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-400"
+                aria-disabled="true"
+              >
+                {item.icon ? <NavIcon name={item.icon} className="h-4 w-4 shrink-0 text-slate-400" /> : null}
+                <span className="min-w-0 flex-1 truncate">{item.title}</span>
+                <span
+                  className="shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-medium"
+                  style={{ borderColor: DATASET_GRADE_COLORS.building, color: DATASET_GRADE_COLORS.building }}
+                >
+                  {datasetGradeLabel("building", locale)}
+                </span>
+              </div>
+            );
+          }
+
           const isActive = isItemActive(item);
-          const Icon = section === "overview"
-            ? getOverviewItemIcon(item.href)
-            : section === "guides"
-              ? getGuideItemIcon(item.href)
-                : section === "sdks"
-                  ? getSdkItemIcon(item.href)
-                  : section === "ai-agents"
-                    ? getAiAgentItemIcon(item.href)
-                    : getHelpItemIcon();
           return (
             <Link
               key={item.href}
@@ -371,7 +371,7 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
                 isActive ? "bg-slate-100 font-medium text-slate-950" : "text-slate-600 hover:bg-slate-50 hover:text-slate-950",
               )}
             >
-              <Icon className="h-4 w-4 shrink-0 text-slate-500" aria-hidden="true" />
+              {item.icon ? <NavIcon name={item.icon} className="h-4 w-4 shrink-0 text-slate-500" /> : null}
               <span className="truncate">{item.title}</span>
             </Link>
           );
@@ -379,48 +379,6 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
       </div>
     );
   }
-
-  // 為 AI Agent 打造 — plain titles + a one-line description, no icons (Part 1). Webhooks is building.
-  function renderAiAgentItems(items: DocsSidebarDescribedItem[]) {
-    return (
-      <div className="space-y-1">
-        {items.map((item) => {
-          if (item.building) {
-            return (
-              <div key={item.href} className="rounded-xl px-3 py-2 text-sm text-slate-400" aria-disabled="true">
-                <span className="flex items-center gap-2">
-                  <span className="min-w-0 flex-1 truncate">{item.title}</span>
-                  <span
-                    className="shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-medium"
-                    style={{ borderColor: DATASET_GRADE_COLORS.building, color: DATASET_GRADE_COLORS.building }}
-                  >
-                    {datasetGradeLabel("building", locale)}
-                  </span>
-                </span>
-                {item.description ? <span className="mt-0.5 block truncate text-xs text-slate-400">{item.description}</span> : null}
-              </div>
-            );
-          }
-          const isActive = isItemActive(item);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "block rounded-xl px-3 py-2 text-sm transition",
-                isActive ? "bg-slate-100 font-medium text-slate-950" : "text-slate-600 hover:bg-slate-50 hover:text-slate-950",
-              )}
-            >
-              <span className="block truncate">{item.title}</span>
-              {item.description ? <span className="mt-0.5 block truncate text-xs text-slate-400">{item.description}</span> : null}
-            </Link>
-          );
-        })}
-      </div>
-    );
-  }
-
-  const gradeFilterOptions: DatasetGrade[] = ["verified", "derived", "reference", "building"];
 
   const sidebarTopOffset = SITE_HEADER_HEIGHT_PX + DESKTOP_SIDEBAR_TOP_GAP_PX;
   const sidebarHeight = `calc(100vh - ${sidebarTopOffset + DESKTOP_SIDEBAR_BOTTOM_GAP_PX}px)`;
@@ -464,41 +422,59 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
           >
             <p className="text-xs font-semibold tracking-wide text-slate-500">{t("sidebarTitle")}</p>
 
-            {/* Search by dataset name + grade filter (Part 1). */}
-            <div className="mt-3 space-y-2">
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-                <input
-                  type="search"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder={t("searchPlaceholder")}
-                  aria-label={t("searchPlaceholder")}
-                  className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-8 pr-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-100"
-                />
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {gradeFilterOptions.map((grade) => {
-                  const active = gradeFilter === grade;
-                  const color = DATASET_GRADE_COLORS[grade];
-                  return (
-                    <button
-                      key={grade}
-                      type="button"
-                      onClick={() => setGradeFilter(active ? null : grade)}
-                      aria-pressed={active}
-                      className={cn(
-                        "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium transition",
-                        active ? "border-transparent text-white" : "border-slate-200 text-slate-500 hover:bg-slate-50",
-                      )}
-                      style={active ? { backgroundColor: color } : undefined}
-                    >
-                      <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: active ? "#ffffff" : color }} />
-                      {datasetGradeLabel(grade, locale)}
-                    </button>
-                  );
-                })}
-              </div>
+            {/* Dataset search with an autocomplete list — picking a suggestion opens that page. */}
+            <div ref={searchBoxRef} className="relative mt-3">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setSearchOpen(true);
+                }}
+                onFocus={() => setSearchOpen(true)}
+                onKeyDown={onSearchKeyDown}
+                placeholder={t("searchPlaceholder")}
+                aria-label={t("searchPlaceholder")}
+                role="combobox"
+                aria-expanded={showSuggestions}
+                aria-controls="docs-dataset-search-listbox"
+                aria-autocomplete="list"
+                autoComplete="off"
+                className="w-full rounded-xl border border-slate-200 bg-white py-2 pl-8 pr-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-slate-300 focus:ring-2 focus:ring-slate-100"
+              />
+              {showSuggestions ? (
+                <div
+                  id="docs-dataset-search-listbox"
+                  role="listbox"
+                  className="absolute left-0 right-0 top-full z-20 mt-1 max-h-80 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+                >
+                  {suggestions.length === 0 ? (
+                    <p className="px-3 py-2 text-sm text-slate-400">{t("searchNoResults")}</p>
+                  ) : (
+                    suggestions.map((entry, index) => (
+                      <button
+                        key={entry.href}
+                        type="button"
+                        role="option"
+                        aria-selected={index === highlightIndex}
+                        onMouseEnter={() => setHighlightIndex(index)}
+                        onClick={() => goToSuggestion(entry.href)}
+                        className={cn(
+                          "flex w-full items-center gap-2 px-3 py-2 text-left text-sm transition",
+                          index === highlightIndex ? "bg-slate-100 text-slate-950" : "text-slate-600 hover:bg-slate-50",
+                        )}
+                      >
+                        <GradeDot grade={entry.grade} locale={locale} />
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate">{entry.title}</span>
+                          <span className="block truncate text-xs text-slate-400">{entry.groupLabel}</span>
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              ) : null}
             </div>
 
             <nav className="mt-3">
@@ -506,59 +482,53 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
               {renderSidebarItems(sidebar.dashboardItems)}
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">FOR AI AGENTS</p>
-              {renderAiAgentItems(sidebar.aiAgentItems)}
+              {renderFlatSidebarItems(sidebar.aiAgentItems)}
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">OVERVIEW</p>
-              {renderFlatSidebarItems(sidebar.overviewItems, "overview")}
+              {renderFlatSidebarItems(sidebar.overviewItems)}
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">DATA APIS</p>
-              {filteredApiGroups.length === 0 ? (
-                <p className="px-3 py-2 text-sm text-slate-400">{t("searchNoResults")}</p>
-              ) : (
-                <div className="space-y-4">
-                  {filteredApiGroups.map((group) => {
-                    const expanded = openGroupIds.includes(group.id) || isFiltering;
-                    return (
-                      <div key={group.id}>
-                        <button
-                          type="button"
-                          aria-label={`${group.label}${expanded ? t("collapse") : t("expand")}`}
-                          className={cn(
-                            "flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-950",
-                            activeGroupIds.includes(group.id) && "text-slate-950",
-                          )}
-                          onClick={() => {
-                            userToggledGroupsRef.current.add(group.id);
-                            setOpenGroupIds((previous) => toggleGroupExpanded(previous, group.id));
-                          }}
-                        >
-                          <div className="flex min-w-0 items-center gap-2">
-                            <GroupIcon groupIcon={group.groupIcon} className="h-4 w-4 shrink-0 text-slate-500" />
-                            <span className="truncate">{group.label}</span>
-                            <span className="shrink-0 rounded-full bg-slate-100 px-1.5 text-[11px] font-medium text-slate-500">{group.count}</span>
-                          </div>
-                          {!isFiltering ? (
-                            <ChevronDown
-                              className={cn("h-4 w-4 shrink-0 text-slate-400 transition-transform", expanded && "rotate-180")}
-                              aria-hidden="true"
-                            />
-                          ) : null}
-                        </button>
-                        {expanded ? <div className="mt-1 space-y-1 pl-7">{renderSidebarItems(group.items)}</div> : null}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+              <div className="space-y-4">
+                {sidebar.apiGroups.map((group) => {
+                  const expanded = openGroupIds.includes(group.id);
+                  return (
+                    <div key={group.id}>
+                      <button
+                        type="button"
+                        aria-label={`${group.label}${expanded ? t("collapse") : t("expand")}`}
+                        className={cn(
+                          "flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-950",
+                          activeGroupIds.includes(group.id) && "text-slate-950",
+                        )}
+                        onClick={() => {
+                          userToggledGroupsRef.current.add(group.id);
+                          setOpenGroupIds((previous) => toggleGroupExpanded(previous, group.id));
+                        }}
+                      >
+                        <div className="flex min-w-0 items-center gap-2">
+                          <NavIcon name={group.groupIcon} className="h-4 w-4 shrink-0 text-slate-500" />
+                          <span className="truncate">{group.label}</span>
+                          <span className="shrink-0 rounded-full bg-slate-100 px-1.5 text-[11px] font-medium text-slate-500">{group.count}</span>
+                        </div>
+                        <ChevronDown
+                          className={cn("h-4 w-4 shrink-0 text-slate-400 transition-transform", expanded && "rotate-180")}
+                          aria-hidden="true"
+                        />
+                      </button>
+                      {expanded ? <div className="mt-1 space-y-1 pl-7">{renderSidebarItems(group.items)}</div> : null}
+                    </div>
+                  );
+                })}
+              </div>
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">GUIDES</p>
-              {renderFlatSidebarItems(sidebar.guideItems, "guides")}
+              {renderFlatSidebarItems(sidebar.guideItems)}
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">SDKS</p>
-              {renderFlatSidebarItems(sidebar.sdkItems, "sdks")}
+              {renderFlatSidebarItems(sidebar.sdkItems)}
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">HELP</p>
-              {renderFlatSidebarItems(sidebar.helpItems, "help")}
+              {renderFlatSidebarItems(sidebar.helpItems)}
             </nav>
             <div className="h-28 shrink-0" aria-hidden="true" />
           </div>

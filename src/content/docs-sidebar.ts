@@ -1,8 +1,10 @@
 import type { AppLocale } from "@/src/i18n/locales";
 import type { DatasetGrade } from "@/src/lib/docs/dataset-grade";
+import { buildDatasetSearchHaystack, type DocsDatasetSearchEntry } from "@/src/lib/docs/dataset-search";
 import {
   DOCS_DOMAINS,
   datasetsByDomain,
+  domainDisplayName,
   type DocsDomainId,
 } from "@/src/content/docs/dataset-catalog";
 
@@ -12,28 +14,59 @@ import {
 // clickable (Part 1). Labels are bilingual and projected to one locale at render time.
 
 // Projected shapes consumed by the docs shell (a single locale resolved at render time).
+// Every nav entry (flat item or API group) declares its own icon here, next to the entry itself, and
+// EVERY name below is used exactly once across the whole sidebar — no two entries share an icon.
+// `docs-sidebar.test.ts` asserts that uniqueness so a future entry cannot silently reuse one.
+export type DocsIconName =
+  // API groups (the 8 domains)
+  | "candlestick-chart"
+  | "file-spreadsheet"
+  | "landmark"
+  | "megaphone"
+  | "network"
+  | "activity"
+  | "layers"
+  | "book-open"
+  // FOR AI AGENTS
+  | "plug"
+  | "file-text"
+  | "scroll-text"
+  | "braces"
+  | "bot"
+  | "webhook"
+  // OVERVIEW
+  | "layout-grid"
+  | "rocket"
+  | "key-round"
+  | "file-check"
+  | "badge-check"
+  | "waypoints"
+  | "globe"
+  // GUIDES
+  | "calculator"
+  | "users"
+  | "gauge"
+  | "brain-circuit"
+  // SDKS
+  | "git-branch"
+  | "file-code"
+  | "code-2"
+  // HELP
+  | "life-buoy";
+
 export type DocsSidebarNavItem = {
   title: string;
   href: string;
+  icon?: DocsIconName;
   grade?: DatasetGrade;
   building?: boolean; // roadmap — shown with a badge, never a live link
   children?: DocsSidebarNavItem[];
 };
 
-export type DocsSidebarGroupIcon =
-  | "line-chart"
-  | "file-spreadsheet"
-  | "landmark"
-  | "building-2"
-  | "network"
-  | "activity"
-  | "search-code"
-  | "book-open";
-
 export type DocsSidebarNavGroup = {
   id: string;
   label: string;
-  groupIcon: DocsSidebarGroupIcon;
+  groupIcon: DocsIconName;
   count: number; // number of real datasets in the group (Part 1: 計數)
   items: DocsSidebarNavItem[];
 };
@@ -42,26 +75,20 @@ export type DocsSidebarNavItemSource = {
   title: string;
   titleEn: string;
   href: string;
+  icon?: DocsIconName;
   grade?: DatasetGrade;
   building?: boolean;
   children?: DocsSidebarNavItemSource[];
 };
 
-// A flat item with a one-line description (Part 1: 為 AI Agent 打造 — 純標題 + 一行說明).
-export type DocsSidebarDescribedItemSource = DocsSidebarNavItemSource & {
-  description?: string;
-  descriptionEn?: string;
-};
-export type DocsSidebarDescribedItem = DocsSidebarNavItem & { description?: string };
-
-const DOMAIN_ICON: Record<DocsDomainId, DocsSidebarGroupIcon> = {
-  "market-prices": "line-chart",
+const DOMAIN_ICON: Record<DocsDomainId, DocsIconName> = {
+  "market-prices": "candlestick-chart",
   financials: "file-spreadsheet",
   "capital-flows": "landmark",
-  "companies-events": "building-2",
+  "companies-events": "megaphone",
   "structure-reference": "network",
   macro: "activity",
-  derivatives: "search-code",
+  derivatives: "layers",
   "funds-intel": "book-open",
 };
 
@@ -87,7 +114,7 @@ export type DocsSidebarNavGroupSource = {
   id: string;
   label: string;
   labelEn: string;
-  groupIcon: DocsSidebarGroupIcon;
+  groupIcon: DocsIconName;
   items: DocsSidebarNavItemSource[];
 };
 
@@ -98,57 +125,80 @@ export const docsSidebarDashboardItems: DocsSidebarNavItemSource[] = [
   { title: "定價", titleEn: "Pricing", href: "/pricing" },
 ];
 
-// 為 AI Agent 打造 — plain titles + a one-line description each (no icons).
-export const docsSidebarAiAgentItems: DocsSidebarDescribedItemSource[] = [
-  { title: "MCP Server", titleEn: "MCP Server", href: "/docs/ai-agents/mcp-server", description: "以 MCP 連接你的 agent", descriptionEn: "Connect your agent over MCP" },
-  { title: "llms.txt", titleEn: "llms.txt", href: "/docs/ai-agents/llms-txt", description: "機器可讀的能力索引", descriptionEn: "Machine-readable capability index" },
-  { title: "工具清單", titleEn: "Tool manifest", href: "/docs/ai-agents/tool-manifest", description: "每個 dataset 皆為一個 MCP 工具", descriptionEn: "Every dataset is exposed as an MCP tool" },
-  { title: "OpenAPI Spec", titleEn: "OpenAPI Spec", href: "/docs/ai-agents/openapi-spec", description: "完整端點與 schema", descriptionEn: "Full endpoints and schemas" },
-  { title: "Agent 工作流範例", titleEn: "Agent workflow examples", href: "/docs/ai-agents/agent-workflow-examples", description: "端到端 agent 範例", descriptionEn: "End-to-end agent examples" },
-  { title: "Webhooks", titleEn: "Webhooks", href: "/docs/ai-agents/webhooks", building: true, description: "規劃中", descriptionEn: "Planned" },
+// 為 AI Agent 打造 — same shape as every other flat nav section (icon + title, no sub-caption).
+export const docsSidebarAiAgentItems: DocsSidebarNavItemSource[] = [
+  { title: "MCP Server", titleEn: "MCP Server", href: "/docs/ai-agents/mcp-server", icon: "plug" },
+  { title: "llms.txt", titleEn: "llms.txt", href: "/docs/ai-agents/llms-txt", icon: "file-text" },
+  { title: "工具清單", titleEn: "Tool manifest", href: "/docs/ai-agents/tool-manifest", icon: "scroll-text" },
+  { title: "OpenAPI Spec", titleEn: "OpenAPI Spec", href: "/docs/ai-agents/openapi-spec", icon: "braces" },
+  { title: "Agent 工作流範例", titleEn: "Agent workflow examples", href: "/docs/ai-agents/agent-workflow-examples", icon: "bot" },
+  { title: "Webhooks", titleEn: "Webhooks", href: "/docs/ai-agents/webhooks", icon: "webhook", building: true },
 ];
 
 export const docsSidebarOverviewItems: DocsSidebarNavItemSource[] = [
-  { title: "總覽", titleEn: "Overview", href: "/docs/introduction" },
-  { title: "快速開始", titleEn: "Quick start", href: "/docs/quick-start" },
-  { title: "認證", titleEn: "Authentication", href: "/docs/authentication" },
-  { title: "來源政策", titleEn: "Source policy", href: "/docs/source-policy" },
-  { title: "資料分級", titleEn: "Data grades", href: "/docs/data-grades" },
-  { title: "資料血緣", titleEn: "Data lineage", href: "/docs/data-freshness-lineage" },
-  { title: "市場覆蓋", titleEn: "Market coverage", href: "/docs/coverage-overview" },
+  { title: "總覽", titleEn: "Overview", href: "/docs/introduction", icon: "layout-grid" },
+  { title: "快速開始", titleEn: "Quick start", href: "/docs/quick-start", icon: "rocket" },
+  { title: "認證", titleEn: "Authentication", href: "/docs/authentication", icon: "key-round" },
+  { title: "來源政策", titleEn: "Source policy", href: "/docs/source-policy", icon: "file-check" },
+  { title: "資料分級", titleEn: "Data grades", href: "/docs/data-grades", icon: "badge-check" },
+  { title: "資料血緣", titleEn: "Data lineage", href: "/docs/data-freshness-lineage", icon: "waypoints" },
+  { title: "市場覆蓋", titleEn: "Market coverage", href: "/docs/coverage-overview", icon: "globe" },
 ];
 
 export const docsSidebarGuideItems: DocsSidebarNavItemSource[] = [
-  { title: "如何取得財報三表", titleEn: "How to get the 3 financial statements", href: "/docs/guides/financial-statements" },
-  { title: "如何查三大法人籌碼", titleEn: "How to read institutional flows", href: "/docs/guides/institutional-flows" },
-  { title: "如何看市場狀態", titleEn: "How to check market status", href: "/docs/guides/market-status" },
-  { title: "如何接策略・AI Agent", titleEn: "How to wire a strategy / AI agent", href: "/docs/guides/strategy-ai-agent" },
+  { title: "如何取得財報三表", titleEn: "How to get the 3 financial statements", href: "/docs/guides/financial-statements", icon: "calculator" },
+  { title: "如何查三大法人籌碼", titleEn: "How to read institutional flows", href: "/docs/guides/institutional-flows", icon: "users" },
+  { title: "如何看市場狀態", titleEn: "How to check market status", href: "/docs/guides/market-status", icon: "gauge" },
+  { title: "如何接策略・AI Agent", titleEn: "How to wire a strategy / AI agent", href: "/docs/guides/strategy-ai-agent", icon: "brain-circuit" },
 ];
 
 export const docsSidebarSdkItems: DocsSidebarNavItemSource[] = [
-  { title: "Release Status", titleEn: "Release status", href: "/docs/sdk/release-status" },
-  { title: "Python SDK", titleEn: "Python SDK", href: "/docs/sdk/python-sdk" },
-  { title: "JavaScript / TypeScript SDK", titleEn: "JavaScript / TypeScript SDK", href: "/docs/sdk/javascript-sdk" },
+  { title: "Release Status", titleEn: "Release status", href: "/docs/sdk/release-status", icon: "git-branch" },
+  { title: "Python SDK", titleEn: "Python SDK", href: "/docs/sdk/python-sdk", icon: "file-code" },
+  { title: "JavaScript / TypeScript SDK", titleEn: "JavaScript / TypeScript SDK", href: "/docs/sdk/javascript-sdk", icon: "code-2" },
 ];
 
 export const docsSidebarHelpItems: DocsSidebarNavItemSource[] = [
-  { title: "幫助中心", titleEn: "Help center", href: "/help-center" },
+  { title: "幫助中心", titleEn: "Help center", href: "/help-center", icon: "life-buoy" },
 ];
+
+// Every icon in the nav must be unique (Part 1 §F). Rather than trust a manual audit, derive the list
+// from the entries themselves and fail at module load — i.e. at build time, since the sidebar is
+// static — the moment two entries reuse an icon or an entry forgets to declare one.
+export function collectDocsSidebarIconNames(): { href: string; icon: DocsIconName | undefined }[] {
+  return [
+    ...docsSidebarApiGroups.map((group) => ({ href: `group:${group.id}`, icon: group.groupIcon })),
+    ...docsSidebarAiAgentItems,
+    ...docsSidebarOverviewItems,
+    ...docsSidebarGuideItems,
+    ...docsSidebarSdkItems,
+    ...docsSidebarHelpItems,
+  ].map((entry) => ({ href: entry.href, icon: entry.icon }));
+}
+
+const declaredIcons = collectDocsSidebarIconNames();
+const missingIcon = declaredIcons.find((entry) => !entry.icon);
+if (missingIcon) {
+  throw new Error(`[docs-sidebar] nav entry has no icon: ${missingIcon.href}`);
+}
+const seenIcons = new Map<string, string>();
+for (const entry of declaredIcons) {
+  const previous = seenIcons.get(entry.icon as string);
+  if (previous) {
+    throw new Error(`[docs-sidebar] duplicate icon "${entry.icon}" used by ${previous} and ${entry.href}`);
+  }
+  seenIcons.set(entry.icon as string, entry.href);
+}
 
 function projectItem(item: DocsSidebarNavItemSource, en: boolean): DocsSidebarNavItem {
   return {
     title: en ? item.titleEn || item.title : item.title,
     href: item.href,
+    ...(item.icon ? { icon: item.icon } : {}),
     ...(item.grade ? { grade: item.grade } : {}),
     ...(item.building ? { building: true } : {}),
     ...(item.children?.length ? { children: item.children.map((child) => projectItem(child, en)) } : {}),
   };
-}
-
-function projectDescribedItem(item: DocsSidebarDescribedItemSource, en: boolean): DocsSidebarDescribedItem {
-  const base = projectItem(item, en);
-  const description = en ? item.descriptionEn || item.description : item.description;
-  return { ...base, ...(description ? { description } : {}) };
 }
 
 function projectGroup(group: DocsSidebarNavGroupSource, en: boolean): DocsSidebarNavGroup {
@@ -165,7 +215,7 @@ function projectGroup(group: DocsSidebarNavGroupSource, en: boolean): DocsSideba
 export type DocsSidebar = {
   apiGroups: DocsSidebarNavGroup[];
   dashboardItems: DocsSidebarNavItem[];
-  aiAgentItems: DocsSidebarDescribedItem[];
+  aiAgentItems: DocsSidebarNavItem[];
   overviewItems: DocsSidebarNavItem[];
   guideItems: DocsSidebarNavItem[];
   sdkItems: DocsSidebarNavItem[];
@@ -177,7 +227,7 @@ export function getDocsSidebar(locale: AppLocale): DocsSidebar {
   return {
     apiGroups: docsSidebarApiGroups.map((group) => projectGroup(group, en)),
     dashboardItems: docsSidebarDashboardItems.map((item) => projectItem(item, en)),
-    aiAgentItems: docsSidebarAiAgentItems.map((item) => projectDescribedItem(item, en)),
+    aiAgentItems: docsSidebarAiAgentItems.map((item) => projectItem(item, en)),
     overviewItems: docsSidebarOverviewItems.map((item) => projectItem(item, en)),
     guideItems: docsSidebarGuideItems.map((item) => projectItem(item, en)),
     sdkItems: docsSidebarSdkItems.map((item) => projectItem(item, en)),
@@ -228,6 +278,23 @@ export function getAllDocsSidebarLinks(): { href: string; title: string; titleEn
 
 export function findDocsSidebarLink(href: string): { href: string; title: string; titleEn: string } | null {
   return getAllDocsSidebarLinks().find((l) => l.href === href) ?? null;
+}
+
+// ── Dataset search index (sidebar autocomplete) ──
+// One entry per real dataset, built from the catalog SSOT so it can never drift from the sidebar.
+// The matching itself lives in lib/docs/dataset-search.ts (pure, unit-tested).
+export function getDocsDatasetSearchIndex(locale: AppLocale): DocsDatasetSearchEntry[] {
+  const en = locale === "en";
+  return DOCS_DOMAINS.flatMap((domain) =>
+    datasetsByDomain(domain.id).map((d) => ({
+      href: `/docs/api/${d.domain}/${d.slug}`,
+      title: en ? d.en : d.zh,
+      groupLabel: domainDisplayName(domain, locale),
+      slug: d.slug,
+      grade: d.grade,
+      haystack: buildDatasetSearchHaystack(d.zh, d.en, d.slug),
+    })),
+  );
 }
 
 export function resolveDocsGroupTargetHref(href: string): string | null {
