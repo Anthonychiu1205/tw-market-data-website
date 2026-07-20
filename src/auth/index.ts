@@ -63,6 +63,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // subdomains. Do NOT touch csrfToken / any __Host- cookie (the __Host- spec forbids
   // a Domain attribute; adding one breaks sign-in). sameSite stays "lax" (subdomains
   // are same-site). In non-production, ssoCookieDomain is undefined → host-only.
+  //
+  // AUTH-FIX: the OAuth handshake cookies need the same zone scope as the session.
+  // Symptom this fixes — a sign-in started on www.twmarketdata.com wrote a HOST-ONLY
+  // `__Secure-authjs.pkce.code_verifier` on www, while the redirect_uri sent to Google is
+  // always the apex (AUTH_URL). Google then returned the browser to the APEX callback,
+  // which never received the www-scoped cookie:
+  //     InvalidCheck: pkceCodeVerifier value could not be parsed
+  //   → CallbackRouteError → /api/auth/error → the "server configuration" screen.
+  // Scoping them to the zone makes a handshake started on ANY first-party host complete on
+  // the apex, so login no longer depends on a www→apex redirect existing.
+  //
+  // Only `domain` is specified: @auth/core deep-merges over its defaults (lib/utils/cookie.js),
+  // and merge() skips undefined — so names, httpOnly/sameSite/path/secure and the 15-minute
+  // maxAge are preserved, and non-production stays host-only.
   cookies: {
     sessionToken: {
       name: `${useSecureCookies ? "__Secure-" : ""}authjs.session-token`,
@@ -74,11 +88,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         domain: ssoCookieDomain,
       },
     },
+    pkceCodeVerifier: { options: { domain: ssoCookieDomain } },
+    state: { options: { domain: ssoCookieDomain } },
+    nonce: { options: { domain: ssoCookieDomain } },
   },
   trustHost,
   debug: isProduction ? authDebug : true,
   pages: {
     signIn: "/login",
+    // AUTH-FIX: without this, a failed handshake fell through to @auth/core's built-in error
+    // page, which was answering `GET /api/auth/error` with a 500 — so a recoverable sign-in
+    // failure looked like a server crash ("There is a problem with the server configuration").
+    // /login already renders a localized error notice from ?error=, and is the page the user
+    // needs anyway: retry is one click away.
+    error: "/login",
   },
   providers,
   callbacks: {
