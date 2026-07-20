@@ -834,6 +834,8 @@
     "sidebarTitle": "Documentation",
     "onThisPage": "On this page",
     "noSections": "This page has no section outline yet.",
+    "searchPlaceholder": "Search datasets",
+    "searchNoResults": "No datasets match.",
     "expand": " Expand",
     "collapse": " Collapse",
     "breadcrumbHome": "Home",

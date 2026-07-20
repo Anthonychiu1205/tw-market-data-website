@@ -834,6 +834,8 @@
     "sidebarTitle": "文件總覽",
     "onThisPage": "本頁章節",
     "noSections": "本頁目前沒有章節目錄。",
+    "searchPlaceholder": "搜尋資料集",
+    "searchNoResults": "沒有符合的資料集。",
     "expand": "展開",
     "collapse": "收合",
     "breadcrumbHome": "首頁",
