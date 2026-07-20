@@ -1262,6 +1262,2245 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       },
     ],
   },
+
+// ── Market & Prices (16 pages) ──
+// Paste these entries inside DATASET_DOC_CONTENT. In scope at that point: coverageFacts,
+// COVERAGE_FACTS_SNAPSHOT_DATE, fmt(), STANDARD_PARAMS, REFERENCE_PARAMS.
+
+  // tpex-daily-price — verified, TPEx; REAL coverage from the SSOT (rows/stocks/earliestDate).
+  "tpex-daily-price": {
+    slug: "tpex-daily-price",
+    description: {
+      en: "Daily open/high/low/close, volume and turnover for TPEx (over-the-counter) listed stocks, aligned to the official trading calendar.",
+      zh: "上櫃股票的日開高低收、成交量與成交金額,對齊官方交易日曆。",
+    },
+    overview: [
+      {
+        en: "tpex-daily-price returns one row per stock per trading day from the official TPEx daily quote feed. Every row carries its source fields, so a value can be traced back to the exact upstream publication.",
+        zh: "tpex-daily-price 以官方 TPEx 日成交行情為源,每一交易日每檔股票回傳一列,並附來源欄位,任一數值可回溯到上游原始發布。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "close", type: "number", desc: { en: "Closing price.", zh: "收盤價。" } },
+      { name: "volume_shares", type: "number", desc: { en: "Shares traded.", zh: "成交股數。" } },
+      { name: "turnover", type: "number", desc: { en: "Turnover value (TWD).", zh: "成交金額（新台幣）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_tpex).", zh: "正規來源角色（official_tpex）。" } },
+      { name: "updated_at", type: "string", desc: { en: "When this row was last refreshed.", zh: "此列最後更新時間。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "5483",
+      "date": "2026-07-16",
+      "open": 148.5,
+      "high": 151.0,
+      "low": 147.0,
+      "close": 150.5,
+      "volume_shares": 4821000,
+      "turnover": 723160500,
+      "source_role": "official_tpex",
+      "lineage": { "source_authority": "TPEx" },
+      "updated_at": "2026-07-17"
+    }
+  ]
+}`,
+    coverage: {
+      rows: fmt(coverageFacts.tpexDailyPrice.rows),
+      symbols: fmt(coverageFacts.tpexDailyPrice.stocks),
+      window: {
+        en: `${coverageFacts.tpexDailyPrice.earliestDate} → latest trading day`,
+        zh: `${coverageFacts.tpexDailyPrice.earliestDate} → 最新交易日`,
+      },
+      frequency: { en: "Daily (trading days)", zh: "每日（交易日）" },
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: `Row and symbol totals are a database snapshot measured on ${COVERAGE_FACTS_SNAPSHOT_DATE}; the live TPEx feed advances each trading day, so the latest available date is newer than the snapshot and no fixed window end is claimed. The symbol total spans the full TPEx history, including names that have since stopped trading.`,
+        zh: `列數與標的數為 ${COVERAGE_FACTS_SNAPSHOT_DATE} 量測的資料庫快照;即時 TPEx 資料每交易日推進,故實際最新日期會新於快照,不宣稱固定視窗結束日。標的數涵蓋 TPEx 完整歷史,含此後已停止交易的標的。`,
+      },
+    ],
+  },
+
+  // market-prices — verified, TWSE + TPEx unified daily prices; no combined SSOT count → coverage TODO.
+  "market-prices": {
+    slug: "market-prices",
+    description: {
+      en: "Unified daily prices across both boards — TWSE and TPEx open/high/low/close, volume and turnover from a single endpoint.",
+      zh: "跨市場整合日線價格——單一端點提供 TWSE 與 TPEx 的日開高低收、成交量與成交金額。",
+    },
+    overview: [
+      {
+        en: "market-prices merges the official TWSE and TPEx daily quote feeds into one row per stock per trading day, so a query does not need to know which board a ticker trades on. Each row keeps its source role naming the originating exchange, so the value stays traceable to the official publication.",
+        zh: "market-prices 將官方 TWSE 與 TPEx 日成交行情合併為每交易日每檔股票一列,查詢時無須先知道代碼屬於哪個市場。每列保留標明來源交易所的來源角色,數值可回溯官方發布。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "board", type: "string", desc: { en: "Originating board (TWSE / TPEx).", zh: "來源市場（TWSE／TPEx）。" } },
+      { name: "close", type: "number", desc: { en: "Closing price.", zh: "收盤價。" } },
+      { name: "volume_shares", type: "number", desc: { en: "Shares traded.", zh: "成交股數。" } },
+      { name: "turnover", type: "number", desc: { en: "Turnover value (TWD).", zh: "成交金額（新台幣）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse / official_tpex).", zh: "正規來源角色（official_twse／official_tpex）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-16",
+      "board": "TWSE",
+      "open": 2495.0,
+      "high": 2500.0,
+      "low": 2465.0,
+      "close": 2470.0,
+      "volume_shares": 30538604,
+      "turnover": 74750491934,
+      "source_role": "official_twse",
+      "lineage": { "source_authority": "TWSE" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — the combined row / symbol counts and coverage window are pending a measured snapshot; the sources are the official TWSE and TPEx daily quote feeds (present through the latest trading day). The per-board totals are documented on the twse-daily-price and tpex-daily-price pages; no combined number is shown rather than a fabricated one.",
+      zh: "TODO — 合併後的列數／標的數與涵蓋視窗待量測快照;來源為官方 TWSE 與 TPEx 日成交行情(涵蓋至最新交易日)。各市場分別的總數見 twse-daily-price 與 tpex-daily-price 頁面;寧不顯示合併數字也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+  },
+
+  // price-enhanced — derived, TWSE / TPEx; computed change/amplitude/VWAP on top of official daily price.
+  "price-enhanced": {
+    slug: "price-enhanced",
+    description: {
+      en: "Daily price with the common derived fields pre-computed — change, percent change, intraday amplitude and turnover-weighted average price on top of the official quote.",
+      zh: "增強價格欄位,已預先計算常用衍生值——在官方報價之上加上漲跌、漲跌幅、振幅與成交均價。",
+    },
+    overview: [
+      {
+        en: "price-enhanced is a derived dataset: it starts from the official TWSE / TPEx daily quote and adds the change, percent-change, amplitude and volume-weighted price fields an agent would otherwise compute itself. The lineage block points back to the underlying official price so the base values stay auditable.",
+        zh: "price-enhanced 為推導型資料集:以官方 TWSE／TPEx 日報價為基礎,附上原本需自行計算的漲跌、漲跌幅、振幅與成交均價欄位。lineage 欄位回指底層官方價格,基準數值可稽核。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "close", type: "number", desc: { en: "Closing price (from the official quote).", zh: "收盤價（取自官方報價）。" } },
+      { name: "change", type: "number", desc: { en: "Change vs previous close (derived).", zh: "較前一日收盤之漲跌（推導）。" } },
+      { name: "change_pct", type: "number", desc: { en: "Percent change vs previous close (derived).", zh: "較前一日收盤之漲跌幅（推導）。" } },
+      { name: "vwap", type: "number", desc: { en: "Turnover / volume weighted average price (derived).", zh: "成交金額／成交量之成交均價（推導）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_price_enhanced).", zh: "正規來源角色（derived_price_enhanced）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-16",
+      "close": 2470.0,
+      "change": -25.0,
+      "change_pct": -1.002,
+      "amplitude_pct": 1.402,
+      "vwap": 2447.6,
+      "source_role": "derived_price_enhanced",
+      "lineage": {
+        "derived_from": "official_twse / official_tpex daily price",
+        "source_authority": "TWSE / TPEx",
+        "computed_at": "2026-07-17"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the fields are computed from the official TWSE / TPEx daily price (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;欄位由官方 TWSE／TPEx 日價格計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Derived, not disclosed: every enhanced field is computed from the official daily quote, so it inherits any upstream correction to that quote.",
+        zh: "推導而非官方揭露:每個增強欄位皆由官方日報價計算,會承接該報價的任何上游更正。",
+      },
+    ],
+  },
+
+  // adjusted-prices — derived, TWSE / TPEx; dividend/split back-adjusted OHLC.
+  "adjusted-prices": {
+    slug: "adjusted-prices",
+    description: {
+      en: "Dividend- and split-adjusted daily prices — back-adjusted open/high/low/close so a price series is continuous across corporate actions.",
+      zh: "還原日線價格——經配息與分割還原的日開高低收,使價格序列在公司行動前後連續。",
+    },
+    overview: [
+      {
+        en: "adjusted-prices is a derived dataset: the official daily close is back-adjusted for dividends and splits so a chart or return calculation is not distorted by ex-dividend gaps. Each row carries the adjustment factor and lineage back to the official price and corporate-action inputs, so the adjustment is reproducible rather than opaque.",
+        zh: "adjusted-prices 為推導型資料集:官方日收盤經配息與分割還原,使圖表或報酬計算不因除息缺口失真。每列附還原係數與回溯官方價格及公司行動輸入的 lineage,還原過程可重現而非黑箱。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "close", type: "number", desc: { en: "Unadjusted closing price (from the official quote).", zh: "未還原收盤價（取自官方報價）。" } },
+      { name: "adj_close", type: "number", desc: { en: "Back-adjusted closing price (derived).", zh: "還原後收盤價（推導）。" } },
+      { name: "adj_factor", type: "number", desc: { en: "Cumulative adjustment factor applied.", zh: "所套用之累積還原係數。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_adjusted_prices).", zh: "正規來源角色（derived_adjusted_prices）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-16",
+      "close": 2470.0,
+      "adj_close": 2453.8,
+      "adj_factor": 0.99344,
+      "source_role": "derived_adjusted_prices",
+      "lineage": {
+        "derived_from": "official_twse daily price + official corporate actions",
+        "source_authority": "TWSE / TPEx",
+        "computed_at": "2026-07-17"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the adjusted series is computed from the official TWSE / TPEx daily price and corporate-action inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;還原序列由官方 TWSE／TPEx 日價格與公司行動輸入計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Derived, not disclosed: adjustment factors are recomputed as new corporate actions are recorded, so the adjusted history for a past date can shift after a later ex-dividend — pin as_of for reproducible backtests.",
+        zh: "推導而非官方揭露:還原係數會隨新公司行動記錄而重算,故過去某日的還原歷史可能在稍後除息後改變——回測請固定 as_of 以求可重現。",
+      },
+    ],
+  },
+
+  // market-index — verified, TWSE; daily levels for the headline market and sector indices.
+  "market-index": {
+    slug: "market-index",
+    description: {
+      en: "Daily levels for TWSE market indices — the TAIEX and its sector indices, open/high/low/close by trading day.",
+      zh: "TWSE 市場指數日線水準——發行量加權股價指數（TAIEX）及各類股指數的每日開高低收。",
+    },
+    overview: [
+      {
+        en: "market-index returns one row per index per trading day from the official TWSE index publication, covering the headline TAIEX and the sector indices. Each row carries its source role so an index level can be traced back to the exchange feed.",
+        zh: "market-index 以官方 TWSE 指數發布為源,每個指數每交易日回傳一列,涵蓋大盤 TAIEX 與各類股指數。每列附來源角色,指數水準可回溯交易所資料。",
+      },
+    ],
+    fields: [
+      { name: "index_code", type: "string", desc: { en: "Index code (e.g. IX0001 for TAIEX).", zh: "指數代碼（如 IX0001 代表 TAIEX）。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "close", type: "number", desc: { en: "Index closing level.", zh: "指數收盤水準。" } },
+      { name: "open", type: "number", desc: { en: "Index opening level.", zh: "指數開盤水準。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_index).", zh: "正規來源角色（official_twse_index）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "index_code": "IX0001",
+      "date": "2026-07-16",
+      "open": 23180.5,
+      "high": 23310.2,
+      "low": 23120.0,
+      "close": 23255.4,
+      "source_role": "official_twse_index",
+      "lineage": { "source_authority": "TWSE MI_INDEX" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact index / row counts and the coverage window are pending a measured snapshot; the source is the official TWSE index publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確指數／列數與涵蓋視窗待量測快照;來源為官方 TWSE 指數發布(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "For this dataset the symbol param is an index code (e.g. IX0001 for TAIEX), not a stock ticker.",
+        zh: "此資料集的 symbol 參數為指數代碼（如 IX0001 代表 TAIEX），非股票代碼。",
+      },
+    ],
+  },
+
+  // index-data — verified, TWSE; per-index daily record with value, change and percent change.
+  "index-data": {
+    slug: "index-data",
+    description: {
+      en: "Per-index daily data — the index value with its change and percent change against the previous session, one row per index per trading day.",
+      zh: "指數資料日線——每個指數的當日數值及相對前一交易日的漲跌與漲跌幅,每個指數每交易日一列。",
+    },
+    overview: [
+      {
+        en: "index-data returns one row per index per trading day with the index value and its session change, sourced from the official TWSE index publication. It sits alongside market-index as the value-and-change view of the same official series; each row carries its source role for traceability.",
+        zh: "index-data 以官方 TWSE 指數發布為源,每個指數每交易日回傳一列,含指數數值與當日漲跌。它與 market-index 並列,為同一官方序列的「數值與漲跌」視角;每列附來源角色以利追溯。",
+      },
+    ],
+    fields: [
+      { name: "index_code", type: "string", desc: { en: "Index code (e.g. IX0001 for TAIEX).", zh: "指數代碼（如 IX0001 代表 TAIEX）。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "value", type: "number", desc: { en: "Index value at close.", zh: "收盤指數數值。" } },
+      { name: "change", type: "number", desc: { en: "Change vs previous session.", zh: "較前一交易日之漲跌。" } },
+      { name: "change_pct", type: "number", desc: { en: "Percent change vs previous session.", zh: "較前一交易日之漲跌幅。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_index).", zh: "正規來源角色（official_twse_index）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "index_code": "IX0001",
+      "date": "2026-07-16",
+      "value": 23255.4,
+      "change": 74.9,
+      "change_pct": 0.323,
+      "source_role": "official_twse_index",
+      "lineage": { "source_authority": "TWSE MI_INDEX" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact index / row counts and the coverage window are pending a measured snapshot; the source is the official TWSE index publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確指數／列數與涵蓋視窗待量測快照;來源為官方 TWSE 指數發布(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "For this dataset the symbol param is an index code (e.g. IX0001 for TAIEX), not a stock ticker.",
+        zh: "此資料集的 symbol 參數為指數代碼（如 IX0001 代表 TAIEX），非股票代碼。",
+      },
+    ],
+  },
+
+  // index-classification — reference, TWSE; lookup of index code → family / category.
+  "index-classification": {
+    slug: "index-classification",
+    description: {
+      en: "Index classification — the reference lookup mapping each index code to its family and category (broad-market, sector, thematic).",
+      zh: "指數分類——將每個指數代碼對映到所屬家族與類別（大盤、類股、主題）的參考查表。",
+    },
+    overview: [
+      {
+        en: "index-classification is a reference dataset: one record per index describing where it sits in the TWSE index hierarchy. Use it to resolve an index code to its name and category, or to enumerate the indices in a family. It is a lookup snapshot, not a time series of levels.",
+        zh: "index-classification 為參考型資料集:每個指數一筆紀錄,描述其在 TWSE 指數體系中的位置。用於將指數代碼解析為名稱與類別,或列舉某家族下的指數。此為查表快照,非水準時間序列。",
+      },
+    ],
+    fields: [
+      { name: "index_code", type: "string", desc: { en: "Index code.", zh: "指數代碼。" } },
+      { name: "index_name", type: "string", desc: { en: "Index display name.", zh: "指數顯示名稱。" } },
+      { name: "category", type: "string", desc: { en: "Classification (broad-market / sector / thematic).", zh: "分類（大盤／類股／主題）。" } },
+      { name: "family", type: "string", desc: { en: "Index family the code belongs to.", zh: "指數代碼所屬家族。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_index_master).", zh: "正規來源角色（official_twse_index_master）。" } },
+    ],
+    exampleJson: {
+      en: `{
+  "data": [
+    {
+      "index_code": "IX0001",
+      "index_name": "TAIEX",
+      "category": "broad-market",
+      "family": "TWSE composite",
+      "source_role": "official_twse_index_master",
+      "as_of": "2026-05-28"
+    }
+  ]
+}`,
+      zh: `{
+  "data": [
+    {
+      "index_code": "IX0001",
+      "index_name": "發行量加權股價指數",
+      "category": "大盤",
+      "family": "TWSE 綜合指數",
+      "source_role": "official_twse_index_master",
+      "as_of": "2026-05-28"
+    }
+  ]
+}`,
+    },
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact index counts and the classification-snapshot window are pending a measured snapshot; the source is the official TWSE index register (current published indices).",
+      zh: "TODO — 精確指數數與分類快照視窗待量測快照;來源為官方 TWSE 指數登記(現行公布指數)。",
+    },
+    params: REFERENCE_PARAMS,
+    notes: [
+      {
+        en: "Reference lookup snapshot — not a time series; it does not reconstruct how an index was classified at a past date.",
+        zh: "參考查表快照——非時間序列;無法重建某指數在過去某日的分類方式。",
+      },
+    ],
+  },
+
+  // index-constituents — derived, TWSE; the member list (with weights) of each index.
+  "index-constituents": {
+    slug: "index-constituents",
+    description: {
+      en: "Index constituents — the member securities of each index with their weights, resolved from the official index and market data.",
+      zh: "指數成分股——每個指數的成分證券及其權重,由官方指數與市場資料解析而得。",
+    },
+    overview: [
+      {
+        en: "index-constituents returns one row per member security of an index, with the weight it carries. It is a derived surface: the membership comes from the official index definition and the weights are computed from official market data, so a constituent list is reproducible rather than opaque. Each row carries lineage back to those inputs.",
+        zh: "index-constituents 針對某指數的每檔成分證券回傳一列,含其權重。此為推導面:成分來自官方指數定義,權重由官方市場資料計算,成分清單可重現而非黑箱。每列附回溯上述輸入的 lineage。",
+      },
+    ],
+    fields: [
+      { name: "index_code", type: "string", desc: { en: "Index code the constituents belong to.", zh: "成分股所屬指數代碼。" } },
+      { name: "symbol", type: "string", desc: { en: "Constituent ticker.", zh: "成分股股票代碼。" } },
+      { name: "weight_pct", type: "number", desc: { en: "Weight of the constituent in the index (percent, derived).", zh: "成分股於指數中的權重（百分比,推導）。" } },
+      { name: "as_of", type: "string", desc: { en: "Data date the membership was resolved against.", zh: "成分解析所依據的資料日期。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_index_constituents).", zh: "正規來源角色（derived_index_constituents）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "index_code": "IX0001",
+      "symbol": "2330",
+      "weight_pct": 38.42,
+      "as_of": "2026-07-16",
+      "source_role": "derived_index_constituents",
+      "lineage": {
+        "derived_from": "official_twse index definition + official_twse market data",
+        "source_authority": "TWSE",
+        "computed_at": "2026-07-17"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact index / constituent counts and the coverage window are pending a measured snapshot; membership comes from the official TWSE index definition and weights are computed from official market data (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確指數／成分股數與涵蓋視窗待量測快照;成分來自官方 TWSE 指數定義,權重由官方市場資料計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "For this dataset the symbol param is an index code (e.g. IX0001), which selects the index whose constituents you want. Weights are derived and change with prices — pin as_of to reproduce a membership snapshot.",
+        zh: "此資料集的 symbol 參數為指數代碼（如 IX0001），用以選取欲查詢成分的指數。權重為推導值且隨價格變動——固定 as_of 以重現某次成分快照。",
+      },
+    ],
+  },
+
+  // return-index-daily — derived, TWSE; daily total-return index (dividends reinvested).
+  "return-index-daily": {
+    slug: "return-index-daily",
+    description: {
+      en: "Daily total-return index — the dividends-reinvested counterpart of the price index, one level per index per trading day.",
+      zh: "報酬指數日線——含息（股利再投入）的報酬指數,每個指數每交易日一個水準值。",
+    },
+    overview: [
+      {
+        en: "return-index-daily returns the total-return (dividends-reinvested) index level per index per trading day. It is a derived series computed from the official price index and the corporate-action inputs, giving a like-for-like total-return measure; each row carries lineage back to those official inputs so the level is auditable.",
+        zh: "return-index-daily 每個指數每交易日回傳含息（股利再投入）報酬指數水準。此為由官方價格指數與公司行動輸入計算的推導序列,提供可對比的總報酬衡量;每列附回溯上述官方輸入的 lineage,水準值可稽核。",
+      },
+    ],
+    fields: [
+      { name: "index_code", type: "string", desc: { en: "Index code (e.g. IR0001 total-return TAIEX).", zh: "指數代碼（如 IR0001 加權股價報酬指數）。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "return_index", type: "number", desc: { en: "Total-return index level (dividends reinvested).", zh: "含息報酬指數水準（股利再投入）。" } },
+      { name: "change_pct", type: "number", desc: { en: "Percent change vs previous session (derived).", zh: "較前一交易日之漲跌幅（推導）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_return_index).", zh: "正規來源角色（derived_return_index）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "index_code": "IR0001",
+      "date": "2026-07-16",
+      "return_index": 41880.7,
+      "change_pct": 0.331,
+      "source_role": "derived_return_index",
+      "lineage": {
+        "derived_from": "official_twse price index + official corporate actions",
+        "source_authority": "TWSE MI_INDEX",
+        "computed_at": "2026-07-17"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact index / row counts and the coverage window are pending a measured snapshot; the return index is computed from the official TWSE price index and corporate-action inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確指數／列數與涵蓋視窗待量測快照;報酬指數由官方 TWSE 價格指數與公司行動輸入計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "For this dataset the symbol param is an index code (e.g. IR0001), not a stock ticker. The total-return level is derived — where TWSE also publishes an official return index, values are reconciled against it.",
+        zh: "此資料集的 symbol 參數為指數代碼（如 IR0001），非股票代碼。報酬水準為推導值——若 TWSE 亦公布官方報酬指數,數值會與其對帳。",
+      },
+    ],
+  },
+
+  // market-snapshot — verified, TWSE; latest whole-market quote snapshot, one row per symbol.
+  "market-snapshot": {
+    slug: "market-snapshot",
+    description: {
+      en: "Whole-market quote snapshot — the latest official price snapshot for every symbol in one call, one row per security.",
+      zh: "全市場報價快照——一次呼叫取得每檔證券的最新官方價格快照,每檔證券一列。",
+    },
+    overview: [
+      {
+        en: "market-snapshot returns the latest official quote for each security across the market as a single snapshot, so an agent can read the whole board's last prices in one call rather than iterating symbol by symbol. Each row carries its source role and the snapshot date so the value stays traceable to the official feed.",
+        zh: "market-snapshot 以單一快照回傳全市場每檔證券的最新官方報價,讓 agent 一次呼叫即可讀取全盤最新價格,而非逐檔查詢。每列附來源角色與快照日期,數值可回溯官方資料。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "snapshot_date", type: "string", desc: { en: "Trading date the snapshot reflects.", zh: "快照所反映的交易日。" } },
+      { name: "last", type: "number", desc: { en: "Latest price in the snapshot.", zh: "快照中的最新價格。" } },
+      { name: "change_pct", type: "number", desc: { en: "Percent change vs previous close.", zh: "較前一日收盤之漲跌幅。" } },
+      { name: "volume_shares", type: "number", desc: { en: "Shares traded in the session.", zh: "當日成交股數。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_snapshot).", zh: "正規來源角色（official_twse_snapshot）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "snapshot_date": "2026-07-16",
+      "last": 2470.0,
+      "change_pct": -1.002,
+      "volume_shares": 30538604,
+      "source_role": "official_twse_snapshot",
+      "lineage": { "source_authority": "TWSE" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — the size of the snapshot universe and the snapshot window are pending a measured snapshot; the source is the official TWSE quote feed (latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 快照涵蓋的宇宙規模與快照視窗待量測快照;來源為官方 TWSE 報價(最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Snapshot surface: it returns the latest available session per symbol, not a long daily history — use twse-daily-price / tpex-daily-price for the full time series.",
+        zh: "快照面:回傳每檔的最新可得交易日,非長期每日歷史——完整時間序列請用 twse-daily-price／tpex-daily-price。",
+      },
+    ],
+  },
+
+  // market-overview-snapshots — reference, TWSE; market-level overview aggregates, partial coverage.
+  "market-overview-snapshots": {
+    slug: "market-overview-snapshots",
+    description: {
+      en: "Market overview snapshots — board-level aggregates per trading day: index level, total turnover and the up/down/unchanged counts.",
+      zh: "市場概況快照——每交易日的市場層級匯總:指數水準、總成交金額與上漲／下跌／平盤家數。",
+    },
+    overview: [
+      {
+        en: "market-overview-snapshots returns one aggregate row per board per trading day summarizing the whole market — the index level, total turnover and the count of advancing, declining and unchanged securities. It is a reference overview surface; each row carries its source role so the figures trace back to the official publication. Coverage is partial while the historical backfill is completed.",
+        zh: "market-overview-snapshots 每個市場每交易日回傳一列匯總,概括全市場——指數水準、總成交金額與上漲、下跌、平盤家數。此為參考型概況面;每列附來源角色,數字可回溯官方發布。歷史回補完成前,涵蓋為部分。",
+      },
+    ],
+    fields: [
+      { name: "board", type: "string", desc: { en: "Board (TWSE / TPEx).", zh: "市場別（TWSE／TPEx）。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "total_turnover", type: "number", desc: { en: "Total market turnover (TWD).", zh: "市場總成交金額（新台幣）。" } },
+      { name: "advancers", type: "number", desc: { en: "Count of advancing securities.", zh: "上漲家數。" } },
+      { name: "decliners", type: "number", desc: { en: "Count of declining securities.", zh: "下跌家數。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_market_overview).", zh: "正規來源角色（official_twse_market_overview）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "board": "TWSE",
+      "date": "2026-07-16",
+      "index_close": 23255.4,
+      "total_turnover": 412580000000,
+      "advancers": 512,
+      "decliners": 388,
+      "unchanged": 120,
+      "source_role": "official_twse_market_overview",
+      "lineage": { "source_authority": "TWSE" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx market-summary publication. Coverage is partial while the historical backfill is completed, so no counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數與涵蓋視窗待量測快照;來源為官方 TWSE／TPEx 市場總計發布。歷史回補完成前涵蓋為部分,寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Partial coverage: this overview surface is being backfilled, so the historical window may be shorter than the per-stock price datasets. Treat it as a market-level summary, not a per-security feed.",
+        zh: "部分涵蓋:此概況面仍在回補,故歷史視窗可能短於逐檔價格資料集。請視為市場層級摘要,而非逐檔證券資料。",
+      },
+    ],
+  },
+
+  // market-breadth — derived, TWSE; computed breadth metrics, partial coverage.
+  "market-breadth": {
+    slug: "market-breadth",
+    description: {
+      en: "Market breadth — derived breadth metrics per trading day: advance/decline counts and ratio, and new highs vs new lows.",
+      zh: "市場廣度——每交易日的推導廣度指標:上漲／下跌家數與比率,以及創新高對創新低家數。",
+    },
+    overview: [
+      {
+        en: "market-breadth is a derived dataset: it computes the breadth statistics — advancers, decliners, the advance/decline ratio and new-high vs new-low counts — from the official per-security daily prices. The lineage block points back to that official price data so the breadth reading is reproducible. Coverage is partial while the historical backfill is completed.",
+        zh: "market-breadth 為推導型資料集:由官方逐檔日價格計算廣度統計——上漲、下跌家數、漲跌比與創新高／創新低家數。lineage 欄位回指該官方價格資料,廣度讀數可重現。歷史回補完成前,涵蓋為部分。",
+      },
+    ],
+    fields: [
+      { name: "board", type: "string", desc: { en: "Board (TWSE / TPEx).", zh: "市場別（TWSE／TPEx）。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "advancers", type: "number", desc: { en: "Count of advancing securities (derived).", zh: "上漲家數（推導）。" } },
+      { name: "decliners", type: "number", desc: { en: "Count of declining securities (derived).", zh: "下跌家數（推導）。" } },
+      { name: "ad_ratio", type: "number", desc: { en: "Advance/decline ratio (derived).", zh: "漲跌比（推導）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_market_breadth).", zh: "正規來源角色（derived_market_breadth）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "board": "TWSE",
+      "date": "2026-07-16",
+      "advancers": 512,
+      "decliners": 388,
+      "unchanged": 120,
+      "ad_ratio": 1.320,
+      "new_highs": 47,
+      "new_lows": 12,
+      "source_role": "derived_market_breadth",
+      "lineage": {
+        "derived_from": "official_twse daily price",
+        "source_authority": "TWSE",
+        "computed_at": "2026-07-17"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the metrics are computed from the official TWSE / TPEx per-security daily prices. Coverage is partial while the historical backfill is completed, so no counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數與涵蓋視窗待量測快照;指標由官方 TWSE／TPEx 逐檔日價格計算。歷史回補完成前涵蓋為部分,寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Derived and partially covered: breadth is computed from the official per-security prices and the historical window is still being backfilled, so it may be shorter than the price datasets it is built from.",
+        zh: "推導且部分涵蓋:廣度由官方逐檔價格計算,歷史視窗仍在回補,故可能短於其所依據的價格資料集。",
+      },
+    ],
+  },
+
+  // technical-indicators — derived, TWSE / TPEx; computed TA indicators on top of daily price.
+  "technical-indicators": {
+    slug: "technical-indicators",
+    description: {
+      en: "Technical indicators — common TA signals (moving averages, RSI, MACD) pre-computed per stock per trading day from the official price.",
+      zh: "技術指標——由官方價格預先計算的常用技術訊號（移動平均、RSI、MACD）,每檔股票每交易日一列。",
+    },
+    overview: [
+      {
+        en: "technical-indicators is a derived dataset: it computes the standard technical signals from the official TWSE / TPEx daily prices so an agent does not have to maintain the rolling windows itself. The lineage block points back to the underlying official price, so each indicator value is reproducible rather than a black box.",
+        zh: "technical-indicators 為推導型資料集:由官方 TWSE／TPEx 日價格計算標準技術訊號,讓 agent 無須自行維護滾動視窗。lineage 欄位回指底層官方價格,每個指標值可重現而非黑箱。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "sma_20", type: "number", desc: { en: "20-day simple moving average (derived).", zh: "20 日簡單移動平均（推導）。" } },
+      { name: "rsi_14", type: "number", desc: { en: "14-day relative strength index (derived).", zh: "14 日相對強弱指標（推導）。" } },
+      { name: "macd", type: "number", desc: { en: "MACD line (derived).", zh: "MACD 線（推導）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_technical_indicators).", zh: "正規來源角色（derived_technical_indicators）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-16",
+      "sma_20": 2438.6,
+      "rsi_14": 57.2,
+      "macd": 18.4,
+      "source_role": "derived_technical_indicators",
+      "lineage": {
+        "derived_from": "official_twse / official_tpex daily price",
+        "source_authority": "TWSE / TPEx",
+        "computed_at": "2026-07-17"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the indicators are computed from the official TWSE / TPEx daily price (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;指標由官方 TWSE／TPEx 日價格計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Derived, not disclosed: every indicator is computed from the official daily price, so early rows in a rolling window (e.g. before 20 sessions exist) may be null until the window fills.",
+        zh: "推導而非官方揭露:每個指標皆由官方日價格計算,故滾動視窗初期(如未滿 20 個交易日前)的列可能為 null,直到視窗填滿。",
+      },
+    ],
+  },
+
+  // stock-price-limit-daily — verified, TWSE; official daily up/down limit prices.
+  "stock-price-limit-daily": {
+    slug: "stock-price-limit-daily",
+    description: {
+      en: "Daily price limits — the official upper and lower limit prices and the reference price for each stock per trading day.",
+      zh: "漲跌停價日線——每檔股票每交易日的官方漲停價、跌停價與參考價。",
+    },
+    overview: [
+      {
+        en: "stock-price-limit-daily returns one row per stock per trading day with the official upper and lower price limits and the reference price they are computed from. Each row carries its source role, so the limits trace back to the exchange publication rather than being re-derived on the client.",
+        zh: "stock-price-limit-daily 每檔股票每交易日回傳一列,含官方漲停價、跌停價及其計算所依據的參考價。每列附來源角色,漲跌停價可回溯交易所發布,而非於客戶端重新推導。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "reference_price", type: "number", desc: { en: "Reference price the limits are set from.", zh: "計算漲跌停之參考價。" } },
+      { name: "limit_up", type: "number", desc: { en: "Upper limit price.", zh: "漲停價。" } },
+      { name: "limit_down", type: "number", desc: { en: "Lower limit price.", zh: "跌停價。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_price_limit).", zh: "正規來源角色（official_twse_price_limit）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-16",
+      "reference_price": 2495.0,
+      "limit_up": 2740.0,
+      "limit_down": 2250.0,
+      "source_role": "official_twse_price_limit",
+      "lineage": { "source_authority": "TWSE" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx price-limit publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;來源為官方 TWSE／TPEx 漲跌停價發布(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+  },
+
+  // valuation-core-daily — derived, TWSE / TPEx; core daily valuation ratios.
+  "valuation-core-daily": {
+    slug: "valuation-core-daily",
+    description: {
+      en: "Core daily valuation — per-share valuation ratios (PER, PBR, dividend yield) per stock per trading day.",
+      zh: "核心估值日線——每檔股票每交易日的核心估值比率（本益比、股價淨值比、殖利率）。",
+    },
+    overview: [
+      {
+        en: "valuation-core-daily is a derived dataset: it combines the official daily price with per-share earnings, book value and dividend inputs to give the core valuation ratios per stock per trading day. The lineage block names what each ratio was computed from, so a valuation stays auditable rather than opaque.",
+        zh: "valuation-core-daily 為推導型資料集:結合官方日價格與每股盈餘、每股淨值及股利輸入,得出每檔股票每交易日的核心估值比率。lineage 欄位標明每個比率的計算來源,估值可稽核而非黑箱。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "per", type: "number", desc: { en: "Price-to-earnings ratio (derived).", zh: "本益比（推導）。" } },
+      { name: "pbr", type: "number", desc: { en: "Price-to-book ratio (derived).", zh: "股價淨值比（推導）。" } },
+      { name: "dividend_yield", type: "number", desc: { en: "Dividend yield (ratio, derived).", zh: "殖利率（比值,推導）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_valuation_core).", zh: "正規來源角色（derived_valuation_core）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-16",
+      "per": 22.4,
+      "pbr": 6.1,
+      "dividend_yield": 0.0134,
+      "source_role": "derived_valuation_core",
+      "lineage": {
+        "derived_from": "official_twse daily price + MOPS earnings / dividends",
+        "source_authority": "TWSE / TPEx / MOPS",
+        "computed_at": "2026-07-17"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the ratios are computed from the official TWSE / TPEx daily price and MOPS earnings / dividend inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;比率由官方 TWSE／TPEx 日價格與 MOPS 盈餘／股利輸入計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Derived, not disclosed: ratios combine the official price with point-in-time earnings and dividend figures, which get restated — pin as_of for backtests so a past valuation uses only figures public at that moment.",
+        zh: "推導而非官方揭露:比率結合官方價格與具時間點敏感性的盈餘與股利數字,該等數字會重編——回測請固定 as_of,使過去估值僅採用當下已公開的數字。",
+      },
+    ],
+  },
+
+  // valuation-data — derived, TWSE / TPEx / MOPS; broader valuation record incl. market cap.
+  "valuation-data": {
+    slug: "valuation-data",
+    description: {
+      en: "Valuation data — the fuller per-stock valuation record: the core ratios plus market capitalization and shares outstanding, per trading day.",
+      zh: "估值資料——更完整的逐檔估值紀錄:核心比率加上市值與流通在外股數,每交易日一列。",
+    },
+    overview: [
+      {
+        en: "valuation-data is a derived dataset that extends the core valuation ratios with market capitalization and shares-outstanding context per stock per trading day, computed from the official price and MOPS financial inputs. The lineage block points back to those official sources so each figure is reproducible rather than a standalone assertion.",
+        zh: "valuation-data 為推導型資料集,在核心估值比率之外,加上每檔股票每交易日的市值與流通在外股數脈絡,係由官方價格與 MOPS 財務輸入計算。lineage 欄位回指上述官方來源,每個數字可重現而非孤立主張。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "market_cap", type: "number", desc: { en: "Market capitalization (TWD, derived).", zh: "市值（新台幣,推導）。" } },
+      { name: "shares_outstanding", type: "number", desc: { en: "Shares outstanding used in the calculation.", zh: "計算所用之流通在外股數。" } },
+      { name: "per", type: "number", desc: { en: "Price-to-earnings ratio (derived).", zh: "本益比（推導）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_valuation_data).", zh: "正規來源角色（derived_valuation_data）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-16",
+      "market_cap": 64050000000000,
+      "shares_outstanding": 25930380458,
+      "per": 22.4,
+      "pbr": 6.1,
+      "dividend_yield": 0.0134,
+      "source_role": "derived_valuation_data",
+      "lineage": {
+        "derived_from": "official_twse daily price + MOPS financials",
+        "source_authority": "TWSE / TPEx / MOPS",
+        "computed_at": "2026-07-17"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the figures are computed from the official TWSE / TPEx daily price and MOPS financial inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;數字由官方 TWSE／TPEx 日價格與 MOPS 財務輸入計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Derived, not disclosed: market cap and ratios combine the official price with point-in-time shares and financial figures, which get restated — pin as_of for backtests so a past valuation uses only figures public at that moment.",
+        zh: "推導而非官方揭露:市值與比率結合官方價格與具時間點敏感性的股數與財務數字,該等數字會重編——回測請固定 as_of,使過去估值僅採用當下已公開的數字。",
+      },
+    ],
+  },
+
+// capital-flows / institutional-flow-market-aggregate — DERIVED, market-wide aggregation of the T86 three-investor flows → TODO coverage
+  "institutional-flow-market-aggregate": {
+    slug: "institutional-flow-market-aggregate",
+    description: {
+      en: "Market-wide net buy/sell by the three major institutional investor groups per trading day, aggregated across all listed stocks from the official T86 report.",
+      zh: "三大法人每交易日全市場買賣超彙總，由官方 T86 報表跨全體上市股票加總而得。",
+    },
+    overview: [
+      {
+        en: "institutional-flow-market-aggregate is a derived dataset: it sums the per-stock foreign, investment-trust and dealer flows from the official TWSE T86 report into one market-wide row per trading day, so an agent can read the whole-market institutional stance without fetching and summing every stock. The lineage block points back to the underlying T86 source so the aggregate stays auditable.",
+        zh: "institutional-flow-market-aggregate 為推導型資料集：將官方 TWSE T86 報表中每檔股票的外資、投信、自營商買賣超加總為每交易日一列的全市場資料，讓 agent 無須逐檔抓取加總即可讀取整體法人動向；lineage 欄位回指底層 T86 來源，彙總值可稽核。",
+      },
+    ],
+    fields: [
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "foreign_net", type: "number", desc: { en: "Market-wide foreign investor net (shares).", zh: "全市場外資買賣超（股）。" } },
+      { name: "trust_net", type: "number", desc: { en: "Market-wide investment-trust net (shares).", zh: "全市場投信買賣超（股）。" } },
+      { name: "dealer_net", type: "number", desc: { en: "Market-wide dealer net (shares).", zh: "全市場自營商買賣超（股）。" } },
+      { name: "total_net", type: "number", desc: { en: "Combined three-investor net (shares).", zh: "三大法人合計買賣超（股）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_twse_institutional_aggregate).", zh: "正規來源角色（derived_twse_institutional_aggregate）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "date": "2026-07-17",
+      "foreign_net": -412580000,
+      "trust_net": 38150000,
+      "dealer_net": 9420000,
+      "total_net": -365010000,
+      "source_role": "derived_twse_institutional_aggregate",
+      "lineage": {
+        "derived_from": "official_twse_t86",
+        "source_authority": "TWSE T86",
+        "computed_at": "2026-07-18"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the figures are aggregated from the official TWSE T86 daily report (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數與涵蓋視窗待量測快照；數字由官方 TWSE T86 每日報表加總（涵蓋至最新交易日）。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Derived, not disclosed: this is a market-wide roll-up computed from the per-stock T86 flows, so it inherits any upstream is_placeholder rows — reconcile against institutional-flow when a single day looks off.",
+        zh: "推導而非官方揭露：此為由逐檔 T86 買賣超計算的全市場彙總，會承接上游任何 is_placeholder 列——單日數字異常時請與 institutional-flow 對帳。",
+      },
+    ],
+  },
+
+  // capital-flows / institutional-ownership — verified, TWSE per-stock foreign/institutional holdings → TODO coverage
+  "institutional-ownership": {
+    slug: "institutional-ownership",
+    description: {
+      en: "Foreign and institutional holdings per listed stock per trading day, sourced from the official TWSE shareholding disclosure — shares held and holding ratio.",
+      zh: "每檔上市股票每交易日的外資與法人持股，來源為官方 TWSE 持股揭露——持有股數與持股比率。",
+    },
+    overview: [
+      {
+        en: "institutional-ownership returns one row per stock per trading day with the foreign and institutional shares held and the corresponding holding ratio, sourced from the official TWSE shareholding disclosure. Each row carries its source role so the holding figure is traceable to the official report rather than taken on trust.",
+        zh: "institutional-ownership 以官方 TWSE 持股揭露為源，每交易日每檔股票回傳一列，含外資與法人持有股數及對應持股比率；每列附來源角色，持股數字可回溯官方報表而非僅憑信任。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "foreign_shares_held", type: "number", desc: { en: "Shares held by foreign investors.", zh: "外資持有股數。" } },
+      { name: "foreign_holding_ratio", type: "number", desc: { en: "Foreign holding as a ratio of issued shares (0-1).", zh: "外資持股占已發行股數比率（0-1）。" } },
+      { name: "issued_shares", type: "number", desc: { en: "Total issued shares for the ratio base.", zh: "作為比率分母的已發行股數。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_shareholding).", zh: "正規來源角色（official_twse_shareholding）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-17",
+      "foreign_shares_held": 21870540000,
+      "foreign_holding_ratio": 0.8434,
+      "issued_shares": 25930380000,
+      "source_role": "official_twse_shareholding",
+      "lineage": { "source_authority": "TWSE" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE shareholding disclosure (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；來源為官方 TWSE 持股揭露（涵蓋至最新交易日）。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "The holding ratio uses issued shares as the base; the disclosed figure is a settlement-dated snapshot, so it lags trades by the standard settlement cycle.",
+        zh: "持股比率以已發行股數為分母；揭露數字為交割日基準的快照，故較成交落後一個標準交割週期。",
+      },
+    ],
+  },
+
+  // capital-flows / margin-short — reference (private-beta / preview), TWSE margin & short balances → TODO coverage
+  "margin-short": {
+    slug: "margin-short",
+    description: {
+      en: "Daily margin-purchase and short-sale balances per listed stock from the official TWSE margin trading report.",
+      zh: "每檔上市股票每日融資與融券餘額，來源為官方 TWSE 信用交易報表。",
+    },
+    overview: [
+      {
+        en: "margin-short returns one row per stock per trading day with the margin-purchase and short-sale balances from the official TWSE margin trading report. Each row carries its source role so a balance is traceable to the official report. This endpoint is a preview surface — coverage is currently partial and served as a snapshot rather than a fully backfilled history.",
+        zh: "margin-short 以官方 TWSE 信用交易報表為源，每交易日每檔股票回傳一列，含融資與融券餘額；每列附來源角色，餘額可回溯官方報表。此端點為預覽面——目前涵蓋為部分資料，以快照形式提供，尚非完整回補的歷史。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "margin_balance", type: "number", desc: { en: "Margin-purchase balance (shares).", zh: "融資餘額（股）。" } },
+      { name: "short_balance", type: "number", desc: { en: "Short-sale balance (shares).", zh: "融券餘額（股）。" } },
+      { name: "margin_quota", type: "number", desc: { en: "Margin balance limit for the stock (shares).", zh: "該股融資限額（股）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_margin).", zh: "正規來源角色（official_twse_margin）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-17",
+      "margin_balance": 3182000,
+      "short_balance": 415000,
+      "margin_quota": 6482595000,
+      "source_role": "official_twse_margin",
+      "lineage": { "source_authority": "TWSE" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE margin trading report. This is a preview surface with partial, snapshot-only coverage, so no counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；來源為官方 TWSE 信用交易報表。此為預覽面，涵蓋為部分且僅快照，故不顯示計數而非捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Preview grade: coverage is partial and served as a snapshot, not a fully backfilled daily history — do not assume every stock or every trading day is present.",
+        zh: "預覽等級：涵蓋為部分且以快照提供，非完整回補的每日歷史——請勿假設每檔股票或每個交易日皆存在。",
+      },
+    ],
+  },
+
+  // capital-flows / margin-short-enhanced — DERIVED, utilization & change metrics on top of margin & short → TODO coverage
+  "margin-short-enhanced": {
+    slug: "margin-short-enhanced",
+    description: {
+      en: "Margin and short balances with utilization and day-over-day change pre-computed on top of the official TWSE margin trading figures.",
+      zh: "增強融資融券，在官方 TWSE 信用交易數字之上預先計算使用率與日變動。",
+    },
+    overview: [
+      {
+        en: "margin-short-enhanced is a derived dataset: it starts from the official TWSE margin-purchase and short-sale balances and adds the utilization ratios and day-over-day changes an agent would otherwise compute itself. The lineage block points back to the underlying margin report so the base balances stay auditable.",
+        zh: "margin-short-enhanced 為推導型資料集：以官方 TWSE 融資與融券餘額為基礎，附上原本需自行計算的使用率與日變動。lineage 欄位回指底層信用交易報表，基準餘額可稽核。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "margin_balance", type: "number", desc: { en: "Margin-purchase balance (shares).", zh: "融資餘額（股）。" } },
+      { name: "margin_utilization", type: "number", desc: { en: "Margin balance as a ratio of its quota (0-1).", zh: "融資餘額占融資限額比率（0-1）。" } },
+      { name: "margin_change", type: "number", desc: { en: "Day-over-day change in margin balance (shares).", zh: "融資餘額日變動（股）。" } },
+      { name: "short_margin_ratio", type: "number", desc: { en: "Short balance as a ratio of margin balance.", zh: "券資比（融券餘額占融資餘額比值）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_twse_margin_enhanced).", zh: "正規來源角色（derived_twse_margin_enhanced）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-17",
+      "margin_balance": 3182000,
+      "margin_utilization": 0.00049,
+      "margin_change": -18000,
+      "short_margin_ratio": 0.1304,
+      "source_role": "derived_twse_margin_enhanced",
+      "lineage": {
+        "derived_from": "official_twse_margin",
+        "source_authority": "TWSE",
+        "computed_at": "2026-07-18"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the metrics are computed from the official TWSE margin trading report (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；指標由官方 TWSE 信用交易報表計算（涵蓋至最新交易日）。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Derived, not disclosed: utilization and change are computed from the official TWSE margin balances, so they inherit the base report's partial coverage — a metric is only present where the underlying balance exists.",
+        zh: "推導而非官方揭露：使用率與變動由官方 TWSE 融資餘額計算，會承接基礎報表的部分涵蓋——僅在底層餘額存在時才有指標值。",
+      },
+    ],
+  },
+
+  // capital-flows / total-margin-short — reference (private-beta / preview), TWSE market-wide margin & short totals → TODO coverage
+  "total-margin-short": {
+    slug: "total-margin-short",
+    description: {
+      en: "Market-wide total margin-purchase and short-sale balances per trading day from the official TWSE margin trading report.",
+      zh: "全市場每交易日融資與融券總餘額，來源為官方 TWSE 信用交易報表。",
+    },
+    overview: [
+      {
+        en: "total-margin-short returns one market-wide row per trading day with the total margin-purchase and short-sale balances across all listed stocks, sourced from the official TWSE margin trading report. Each row carries its source role so the totals are traceable. This endpoint is a preview surface — coverage is currently partial and served as a snapshot rather than a fully backfilled history.",
+        zh: "total-margin-short 以官方 TWSE 信用交易報表為源，每交易日回傳一列全市場資料，含全體上市股票的融資與融券總餘額；每列附來源角色，總額可追溯。此端點為預覽面——目前涵蓋為部分資料，以快照形式提供，尚非完整回補的歷史。",
+      },
+    ],
+    fields: [
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "total_margin_balance", type: "number", desc: { en: "Market-wide margin-purchase balance (TWD thousands).", zh: "全市場融資總餘額（新台幣仟元）。" } },
+      { name: "total_short_balance", type: "number", desc: { en: "Market-wide short-sale balance (shares thousands).", zh: "全市場融券總餘額（仟股）。" } },
+      { name: "margin_change", type: "number", desc: { en: "Day-over-day change in total margin balance (TWD thousands).", zh: "融資總餘額日變動（新台幣仟元）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_margin_total).", zh: "正規來源角色（official_twse_margin_total）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "date": "2026-07-17",
+      "total_margin_balance": 285640000,
+      "total_short_balance": 612450,
+      "margin_change": -1840000,
+      "source_role": "official_twse_margin_total",
+      "lineage": { "source_authority": "TWSE" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the source is the official TWSE margin trading report. This is a preview surface with partial, snapshot-only coverage, so no counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數與涵蓋視窗待量測快照；來源為官方 TWSE 信用交易報表。此為預覽面，涵蓋為部分且僅快照，故不顯示計數而非捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Preview grade: coverage is partial and served as a snapshot, not a fully backfilled daily history — do not assume every trading day is present.",
+        zh: "預覽等級：涵蓋為部分且以快照提供，非完整回補的每日歷史——請勿假設每個交易日皆存在。",
+      },
+    ],
+  },
+
+  // capital-flows / securities-lending — verified, TWSE securities-lending balances → TODO coverage
+  "securities-lending": {
+    slug: "securities-lending",
+    description: {
+      en: "Daily securities-lending balances per listed stock from the official TWSE securities-lending report — lent shares and outstanding balance.",
+      zh: "每檔上市股票每日借券餘額，來源為官方 TWSE 借券報表——出借股數與未償還餘額。",
+    },
+    overview: [
+      {
+        en: "securities-lending returns one row per stock per trading day with the securities-lending volume and outstanding balance from the official TWSE report. Each row carries its source role so a balance is traceable to the official report rather than taken on trust.",
+        zh: "securities-lending 以官方 TWSE 借券報表為源，每交易日每檔股票回傳一列，含借券成交量與未償還餘額；每列附來源角色，餘額可回溯官方報表而非僅憑信任。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "lending_volume", type: "number", desc: { en: "Shares lent on the day.", zh: "當日借券成交股數。" } },
+      { name: "lending_balance", type: "number", desc: { en: "Outstanding securities-lending balance (shares).", zh: "借券未償還餘額（股）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_securities_lending).", zh: "正規來源角色（official_twse_securities_lending）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-17",
+      "lending_volume": 1284000,
+      "lending_balance": 58720000,
+      "source_role": "official_twse_securities_lending",
+      "lineage": { "source_authority": "TWSE" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE securities-lending report (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；來源為官方 TWSE 借券報表（涵蓋至最新交易日）。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "The lending balance is the outstanding position, not the same as the short-sale balance in margin-short — the two are distinct mechanisms and should not be summed.",
+        zh: "借券餘額為未償還部位，與 margin-short 的融券餘額不同——兩者為不同機制，不應相加。",
+      },
+    ],
+  },
+
+  // capital-flows / chip-flows — DERIVED, combined chip indicators from institutional + margin → TODO coverage
+  "chip-flows": {
+    slug: "chip-flows",
+    description: {
+      en: "Combined chip-flow indicators per stock per trading day, computed from the official institutional-flow and margin trading data.",
+      zh: "每檔股票每交易日的綜合籌碼流向指標，由官方三大法人與信用交易資料計算而得。",
+    },
+    overview: [
+      {
+        en: "chip-flows is a derived dataset: it combines the official TWSE institutional flows and margin trading balances into a single per-stock daily view of who is accumulating or distributing. The lineage block names what each figure was derived from, so the composite stays auditable rather than a black box.",
+        zh: "chip-flows 為推導型資料集：將官方 TWSE 三大法人買賣超與信用交易餘額合併為每檔股票每日一列的籌碼流向視圖，呈現誰在吸貨或出貨。lineage 欄位標明每個數字的推導來源，綜合值可稽核而非黑箱。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "institutional_net", type: "number", desc: { en: "Combined three-investor net for the stock (shares).", zh: "該股三大法人合計買賣超（股）。" } },
+      { name: "margin_change", type: "number", desc: { en: "Day-over-day change in margin balance (shares).", zh: "融資餘額日變動（股）。" } },
+      { name: "short_change", type: "number", desc: { en: "Day-over-day change in short balance (shares).", zh: "融券餘額日變動（股）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_twse_chip_flows).", zh: "正規來源角色（derived_twse_chip_flows）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-17",
+      "institutional_net": -7586000,
+      "margin_change": -18000,
+      "short_change": 12000,
+      "source_role": "derived_twse_chip_flows",
+      "lineage": {
+        "derived_from": "official_twse_t86 + official_twse_margin",
+        "source_authority": "TWSE",
+        "computed_at": "2026-07-18"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the indicators are computed from the official TWSE institutional-flow (T86) and margin trading reports (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；指標由官方 TWSE 三大法人（T86）與信用交易報表計算（涵蓋至最新交易日）。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Derived, not disclosed: every figure is computed from the official institutional-flow and margin data, so it inherits their partial coverage and any upstream is_placeholder rows.",
+        zh: "推導而非官方揭露：每個數字皆由官方三大法人與信用交易資料計算，會承接其部分涵蓋與上游任何 is_placeholder 列。",
+      },
+    ],
+  },
+
+  // capital-flows / ownership-distribution — verified, TDCC shareholding-distribution table → TODO coverage
+  "ownership-distribution": {
+    slug: "ownership-distribution",
+    description: {
+      en: "Shareholding distribution per stock by holding-size tier, sourced from the official TDCC shareholding-distribution table — holders and shares in each tier.",
+      zh: "每檔股票依持股級距的股權分散情形，來源為官方集保結算所（TDCC）股權分散表——各級距的股東人數與股數。",
+    },
+    overview: [
+      {
+        en: "ownership-distribution returns one row per stock per holding-size tier per data date from the official TDCC shareholding-distribution table, showing how many holders and shares sit in each tier. It is published on a weekly cadence; each row carries its source role so a tier figure is traceable to the TDCC release.",
+        zh: "ownership-distribution 以官方 TDCC 股權分散表為源，每個資料日每檔股票每個持股級距回傳一列，呈現各級距的股東人數與股數。以每週頻率發布；每列附來源角色，級距數字可回溯 TDCC 發布。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "data_date", type: "string", desc: { en: "Distribution reference date (weekly).", zh: "股權分散基準日（每週）。" } },
+      { name: "holding_tier", type: "string", desc: { en: "Holding-size tier (share-count band).", zh: "持股級距（股數區間）。" } },
+      { name: "holders", type: "number", desc: { en: "Number of holders in the tier.", zh: "該級距股東人數。" } },
+      { name: "shares", type: "number", desc: { en: "Shares held in the tier.", zh: "該級距持有股數。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_tdcc_shareholding_distribution).", zh: "正規來源角色（official_tdcc_shareholding_distribution）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "data_date": "2026-07-11",
+      "holding_tier": "1000001-plus",
+      "holders": 1842,
+      "shares": 19845200000,
+      "source_role": "official_tdcc_shareholding_distribution",
+      "lineage": { "source_authority": "TDCC" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TDCC shareholding-distribution table (present through the latest weekly release). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；來源為官方 TDCC 股權分散表（涵蓋至最新每週發布）。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Weekly cadence: TDCC publishes the distribution on a settlement-dated weekly basis, so the latest data_date trails the current trading day.",
+        zh: "每週更新：TDCC 以交割日基準按週發布分散表，故最新 data_date 會落後於當前交易日。",
+      },
+    ],
+  },
+
+  // capital-flows / insider-director-holdings — verified, MOPS director & supervisor holdings → TODO coverage
+  "insider-director-holdings": {
+    slug: "insider-director-holdings",
+    description: {
+      en: "Director and supervisor shareholdings per company per reporting month, sourced from MOPS — shares held and pledged shares.",
+      zh: "每家公司每個申報月份的董監事持股，來源為公開資訊觀測站（MOPS）——持有股數與設質股數。",
+    },
+    overview: [
+      {
+        en: "insider-director-holdings returns one row per company per reporting month with the aggregate director and supervisor shareholding and pledged shares, sourced from the official MOPS insider-holding disclosure. Each row carries a source role and lineage back to the MOPS filing so the holding is traceable rather than opaque.",
+        zh: "insider-director-holdings 以官方 MOPS 董監持股揭露為源，每家公司每個申報月份回傳一列，含董監事持股合計與設質股數；每列附來源角色與回溯 MOPS 申報的 lineage，持股可追溯而非黑箱。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "period", type: "string", desc: { en: "Reporting month (YYYY-MM).", zh: "申報月份（YYYY-MM）。" } },
+      { name: "director_shares", type: "number", desc: { en: "Aggregate director & supervisor shares held.", zh: "董監事持股合計（股）。" } },
+      { name: "pledged_shares", type: "number", desc: { en: "Shares pledged by directors & supervisors.", zh: "董監事設質股數。" } },
+      { name: "holding_ratio", type: "number", desc: { en: "Director & supervisor holding as a ratio of issued shares (0-1).", zh: "董監持股占已發行股數比率（0-1）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_insider_holding).", zh: "正規來源角色（official_mops_insider_holding）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "period": "2026-06",
+      "director_shares": 168420000,
+      "pledged_shares": 0,
+      "holding_ratio": 0.0065,
+      "source_role": "official_mops_insider_holding",
+      "lineage": {
+        "source_authority": "MOPS (insider holdings)",
+        "payload_date": "2026-07-10"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS director & supervisor holding disclosure (present through the latest disclosed month). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；來源為官方 MOPS 董監持股揭露（涵蓋至最新揭露月份）。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Monthly cadence: insider holdings are disclosed on a reporting-month lag, so the latest available period trails the current month.",
+        zh: "每月更新：董監持股以申報月份落後揭露，故最新可得期間會落後於當前月份。",
+      },
+    ],
+  },
+
+  // capital-flows / day-trading-suspension — reference (private-beta / preview), TWSE day-trading suspension list → TODO coverage
+  "day-trading-suspension": {
+    slug: "day-trading-suspension",
+    description: {
+      en: "Stocks suspended from same-day (cash) day trading, sourced from the official TWSE announcement — suspension window and reason.",
+      zh: "被暫停現股當沖交易的股票，來源為官方 TWSE 公告——暫停期間與事由。",
+    },
+    overview: [
+      {
+        en: "day-trading-suspension returns one row per stock per suspension event from the official TWSE day-trading suspension announcement, with the suspension window and reason. Each row carries its source role so an entry is traceable to the official notice. This endpoint is a preview surface — coverage is currently partial and served as a snapshot rather than a fully backfilled history.",
+        zh: "day-trading-suspension 以官方 TWSE 現股當沖暫停公告為源，每筆暫停事件每檔股票回傳一列，含暫停期間與事由；每列附來源角色，項目可回溯官方公告。此端點為預覽面——目前涵蓋為部分資料，以快照形式提供，尚非完整回補的歷史。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "suspension_start", type: "string", desc: { en: "First date day trading is suspended.", zh: "當沖暫停起始日。" } },
+      { name: "suspension_end", type: "string", desc: { en: "Last date of the suspension.", zh: "當沖暫停結束日。" } },
+      { name: "reason", type: "string", desc: { en: "Normalized suspension reason code.", zh: "正規化暫停事由代碼。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_day_trading_suspension).", zh: "正規來源角色（official_twse_day_trading_suspension）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "suspension_start": "2026-07-14",
+      "suspension_end": "2026-07-25",
+      "reason": "volatility_threshold",
+      "source_role": "official_twse_day_trading_suspension",
+      "lineage": { "source_authority": "TWSE" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE day-trading suspension announcement. This is a preview surface with partial, snapshot-only coverage, so no counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；來源為官方 TWSE 現股當沖暫停公告。此為預覽面，涵蓋為部分且僅快照，故不顯示計數而非捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Preview grade: coverage is partial and served as a snapshot, not a fully backfilled history — the example symbol is illustrative and does not assert 2330 was actually suspended.",
+        zh: "預覽等級：涵蓋為部分且以快照提供，非完整回補的歷史——範例代碼僅為示意，不代表 2330 實際曾被暫停。",
+      },
+    ],
+  },
+
+// ── Companies & Events (7 pages) ──
+
+  // corporate-actions — TWSE / TPEx / MOPS, verified; normalized action stream. Chinese action titles → bilingual exampleJson. No measured coverage snapshot → TODO
+  "corporate-actions": {
+    slug: "corporate-actions",
+    description: {
+      en: "Corporate actions for listed companies — dividends, capital increases, splits and other structural events, normalized into one stream across TWSE / TPEx / MOPS.",
+      zh: "上市櫃公司行動——股利、增資、分割等結構性事件，跨 TWSE／TPEx／MOPS 正規化為單一資料流。",
+    },
+    overview: [
+      {
+        en: "corporate-actions returns one row per action with a normalized action type and the key dates (record, ex, effective), merged from the official TWSE / TPEx / MOPS announcements. Each row carries its source role and lineage, so an action can be traced back to the exact upstream disclosure rather than taken on trust.",
+        zh: "corporate-actions 每筆公司行動回傳一列，附正規化行動類型與關鍵日期（基準日、除權息日、生效日），整合自官方 TWSE／TPEx／MOPS 公告。每列附來源角色與 lineage，任一行動可回溯到上游原始揭露，而非僅憑信任。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "action_type", type: "string", desc: { en: "Normalized action type (e.g. cash_dividend, capital_increase, split).", zh: "正規化行動類型（如 cash_dividend、capital_increase、split）。" } },
+      { name: "title", type: "string", desc: { en: "Action title as disclosed.", zh: "揭露之行動標題。" } },
+      { name: "ex_date", type: "string", desc: { en: "Ex-rights / ex-dividend date.", zh: "除權（息）日。" } },
+      { name: "record_date", type: "string", desc: { en: "Shareholder record date.", zh: "股東基準日。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_corporate_action).", zh: "正規來源角色（official_twse_corporate_action）。" } },
+    ],
+    exampleJson: {
+      en: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "action_type": "cash_dividend",
+      "title": "Cash dividend distribution",
+      "ex_date": "2026-06-18",
+      "record_date": "2026-06-24",
+      "source_role": "official_twse_corporate_action",
+      "lineage": {
+        "source_authority": "MOPS",
+        "payload_date": "2026-05-20"
+      }
+    }
+  ]
+}`,
+      zh: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "action_type": "cash_dividend",
+      "title": "現金股利分派",
+      "ex_date": "2026-06-18",
+      "record_date": "2026-06-24",
+      "source_role": "official_twse_corporate_action",
+      "lineage": {
+        "source_authority": "MOPS",
+        "payload_date": "2026-05-20"
+      }
+    }
+  ]
+}`,
+    },
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact action / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx / MOPS corporate-action announcements (present through the latest disclosure). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確行動數／標的數與涵蓋視窗待量測快照；來源為官方 TWSE／TPEx／MOPS 公司行動公告（涵蓋至最新揭露）。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Actions are point-in-time sensitive: a proposed action is only final once approved and its ex/record dates are set — pass as_of when backtesting so unapproved actions do not leak into a past date.",
+        zh: "公司行動具時間點敏感性：擬議行動須經核准且訂定除權息／基準日後方為定案——回測時請帶 as_of，避免未核准行動洩入過去日期。",
+      },
+    ],
+  },
+
+  // corporate-actions-enhanced — TWSE / TPEx / MOPS, DERIVED (adjustment factors computed on top of corporate actions). Chinese titles → bilingual. No measured coverage snapshot → TODO
+  "corporate-actions-enhanced": {
+    slug: "corporate-actions-enhanced",
+    description: {
+      en: "Corporate actions with the price-adjustment factors pre-computed — the same action stream plus the cumulative and per-event factors an agent would otherwise derive itself.",
+      zh: "增強公司行動，已預先計算價格調整因子——與公司行動相同的資料流，另附原本需自行推導的累積與單筆事件調整因子。",
+    },
+    overview: [
+      {
+        en: "corporate-actions-enhanced is a derived dataset: it starts from the official corporate-action disclosures and adds the per-event and cumulative adjustment factors used to build split- and dividend-adjusted price series. The lineage block points back to the underlying official action so the base event stays auditable rather than a black box.",
+        zh: "corporate-actions-enhanced 為推導型資料集：以官方公司行動揭露為基礎，附上用於建構還原價格序列的單筆與累積調整因子。lineage 欄位回指底層官方行動，基準事件可稽核而非黑箱。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "action_type", type: "string", desc: { en: "Normalized action type (e.g. cash_dividend, split).", zh: "正規化行動類型（如 cash_dividend、split）。" } },
+      { name: "title", type: "string", desc: { en: "Action title as disclosed.", zh: "揭露之行動標題。" } },
+      { name: "ex_date", type: "string", desc: { en: "Ex-rights / ex-dividend date.", zh: "除權（息）日。" } },
+      { name: "adjustment_factor", type: "number", desc: { en: "Per-event price-adjustment factor (derived).", zh: "單筆事件價格調整因子（推導）。" } },
+      { name: "cumulative_factor", type: "number", desc: { en: "Cumulative adjustment factor to date (derived).", zh: "截至當日之累積調整因子（推導）。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_corporate_action_enhanced).", zh: "正規來源角色（derived_corporate_action_enhanced）。" } },
+    ],
+    exampleJson: {
+      en: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "action_type": "cash_dividend",
+      "title": "Cash dividend distribution",
+      "ex_date": "2026-06-18",
+      "adjustment_factor": 0.9934,
+      "cumulative_factor": 0.8471,
+      "source_role": "derived_corporate_action_enhanced",
+      "lineage": {
+        "derived_from": "official_twse_corporate_action",
+        "source_authority": "MOPS",
+        "computed_at": "2026-06-19"
+      }
+    }
+  ]
+}`,
+      zh: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "action_type": "cash_dividend",
+      "title": "現金股利分派",
+      "ex_date": "2026-06-18",
+      "adjustment_factor": 0.9934,
+      "cumulative_factor": 0.8471,
+      "source_role": "derived_corporate_action_enhanced",
+      "lineage": {
+        "derived_from": "official_twse_corporate_action",
+        "source_authority": "MOPS",
+        "computed_at": "2026-06-19"
+      }
+    }
+  ]
+}`,
+    },
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact action / symbol counts and the coverage window are pending a measured snapshot; the adjustment factors are computed from the official TWSE / TPEx / MOPS corporate-action disclosures (present through the latest disclosure). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確行動數／標的數與涵蓋視窗待量測快照；調整因子由官方 TWSE／TPEx／MOPS 公司行動揭露計算（涵蓋至最新揭露）。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Derived, not disclosed: adjustment factors are computed from the official corporate actions, so they inherit any upstream correction — recompute against as_of actions for backtests.",
+        zh: "推導而非官方揭露：調整因子由官方公司行動計算，會承接上游更正——回測時請以 as_of 行動重新計算。",
+      },
+    ],
+  },
+
+  // stock-split-par-value-events — TWSE / TPEx, verified; par-value / split events. Numeric fields → plain ASCII exampleJson. No measured coverage snapshot → TODO
+  "stock-split-par-value-events": {
+    slug: "stock-split-par-value-events",
+    description: {
+      en: "Stock split and par-value change events for listed securities — the old and new par value, split ratio and effective date, from the official TWSE / TPEx announcements.",
+      zh: "上市櫃證券的股票分割與面額變更事件——變更前後面額、分割比例與生效日，來源為官方 TWSE／TPEx 公告。",
+    },
+    overview: [
+      {
+        en: "stock-split-par-value-events returns one row per split or par-value change with the old and new par value, the resulting share ratio and the effective date, sourced from the official TWSE / TPEx announcements. Each row carries its source role and lineage, so the event is traceable to the exact upstream disclosure.",
+        zh: "stock-split-par-value-events 每筆分割或面額變更回傳一列，含變更前後面額、換股比例與生效日，來源為官方 TWSE／TPEx 公告。每列附來源角色與 lineage，事件可回溯到上游原始揭露。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "event_type", type: "string", desc: { en: "Normalized event type (e.g. split, par_value_change).", zh: "正規化事件類型（如 split、par_value_change）。" } },
+      { name: "old_par_value", type: "number", desc: { en: "Par value before the change (TWD per share).", zh: "變更前面額（每股新台幣元）。" } },
+      { name: "new_par_value", type: "number", desc: { en: "Par value after the change (TWD per share).", zh: "變更後面額（每股新台幣元）。" } },
+      { name: "effective_date", type: "string", desc: { en: "Date the change takes effect.", zh: "變更生效日。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_par_value_event).", zh: "正規來源角色（official_twse_par_value_event）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "6666",
+      "event_type": "par_value_change",
+      "old_par_value": 10.0,
+      "new_par_value": 5.0,
+      "split_ratio": 2.0,
+      "effective_date": "2026-04-15",
+      "source_role": "official_twse_par_value_event",
+      "lineage": {
+        "source_authority": "TWSE",
+        "payload_date": "2026-03-10"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact event / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx split and par-value announcements (present through the latest disclosure). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確事件數／標的數與涵蓋視窗待量測快照；來源為官方 TWSE／TPEx 分割與面額變更公告（涵蓋至最新揭露）。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Par-value and split events change the share base: when joining to a raw price series, apply the effective date so pre- and post-event prices are compared on the same basis.",
+        zh: "面額與分割事件改變股本基準：與原始價格序列串接時，請以生效日對齊，使事件前後價格於同一基準比較。",
+      },
+    ],
+  },
+
+  // stock-delisting-lifecycle — TWSE / TPEx, reference/lifecycle; one record per security. Chinese reason → bilingual. REFERENCE_PARAMS (per-security master). No measured coverage snapshot → TODO
+  "stock-delisting-lifecycle": {
+    slug: "stock-delisting-lifecycle",
+    description: {
+      en: "Delisting lifecycle — the listing status and key lifecycle dates for each security, including suspension and delisting, from the official TWSE / TPEx records.",
+      zh: "下市生命週期——每檔證券的上市狀態與關鍵生命週期日期，含停止買賣與下市，來源為官方 TWSE／TPEx 紀錄。",
+    },
+    overview: [
+      {
+        en: "stock-delisting-lifecycle is a reference dataset: one lifecycle record per security tracking its listing status and the dates it changed (listed, suspended, delisted), sourced from the official TWSE / TPEx records. Use it to know whether a ticker was tradable at a past date; each row carries its source role and lineage back to the upstream disclosure.",
+        zh: "stock-delisting-lifecycle 為參考型資料集：每檔證券一筆生命週期紀錄，追蹤其上市狀態與狀態變更日期（上市、停止買賣、下市），來源為官方 TWSE／TPEx 紀錄。用於判斷某代碼在過去某日是否可交易；每列附來源角色與回溯上游揭露的 lineage。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "status", type: "string", desc: { en: "Normalized lifecycle status (e.g. listed, suspended, delisted).", zh: "正規化生命週期狀態（如 listed、suspended、delisted）。" } },
+      { name: "listing_date", type: "string", desc: { en: "Date the security was first listed.", zh: "首次上市（櫃）日。" } },
+      { name: "delisting_date", type: "string", desc: { en: "Date the security was delisted (null if still listed).", zh: "下市（櫃）日（仍上市則為 null）。" } },
+      { name: "reason", type: "string", desc: { en: "Reason for the status change as disclosed.", zh: "揭露之狀態變更原因。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_delisting_lifecycle).", zh: "正規來源角色（official_twse_delisting_lifecycle）。" } },
+    ],
+    exampleJson: {
+      en: `{
+  "data": [
+    {
+      "symbol": "2333",
+      "status": "delisted",
+      "listing_date": "1990-11-05",
+      "delisting_date": "2026-02-27",
+      "reason": "Delisted on net-worth deficiency",
+      "source_role": "official_twse_delisting_lifecycle",
+      "lineage": {
+        "source_authority": "TWSE",
+        "payload_date": "2026-02-27"
+      }
+    }
+  ]
+}`,
+      zh: `{
+  "data": [
+    {
+      "symbol": "2333",
+      "status": "delisted",
+      "listing_date": "1990-11-05",
+      "delisting_date": "2026-02-27",
+      "reason": "淨值不足下市",
+      "source_role": "official_twse_delisting_lifecycle",
+      "lineage": {
+        "source_authority": "TWSE",
+        "payload_date": "2026-02-27"
+      }
+    }
+  ]
+}`,
+    },
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact security counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx listing and delisting records (present through the latest status change). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確證券數與涵蓋視窗待量測快照；來源為官方 TWSE／TPEx 上市與下市紀錄（涵蓋至最新狀態變更）。寧不顯示計數也不捏造。",
+    },
+    params: REFERENCE_PARAMS,
+    notes: [
+      {
+        en: "This is the survivorship-safe companion to the active security master: use the lifecycle dates to reconstruct which tickers were tradable at a past date instead of assuming the current snapshot held then.",
+        zh: "此為現用股票主檔的倖存者偏誤安全對照：以生命週期日期重建過去某日可交易的代碼，而非假設當時即為目前快照。",
+      },
+    ],
+  },
+
+  // company-risk-events — TWSE / TPEx, reference / PRIVATE-BETA preview; partial coverage. Chinese risk description → bilingual. Not legal advice. No measured coverage snapshot → TODO
+  "company-risk-events": {
+    slug: "company-risk-events",
+    description: {
+      en: "Company risk events (preview) — attention, altered-trading and other risk flags raised on listed securities by the exchange, normalized into one stream.",
+      zh: "公司風險事件（預覽）——交易所對上市櫃證券發布的注意、變更交易方法等風險標記，正規化為單一資料流。",
+    },
+    overview: [
+      {
+        en: "company-risk-events returns one row per risk flag raised on a security — for example attention or altered-trading notices — normalized across the official TWSE / TPEx announcements. This is a private-beta preview: coverage is partial and the schema may change, so numbers here are provisional. Each row carries its source role and lineage back to the upstream disclosure.",
+        zh: "company-risk-events 每筆對證券發布的風險標記回傳一列——例如注意或變更交易方法——跨官方 TWSE／TPEx 公告正規化。此為私測預覽：涵蓋為部分且結構可能變動，數字屬暫定。每列附來源角色與回溯上游揭露的 lineage。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "event_date", type: "string", desc: { en: "Date the flag was raised.", zh: "風險標記發布日。" } },
+      { name: "risk_type", type: "string", desc: { en: "Normalized risk type (e.g. attention, altered_trading).", zh: "正規化風險類型（如 attention、altered_trading）。" } },
+      { name: "description", type: "string", desc: { en: "Risk-event description as disclosed.", zh: "揭露之風險事件描述。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_risk_event).", zh: "正規來源角色（official_twse_risk_event）。" } },
+      { name: "lineage", type: "object", desc: { en: "Upstream authority + release for the flag.", zh: "標記所屬的上游權威來源與發布。" } },
+    ],
+    exampleJson: {
+      en: `{
+  "data": [
+    {
+      "symbol": "8888",
+      "event_date": "2026-07-06",
+      "risk_type": "attention",
+      "description": "Attention notice on abnormal price fluctuation",
+      "source_role": "official_twse_risk_event",
+      "lineage": {
+        "source_authority": "TWSE",
+        "payload_date": "2026-07-06"
+      }
+    }
+  ]
+}`,
+      zh: `{
+  "data": [
+    {
+      "symbol": "8888",
+      "event_date": "2026-07-06",
+      "risk_type": "attention",
+      "description": "股價異常波動注意交易資訊",
+      "source_role": "official_twse_risk_event",
+      "lineage": {
+        "source_authority": "TWSE",
+        "payload_date": "2026-07-06"
+      }
+    }
+  ]
+}`,
+    },
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — this is a private-beta preview with partial coverage; exact event / symbol counts and the coverage window are pending a measured snapshot. The source is the official TWSE / TPEx risk-related announcements. No counts are shown rather than fabricated ones.",
+      zh: "TODO — 此為私測預覽，涵蓋為部分；精確事件數／標的數與涵蓋視窗待量測快照。來源為官方 TWSE／TPEx 風險相關公告。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Private-beta preview: coverage is partial and the schema may change before general availability — treat the absence of a flag as \"not captured\", not as \"no risk\".",
+        zh: "私測預覽：涵蓋為部分且結構在正式上線前可能變動——無標記應視為「未收錄」，而非「無風險」。",
+      },
+      {
+        en: "Informational only, not legal or investment advice: a risk flag reflects an exchange notice and does not constitute a judgement about a company — verify against the official announcement before acting.",
+        zh: "僅供參考，非法律或投資建議：風險標記反映交易所公告，不構成對公司的判斷——採取行動前請對照官方公告核實。",
+      },
+    ],
+  },
+
+  // disposition-securities-period — TWSE, reference / PRIVATE-BETA preview; partial coverage. Chinese disposition measures → bilingual. No measured coverage snapshot → TODO
+  "disposition-securities-period": {
+    slug: "disposition-securities-period",
+    description: {
+      en: "Disposition securities period (preview) — securities placed under disposition measures by the exchange, with the period and the trading restriction applied.",
+      zh: "處置證券期間（預覽）——遭交易所列入處置措施的證券，含處置期間與所施加的交易限制。",
+    },
+    overview: [
+      {
+        en: "disposition-securities-period returns one row per disposition placed on a security, with the start and end of the disposition period and the measure applied (for example matched-auction throttling), sourced from the official TWSE announcements. This is a private-beta preview with partial coverage. Each row carries its source role and lineage back to the upstream disclosure.",
+        zh: "disposition-securities-period 每筆對證券的處置回傳一列，含處置期間起訖與所施加措施（例如分盤集合競價），來源為官方 TWSE 公告。此為私測預覽，涵蓋為部分。每列附來源角色與回溯上游揭露的 lineage。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "period_start", type: "string", desc: { en: "Start of the disposition period.", zh: "處置期間起日。" } },
+      { name: "period_end", type: "string", desc: { en: "End of the disposition period.", zh: "處置期間迄日。" } },
+      { name: "measure", type: "string", desc: { en: "Trading restriction applied during the period.", zh: "處置期間所施加之交易限制。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_disposition).", zh: "正規來源角色（official_twse_disposition）。" } },
+      { name: "lineage", type: "object", desc: { en: "Upstream authority + release for the disposition.", zh: "處置所屬的上游權威來源與發布。" } },
+    ],
+    exampleJson: {
+      en: `{
+  "data": [
+    {
+      "symbol": "8888",
+      "period_start": "2026-07-08",
+      "period_end": "2026-07-21",
+      "measure": "Matched auction every 5 minutes",
+      "source_role": "official_twse_disposition",
+      "lineage": {
+        "source_authority": "TWSE",
+        "payload_date": "2026-07-07"
+      }
+    }
+  ]
+}`,
+      zh: `{
+  "data": [
+    {
+      "symbol": "8888",
+      "period_start": "2026-07-08",
+      "period_end": "2026-07-21",
+      "measure": "每5分鐘分盤集合競價",
+      "source_role": "official_twse_disposition",
+      "lineage": {
+        "source_authority": "TWSE",
+        "payload_date": "2026-07-07"
+      }
+    }
+  ]
+}`,
+    },
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — this is a private-beta preview with partial coverage; exact disposition / symbol counts and the coverage window are pending a measured snapshot. The source is the official TWSE disposition announcements. No counts are shown rather than fabricated ones.",
+      zh: "TODO — 此為私測預覽，涵蓋為部分；精確處置數／標的數與涵蓋視窗待量測快照。來源為官方 TWSE 處置公告。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Private-beta preview: coverage is partial and the schema may change before general availability — the absence of a disposition means \"not captured\", not \"never disposed\".",
+        zh: "私測預覽：涵蓋為部分且結構在正式上線前可能變動——無處置紀錄意指「未收錄」，而非「從未處置」。",
+      },
+      {
+        en: "A disposition period restricts how a security trades: apply the period bounds when reconstructing intraday execution assumptions for a past date.",
+        zh: "處置期間會限制證券的交易方式：重建過去某日的盤中成交假設時，請套用期間起訖界線。",
+      },
+    ],
+  },
+
+  // esg-tesg — TWSE, DERIVED (TESG scores compiled/computed from disclosures). Scores are ASCII → plain exampleJson. No measured coverage snapshot → TODO
+  "esg-tesg": {
+    slug: "esg-tesg",
+    description: {
+      en: "ESG (TESG) scores for listed companies — the composite sustainability score and its environmental, social and governance pillars, compiled from official disclosures.",
+      zh: "上市櫃公司 ESG（TESG）評分——永續綜合評分及其環境、社會與公司治理三大構面，彙整自官方揭露。",
+    },
+    overview: [
+      {
+        en: "esg-tesg is a derived dataset: the composite TESG score and its E / S / G pillar scores are compiled and computed from official corporate sustainability disclosures, not published as a single raw figure. The lineage block names what each score was derived from, so the rating stays auditable rather than a black box. One row per company per assessment period.",
+        zh: "esg-tesg 為推導型資料集：TESG 綜合評分與其環境／社會／治理三構面分數，由官方企業永續揭露彙整計算而得，非以單一原始數字發布。lineage 欄位標明每個分數的推導來源，評等可稽核而非黑箱。每家公司每個評估期間一列。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
+      { name: "period", type: "string", desc: { en: "Assessment period (e.g. 2025).", zh: "評估期間（如 2025）。" } },
+      { name: "tesg_score", type: "number", desc: { en: "Composite TESG score.", zh: "TESG 綜合評分。" } },
+      { name: "environment_score", type: "number", desc: { en: "Environmental pillar score.", zh: "環境構面分數。" } },
+      { name: "social_score", type: "number", desc: { en: "Social pillar score.", zh: "社會構面分數。" } },
+      { name: "governance_score", type: "number", desc: { en: "Governance pillar score.", zh: "公司治理構面分數。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_twse_tesg).", zh: "正規來源角色（derived_twse_tesg）。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "symbol": "2330",
+      "period": "2025",
+      "tesg_score": 82.4,
+      "environment_score": 80.1,
+      "social_score": 84.7,
+      "governance_score": 82.0,
+      "rating": "A",
+      "source_role": "derived_twse_tesg",
+      "lineage": {
+        "derived_from": "official_twse_esg_disclosure",
+        "source_authority": "TWSE",
+        "computed_at": "2026-06-30"
+      }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact company counts and the coverage window are pending a measured snapshot; the scores are compiled from the official TWSE corporate sustainability disclosures (present through the latest assessment period). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確公司數與涵蓋視窗待量測快照；分數由官方 TWSE 企業永續揭露彙整（涵蓋至最新評估期間）。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Derived, not disclosed: TESG scores are compiled from official disclosures on an annual assessment cadence, so the latest period trails the current year and a score can be revised as underlying disclosures update.",
+        zh: "推導而非官方揭露：TESG 分數由官方揭露以年度評估頻率彙整，故最新期間會落後於當前年度，且分數會隨底層揭露更新而修訂。",
+      },
+    ],
+  },
+
+// ── Derivatives & Convertibles ──
+
+  // options-daily-taifex — TAIFEX options daily; data exists but doc-build key not entitled → coverage TODO
+  "options-daily-taifex": {
+    slug: "options-daily-taifex",
+    description: {
+      en: "TAIFEX options daily market data — daily settlement, volume and open interest for listed options series.",
+      zh: "TAIFEX 選擇權每日市場資料——上市選擇權契約的每日結算、成交量與未平倉量。",
+    },
+    overview: [
+      {
+        en: "options-daily-taifex returns one row per options series per trading day from the official TAIFEX feed, keyed by contract, strike and call/put right. Each row carries its source role so a value can be traced back to the exchange publication rather than taken on trust.",
+        zh: "options-daily-taifex 以官方 TAIFEX 資料為源,每交易日每個選擇權契約序列回傳一列,以契約、履約價與買賣權別為鍵;每列附來源角色,任一數值可回溯交易所發布,而非僅憑信任。",
+      },
+    ],
+    fields: [
+      { name: "contract", type: "string", desc: { en: "Options contract code (e.g. TXO).", zh: "選擇權契約代碼(如 TXO)。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "strike_price", type: "number", desc: { en: "Strike price of the series.", zh: "契約序列履約價。" } },
+      { name: "call_put", type: "string", desc: { en: "Right of the series (call / put).", zh: "買賣權別(買權／賣權)。" } },
+      { name: "settlement_price", type: "number", desc: { en: "Daily settlement price.", zh: "每日結算價。" } },
+      { name: "open_interest", type: "number", desc: { en: "Open interest.", zh: "未平倉量。" } },
+      { name: "source_role", type: "string", desc: { en: "official_taifex.", zh: "official_taifex。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "contract": "TXO",
+      "date": "TODO",
+      "strike_price": null,
+      "call_put": "call",
+      "settlement_price": null,
+      "open_interest": null,
+      "source_role": "official_taifex",
+      "lineage": { "source_authority": "TAIFEX" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — real example values, exact row counts and the coverage window are pending an entitled key at doc-build time. The data exists (TAIFEX options, daily) but was not queryable from this build session, so no numbers are shown rather than fabricated ones.",
+      zh: "TODO — 真實範例值、精確列數與涵蓋視窗待建置時具權限的金鑰。資料存在(TAIFEX 選擇權、每日),但本建置階段無法查詢,故不顯示數字而非捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "This page is published so the endpoint is documented, but its live numbers are intentionally left as TODO until measured from an entitled key — no placeholder values are shown.",
+        zh: "本頁先發佈以記錄端點,但即時數字刻意保留為 TODO,直到以具權限金鑰量測——不顯示任何佔位數值。",
+      },
+    ],
+  },
+
+  // taifex-options-settlement-price — TAIFEX options settlement price; data exists but doc-build key not entitled → coverage TODO
+  "taifex-options-settlement-price": {
+    slug: "taifex-options-settlement-price",
+    description: {
+      en: "TAIFEX options settlement prices — the official daily settlement price per options series, used to mark positions to market.",
+      zh: "TAIFEX 選擇權結算價——每個選擇權契約序列的官方每日結算價,用於部位逐日結算。",
+    },
+    overview: [
+      {
+        en: "taifex-options-settlement-price returns one row per options series per trading day carrying the official TAIFEX settlement price, keyed by contract, strike and call/put right. It isolates the authoritative settlement figure so a position can be marked to market against the exchange's own number; each row keeps its source role for traceability.",
+        zh: "taifex-options-settlement-price 每交易日每個選擇權契約序列回傳一列,載明官方 TAIFEX 結算價,以契約、履約價與買賣權別為鍵。它單獨提供權威結算數字,使部位可依交易所自身數字逐日結算;每列保留來源角色以供追溯。",
+      },
+    ],
+    fields: [
+      { name: "contract", type: "string", desc: { en: "Options contract code (e.g. TXO).", zh: "選擇權契約代碼(如 TXO)。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "strike_price", type: "number", desc: { en: "Strike price of the series.", zh: "契約序列履約價。" } },
+      { name: "call_put", type: "string", desc: { en: "Right of the series (call / put).", zh: "買賣權別(買權／賣權)。" } },
+      { name: "settlement_price", type: "number", desc: { en: "Official daily settlement price.", zh: "官方每日結算價。" } },
+      { name: "source_role", type: "string", desc: { en: "official_taifex.", zh: "official_taifex。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "contract": "TXO",
+      "date": "TODO",
+      "strike_price": null,
+      "call_put": "put",
+      "settlement_price": null,
+      "source_role": "official_taifex",
+      "lineage": { "source_authority": "TAIFEX" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — real example values, exact row counts and the coverage window are pending an entitled key at doc-build time. The data exists (TAIFEX options settlement prices, daily) but was not queryable from this build session, so no numbers are shown rather than fabricated ones.",
+      zh: "TODO — 真實範例值、精確列數與涵蓋視窗待建置時具權限的金鑰。資料存在(TAIFEX 選擇權結算價、每日),但本建置階段無法查詢,故不顯示數字而非捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "This page is published so the endpoint is documented, but its live numbers are intentionally left as TODO until measured from an entitled key — no placeholder values are shown.",
+        zh: "本頁先發佈以記錄端點,但即時數字刻意保留為 TODO,直到以具權限金鑰量測——不顯示任何佔位數值。",
+      },
+    ],
+  },
+
+  // taifex-institutional-flow — TAIFEX futures/options institutional positions; data exists but doc-build key not entitled → coverage TODO
+  "taifex-institutional-flow": {
+    slug: "taifex-institutional-flow",
+    description: {
+      en: "TAIFEX institutional trading — daily net positions of the three major institutional investor groups in listed futures and options.",
+      zh: "TAIFEX 三大法人籌碼——上市期貨與選擇權中三大法人的每日淨部位。",
+    },
+    overview: [
+      {
+        en: "taifex-institutional-flow returns one row per contract per trading day with the foreign, investment-trust and dealer net positions from the official TAIFEX institutional-trading report. Rows carry their source role so a figure is traceable to the exchange report rather than taken on trust.",
+        zh: "taifex-institutional-flow 以官方 TAIFEX 三大法人交易報表為源,每交易日每個契約回傳一列,含外資、投信與自營商淨部位;每列附來源角色,數字可回溯交易所報表,而非僅憑信任。",
+      },
+    ],
+    fields: [
+      { name: "contract", type: "string", desc: { en: "Futures / options contract code (e.g. TXF, TXO).", zh: "期貨／選擇權契約代碼(如 TXF、TXO)。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "foreign_net", type: "number", desc: { en: "Foreign investor net position (contracts).", zh: "外資淨部位(口)。" } },
+      { name: "trust_net", type: "number", desc: { en: "Investment-trust net position (contracts).", zh: "投信淨部位(口)。" } },
+      { name: "dealer_net", type: "number", desc: { en: "Dealer net position (contracts).", zh: "自營商淨部位(口)。" } },
+      { name: "source_role", type: "string", desc: { en: "official_taifex.", zh: "official_taifex。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "contract": "TXF",
+      "date": "TODO",
+      "foreign_net": null,
+      "trust_net": null,
+      "dealer_net": null,
+      "source_role": "official_taifex",
+      "lineage": { "source_authority": "TAIFEX" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — real example values, exact row counts and the coverage window are pending an entitled key at doc-build time. The data exists (TAIFEX institutional futures & options positions, daily) but was not queryable from this build session, so no numbers are shown rather than fabricated ones.",
+      zh: "TODO — 真實範例值、精確列數與涵蓋視窗待建置時具權限的金鑰。資料存在(TAIFEX 期貨與選擇權三大法人部位、每日),但本建置階段無法查詢,故不顯示數字而非捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "This page is published so the endpoint is documented, but its live numbers are intentionally left as TODO until measured from an entitled key — no placeholder values are shown.",
+        zh: "本頁先發佈以記錄端點,但即時數字刻意保留為 TODO,直到以具權限金鑰量測——不顯示任何佔位數值。",
+      },
+    ],
+  },
+
+  // convertible-bonds — TPEx convertible bonds daily; counts pending a measured snapshot → coverage TODO
+  "convertible-bonds": {
+    slug: "convertible-bonds",
+    description: {
+      en: "Convertible bonds traded on TPEx — daily price, volume and conversion terms for listed convertible-bond issues.",
+      zh: "櫃買中心(TPEx)交易之可轉換公司債——上櫃可轉債的每日價格、成交量與轉換條件。",
+    },
+    overview: [
+      {
+        en: "convertible-bonds returns one row per convertible-bond issue per trading day from the official TPEx feed, with the traded price alongside the current conversion terms. Each row carries its source role so a value can be traced back to the TPEx publication rather than taken on trust.",
+        zh: "convertible-bonds 以官方 TPEx 資料為源,每交易日每檔可轉債回傳一列,含成交價格與當前轉換條件;每列附來源角色,任一數值可回溯 TPEx 發布,而非僅憑信任。",
+      },
+    ],
+    fields: [
+      { name: "bond_code", type: "string", desc: { en: "Convertible-bond code.", zh: "可轉債代碼。" } },
+      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
+      { name: "close", type: "number", desc: { en: "Closing price of the bond.", zh: "可轉債收盤價。" } },
+      { name: "volume", type: "number", desc: { en: "Trading volume.", zh: "成交量。" } },
+      { name: "conversion_price", type: "number", desc: { en: "Current conversion price (TWD).", zh: "當前轉換價格(新台幣元)。" } },
+      { name: "source_role", type: "string", desc: { en: "official_tpex.", zh: "official_tpex。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "bond_code": "TODO",
+      "date": "TODO",
+      "close": null,
+      "volume": null,
+      "conversion_price": null,
+      "source_role": "official_tpex",
+      "lineage": { "source_authority": "TPEx" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — real example values, exact row / issue counts and the coverage window are pending a measured snapshot; the source is the official TPEx convertible-bond feed (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 真實範例值、精確列數／檔數與涵蓋視窗待量測快照;來源為官方 TPEx 可轉債資料(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "Live numbers are intentionally left as TODO until measured — the page is published so the endpoint is documented, but no placeholder values are shown.",
+        zh: "即時數字刻意保留為 TODO 直到量測——本頁先發佈以記錄端點,但不顯示任何佔位數值。",
+      },
+    ],
+  },
+
+  // bond-convertible-reference — TPEx convertible-bond reference master (reference grade) → coverage TODO
+  "bond-convertible-reference": {
+    slug: "bond-convertible-reference",
+    description: {
+      en: "Convertible-bond reference — the master record for each convertible-bond issue (issuer, terms, key dates), sourced from TPEx.",
+      zh: "可轉債參考——每檔可轉換公司債的主檔資料(發行人、條款、重要日期),來源為 TPEx。",
+    },
+    overview: [
+      {
+        en: "bond-convertible-reference is a reference dataset: one master record per convertible-bond issue, not a time series. Use it to resolve a bond code to its issuer, conversion terms and key dates. Each record carries its source role back to the TPEx publication.",
+        zh: "bond-convertible-reference 為參考型資料集:每檔可轉債一筆主檔紀錄,非時間序列。用於將可轉債代碼解析為發行人、轉換條款與重要日期;每筆紀錄附回溯 TPEx 發布的來源角色。",
+      },
+    ],
+    fields: [
+      { name: "bond_code", type: "string", desc: { en: "Convertible-bond code.", zh: "可轉債代碼。" } },
+      { name: "issuer_symbol", type: "string", desc: { en: "Ticker of the issuing company.", zh: "發行公司股票代碼。" } },
+      { name: "issue_date", type: "string", desc: { en: "Issue date of the bond.", zh: "發行日期。" } },
+      { name: "maturity_date", type: "string", desc: { en: "Maturity date of the bond.", zh: "到期日期。" } },
+      { name: "conversion_price", type: "number", desc: { en: "Reference conversion price (TWD).", zh: "參考轉換價格(新台幣元)。" } },
+      { name: "source_role", type: "string", desc: { en: "official_tpex.", zh: "official_tpex。" } },
+    ],
+    exampleJson: `{
+  "data": [
+    {
+      "bond_code": "TODO",
+      "issuer_symbol": "TODO",
+      "issue_date": "TODO",
+      "maturity_date": "TODO",
+      "conversion_price": null,
+      "source_role": "official_tpex",
+      "lineage": { "source_authority": "TPEx" }
+    }
+  ]
+}`,
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — real example values and exact issue counts are pending a measured snapshot; this is the TPEx-sourced convertible-bond reference master (present through the latest listed issue). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 真實範例值與精確檔數待量測快照;此為 TPEx 來源的可轉債參考主檔(涵蓋至最新上櫃檔次)。寧不顯示計數也不捏造。",
+    },
+    params: REFERENCE_PARAMS,
+    notes: [
+      {
+        en: "Reference / lookup dataset — one master record per convertible-bond issue, not a price time series; use it to resolve a bond code to its terms, then query convertible-bonds for daily figures.",
+        zh: "參考／查表型資料集——每檔可轉債一筆主檔紀錄,非價格時間序列;用於將可轉債代碼解析為條款,每日數字請查詢 convertible-bonds。",
+      },
+    ],
+  },
+
+// funds-intel — ETF flow (verified provenance, Issuer; time-series; counts not measured this session → coverage TODO)
+  "etf-flow": {
+    slug: "etf-flow",
+    description: {
+      en: "Daily ETF fund-flow surface — unit creations/redemptions and units outstanding per listed ETF, sourced from the issuer.",
+      zh: "ETF 每日資金流——每檔上市 ETF 的申購／贖回單位數與流通在外單位數,來源為發行機構。",
+    },
+    overview: [
+      {
+        en: "etf-flow returns one row per ETF per trading day: the net unit change (creations minus redemptions) and the resulting units outstanding, sourced from the issuer. Each row carries a source role and lineage so a flow figure can be traced back to the issuer publication rather than taken on trust.",
+        zh: "etf-flow 以發行機構為源,每檔 ETF 每交易日回傳一列:淨單位變動(申購減贖回)與其後的流通在外單位數;每列附來源角色與 lineage,任一資金流數字可回溯發行機構發布,而非僅憑信任。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "ETF code (e.g. 0050).", zh: "ETF 代碼(如 0050)。" } },
+      { name: "date", type: "string", desc: { en: "Observation trading date.", zh: "觀測交易日。" } },
+      { name: "net_unit_change", type: "number", desc: { en: "Net unit change for the day (creations − redemptions).", zh: "當日淨單位變動(申購減贖回)。" } },
+      { name: "units_outstanding", type: "number", desc: { en: "Units outstanding after the day's flow.", zh: "當日資金流後之流通在外單位數。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (issuer_etf_flow).", zh: "正規來源角色(issuer_etf_flow)。" } },
+      { name: "lineage", type: "object", desc: { en: "Upstream issuer + publication date for the value.", zh: "數值所屬的上游發行機構與發布日期。" } },
+    ],
+    exampleJson: {
+      en: `{
+  "data": [
+    {
+      "symbol": "0050",
+      "name": "Yuanta Taiwan Top 50 ETF",
+      "date": "2026-07-17",
+      "net_unit_change": 12000000,
+      "units_outstanding": 8765000000,
+      "source_role": "issuer_etf_flow",
+      "lineage": {
+        "source_authority": "Issuer",
+        "payload_date": "2026-07-17"
+      }
+    }
+  ]
+}`,
+      zh: `{
+  "data": [
+    {
+      "symbol": "0050",
+      "name": "元大台灣50",
+      "date": "2026-07-17",
+      "net_unit_change": 12000000,
+      "units_outstanding": 8765000000,
+      "source_role": "issuer_etf_flow",
+      "lineage": {
+        "source_authority": "Issuer",
+        "payload_date": "2026-07-17"
+      }
+    }
+  ]
+}`,
+    },
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact row / ETF counts and the coverage window are pending a measured snapshot; the source is the issuer's ETF fund-flow publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／ETF 檔數與涵蓋視窗待量測快照;來源為發行機構的 ETF 資金流發布(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+    },
+    params: STANDARD_PARAMS,
+    notes: [
+      {
+        en: "For this dataset the symbol param is an ETF code (e.g. 0050), not a general stock ticker.",
+        zh: "此資料集的 symbol 參數為 ETF 代碼(如 0050),非一般股票代碼。",
+      },
+    ],
+  },
+
+  // funds-intel — ETF holdings (reference grade, Issuer; issuer-limited latest snapshot, not market-wide/historical → coverage TODO)
+  "etf-holdings": {
+    slug: "etf-holdings",
+    description: {
+      en: "ETF holdings — the latest disclosed constituent list per ETF (constituent, weight, as-of date), sourced from the issuer.",
+      zh: "ETF 持股明細——每檔 ETF 最新揭露的成分股清單(成分、權重、資料日期),來源為發行機構。",
+    },
+    overview: [
+      {
+        en: "etf-holdings is a reference dataset: for each ETF it returns the constituents of its latest disclosed portfolio with each one's weight, sourced from the issuer. It is an issuer-limited latest snapshot — the coverage is only the ETFs whose holdings the issuer publishes, and only the most recent disclosure, not a market-wide or historical holdings series. Each row carries a source role and lineage so a weight can be reconciled against the issuer disclosure.",
+        zh: "etf-holdings 為參考型資料集:每檔 ETF 回傳其最新揭露投資組合的成分股與各自權重,來源為發行機構。此為發行機構受限的最新快照——僅涵蓋發行機構有揭露持股的 ETF,且僅最新一期揭露,非全市場或歷史持股序列。每列附來源角色與 lineage,權重可與發行機構揭露對帳。",
+      },
+    ],
+    fields: [
+      { name: "symbol", type: "string", desc: { en: "ETF code (e.g. 0050).", zh: "ETF 代碼(如 0050)。" } },
+      { name: "constituent_symbol", type: "string", desc: { en: "Ticker of the held constituent.", zh: "所持成分股之代碼。" } },
+      { name: "constituent_name", type: "string", desc: { en: "Name of the held constituent.", zh: "所持成分股之名稱。" } },
+      { name: "weight_pct", type: "number", desc: { en: "Constituent weight in the ETF (percent).", zh: "該成分股於 ETF 之權重(百分比)。" } },
+      { name: "as_of", type: "string", desc: { en: "Disclosure date of this holdings snapshot.", zh: "此持股快照之揭露日期。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (issuer_etf_holdings).", zh: "正規來源角色(issuer_etf_holdings)。" } },
+    ],
+    exampleJson: {
+      en: `{
+  "data": [
+    {
+      "symbol": "0050",
+      "name": "Yuanta Taiwan Top 50 ETF",
+      "constituent_symbol": "2330",
+      "constituent_name": "TSMC",
+      "weight_pct": 56.2,
+      "as_of": "2026-07-17",
+      "source_role": "issuer_etf_holdings",
+      "lineage": {
+        "source_authority": "Issuer",
+        "payload_date": "2026-07-17"
+      }
+    }
+  ]
+}`,
+      zh: `{
+  "data": [
+    {
+      "symbol": "0050",
+      "name": "元大台灣50",
+      "constituent_symbol": "2330",
+      "constituent_name": "台積電",
+      "weight_pct": 56.2,
+      "as_of": "2026-07-17",
+      "source_role": "issuer_etf_holdings",
+      "lineage": {
+        "source_authority": "Issuer",
+        "payload_date": "2026-07-17"
+      }
+    }
+  ]
+}`,
+    },
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact ETF / constituent-row counts are pending a measured snapshot; the source is issuer holdings disclosure. Note this is an issuer-limited latest snapshot: only ETFs the issuer publishes holdings for, and only the most recent disclosure — not market-wide or historical. No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確 ETF 檔數／成分列數待量測快照;來源為發行機構持股揭露。注意此為發行機構受限的最新快照:僅涵蓋發行機構有揭露持股的 ETF,且僅最新一期——非全市場亦非歷史。寧不顯示計數也不捏造。",
+    },
+    params: REFERENCE_PARAMS,
+    notes: [
+      {
+        en: "Issuer-limited latest snapshot: coverage is whichever ETFs the issuer discloses holdings for, at their most recent disclosure date only — do not treat it as a market-wide or point-in-time historical holdings series.",
+        zh: "發行機構受限的最新快照:涵蓋範圍為發行機構有揭露持股的 ETF,且僅其最新揭露日期——請勿當作全市場或 point-in-time 歷史持股序列使用。",
+      },
+      {
+        en: "For this dataset the symbol param is an ETF code (e.g. 0050), not a general stock ticker.",
+        zh: "此資料集的 symbol 參數為 ETF 代碼(如 0050),非一般股票代碼。",
+      },
+    ],
+  },
+
+  // funds-intel — tax & business registration (reference grade, MOEA; public business-registration reference only, not private tax data → coverage TODO)
+  "tax-business-registration": {
+    slug: "tax-business-registration",
+    description: {
+      en: "Business-registration reference from the MOEA — the public registration record for a company (registered name, status, paid-in capital), via data.gov.tw.",
+      zh: "經濟部(MOEA)商業登記參考——公司的公開登記紀錄(登記名稱、狀態、實收資本額),經由 data.gov.tw。",
+    },
+    overview: [
+      {
+        en: "tax-business-registration is a reference dataset: one active record per registered business resolving an identifier to its public registration basics, sourced from the MOEA via data.gov.tw. It is public business-registration reference only — the registered name, status and capital that the MOEA publishes openly — not private tax-filing or confidential tax data. Each row carries a source role and lineage so a field can be reconciled against the open dataset.",
+        zh: "tax-business-registration 為參考型資料集:每家已登記商業一筆現用紀錄,將識別碼解析為公開登記基本資料,來源為經濟部(MOEA)經由 data.gov.tw。此僅為公開商業登記參考——MOEA 公開發布的登記名稱、狀態與資本額——非私人稅務申報或機密稅籍資料。每列附來源角色與 lineage,欄位可與開放資料集對帳。",
+      },
+    ],
+    fields: [
+      { name: "business_id", type: "string", desc: { en: "MOEA unified business number (8-digit registration id).", zh: "經濟部統一編號(8 碼登記識別)。" } },
+      { name: "company_name", type: "string", desc: { en: "Registered company name.", zh: "公司登記名稱。" } },
+      { name: "registration_status", type: "string", desc: { en: "Registration status (e.g. active / dissolved).", zh: "登記狀態(如 核准設立／解散)。" } },
+      { name: "paid_in_capital", type: "number", desc: { en: "Registered paid-in capital (TWD).", zh: "登記實收資本額(新台幣元)。" } },
+      { name: "registered_city", type: "string", desc: { en: "Registered location (city / county).", zh: "登記所在地(縣市)。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (moea_business_registration).", zh: "正規來源角色(moea_business_registration)。" } },
+    ],
+    exampleJson: {
+      en: `{
+  "data": [
+    {
+      "business_id": "########",
+      "company_name": "TSMC",
+      "registration_status": "active",
+      "paid_in_capital": 259320000000,
+      "registered_city": "Hsinchu",
+      "source_role": "moea_business_registration",
+      "lineage": {
+        "source_authority": "MOEA / data.gov.tw",
+        "payload_date": "2026-06-30"
+      }
+    }
+  ]
+}`,
+      zh: `{
+  "data": [
+    {
+      "business_id": "########",
+      "company_name": "台積電",
+      "registration_status": "核准設立",
+      "paid_in_capital": 259320000000,
+      "registered_city": "新竹",
+      "source_role": "moea_business_registration",
+      "lineage": {
+        "source_authority": "MOEA / data.gov.tw",
+        "payload_date": "2026-06-30"
+      }
+    }
+  ]
+}`,
+    },
+    coverage: null,
+    coverageTodo: {
+      en: "TODO — exact registered-business counts are pending a measured snapshot; the source is the MOEA public business-registration dataset via data.gov.tw. Note this is public business-registration reference only (registered name, status, capital) — not private tax-filing or confidential tax data. No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確登記商業家數待量測快照;來源為經濟部(MOEA)經由 data.gov.tw 的公開商業登記資料集。注意此僅為公開商業登記參考(登記名稱、狀態、資本額)——非私人稅務申報或機密稅籍資料。寧不顯示計數也不捏造。",
+    },
+    params: REFERENCE_PARAMS,
+    notes: [
+      {
+        en: "Public business-registration reference only: it exposes what the MOEA publishes openly (registered name, status, capital), not private tax filings or any confidential tax data.",
+        zh: "僅為公開商業登記參考:僅呈現經濟部公開發布之內容(登記名稱、狀態、資本額),不含私人稅務申報或任何機密稅籍資料。",
+      },
+      {
+        en: "The example business_id is masked (########); a real query returns the actual 8-digit MOEA unified business number from the open dataset.",
+        zh: "範例 business_id 已遮罩(########);實際查詢會回傳開放資料集中真實的 8 碼經濟部統一編號。",
+      },
+    ],
+  },
 };
 
 export function getDatasetDocContent(slug: string): DatasetDocContent | null {
