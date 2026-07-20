@@ -37,7 +37,26 @@ export function AnalyticsControls() {
   const [localConsent, setLocalConsent] = useState<boolean | null>(null);
   const consent = localConsent ?? storedConsent;
 
-  const shouldShowBanner = consent === null;
+  // COOKIE-CONSENT-01. The banner is client-only: it renders nothing until mounted.
+  //
+  // The consent decision lives in localStorage, which the server cannot read — and these pages are
+  // PRERENDERED (setRequestLocale enables static rendering; 215 zh-TW pages ship as static HTML).
+  // A prerendered file is one document shared by every visitor, so it can never encode "this person
+  // already consented": the banner was baked into the HTML, painted on load, then removed by JS after
+  // hydration. That flash is what users saw as "the banner comes back every time".
+  //
+  // Mirroring the decision into a cookie would not fix it here — reading a cookie during render opts
+  // the whole locale subtree out of static generation, turning every prerendered page into a
+  // per-request render. That is a large cost to pay for a cosmetic flash, so the render TIMING is
+  // moved instead: nothing is emitted server-side, and returning visitors never see the banner at all.
+  //
+  // The storage logic below is untouched — this only changes when the banner is allowed to render.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const shouldShowBanner = mounted && consent === null;
 
   if (!shouldShowBanner) return null;
 
