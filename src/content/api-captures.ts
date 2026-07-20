@@ -31,6 +31,647 @@ export type ApiCapture = {
 export const API_CAPTURED_AT = "2026-07-20";
 
 export const API_CAPTURES: Record<string, ApiCapture> = {
+  "adjusted-prices": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/adjusted-prices",
+  "request_id": "req_3fa1a13dd5cf",
+  "plan_id": "enterprise",
+  "dataset": "adjusted_prices",
+  "query": {
+    "ticker": "2330",
+    "market": null,
+    "date_from": null,
+    "date_to": "2026-07-20",
+    "adjustment_basis": null,
+    "limit": 50
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "adjusted_prices",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-20.preview",
+    "release_date": "2026-07-20",
+    "data_as_of": "2026-07-20",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-07-20",
+      "family": "market_technical",
+      "field_group_type": "derived",
+      "dataset_view": "adjusted_prices_v3",
+      "adjustment_basis": "price_only",
+      "supported_action_types": [
+        "split",
+        "stock_dividend"
+      ],
+      "supported_action_types_v3": [
+        "split",
+        "stock_dividend",
+        "cash_dividend"
+      ],
+      "included_in_price_only": [
+        "split",
+        "stock_dividend"
+      ],
+      "included_in_total_return": [
+        "split",
+        "stock_dividend",
+        "cash_dividend"
+      ],
+      "included_in_actions_v3": [
+        "split",
+        "stock_dividend",
+        "cash_dividend"
+      ],
+      "excluded_from_total_return": [
+        "capital_reduction",
+        "par_value_change",
+        "rights_issue"
+      ],
+      "excluded_action_types": [
+        {
+          "action_type": "capital_reduction",
+          "reason": "missing_fields_or_unstable_rule"
+        },
+        {
+          "action_type": "rights_issue",
+          "reason": "missing_fields_or_unstable_rule"
+        },
+        {
+          "action_type": "par_value_change",
+          "reason": "missing_fields_or_unstable_rule"
+        }
+      ]
+    },
+    "data": [
+      {
+        "ticker": "2330",
+        "trade_date": "2026-07-17",
+        "market": "TWSE",
+        "close": 2290,
+        "adjusted_close": 2290,
+        "adjustment_factor": 1,
+        "adjusted_close_total_return": null,
+        "adjustment_factor_total_return": null,
+        "adjustment_factor_actions_v3": 1,
+        "dividend_component": null,
+        "actions_applied": [],
+        "actions_excluded": [],
+        "adjustment_basis": "price_only",
+        "open": 2375,
+        "high": 2395,
+        "low": 2290,
+        "adjusted_open": 2375,
+        "adjusted_high": 2395,
+        "adjusted_low": 2290,
+        "volume_shares": 97362670,
+        "adjusted_volume": 97362670,
+        "source_id": "official_twse",
+        "quality_flag": "ok"
+      },
+      {
+        "ticker": "2330",
+        "trade_date": "2026-07-16",
+        "market": "TWSE",
+        "close": 2470,
+        "adjusted_close": 2470,
+        "adjustment_factor": 1,
+        "adjusted_close_total_return": null,
+        "adjustment_factor_total_return": null,
+        "adjustment_factor_actions_v3": 1,
+        "dividend_component": null,
+        "actions_applied": [],
+        "actions_excluded": [],
+        "adjustment_basis": "price_only",
+        "open": 2430,
+        "high": 2470,
+        "low": 2420,
+        "adjusted_open": 2430,
+        "adjusted_high": 2470,
+        "adjusted_low": 2420,
+        "volume_shares": 30538604,
+        "adjusted_volume": 30538604,
+        "source_id": "official_twse",
+        "quality_flag": "ok"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-20",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "market_prices_plus_corporate_actions",
+      "fallback_chain": [
+        "twse_official",
+        "tpex_official",
+        "data_gov_mirror"
+      ],
+      "policy_notes": [
+        "official/public-first canonical base",
+        "read-time adjustment adapter",
+        "v1 price_only supports split + stock_dividend only"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "adjusted_prices",
+      "request_id": "read-api-42bb2d808976",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
+  "balance-sheet": {
+    rowsKey: "rows",
+    envelopeKeys: ["count","dataset","meta","plan_id","rows","status","unit"],
+    zh: `{
+  "dataset": "balance_sheet",
+  "rows": [
+    {
+      "symbol": "2330",
+      "ticker": "2330",
+      "fiscal_year": 2026,
+      "fiscal_quarter": 1,
+      "period_type": "quarterly",
+      "period_end_date": "2026-03-31",
+      "report_date": "2026-03-31",
+      "total_assets": 8660949685,
+      "total_liabilities": 2728560764,
+      "total_equity": 5932388921,
+      "cash_and_cash_equivalents": null,
+      "inventory": null,
+      "accounts_receivable": null,
+      "current_assets": null,
+      "current_liabilities": null,
+      "source": "mops_official",
+      "source_name": "mops_official",
+      "fiscal_period": "2026-Q1",
+      "frequency": "quarterly",
+      "created_at": "2026-05-17T17:12:58.659044",
+      "updated_at": "2026-05-17T17:12:58.659044",
+      "fundamentals_context": {
+        "generated_at": "2026-07-20T18:31:54Z",
+        "ticker": "2330",
+        "period": "2026Q1",
+        "period_type": "quarterly",
+        "statement_family": "balance_sheet",
+        "metric_values": {
+          "symbol": "2330",
+          "period_end_date": "2026-03-31",
+          "report_date": "2026-03-31",
+          "total_assets": 8660949685,
+          "total_liabilities": 2728560764,
+          "total_equity": 5932388921,
+          "cash_and_cash_equivalents": null,
+          "inventory": null,
+          "accounts_receivable": null,
+          "current_assets": null,
+          "current_liabilities": null,
+          "source": "mops_official",
+          "source_name": "mops_official",
+          "fiscal_period": "2026-Q1",
+          "frequency": "quarterly",
+          "created_at": "2026-05-17T17:12:58.659044",
+          "updated_at": "2026-05-17T17:12:58.659044"
+        },
+        "source_lineage": {
+          "provider": "mops_official",
+          "source_role": "official_mops_balance_sheet",
+          "source_table": "fundamental_balance_sheets",
+          "ingestion_run_id": null,
+          "transformation_version": "fundamentals_ai_context_v1"
+        },
+        "data_gaps": [],
+        "restatement_warning": {
+          "has_restatement": false,
+          "reason": null,
+          "previous_version_ref": null
+        },
+        "not_investment_advice": true,
+        "coverage_window": {
+          "min_period": null,
+          "max_period": null,
+          "coverage_confidence": "medium",
+          "row_count": 0
+        },
+        "safe_usage_notes": [
+          "not_investment_advice",
+          "official_public_first_policy",
+          "period_semantics_explicit"
+        ],
+        "available_tools_or_endpoints": [
+          {
+            "name": "balance_sheet",
+            "path": "/v2/datasets/balance-sheet"
+          },
+          {
+            "name": "balance_sheet",
+            "path": "/v2/datasets/financials"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "2330",
+      "ticker": "2330",
+      "fiscal_year": 2026,
+      "fiscal_quarter": 1,
+      "period_type": "quarterly",
+      "period_end_date": "2026-03-31",
+      "report_date": "2026-05-15",
+      "total_assets": 8660949685,
+      "total_liabilities": 2728560764,
+      "total_equity": 5932388921,
+      "cash_and_cash_equivalents": null,
+      "inventory": null,
+      "accounts_receivable": null,
+      "current_assets": null,
+      "current_liabilities": null,
+      "source": "mops_t163sb05",
+      "source_name": "mops_t163sb05",
+      "fiscal_period": "2026-Q1",
+      "frequency": "quarterly",
+      "created_at": "2026-07-04T18:13:02.632865",
+      "updated_at": "2026-07-04T18:13:02.632865",
+      "fundamentals_context": {
+        "generated_at": "2026-07-20T18:31:54Z",
+        "ticker": "2330",
+        "period": "2026Q1",
+        "period_type": "quarterly",
+        "statement_family": "balance_sheet",
+        "metric_values": {
+          "symbol": "2330",
+          "period_end_date": "2026-03-31",
+          "report_date": "2026-05-15",
+          "total_assets": 8660949685,
+          "total_liabilities": 2728560764,
+          "total_equity": 5932388921,
+          "cash_and_cash_equivalents": null,
+          "inventory": null,
+          "accounts_receivable": null,
+          "current_assets": null,
+          "current_liabilities": null,
+          "source": "mops_t163sb05",
+          "source_name": "mops_t163sb05",
+          "fiscal_period": "2026-Q1",
+          "frequency": "quarterly",
+          "created_at": "2026-07-04T18:13:02.632865",
+          "updated_at": "2026-07-04T18:13:02.632865"
+        },
+        "source_lineage": {
+          "provider": "mops_t163sb05",
+          "source_role": "official_mops_balance_sheet",
+          "source_table": "fundamental_balance_sheets",
+          "ingestion_run_id": null,
+          "transformation_version": "fundamentals_ai_context_v1"
+        },
+        "data_gaps": [],
+        "restatement_warning": {
+          "has_restatement": false,
+          "reason": null,
+          "previous_version_ref": null
+        },
+        "not_investment_advice": true,
+        "coverage_window": {
+          "min_period": null,
+          "max_period": null,
+          "coverage_confidence": "medium",
+          "row_count": 0
+        },
+        "safe_usage_notes": [
+          "not_investment_advice",
+          "official_public_first_policy",
+          "period_semantics_explicit"
+        ],
+        "available_tools_or_endpoints": [
+          {
+            "name": "balance_sheet",
+            "path": "/v2/datasets/balance-sheet"
+          },
+          {
+            "name": "balance_sheet",
+            "path": "/v2/datasets/financials"
+          }
+        ]
+      }
+    }
+  ],
+  "count": 50,
+  "plan_id": "enterprise",
+  "status": "ok",
+  "unit": {
+    "currency": "TWD",
+    "scale": "per_field",
+    "fields": {
+      "total_assets": {
+        "currency": "TWD",
+        "scale": "thousand_twd",
+        "scale_multiplier": 1000,
+        "unit_label": "仟元",
+        "verified": true
+      },
+      "total_liabilities": {
+        "currency": "TWD",
+        "scale": "thousand_twd",
+        "scale_multiplier": 1000,
+        "unit_label": "仟元",
+        "verified": true
+      },
+      "total_equity": {
+        "currency": "TWD",
+        "scale": "thousand_twd",
+        "scale_multiplier": 1000,
+        "unit_label": "仟元",
+        "verified": true
+      },
+      "cash_and_cash_equivalents": {
+        "currency": "TWD",
+        "scale": "thousand_twd",
+        "scale_multiplier": 1000,
+        "unit_label": "仟元",
+        "verified": true
+      },
+      "accounts_receivable": {
+        "currency": "TWD",
+        "scale": "thousand_twd",
+        "scale_multiplier": 1000,
+        "unit_label": "仟元",
+        "verified": true
+      },
+      "inventory": {
+        "currency": "TWD",
+        "scale": "scale_unknown",
+        "scale_multiplier": null,
+        "unit_label": null,
+        "verified": false,
+        "reason": "no populated value exists to verify a scale against; the unit is NOT asserted"
+      }
+    },
+    "unverified_fields": [
+      "inventory"
+    ],
+    "source_of_truth": "official_mops_statement",
+    "note": "科目字典(§2b):單位以官方 MOPS 報表為準——三大報表金額為仟元(值 ×1000 = 元),EPS 為元/股,比率為 %。每個科目的 scale 皆以官方公布數字核對過;無法核對者標 scale_unknown,不臆測。"
+  },
+  "meta": {
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  }
+}`,
+    en: `{
+  "dataset": "balance_sheet",
+  "rows": [
+    {
+      "symbol": "2330",
+      "ticker": "2330",
+      "fiscal_year": 2026,
+      "fiscal_quarter": 1,
+      "period_type": "quarterly",
+      "period_end_date": "2026-03-31",
+      "report_date": "2026-03-31",
+      "total_assets": 8660949685,
+      "total_liabilities": 2728560764,
+      "total_equity": 5932388921,
+      "cash_and_cash_equivalents": null,
+      "inventory": null,
+      "accounts_receivable": null,
+      "current_assets": null,
+      "current_liabilities": null,
+      "source": "mops_official",
+      "source_name": "mops_official",
+      "fiscal_period": "2026-Q1",
+      "frequency": "quarterly",
+      "created_at": "2026-05-17T17:12:58.659044",
+      "updated_at": "2026-05-17T17:12:58.659044",
+      "fundamentals_context": {
+        "generated_at": "2026-07-20T18:31:54Z",
+        "ticker": "2330",
+        "period": "2026Q1",
+        "period_type": "quarterly",
+        "statement_family": "balance_sheet",
+        "metric_values": {
+          "symbol": "2330",
+          "period_end_date": "2026-03-31",
+          "report_date": "2026-03-31",
+          "total_assets": 8660949685,
+          "total_liabilities": 2728560764,
+          "total_equity": 5932388921,
+          "cash_and_cash_equivalents": null,
+          "inventory": null,
+          "accounts_receivable": null,
+          "current_assets": null,
+          "current_liabilities": null,
+          "source": "mops_official",
+          "source_name": "mops_official",
+          "fiscal_period": "2026-Q1",
+          "frequency": "quarterly",
+          "created_at": "2026-05-17T17:12:58.659044",
+          "updated_at": "2026-05-17T17:12:58.659044"
+        },
+        "source_lineage": {
+          "provider": "mops_official",
+          "source_role": "official_mops_balance_sheet",
+          "source_table": "fundamental_balance_sheets",
+          "ingestion_run_id": null,
+          "transformation_version": "fundamentals_ai_context_v1"
+        },
+        "data_gaps": [],
+        "restatement_warning": {
+          "has_restatement": false,
+          "reason": null,
+          "previous_version_ref": null
+        },
+        "not_investment_advice": true,
+        "coverage_window": {
+          "min_period": null,
+          "max_period": null,
+          "coverage_confidence": "medium",
+          "row_count": 0
+        },
+        "safe_usage_notes": [
+          "not_investment_advice",
+          "official_public_first_policy",
+          "period_semantics_explicit"
+        ],
+        "available_tools_or_endpoints": [
+          {
+            "name": "balance_sheet",
+            "path": "/v2/datasets/balance-sheet"
+          },
+          {
+            "name": "balance_sheet",
+            "path": "/v2/datasets/financials"
+          }
+        ]
+      }
+    },
+    {
+      "symbol": "2330",
+      "ticker": "2330",
+      "fiscal_year": 2026,
+      "fiscal_quarter": 1,
+      "period_type": "quarterly",
+      "period_end_date": "2026-03-31",
+      "report_date": "2026-05-15",
+      "total_assets": 8660949685,
+      "total_liabilities": 2728560764,
+      "total_equity": 5932388921,
+      "cash_and_cash_equivalents": null,
+      "inventory": null,
+      "accounts_receivable": null,
+      "current_assets": null,
+      "current_liabilities": null,
+      "source": "mops_t163sb05",
+      "source_name": "mops_t163sb05",
+      "fiscal_period": "2026-Q1",
+      "frequency": "quarterly",
+      "created_at": "2026-07-04T18:13:02.632865",
+      "updated_at": "2026-07-04T18:13:02.632865",
+      "fundamentals_context": {
+        "generated_at": "2026-07-20T18:31:54Z",
+        "ticker": "2330",
+        "period": "2026Q1",
+        "period_type": "quarterly",
+        "statement_family": "balance_sheet",
+        "metric_values": {
+          "symbol": "2330",
+          "period_end_date": "2026-03-31",
+          "report_date": "2026-05-15",
+          "total_assets": 8660949685,
+          "total_liabilities": 2728560764,
+          "total_equity": 5932388921,
+          "cash_and_cash_equivalents": null,
+          "inventory": null,
+          "accounts_receivable": null,
+          "current_assets": null,
+          "current_liabilities": null,
+          "source": "mops_t163sb05",
+          "source_name": "mops_t163sb05",
+          "fiscal_period": "2026-Q1",
+          "frequency": "quarterly",
+          "created_at": "2026-07-04T18:13:02.632865",
+          "updated_at": "2026-07-04T18:13:02.632865"
+        },
+        "source_lineage": {
+          "provider": "mops_t163sb05",
+          "source_role": "official_mops_balance_sheet",
+          "source_table": "fundamental_balance_sheets",
+          "ingestion_run_id": null,
+          "transformation_version": "fundamentals_ai_context_v1"
+        },
+        "data_gaps": [],
+        "restatement_warning": {
+          "has_restatement": false,
+          "reason": null,
+          "previous_version_ref": null
+        },
+        "not_investment_advice": true,
+        "coverage_window": {
+          "min_period": null,
+          "max_period": null,
+          "coverage_confidence": "medium",
+          "row_count": 0
+        },
+        "safe_usage_notes": [
+          "not_investment_advice",
+          "official_public_first_policy",
+          "period_semantics_explicit"
+        ],
+        "available_tools_or_endpoints": [
+          {
+            "name": "balance_sheet",
+            "path": "/v2/datasets/balance-sheet"
+          },
+          {
+            "name": "balance_sheet",
+            "path": "/v2/datasets/financials"
+          }
+        ]
+      }
+    }
+  ],
+  "count": 50,
+  "plan_id": "enterprise",
+  "status": "ok",
+  "unit": {
+    "currency": "TWD",
+    "scale": "per_field",
+    "fields": {
+      "total_assets": {
+        "currency": "TWD",
+        "scale": "thousand_twd",
+        "scale_multiplier": 1000,
+        "unit_label": "<Chinese value - see the zh page>",
+        "verified": true
+      },
+      "total_liabilities": {
+        "currency": "TWD",
+        "scale": "thousand_twd",
+        "scale_multiplier": 1000,
+        "unit_label": "<Chinese value - see the zh page>",
+        "verified": true
+      },
+      "total_equity": {
+        "currency": "TWD",
+        "scale": "thousand_twd",
+        "scale_multiplier": 1000,
+        "unit_label": "<Chinese value - see the zh page>",
+        "verified": true
+      },
+      "cash_and_cash_equivalents": {
+        "currency": "TWD",
+        "scale": "thousand_twd",
+        "scale_multiplier": 1000,
+        "unit_label": "<Chinese value - see the zh page>",
+        "verified": true
+      },
+      "accounts_receivable": {
+        "currency": "TWD",
+        "scale": "thousand_twd",
+        "scale_multiplier": 1000,
+        "unit_label": "<Chinese value - see the zh page>",
+        "verified": true
+      },
+      "inventory": {
+        "currency": "TWD",
+        "scale": "scale_unknown",
+        "scale_multiplier": null,
+        "unit_label": null,
+        "verified": false,
+        "reason": "no populated value exists to verify a scale against; the unit is NOT asserted"
+      }
+    },
+    "unverified_fields": [
+      "inventory"
+    ],
+    "source_of_truth": "official_mops_statement",
+    "note": "<Chinese value - see the zh page>"
+  },
+  "meta": {
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  }
+}`,
+  },
   "bond-convertible-reference": {
     rowsKey: "data",
     envelopeKeys: ["data","data_count","dataset_id","envelope","error","known_gaps","lineage","not_investment_advice","quality","request_context","warnings"],
@@ -45,12 +686,12 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "issuer": null,
       "underlying_ticker": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     }
   },
   "quality": {
-    "row_count": 2,
-    "bond_code_count": 2,
+    "row_count": 50,
+    "bond_code_count": 50,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -143,7 +784,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "clean_bondcode_reference_only",
     "latest_snapshot_only",
@@ -156,7 +797,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "bond_convertible_reference",
     "scope": "bond_convertible_reference_latest_snapshot_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
     en: `{
@@ -170,12 +811,12 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "issuer": null,
       "underlying_ticker": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     }
   },
   "quality": {
-    "row_count": 2,
-    "bond_code_count": 2,
+    "row_count": 50,
+    "bond_code_count": 50,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -268,7 +909,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "clean_bondcode_reference_only",
     "latest_snapshot_only",
@@ -281,7 +922,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "bond_convertible_reference",
     "scope": "bond_convertible_reference_latest_snapshot_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
   },
@@ -296,7 +937,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "release_date": "2026-07-20",
   "data_as_of": "2026-07-20",
   "request_context": {
-    "ticker": "犇亞",
+    "ticker": "1020",
     "as_of_date": "2026-07-20",
     "family": "discovery_reference",
     "field_group_type": "canonical",
@@ -412,11 +1053,11 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "blocking_gate": null
   },
   "dataset_id": "broker_branch_reference",
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
+    "address_missing",
     "not_investment_advice",
-    "not_trading_activity_coverage",
-    "reference_only"
+    "not_trading_activity_coverage"
   ],
   "warnings": [
     "not_investment_advice",
@@ -432,7 +1073,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "release_date": "2026-07-20",
   "data_as_of": "2026-07-20",
   "request_context": {
-    "ticker": "<Chinese value - see the zh page>",
+    "ticker": "1020",
     "as_of_date": "2026-07-20",
     "family": "discovery_reference",
     "field_group_type": "canonical",
@@ -548,11 +1189,11 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "blocking_gate": null
   },
   "dataset_id": "broker_branch_reference",
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
+    "address_missing",
     "not_investment_advice",
-    "not_trading_activity_coverage",
-    "reference_only"
+    "not_trading_activity_coverage"
   ],
   "warnings": [
     "not_investment_advice",
@@ -561,96 +1202,422 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   ]
 }`,
   },
+  "business-indicator-monthly": {
+    rowsKey: "data",
+    envelopeKeys: ["api_version","data","data_count","data_gaps","dataset","dataset_id","endpoint","envelope","error","known_gaps","lineage","meta","plan_id","quality","query","request_context","request_id","warnings"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/business-indicator-monthly",
+  "request_id": "req_e3fc727c2a9c",
+  "plan_id": "enterprise",
+  "dataset": "business_indicator_monthly",
+  "dataset_id": "business_indicator_monthly",
+  "request_context": {
+    "scope": "monthly_macro_business_cycle_only",
+    "coverage_type": "monthly_2020_2026_baseline",
+    "filters": {
+      "indicator_code": null,
+      "indicator_name": null,
+      "month_from": null,
+      "month_to": null,
+      "source_family": null,
+      "limit": 50
+    },
+    "min_indicator_month": "2025-10-01",
+    "max_indicator_month": "2026-04-01"
+  },
+  "quality": {
+    "row_count": 50,
+    "indicator_count": 8,
+    "raw_payload_exposed": false
+  },
+  "lineage": {
+    "source_providers": [
+      "ndc_official"
+    ],
+    "source_roles": [
+      "official_business_indicator_monthly"
+    ],
+    "source_families": [
+      "ndc_business_indicator_signal_csv"
+    ]
+  },
+  "error": null,
+  "data": [
+    {
+      "indicator_month": "2026-04-01",
+      "indicator_code": "coincident_composite_index",
+      "indicator_name": "同時指標綜合指數",
+      "value": 134.730496,
+      "value_text": "134.7304956",
+      "value_numeric": 134.730496,
+      "signal_light": null,
+      "unit": null,
+      "source_provider": "ndc_official",
+      "source_role": "official_business_indicator_monthly",
+      "source_family": "ndc_business_indicator_signal_csv",
+      "lineage": {
+        "date_raw": "202604",
+        "source_url": "ndc_download_ashx_zip",
+        "source_file": "景氣指標與燈號.csv",
+        "normalization": "wide_csv_to_month_indicator_rows"
+      },
+      "data_gaps": []
+    },
+    {
+      "indicator_month": "2026-04-01",
+      "indicator_code": "coincident_index_without_trend",
+      "indicator_name": "同時指標不含趨勢指數",
+      "value": 107.572161,
+      "value_text": "107.5721614",
+      "value_numeric": 107.572161,
+      "signal_light": null,
+      "unit": null,
+      "source_provider": "ndc_official",
+      "source_role": "official_business_indicator_monthly",
+      "source_family": "ndc_business_indicator_signal_csv",
+      "lineage": {
+        "date_raw": "202604",
+        "source_url": "ndc_download_ashx_zip",
+        "source_file": "景氣指標與燈號.csv",
+        "normalization": "wide_csv_to_month_indicator_rows"
+      },
+      "data_gaps": []
+    }
+  ],
+  "data_count": 50,
+  "known_gaps": [
+    "monthly_macro_business_cycle_only",
+    "not_company_fundamentals",
+    "not_industry_chain_reference"
+  ],
+  "data_gaps": [
+    "monthly_macro_business_cycle_only",
+    "not_company_fundamentals",
+    "not_industry_chain_reference"
+  ],
+  "query": {
+    "indicator_code": null,
+    "indicator_name": null,
+    "month_from": null,
+    "month_to": null,
+    "source_family": null,
+    "limit": 50
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "data",
+      "error",
+      "lineage"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "warnings": [
+    "not_investment_advice"
+  ],
+  "envelope": {
+    "dataset_id": "business_indicator_monthly",
+    "request_context": {
+      "scope": "monthly_macro_business_cycle_only",
+      "coverage_type": "monthly_2020_2026_baseline",
+      "filters": {
+        "indicator_code": null,
+        "indicator_name": null,
+        "month_from": null,
+        "month_to": null,
+        "source_family": null,
+        "limit": 50
+      },
+      "min_indicator_month": "2025-10-01",
+      "max_indicator_month": "2026-04-01"
+    },
+    "quality": {
+      "row_count": 50,
+      "indicator_count": 8,
+      "raw_payload_exposed": false
+    },
+    "lineage": {
+      "source_providers": [
+        "ndc_official"
+      ],
+      "source_roles": [
+        "official_business_indicator_monthly"
+      ],
+      "source_families": [
+        "ndc_business_indicator_signal_csv"
+      ]
+    },
+    "error": null,
+    "data": [
+      {
+        "indicator_month": "2026-04-01",
+        "indicator_code": "coincident_composite_index",
+        "indicator_name": "同時指標綜合指數",
+        "value": 134.730496,
+        "value_text": "134.7304956",
+        "value_numeric": 134.730496,
+        "signal_light": null,
+        "unit": null,
+        "source_provider": "ndc_official",
+        "source_role": "official_business_indicator_monthly",
+        "source_family": "ndc_business_indicator_signal_csv",
+        "lineage": {
+          "date_raw": "202604",
+          "source_url": "ndc_download_ashx_zip",
+          "source_file": "景氣指標與燈號.csv",
+          "normalization": "wide_csv_to_month_indicator_rows"
+        },
+        "data_gaps": []
+      },
+      {
+        "indicator_month": "2026-04-01",
+        "indicator_code": "coincident_index_without_trend",
+        "indicator_name": "同時指標不含趨勢指數",
+        "value": 107.572161,
+        "value_text": "107.5721614",
+        "value_numeric": 107.572161,
+        "signal_light": null,
+        "unit": null,
+        "source_provider": "ndc_official",
+        "source_role": "official_business_indicator_monthly",
+        "source_family": "ndc_business_indicator_signal_csv",
+        "lineage": {
+          "date_raw": "202604",
+          "source_url": "ndc_download_ashx_zip",
+          "source_file": "景氣指標與燈號.csv",
+          "normalization": "wide_csv_to_month_indicator_rows"
+        },
+        "data_gaps": []
+      }
+    ],
+    "known_gaps": [
+      "monthly_macro_business_cycle_only",
+      "not_company_fundamentals",
+      "not_industry_chain_reference"
+    ],
+    "warnings": [
+      "not_investment_advice"
+    ],
+    "envelope": {
+      "dataset_id": "business_indicator_monthly",
+      "scope": "monthly_macro_business_cycle_only",
+      "row_count": 50
+    }
+  }
+}`,
+    en: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/business-indicator-monthly",
+  "request_id": "req_e3fc727c2a9c",
+  "plan_id": "enterprise",
+  "dataset": "business_indicator_monthly",
+  "dataset_id": "business_indicator_monthly",
+  "request_context": {
+    "scope": "monthly_macro_business_cycle_only",
+    "coverage_type": "monthly_2020_2026_baseline",
+    "filters": {
+      "indicator_code": null,
+      "indicator_name": null,
+      "month_from": null,
+      "month_to": null,
+      "source_family": null,
+      "limit": 50
+    },
+    "min_indicator_month": "2025-10-01",
+    "max_indicator_month": "2026-04-01"
+  },
+  "quality": {
+    "row_count": 50,
+    "indicator_count": 8,
+    "raw_payload_exposed": false
+  },
+  "lineage": {
+    "source_providers": [
+      "ndc_official"
+    ],
+    "source_roles": [
+      "official_business_indicator_monthly"
+    ],
+    "source_families": [
+      "ndc_business_indicator_signal_csv"
+    ]
+  },
+  "error": null,
+  "data": [
+    {
+      "indicator_month": "2026-04-01",
+      "indicator_code": "coincident_composite_index",
+      "indicator_name": "<Chinese value - see the zh page>",
+      "value": 134.730496,
+      "value_text": "134.7304956",
+      "value_numeric": 134.730496,
+      "signal_light": null,
+      "unit": null,
+      "source_provider": "ndc_official",
+      "source_role": "official_business_indicator_monthly",
+      "source_family": "ndc_business_indicator_signal_csv",
+      "lineage": {
+        "date_raw": "202604",
+        "source_url": "ndc_download_ashx_zip",
+        "source_file": "<Chinese value - see the zh page>",
+        "normalization": "wide_csv_to_month_indicator_rows"
+      },
+      "data_gaps": []
+    },
+    {
+      "indicator_month": "2026-04-01",
+      "indicator_code": "coincident_index_without_trend",
+      "indicator_name": "<Chinese value - see the zh page>",
+      "value": 107.572161,
+      "value_text": "107.5721614",
+      "value_numeric": 107.572161,
+      "signal_light": null,
+      "unit": null,
+      "source_provider": "ndc_official",
+      "source_role": "official_business_indicator_monthly",
+      "source_family": "ndc_business_indicator_signal_csv",
+      "lineage": {
+        "date_raw": "202604",
+        "source_url": "ndc_download_ashx_zip",
+        "source_file": "<Chinese value - see the zh page>",
+        "normalization": "wide_csv_to_month_indicator_rows"
+      },
+      "data_gaps": []
+    }
+  ],
+  "data_count": 50,
+  "known_gaps": [
+    "monthly_macro_business_cycle_only",
+    "not_company_fundamentals",
+    "not_industry_chain_reference"
+  ],
+  "data_gaps": [
+    "monthly_macro_business_cycle_only",
+    "not_company_fundamentals",
+    "not_industry_chain_reference"
+  ],
+  "query": {
+    "indicator_code": null,
+    "indicator_name": null,
+    "month_from": null,
+    "month_to": null,
+    "source_family": null,
+    "limit": 50
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "data",
+      "error",
+      "lineage"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "warnings": [
+    "not_investment_advice"
+  ],
+  "envelope": {
+    "dataset_id": "business_indicator_monthly",
+    "request_context": {
+      "scope": "monthly_macro_business_cycle_only",
+      "coverage_type": "monthly_2020_2026_baseline",
+      "filters": {
+        "indicator_code": null,
+        "indicator_name": null,
+        "month_from": null,
+        "month_to": null,
+        "source_family": null,
+        "limit": 50
+      },
+      "min_indicator_month": "2025-10-01",
+      "max_indicator_month": "2026-04-01"
+    },
+    "quality": {
+      "row_count": 50,
+      "indicator_count": 8,
+      "raw_payload_exposed": false
+    },
+    "lineage": {
+      "source_providers": [
+        "ndc_official"
+      ],
+      "source_roles": [
+        "official_business_indicator_monthly"
+      ],
+      "source_families": [
+        "ndc_business_indicator_signal_csv"
+      ]
+    },
+    "error": null,
+    "data": [
+      {
+        "indicator_month": "2026-04-01",
+        "indicator_code": "coincident_composite_index",
+        "indicator_name": "<Chinese value - see the zh page>",
+        "value": 134.730496,
+        "value_text": "134.7304956",
+        "value_numeric": 134.730496,
+        "signal_light": null,
+        "unit": null,
+        "source_provider": "ndc_official",
+        "source_role": "official_business_indicator_monthly",
+        "source_family": "ndc_business_indicator_signal_csv",
+        "lineage": {
+          "date_raw": "202604",
+          "source_url": "ndc_download_ashx_zip",
+          "source_file": "<Chinese value - see the zh page>",
+          "normalization": "wide_csv_to_month_indicator_rows"
+        },
+        "data_gaps": []
+      },
+      {
+        "indicator_month": "2026-04-01",
+        "indicator_code": "coincident_index_without_trend",
+        "indicator_name": "<Chinese value - see the zh page>",
+        "value": 107.572161,
+        "value_text": "107.5721614",
+        "value_numeric": 107.572161,
+        "signal_light": null,
+        "unit": null,
+        "source_provider": "ndc_official",
+        "source_role": "official_business_indicator_monthly",
+        "source_family": "ndc_business_indicator_signal_csv",
+        "lineage": {
+          "date_raw": "202604",
+          "source_url": "ndc_download_ashx_zip",
+          "source_file": "<Chinese value - see the zh page>",
+          "normalization": "wide_csv_to_month_indicator_rows"
+        },
+        "data_gaps": []
+      }
+    ],
+    "known_gaps": [
+      "monthly_macro_business_cycle_only",
+      "not_company_fundamentals",
+      "not_industry_chain_reference"
+    ],
+    "warnings": [
+      "not_investment_advice"
+    ],
+    "envelope": {
+      "dataset_id": "business_indicator_monthly",
+      "scope": "monthly_macro_business_cycle_only",
+      "row_count": 50
+    }
+  }
+}`,
+  },
   "cash-flow-statement": {
     rowsKey: "rows",
     envelopeKeys: ["count","dataset","rows","status"],
     zh: `{
   "dataset": "cash_flow_statement",
   "rows": [
-    {
-      "symbol": "2330",
-      "ticker": "2330",
-      "fiscal_year": 2026,
-      "fiscal_quarter": 1,
-      "period_type": "quarterly",
-      "period_end_date": "2026-03-31",
-      "report_date": null,
-      "operating_cash_flow": 698976265,
-      "investing_cash_flow": -356853756,
-      "financing_cash_flow": -119910612,
-      "free_cash_flow": 342122509,
-      "capital_expenditures": null,
-      "depreciation": null,
-      "cash_beginning": null,
-      "cash_ending": null,
-      "net_change_in_cash": null,
-      "source": "official_mopsov_ajax_t163sb20",
-      "source_name": "official_mopsov_ajax_t163sb20",
-      "fiscal_period": "2026-Q1",
-      "frequency": "quarterly",
-      "updated_at": "2026-05-25T10:25:58.801061",
-      "fundamentals_context": {
-        "generated_at": "2026-07-20T13:57:44Z",
-        "ticker": "2330",
-        "period": "2026Q1",
-        "period_type": "quarterly",
-        "statement_family": "cash_flow_statement",
-        "metric_values": {
-          "symbol": "2330",
-          "period_end_date": "2026-03-31",
-          "report_date": null,
-          "operating_cash_flow": 698976265,
-          "investing_cash_flow": -356853756,
-          "financing_cash_flow": -119910612,
-          "free_cash_flow": 342122509,
-          "capital_expenditures": null,
-          "depreciation": null,
-          "cash_beginning": null,
-          "cash_ending": null,
-          "net_change_in_cash": null,
-          "source": "official_mopsov_ajax_t163sb20",
-          "source_name": "official_mopsov_ajax_t163sb20",
-          "fiscal_period": "2026-Q1",
-          "frequency": "quarterly",
-          "updated_at": "2026-05-25T10:25:58.801061"
-        },
-        "source_lineage": {
-          "provider": "official_mopsov_ajax_t163sb20",
-          "source_role": "official_mops_cash_flow_statement",
-          "source_table": "fundamental_cash_flows",
-          "ingestion_run_id": null,
-          "transformation_version": "fundamentals_ai_context_v1"
-        },
-        "data_gaps": [],
-        "restatement_warning": {
-          "has_restatement": false,
-          "reason": null,
-          "previous_version_ref": null
-        },
-        "not_investment_advice": true,
-        "coverage_window": {
-          "min_period": null,
-          "max_period": null,
-          "coverage_confidence": "medium",
-          "row_count": 0
-        },
-        "safe_usage_notes": [
-          "not_investment_advice",
-          "official_public_first_policy",
-          "period_semantics_explicit"
-        ],
-        "available_tools_or_endpoints": [
-          {
-            "name": "cash_flow_statement",
-            "path": "/v2/datasets/cash-flow-statement"
-          },
-          {
-            "name": "cash_flow_statement",
-            "path": "/v2/datasets/financials"
-          }
-        ]
-      }
-    },
     {
       "symbol": "2330",
       "ticker": "2330",
@@ -674,7 +1641,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "frequency": "quarterly",
       "updated_at": "2026-07-18T14:43:59.997885",
       "fundamentals_context": {
-        "generated_at": "2026-07-20T13:57:44Z",
+        "generated_at": "2026-07-20T18:31:54Z",
         "ticker": "2330",
         "period": "2026Q1",
         "period_type": "quarterly",
@@ -734,9 +1701,93 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
           }
         ]
       }
+    },
+    {
+      "symbol": "2330",
+      "ticker": "2330",
+      "fiscal_year": 2026,
+      "fiscal_quarter": 1,
+      "period_type": "quarterly",
+      "period_end_date": "2026-03-31",
+      "report_date": null,
+      "operating_cash_flow": 698976265,
+      "investing_cash_flow": -356853756,
+      "financing_cash_flow": -119910612,
+      "free_cash_flow": 342122509,
+      "capital_expenditures": null,
+      "depreciation": null,
+      "cash_beginning": null,
+      "cash_ending": null,
+      "net_change_in_cash": null,
+      "source": "official_mopsov_ajax_t163sb20",
+      "source_name": "official_mopsov_ajax_t163sb20",
+      "fiscal_period": "2026-Q1",
+      "frequency": "quarterly",
+      "updated_at": "2026-05-25T10:25:58.801061",
+      "fundamentals_context": {
+        "generated_at": "2026-07-20T18:31:54Z",
+        "ticker": "2330",
+        "period": "2026Q1",
+        "period_type": "quarterly",
+        "statement_family": "cash_flow_statement",
+        "metric_values": {
+          "symbol": "2330",
+          "period_end_date": "2026-03-31",
+          "report_date": null,
+          "operating_cash_flow": 698976265,
+          "investing_cash_flow": -356853756,
+          "financing_cash_flow": -119910612,
+          "free_cash_flow": 342122509,
+          "capital_expenditures": null,
+          "depreciation": null,
+          "cash_beginning": null,
+          "cash_ending": null,
+          "net_change_in_cash": null,
+          "source": "official_mopsov_ajax_t163sb20",
+          "source_name": "official_mopsov_ajax_t163sb20",
+          "fiscal_period": "2026-Q1",
+          "frequency": "quarterly",
+          "updated_at": "2026-05-25T10:25:58.801061"
+        },
+        "source_lineage": {
+          "provider": "official_mopsov_ajax_t163sb20",
+          "source_role": "official_mops_cash_flow_statement",
+          "source_table": "fundamental_cash_flows",
+          "ingestion_run_id": null,
+          "transformation_version": "fundamentals_ai_context_v1"
+        },
+        "data_gaps": [],
+        "restatement_warning": {
+          "has_restatement": false,
+          "reason": null,
+          "previous_version_ref": null
+        },
+        "not_investment_advice": true,
+        "coverage_window": {
+          "min_period": null,
+          "max_period": null,
+          "coverage_confidence": "medium",
+          "row_count": 0
+        },
+        "safe_usage_notes": [
+          "not_investment_advice",
+          "official_public_first_policy",
+          "period_semantics_explicit"
+        ],
+        "available_tools_or_endpoints": [
+          {
+            "name": "cash_flow_statement",
+            "path": "/v2/datasets/cash-flow-statement"
+          },
+          {
+            "name": "cash_flow_statement",
+            "path": "/v2/datasets/financials"
+          }
+        ]
+      }
     }
   ],
-  "count": 2,
+  "count": 50,
   "status": "ok"
 }`,
   },
@@ -825,7 +1876,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "freshness_as_of": "2026-06-09",
     "completeness_ratio": 1,
     "quality_status": "ready",
-    "ticker_count": 2
+    "ticker_count": 38
   },
   "lineage": {
     "source_role": "canonical",
@@ -848,7 +1899,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "blocking_gate": null
   },
   "dataset_id": "day_trading_suspension",
-  "data_count": 2,
+  "data_count": 38,
   "known_gaps": [
     "twse_only_scope",
     "no_tpex_coverage",
@@ -942,7 +1993,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "freshness_as_of": "2026-06-09",
     "completeness_ratio": 1,
     "quality_status": "ready",
-    "ticker_count": 2
+    "ticker_count": 38
   },
   "lineage": {
     "source_role": "canonical",
@@ -965,7 +2016,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "blocking_gate": null
   },
   "dataset_id": "day_trading_suspension",
-  "data_count": 2,
+  "data_count": 38,
   "known_gaps": [
     "twse_only_scope",
     "no_tpex_coverage",
@@ -1075,7 +2126,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "freshness_as_of": "2026-06-09",
     "completeness_ratio": 1,
     "quality_status": "ready",
-    "ticker_count": 2
+    "ticker_count": 43
   },
   "lineage": {
     "source_role": "canonical",
@@ -1098,7 +2149,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "blocking_gate": null
   },
   "dataset_id": "disposition_securities_period",
-  "data_count": 2,
+  "data_count": 48,
   "known_gaps": [
     "twse_only_scope",
     "no_tpex_coverage",
@@ -1204,7 +2255,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "freshness_as_of": "2026-06-09",
     "completeness_ratio": 1,
     "quality_status": "ready",
-    "ticker_count": 2
+    "ticker_count": 43
   },
   "lineage": {
     "source_role": "canonical",
@@ -1227,7 +2278,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "blocking_gate": null
   },
   "dataset_id": "disposition_securities_period",
-  "data_count": 2,
+  "data_count": 48,
   "known_gaps": [
     "twse_only_scope",
     "no_tpex_coverage",
@@ -1257,14 +2308,14 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "metric_name": null,
       "disclosure_status": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_as_of_date": "2026-06-05",
     "max_as_of_date": "2026-06-05"
   },
   "quality": {
-    "row_count": 2,
-    "ticker_count": 1,
+    "row_count": 50,
+    "ticker_count": 9,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -1323,7 +2374,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "official_open_current_snapshot_only",
     "ghg_only_initial_baseline",
@@ -1336,7 +2387,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "esg_tesg",
     "scope": "esg_tesg_official_open_ghg_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
     en: `{
@@ -1353,14 +2404,14 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "metric_name": null,
       "disclosure_status": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_as_of_date": "2026-06-05",
     "max_as_of_date": "2026-06-05"
   },
   "quality": {
-    "row_count": 2,
-    "ticker_count": 1,
+    "row_count": 50,
+    "ticker_count": 9,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -1419,7 +2470,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "official_open_current_snapshot_only",
     "ghg_only_initial_baseline",
@@ -1432,7 +2483,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "esg_tesg",
     "scope": "esg_tesg_official_open_ghg_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
   },
@@ -1451,13 +2502,13 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "holding_ticker": null,
       "market": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_as_of_date": "2026-07-16",
     "max_as_of_date": "2026-07-16"
   },
   "quality": {
-    "row_count": 2,
+    "row_count": 50,
     "etf_count": 1,
     "sensitive_fields_exposed": false
   },
@@ -1541,7 +2592,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "data_gaps": []
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "latest_available_snapshot_only",
     "issuer_limited_fubon_only",
@@ -1553,7 +2604,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "etf_holdings",
     "scope": "fubon_issuer_limited_latest_available_snapshot_set",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
     en: `{
@@ -1568,13 +2619,13 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "holding_ticker": null,
       "market": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_as_of_date": "2026-07-16",
     "max_as_of_date": "2026-07-16"
   },
   "quality": {
-    "row_count": 2,
+    "row_count": 50,
     "etf_count": 1,
     "sensitive_fields_exposed": false
   },
@@ -1658,7 +2709,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "data_gaps": []
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "latest_available_snapshot_only",
     "issuer_limited_fubon_only",
@@ -1670,7 +2721,120 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "etf_holdings",
     "scope": "fubon_issuer_limited_latest_available_snapshot_set",
-    "row_count": 2
+    "row_count": 50
+  }
+}`,
+  },
+  "financials": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/financials",
+  "request_id": "req_f2fe3cca4b9d",
+  "plan_id": "enterprise",
+  "dataset": "financials",
+  "query": {
+    "ticker": null,
+    "statement_type": null,
+    "period_type": null,
+    "date_from": null,
+    "date_to": "2026-07-20",
+    "limit": 50
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "financials",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-20.preview",
+    "release_date": "2026-07-20",
+    "data_as_of": "2026-07-20",
+    "request_context": {
+      "ticker": "1324",
+      "as_of_date": "2026-07-20",
+      "family": "fundamentals",
+      "field_group_type": "canonical",
+      "dataset_view": "fundamental_statements_v1"
+    },
+    "data": [
+      {
+        "ticker": "1324",
+        "statement_type": "income_statement",
+        "period_type": "quarterly",
+        "fiscal_period_end": "2026-03-31",
+        "report_date": null,
+        "fiscal_year": 2026,
+        "fiscal_quarter": 1,
+        "currency": "TWD",
+        "source_id": "mops_official",
+        "fields": {
+          "revenue": 169793,
+          "gross_profit": 27417,
+          "operating_income": -5261,
+          "pretax_income": -3657,
+          "net_income": -4503,
+          "eps": -0.06
+        },
+        "quality_flag": "ok"
+      },
+      {
+        "ticker": "1323",
+        "statement_type": "income_statement",
+        "period_type": "quarterly",
+        "fiscal_period_end": "2026-03-31",
+        "report_date": null,
+        "fiscal_year": 2026,
+        "fiscal_quarter": 1,
+        "currency": "TWD",
+        "source_id": "mops_official",
+        "fields": {
+          "revenue": 530894,
+          "gross_profit": 98916,
+          "operating_income": 23645,
+          "pretax_income": 38156,
+          "net_income": 32509,
+          "eps": 0.36
+        },
+        "quality_flag": "ok"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-20",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "mops_official",
+      "fallback_chain": [
+        "data_gov_mirror",
+        "finmind_legacy"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "FinMind not canonical",
+        "twstock helper only"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "financials",
+      "request_id": "read-api-7ffcf6dd7f4e",
+      "blocking_gate": null
+    }
   }
 }`,
   },
@@ -1689,14 +2853,14 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "fund_type": null,
       "source_as_of_date": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_source_as_of_date": "2026-06-04",
     "max_source_as_of_date": "2026-06-04"
   },
   "quality": {
-    "row_count": 2,
-    "fund_count": 2,
+    "row_count": 50,
+    "fund_count": 50,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -1761,7 +2925,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "latest_snapshot_only",
     "twse_first_baseline",
@@ -1774,7 +2938,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "fund_etf_metadata",
     "scope": "fund_etf_metadata_latest_snapshot_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
     en: `{
@@ -1789,14 +2953,14 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "fund_type": null,
       "source_as_of_date": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_source_as_of_date": "2026-06-04",
     "max_source_as_of_date": "2026-06-04"
   },
   "quality": {
-    "row_count": 2,
-    "fund_count": 2,
+    "row_count": 50,
+    "fund_count": 50,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -1861,7 +3025,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "latest_snapshot_only",
     "twse_first_baseline",
@@ -1874,7 +3038,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "fund_etf_metadata",
     "scope": "fund_etf_metadata_latest_snapshot_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
   },
@@ -1902,7 +3066,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "fiscal_period": "2026-Q1",
       "frequency": "quarterly",
       "fundamentals_context": {
-        "generated_at": "2026-07-20T13:57:51Z",
+        "generated_at": "2026-07-20T18:31:56Z",
         "ticker": "2330",
         "period": "2026Q1",
         "period_type": "quarterly",
@@ -1977,7 +3141,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "fiscal_period": "2025-Q4",
       "frequency": "quarterly",
       "fundamentals_context": {
-        "generated_at": "2026-07-20T13:57:51Z",
+        "generated_at": "2026-07-20T18:31:56Z",
         "ticker": "2330",
         "period": "2025Q4",
         "period_type": "quarterly",
@@ -2035,7 +3199,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       }
     }
   ],
-  "count": 2,
+  "count": 50,
   "status": "ok",
   "data_as_of": null,
   "pit": false,
@@ -2112,7 +3276,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "fiscal_period": "2026-Q1",
       "frequency": "quarterly",
       "fundamentals_context": {
-        "generated_at": "2026-07-20T13:57:51Z",
+        "generated_at": "2026-07-20T18:31:56Z",
         "ticker": "2330",
         "period": "2026Q1",
         "period_type": "quarterly",
@@ -2187,7 +3351,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "fiscal_period": "2025-Q4",
       "frequency": "quarterly",
       "fundamentals_context": {
-        "generated_at": "2026-07-20T13:57:51Z",
+        "generated_at": "2026-07-20T18:31:56Z",
         "ticker": "2330",
         "period": "2025Q4",
         "period_type": "quarterly",
@@ -2245,7 +3409,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       }
     }
   ],
-  "count": 2,
+  "count": 50,
   "status": "ok",
   "data_as_of": null,
   "pit": false,
@@ -2318,14 +3482,14 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "holder_role": null,
       "holder_category": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_source_as_of_date": "2026-05-20",
     "max_source_as_of_date": "2026-05-20"
   },
   "quality": {
-    "row_count": 2,
-    "ticker_count": 1,
+    "row_count": 50,
+    "ticker_count": 3,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -2390,7 +3554,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "latest_balance_snapshot_only",
     "holding_ratio_nullable_by_policy",
@@ -2403,7 +3567,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "insider_director_holdings",
     "scope": "insider_director_holdings_latest_balance_snapshot_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
     en: `{
@@ -2419,14 +3583,14 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "holder_role": null,
       "holder_category": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_source_as_of_date": "2026-05-20",
     "max_source_as_of_date": "2026-05-20"
   },
   "quality": {
-    "row_count": 2,
-    "ticker_count": 1,
+    "row_count": 50,
+    "ticker_count": 3,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -2491,7 +3655,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "latest_balance_snapshot_only",
     "holding_ratio_nullable_by_policy",
@@ -2504,7 +3668,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "insider_director_holdings",
     "scope": "insider_director_holdings_latest_balance_snapshot_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
   },
@@ -2577,7 +3741,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "total_institutional_net_buy_sell": -2624982
     }
   ],
-  "count": 2
+  "count": 50
 }`,
   },
   "institutional-flow-market-aggregate": {
@@ -2585,11 +3749,11 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     envelopeKeys: ["dataset_id","items","row_count","safe_usage_notes","status"],
     zh: `{
   "dataset_id": "institutional-flow-market-aggregate",
-  "row_count": 2,
+  "row_count": 50,
   "status": "ok",
   "items": [
     {
-      "generated_at": "2026-07-20T13:58:21Z",
+      "generated_at": "2026-07-20T18:33:56Z",
       "trade_date": "2026-07-17",
       "market": "TWSE",
       "foreign_net_buy": -1272145532,
@@ -2607,7 +3771,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       },
       "data_gaps": [],
       "coverage_window": {
-        "min_trade_date": "2026-07-16",
+        "min_trade_date": "2026-05-04",
         "max_trade_date": "2026-07-17"
       },
       "safe_usage_notes": [
@@ -2629,7 +3793,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "db_write_executed": false
     },
     {
-      "generated_at": "2026-07-20T13:58:21Z",
+      "generated_at": "2026-07-20T18:33:56Z",
       "trade_date": "2026-07-16",
       "market": "TWSE",
       "foreign_net_buy": 3387389,
@@ -2647,7 +3811,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       },
       "data_gaps": [],
       "coverage_window": {
-        "min_trade_date": "2026-07-16",
+        "min_trade_date": "2026-05-04",
         "max_trade_date": "2026-07-17"
       },
       "safe_usage_notes": [
@@ -2676,12 +3840,397 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   ]
 }`,
   },
+  "issuer-profile": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/issuer-profile",
+  "request_id": "req_b0ee95457597",
+  "plan_id": "enterprise",
+  "dataset": "issuer_profile",
+  "query": {
+    "symbol": "2330",
+    "market": null,
+    "limit": 50
+  },
+  "meta": {
+    "rows_returned": 1,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "issuer_profile",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-05-28.preview",
+    "release_date": "2026-05-28",
+    "data_as_of": "2026-05-28",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-05-28",
+      "family": "discovery_reference",
+      "field_group_type": "canonical",
+      "dataset_view": "issuer_profile_v1"
+    },
+    "data": [
+      {
+        "symbol": "2330",
+        "company_name": "台灣積體電路製造股份有限公司",
+        "market": "TWSE",
+        "industry": "24",
+        "isin": null,
+        "listing_date": "1994-09-05",
+        "chairperson": null,
+        "general_manager": null,
+        "capital": null,
+        "address": null,
+        "website": "https://www.tsmc.com",
+        "source_name": "official_twse_openapi_t187ap03_l",
+        "source_url": null,
+        "announcement_type": null,
+        "source_as_of": "2026-05-28",
+        "updated_at": "2026-07-17T15:58:24.532904"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-05-28",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "issuer_profiles",
+      "fallback_chain": [],
+      "policy_notes": [
+        "official/public-first canonical",
+        "issuer profile mapped from canonical issuer_profiles table",
+        "nullable profile fields are preserved as-is"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "issuer_profile",
+      "request_id": "read-api-590902c52ef5",
+      "blocking_gate": null
+    }
+  }
+}`,
+    en: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/issuer-profile",
+  "request_id": "req_b0ee95457597",
+  "plan_id": "enterprise",
+  "dataset": "issuer_profile",
+  "query": {
+    "symbol": "2330",
+    "market": null,
+    "limit": 50
+  },
+  "meta": {
+    "rows_returned": 1,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "issuer_profile",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-05-28.preview",
+    "release_date": "2026-05-28",
+    "data_as_of": "2026-05-28",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-05-28",
+      "family": "discovery_reference",
+      "field_group_type": "canonical",
+      "dataset_view": "issuer_profile_v1"
+    },
+    "data": [
+      {
+        "symbol": "2330",
+        "company_name": "<Chinese value - see the zh page>",
+        "market": "TWSE",
+        "industry": "24",
+        "isin": null,
+        "listing_date": "1994-09-05",
+        "chairperson": null,
+        "general_manager": null,
+        "capital": null,
+        "address": null,
+        "website": "https://www.tsmc.com",
+        "source_name": "official_twse_openapi_t187ap03_l",
+        "source_url": null,
+        "announcement_type": null,
+        "source_as_of": "2026-05-28",
+        "updated_at": "2026-07-17T15:58:24.532904"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-05-28",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "issuer_profiles",
+      "fallback_chain": [],
+      "policy_notes": [
+        "official/public-first canonical",
+        "issuer profile mapped from canonical issuer_profiles table",
+        "nullable profile fields are preserved as-is"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "issuer_profile",
+      "request_id": "read-api-590902c52ef5",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
+  "margin-short": {
+    rowsKey: "rows",
+    envelopeKeys: ["count","dataset","dataset_id","meta","plan_id","rows"],
+    zh: `{
+  "dataset": "margin_short",
+  "dataset_id": "margin_short",
+  "rows": [
+    {
+      "ticker": "2330",
+      "market": "TWSE",
+      "trade_date": "2026-07-09",
+      "margin_purchase_buy": 1064,
+      "margin_purchase_sell": 272,
+      "margin_purchase_balance": 33061,
+      "short_sale_buy": 0,
+      "short_sale_sell": 14,
+      "short_sale_balance": 71,
+      "data_gaps": [],
+      "source_provider": "twse_official",
+      "source_role": "official_twse_mi_margn",
+      "source_lineage": {
+        "feeds": [
+          "margin_trading_daily",
+          "short_selling_daily"
+        ],
+        "merged_from": "margin_short_daily",
+        "transformation_version": "margin_short_deep_merge_v1"
+      },
+      "not_investment_advice": true,
+      "symbol": "2330",
+      "as_of_date": "2026-07-09",
+      "margin_balance": 33061,
+      "short_balance": 71,
+      "margin_purchase": 1064,
+      "short_sale": 14,
+      "margin_utilization_ratio": 0.0021475454462962403
+    },
+    {
+      "ticker": "2330",
+      "market": "TWSE",
+      "trade_date": "2026-07-08",
+      "margin_purchase_buy": 807,
+      "margin_purchase_sell": 829,
+      "margin_purchase_balance": 32283,
+      "short_sale_buy": 4,
+      "short_sale_sell": 8,
+      "short_sale_balance": 85,
+      "data_gaps": [],
+      "source_provider": "twse_official",
+      "source_role": "official_twse_mi_margn",
+      "source_lineage": {
+        "feeds": [
+          "margin_trading_daily",
+          "short_selling_daily"
+        ],
+        "merged_from": "margin_short_daily",
+        "transformation_version": "margin_short_deep_merge_v1"
+      },
+      "not_investment_advice": true,
+      "symbol": "2330",
+      "as_of_date": "2026-07-08",
+      "margin_balance": 32283,
+      "short_balance": 85,
+      "margin_purchase": 807,
+      "short_sale": 8,
+      "margin_utilization_ratio": 0.0026329647182727752
+    }
+  ],
+  "count": 50,
+  "plan_id": "enterprise",
+  "meta": {
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "market": "TWSE",
+    "private_beta_contract": true,
+    "is_limited": false
+  }
+}`,
+  },
+  "margin-short-enhanced": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/margin-short-enhanced",
+  "request_id": "req_36b76b1d40b7",
+  "plan_id": "enterprise",
+  "dataset": "margin_short",
+  "query": {
+    "ticker": "2330",
+    "date_from": null,
+    "date_to": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "trade_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "margin_short",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-09.preview",
+    "release_date": "2026-07-09",
+    "data_as_of": "2026-07-09",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-07-09",
+      "family": "chip_deep",
+      "field_group_type": "derived",
+      "dataset_view": "margin_short_enhanced_v1",
+      "supported_sort_by": [
+        "trade_date"
+      ],
+      "supported_filter_fields": [
+        "ticker",
+        "date_from",
+        "date_to"
+      ]
+    },
+    "data": [
+      {
+        "ticker": "2330",
+        "market": "TWSE",
+        "trade_date": "2026-07-09",
+        "margin_balance": 33061,
+        "short_balance": 71,
+        "margin_balance_change": 778,
+        "short_balance_change": -14,
+        "margin_usage_ratio": 0.997857,
+        "short_usage_ratio": 0.002143,
+        "margin_buy": 1064,
+        "margin_sell": 272,
+        "short_sell": 14,
+        "short_cover": 0,
+        "securities_lending_balance": null,
+        "securities_lending_change": null,
+        "provider": "twse_official",
+        "source_role": "official_twse_mi_margn",
+        "lineage": {
+          "feeds": [
+            "margin_trading_daily",
+            "short_selling_daily"
+          ],
+          "merged_from": "margin_short_daily",
+          "transformation_version": "margin_short_deep_merge_v1"
+        },
+        "data_gaps": [],
+        "updated_at": "2026-07-14T14:03:17.715986"
+      },
+      {
+        "ticker": "2330",
+        "market": "TWSE",
+        "trade_date": "2026-07-08",
+        "margin_balance": 32283,
+        "short_balance": 85,
+        "margin_balance_change": -259,
+        "short_balance_change": -4,
+        "margin_usage_ratio": 0.997374,
+        "short_usage_ratio": 0.002626,
+        "margin_buy": 807,
+        "margin_sell": 829,
+        "short_sell": 8,
+        "short_cover": 4,
+        "securities_lending_balance": null,
+        "securities_lending_change": null,
+        "provider": "twse_official",
+        "source_role": "official_twse_mi_margn",
+        "lineage": {
+          "feeds": [
+            "margin_trading_daily",
+            "short_selling_daily"
+          ],
+          "merged_from": "margin_short_daily",
+          "transformation_version": "margin_short_deep_merge_v1"
+        },
+        "data_gaps": [],
+        "updated_at": "2026-07-14T14:03:17.715986"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-09",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "twse_official",
+      "fallback_chain": [
+        "tpex_official",
+        "data_gov_mirror"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "margin_short enhanced product rows derived from chip_deep margin/short/lending canonical payloads",
+        "unstable fields excluded from public contract (scores/signals/custom factors)"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "margin_short",
+      "request_id": "read-api-d78cfcbeec22",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
   "market-index": {
     rowsKey: "items",
     envelopeKeys: ["dataset_id","held_policy","items","row_count"],
     zh: `{
   "dataset_id": "market-index",
-  "row_count": 2,
+  "row_count": 50,
   "items": [
     {
       "index_identity": {
@@ -2802,7 +4351,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
 }`,
     en: `{
   "dataset_id": "market-index",
-  "row_count": 2,
+  "row_count": 50,
   "items": [
     {
       "index_identity": {
@@ -3129,11 +4678,11 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "blocking_gate": null
   },
   "dataset_id": "market_overview_snapshots",
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
-    "missing_listed_count_from_approved_inputs",
-    "missing_market_breadth_items_row",
-    "missing_transaction_count_from_approved_inputs"
+    "listed_count_unavailable_from_official_twse_mi_index_ms",
+    "missing_index_data_items_row",
+    "missing_listed_count_from_approved_inputs"
   ],
   "warnings": [
     "not_investment_advice"
@@ -3343,15 +4892,119 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "blocking_gate": null
   },
   "dataset_id": "market_overview_snapshots",
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
-    "missing_listed_count_from_approved_inputs",
-    "missing_market_breadth_items_row",
-    "missing_transaction_count_from_approved_inputs"
+    "listed_count_unavailable_from_official_twse_mi_index_ms",
+    "missing_index_data_items_row",
+    "missing_listed_count_from_approved_inputs"
   ],
   "warnings": [
     "not_investment_advice"
   ]
+}`,
+  },
+  "market-prices": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/market-prices",
+  "request_id": "req_5e9147a25d21",
+  "plan_id": "enterprise",
+  "dataset": "market_prices",
+  "query": {
+    "ticker": null,
+    "market": null,
+    "date_from": null,
+    "date_to": "2026-07-20",
+    "limit": 50
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "market_prices",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-20.preview",
+    "release_date": "2026-07-20",
+    "data_as_of": "2026-07-20",
+    "request_context": {
+      "ticker": "00400A",
+      "as_of_date": "2026-07-20",
+      "family": "market_technical",
+      "field_group_type": "canonical"
+    },
+    "data": [
+      {
+        "ticker": "00400A",
+        "market": "TWSE",
+        "trade_date": "2026-07-17",
+        "open": 13.5,
+        "high": 13.54,
+        "low": 12.99,
+        "close": 12.99,
+        "volume_shares": 84849085,
+        "turnover_value": 1122046948,
+        "trade_count": 28958,
+        "price_change": -1,
+        "price_change_sign": "-",
+        "source_canonical": "official_twse",
+        "source_name": "twse_stock_day_all_openapi"
+      },
+      {
+        "ticker": "00401A",
+        "market": "TWSE",
+        "trade_date": "2026-07-17",
+        "open": 13.06,
+        "high": 13.06,
+        "low": 12.49,
+        "close": 12.5,
+        "volume_shares": 10441738,
+        "turnover_value": 132247089,
+        "trade_count": 1878,
+        "price_change": -0.82,
+        "price_change_sign": "-",
+        "source_canonical": "official_twse",
+        "source_name": "twse_stock_day_all_openapi"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-20",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "twse_official",
+      "fallback_chain": [
+        "tpex_official",
+        "data_gov_mirror",
+        "yahoo_helper"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "FinMind not canonical",
+        "twstock helper only"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "market_prices",
+      "request_id": "read-api-ed85ba073c55",
+      "blocking_gate": null
+    }
+  }
 }`,
   },
   "market-snapshot": {
@@ -3388,7 +5041,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "price_change_sign": "-"
     }
   ],
-  "count": 2,
+  "count": 50,
   "status": "ok"
 }`,
   },
@@ -3427,7 +5080,137 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "source_id": "mops_official"
     }
   ],
-  "count": 2
+  "count": 35
+}`,
+  },
+  "monthly-revenue-enhanced": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/monthly-revenue-enhanced",
+  "request_id": "req_3b0e0cee6363",
+  "plan_id": "enterprise",
+  "dataset": "monthly_revenue_enhanced",
+  "query": {
+    "ticker": "2330",
+    "period_from": null,
+    "period_to": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "period",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "monthly_revenue_enhanced",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-06-10.preview",
+    "release_date": "2026-06-10",
+    "data_as_of": "2026-06-10",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-06-10",
+      "family": "fundamentals",
+      "field_group_type": "derived",
+      "dataset_view": "monthly_revenue_enhanced_v1",
+      "supported_sort_by": [
+        "period"
+      ],
+      "supported_filter_fields": [
+        "ticker",
+        "period_from",
+        "period_to"
+      ]
+    },
+    "data": [
+      {
+        "ticker": "2330",
+        "market": "TWSE",
+        "period": "2026-05",
+        "as_of_date": "2026-06-10",
+        "revenue": 416975163,
+        "revenue_yoy_pct": 30.095,
+        "revenue_mom_pct": 1.5217,
+        "revenue_rolling_3m": 1242891980,
+        "revenue_rolling_12m": 4261521438,
+        "revenue_ytd": 1961803721,
+        "revenue_ytd_yoy_pct": 29.9779,
+        "provider": "twse_official",
+        "source_role": "official_mops_monthly_revenue",
+        "lineage": {
+          "row_index": 279,
+          "source_hash": "",
+          "payload_date": "2026-05-01",
+          "request_date": "2026-05-01",
+          "endpoint_name": "t187ap05",
+          "source_authority": "MOPS t187ap05"
+        },
+        "updated_at": "2026-07-14T02:21:44.473057"
+      },
+      {
+        "ticker": "2330",
+        "market": "TWSE",
+        "period": "2026-04",
+        "as_of_date": "2026-05-10",
+        "revenue": 410725118,
+        "revenue_yoy_pct": 17.495412,
+        "revenue_mom_pct": -1.075788,
+        "revenue_rolling_3m": 1143573430,
+        "revenue_rolling_12m": 4165062226,
+        "revenue_ytd": 1544828558,
+        "revenue_ytd_yoy_pct": 29.946314,
+        "provider": "mops_official",
+        "source_role": "canonical",
+        "lineage": {
+          "revision_key": null,
+          "source_table": "p0_canonical_fundamentals_daily",
+          "normalization": "monthly_revenue_v1",
+          "announcement_date": "2026-05-17",
+          "source_publish_date": "2026-05-17",
+          "transformation_version": "monthly_revenue_enhanced_v1"
+        },
+        "updated_at": "2026-07-14T02:21:47.017593"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-06-10",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "mops_official",
+      "fallback_chain": [
+        "data_gov_mirror",
+        "finmind_legacy"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "monthly_revenue_enhanced derived from canonical fundamentals monthly rows",
+        "unstable fields excluded from public contract (surprise/score/seasonality-adjusted/custom)"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "monthly_revenue_enhanced",
+      "request_id": "read-api-f27c556ebe6b",
+      "blocking_gate": null
+    }
+  }
 }`,
   },
   "options-daily-taifex": {
@@ -3446,13 +5229,13 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "option_type": null,
       "expiry_month": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_trade_date": "2026-06-04",
     "max_trade_date": "2026-06-04"
   },
   "quality": {
-    "row_count": 2,
+    "row_count": 50,
     "contract_count": 1,
     "sensitive_fields_exposed": false
   },
@@ -3520,7 +5303,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "latest_daily_file_only",
     "single_trading_date_baseline",
@@ -3533,7 +5316,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "options_daily_taifex",
     "scope": "options_daily_taifex_latest_daily_file_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
     en: `{
@@ -3549,13 +5332,13 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "option_type": null,
       "expiry_month": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_trade_date": "2026-06-04",
     "max_trade_date": "2026-06-04"
   },
   "quality": {
-    "row_count": 2,
+    "row_count": 50,
     "contract_count": 1,
     "sensitive_fields_exposed": false
   },
@@ -3623,7 +5406,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "latest_daily_file_only",
     "single_trading_date_baseline",
@@ -3636,7 +5419,715 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "options_daily_taifex",
     "scope": "options_daily_taifex_latest_daily_file_only",
-    "row_count": 2
+    "row_count": 50
+  }
+}`,
+  },
+  "ownership-distribution": {
+    rowsKey: "data",
+    envelopeKeys: ["api_version","data","data_count","data_gaps","dataset","dataset_id","endpoint","envelope","error","known_gaps","lineage","meta","plan_id","quality","query","request_context","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/ownership-distribution",
+  "request_id": "req_375fb93dc782",
+  "plan_id": "enterprise",
+  "dataset": "ownership_distribution",
+  "dataset_id": "ownership_distribution",
+  "request_context": {
+    "ticker": "2330",
+    "as_of_date": "2026-05-29",
+    "family": "chip_deep",
+    "field_group_type": "derived",
+    "dataset_view": "tdcc_v1_mapped_company_only_latest_snapshot",
+    "known_gaps": [
+      "mapped_company_only_latest_snapshot",
+      "latest_snapshot_only",
+      "no_full_tdcc_universe_claim"
+    ],
+    "scope": "mapped-company-only",
+    "coverage_type": "latest_snapshot",
+    "dataset_id": "ownership_distribution",
+    "report_date": "2026-05-29",
+    "included_tickers": 1978,
+    "excluded_tickers": 2004,
+    "excluded_rows": 34068
+  },
+  "quality": {
+    "freshness_state": "fresh",
+    "freshness_as_of": "2026-05-29",
+    "completeness_ratio": 1,
+    "quality_status": "ready"
+  },
+  "lineage": {
+    "source_role": "canonical",
+    "selected_source": "tdcc_shareholding_distribution_items",
+    "fallback_chain": [],
+    "policy_notes": [
+      "tdcc_v1_mapped_company_only_latest_snapshot",
+      "contract-aligned filters: ticker/report_date/start_date/end_date/market/holder_bucket",
+      "no_full_tdcc_coverage_claim"
+    ]
+  },
+  "error": {
+    "error_code": null,
+    "error_message": null,
+    "dataset": "ownership_distribution",
+    "request_id": "read-api-a653800fb418",
+    "blocking_gate": null
+  },
+  "data": [
+    {
+      "security_identity": {
+        "ticker": "2330",
+        "market": "TWSE"
+      },
+      "snapshot_context": {
+        "report_date": "2026-05-29",
+        "scope": "mapped-company-only",
+        "coverage_type": "latest_snapshot"
+      },
+      "distribution_bucket": {
+        "holding_bucket": "TDCC_01",
+        "holder_count": 2149965,
+        "shares": 254881810,
+        "holding_ratio": 0.0098
+      },
+      "source_lineage": {
+        "source_provider": "tdcc_official",
+        "source_role": "shareholding_distribution",
+        "source_family": "dataset_1_5",
+        "lineage": {
+          "source_url": "https://smart.tdcc.com.tw/opendata/getOD.ashx?id=1-5",
+          "report_date": "2026-05-29",
+          "product_scope": "mapped_company_only_latest_snapshot_v1",
+          "market_mapping_policy": "official_issuer_profile_union_only",
+          "market_enrichment_sources": [
+            "https://openapi.twse.com.tw/v1/opendata/t187ap03_L",
+            "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O"
+          ]
+        }
+      },
+      "data_gaps": [
+        "mapped_company_only_latest_snapshot",
+        "excludes_etf_fund_preferred_emerging_unknown_unresolved",
+        "not_full_tdcc_coverage"
+      ],
+      "safe_usage_notes": [
+        "latest_snapshot_only",
+        "mapped_company_only_scope",
+        "not_full_tdcc_coverage"
+      ],
+      "not_investment_advice": true,
+      "available_tools_or_endpoints": {
+        "dataset_endpoint": "/v2/datasets/ownership-distribution",
+        "lookup_hint": "ticker=2330&market=TWSE",
+        "scope_note": "tdcc_v1_mapped_company_only_latest_snapshot"
+      }
+    },
+    {
+      "security_identity": {
+        "ticker": "2330",
+        "market": "TWSE"
+      },
+      "snapshot_context": {
+        "report_date": "2026-05-29",
+        "scope": "mapped-company-only",
+        "coverage_type": "latest_snapshot"
+      },
+      "distribution_bucket": {
+        "holding_bucket": "TDCC_02",
+        "holder_count": 421963,
+        "shares": 806563397,
+        "holding_ratio": 0.0311
+      },
+      "source_lineage": {
+        "source_provider": "tdcc_official",
+        "source_role": "shareholding_distribution",
+        "source_family": "dataset_1_5",
+        "lineage": {
+          "source_url": "https://smart.tdcc.com.tw/opendata/getOD.ashx?id=1-5",
+          "report_date": "2026-05-29",
+          "product_scope": "mapped_company_only_latest_snapshot_v1",
+          "market_mapping_policy": "official_issuer_profile_union_only",
+          "market_enrichment_sources": [
+            "https://openapi.twse.com.tw/v1/opendata/t187ap03_L",
+            "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O"
+          ]
+        }
+      },
+      "data_gaps": [
+        "mapped_company_only_latest_snapshot",
+        "excludes_etf_fund_preferred_emerging_unknown_unresolved",
+        "not_full_tdcc_coverage"
+      ],
+      "safe_usage_notes": [
+        "latest_snapshot_only",
+        "mapped_company_only_scope",
+        "not_full_tdcc_coverage"
+      ],
+      "not_investment_advice": true,
+      "available_tools_or_endpoints": {
+        "dataset_endpoint": "/v2/datasets/ownership-distribution",
+        "lookup_hint": "ticker=2330&market=TWSE",
+        "scope_note": "tdcc_v1_mapped_company_only_latest_snapshot"
+      }
+    }
+  ],
+  "data_count": 17,
+  "known_gaps": [
+    "mapped_company_only_latest_snapshot",
+    "latest_snapshot_only",
+    "no_full_tdcc_universe_claim"
+  ],
+  "data_gaps": [
+    "mapped_company_only_latest_snapshot",
+    "latest_snapshot_only",
+    "no_full_tdcc_universe_claim"
+  ],
+  "query": {
+    "symbol": "2330",
+    "report_date": null,
+    "as_of_date": null,
+    "start_date": null,
+    "end_date": null,
+    "market": null,
+    "holder_bucket": null,
+    "limit": 50,
+    "legacy_aliases_used": {
+      "ticker": false,
+      "date_from": false,
+      "date_to": false,
+      "bucket": false,
+      "offset": false,
+      "sort_by": false,
+      "sort_order": false
+    }
+  },
+  "meta": {
+    "rows_returned": 17,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "ownership_distribution",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-05-29.preview",
+    "release_date": "2026-05-29",
+    "data_as_of": "2026-05-29",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-05-29",
+      "family": "chip_deep",
+      "field_group_type": "derived",
+      "dataset_view": "tdcc_v1_mapped_company_only_latest_snapshot",
+      "known_gaps": [
+        "mapped_company_only_latest_snapshot",
+        "latest_snapshot_only",
+        "no_full_tdcc_universe_claim"
+      ],
+      "scope": "mapped-company-only",
+      "coverage_type": "latest_snapshot",
+      "dataset_id": "ownership_distribution",
+      "report_date": "2026-05-29",
+      "included_tickers": 1978,
+      "excluded_tickers": 2004,
+      "excluded_rows": 34068
+    },
+    "data": [
+      {
+        "security_identity": {
+          "ticker": "2330",
+          "market": "TWSE"
+        },
+        "snapshot_context": {
+          "report_date": "2026-05-29",
+          "scope": "mapped-company-only",
+          "coverage_type": "latest_snapshot"
+        },
+        "distribution_bucket": {
+          "holding_bucket": "TDCC_01",
+          "holder_count": 2149965,
+          "shares": 254881810,
+          "holding_ratio": 0.0098
+        },
+        "source_lineage": {
+          "source_provider": "tdcc_official",
+          "source_role": "shareholding_distribution",
+          "source_family": "dataset_1_5",
+          "lineage": {
+            "source_url": "https://smart.tdcc.com.tw/opendata/getOD.ashx?id=1-5",
+            "report_date": "2026-05-29",
+            "product_scope": "mapped_company_only_latest_snapshot_v1",
+            "market_mapping_policy": "official_issuer_profile_union_only",
+            "market_enrichment_sources": [
+              "https://openapi.twse.com.tw/v1/opendata/t187ap03_L",
+              "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O"
+            ]
+          }
+        },
+        "data_gaps": [
+          "mapped_company_only_latest_snapshot",
+          "excludes_etf_fund_preferred_emerging_unknown_unresolved",
+          "not_full_tdcc_coverage"
+        ],
+        "safe_usage_notes": [
+          "latest_snapshot_only",
+          "mapped_company_only_scope",
+          "not_full_tdcc_coverage"
+        ],
+        "not_investment_advice": true,
+        "available_tools_or_endpoints": {
+          "dataset_endpoint": "/v2/datasets/ownership-distribution",
+          "lookup_hint": "ticker=2330&market=TWSE",
+          "scope_note": "tdcc_v1_mapped_company_only_latest_snapshot"
+        }
+      },
+      {
+        "security_identity": {
+          "ticker": "2330",
+          "market": "TWSE"
+        },
+        "snapshot_context": {
+          "report_date": "2026-05-29",
+          "scope": "mapped-company-only",
+          "coverage_type": "latest_snapshot"
+        },
+        "distribution_bucket": {
+          "holding_bucket": "TDCC_02",
+          "holder_count": 421963,
+          "shares": 806563397,
+          "holding_ratio": 0.0311
+        },
+        "source_lineage": {
+          "source_provider": "tdcc_official",
+          "source_role": "shareholding_distribution",
+          "source_family": "dataset_1_5",
+          "lineage": {
+            "source_url": "https://smart.tdcc.com.tw/opendata/getOD.ashx?id=1-5",
+            "report_date": "2026-05-29",
+            "product_scope": "mapped_company_only_latest_snapshot_v1",
+            "market_mapping_policy": "official_issuer_profile_union_only",
+            "market_enrichment_sources": [
+              "https://openapi.twse.com.tw/v1/opendata/t187ap03_L",
+              "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O"
+            ]
+          }
+        },
+        "data_gaps": [
+          "mapped_company_only_latest_snapshot",
+          "excludes_etf_fund_preferred_emerging_unknown_unresolved",
+          "not_full_tdcc_coverage"
+        ],
+        "safe_usage_notes": [
+          "latest_snapshot_only",
+          "mapped_company_only_scope",
+          "not_full_tdcc_coverage"
+        ],
+        "not_investment_advice": true,
+        "available_tools_or_endpoints": {
+          "dataset_endpoint": "/v2/datasets/ownership-distribution",
+          "lookup_hint": "ticker=2330&market=TWSE",
+          "scope_note": "tdcc_v1_mapped_company_only_latest_snapshot"
+        }
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-05-29",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "tdcc_shareholding_distribution_items",
+      "fallback_chain": [],
+      "policy_notes": [
+        "tdcc_v1_mapped_company_only_latest_snapshot",
+        "contract-aligned filters: ticker/report_date/start_date/end_date/market/holder_bucket",
+        "no_full_tdcc_coverage_claim"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "ownership_distribution",
+      "request_id": "read-api-a653800fb418",
+      "blocking_gate": null
+    },
+    "dataset_id": "ownership_distribution",
+    "dataset_label_zh": "集保股權分散資料",
+    "dataset_label_en": "TDCC Shareholding Distribution",
+    "report_date": "2026-05-29",
+    "scope": "mapped-company-only",
+    "coverage_type": "latest_snapshot",
+    "row_count": 17,
+    "included_tickers": 1978,
+    "excluded_tickers": 2004,
+    "excluded_rows": 34068,
+    "known_gaps": [
+      "mapped_company_only_latest_snapshot",
+      "latest_snapshot_only",
+      "no_full_tdcc_universe_claim"
+    ]
+  }
+}`,
+    en: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/ownership-distribution",
+  "request_id": "req_375fb93dc782",
+  "plan_id": "enterprise",
+  "dataset": "ownership_distribution",
+  "dataset_id": "ownership_distribution",
+  "request_context": {
+    "ticker": "2330",
+    "as_of_date": "2026-05-29",
+    "family": "chip_deep",
+    "field_group_type": "derived",
+    "dataset_view": "tdcc_v1_mapped_company_only_latest_snapshot",
+    "known_gaps": [
+      "mapped_company_only_latest_snapshot",
+      "latest_snapshot_only",
+      "no_full_tdcc_universe_claim"
+    ],
+    "scope": "mapped-company-only",
+    "coverage_type": "latest_snapshot",
+    "dataset_id": "ownership_distribution",
+    "report_date": "2026-05-29",
+    "included_tickers": 1978,
+    "excluded_tickers": 2004,
+    "excluded_rows": 34068
+  },
+  "quality": {
+    "freshness_state": "fresh",
+    "freshness_as_of": "2026-05-29",
+    "completeness_ratio": 1,
+    "quality_status": "ready"
+  },
+  "lineage": {
+    "source_role": "canonical",
+    "selected_source": "tdcc_shareholding_distribution_items",
+    "fallback_chain": [],
+    "policy_notes": [
+      "tdcc_v1_mapped_company_only_latest_snapshot",
+      "contract-aligned filters: ticker/report_date/start_date/end_date/market/holder_bucket",
+      "no_full_tdcc_coverage_claim"
+    ]
+  },
+  "error": {
+    "error_code": null,
+    "error_message": null,
+    "dataset": "ownership_distribution",
+    "request_id": "read-api-a653800fb418",
+    "blocking_gate": null
+  },
+  "data": [
+    {
+      "security_identity": {
+        "ticker": "2330",
+        "market": "TWSE"
+      },
+      "snapshot_context": {
+        "report_date": "2026-05-29",
+        "scope": "mapped-company-only",
+        "coverage_type": "latest_snapshot"
+      },
+      "distribution_bucket": {
+        "holding_bucket": "TDCC_01",
+        "holder_count": 2149965,
+        "shares": 254881810,
+        "holding_ratio": 0.0098
+      },
+      "source_lineage": {
+        "source_provider": "tdcc_official",
+        "source_role": "shareholding_distribution",
+        "source_family": "dataset_1_5",
+        "lineage": {
+          "source_url": "https://smart.tdcc.com.tw/opendata/getOD.ashx?id=1-5",
+          "report_date": "2026-05-29",
+          "product_scope": "mapped_company_only_latest_snapshot_v1",
+          "market_mapping_policy": "official_issuer_profile_union_only",
+          "market_enrichment_sources": [
+            "https://openapi.twse.com.tw/v1/opendata/t187ap03_L",
+            "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O"
+          ]
+        }
+      },
+      "data_gaps": [
+        "mapped_company_only_latest_snapshot",
+        "excludes_etf_fund_preferred_emerging_unknown_unresolved",
+        "not_full_tdcc_coverage"
+      ],
+      "safe_usage_notes": [
+        "latest_snapshot_only",
+        "mapped_company_only_scope",
+        "not_full_tdcc_coverage"
+      ],
+      "not_investment_advice": true,
+      "available_tools_or_endpoints": {
+        "dataset_endpoint": "/v2/datasets/ownership-distribution",
+        "lookup_hint": "ticker=2330&market=TWSE",
+        "scope_note": "tdcc_v1_mapped_company_only_latest_snapshot"
+      }
+    },
+    {
+      "security_identity": {
+        "ticker": "2330",
+        "market": "TWSE"
+      },
+      "snapshot_context": {
+        "report_date": "2026-05-29",
+        "scope": "mapped-company-only",
+        "coverage_type": "latest_snapshot"
+      },
+      "distribution_bucket": {
+        "holding_bucket": "TDCC_02",
+        "holder_count": 421963,
+        "shares": 806563397,
+        "holding_ratio": 0.0311
+      },
+      "source_lineage": {
+        "source_provider": "tdcc_official",
+        "source_role": "shareholding_distribution",
+        "source_family": "dataset_1_5",
+        "lineage": {
+          "source_url": "https://smart.tdcc.com.tw/opendata/getOD.ashx?id=1-5",
+          "report_date": "2026-05-29",
+          "product_scope": "mapped_company_only_latest_snapshot_v1",
+          "market_mapping_policy": "official_issuer_profile_union_only",
+          "market_enrichment_sources": [
+            "https://openapi.twse.com.tw/v1/opendata/t187ap03_L",
+            "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O"
+          ]
+        }
+      },
+      "data_gaps": [
+        "mapped_company_only_latest_snapshot",
+        "excludes_etf_fund_preferred_emerging_unknown_unresolved",
+        "not_full_tdcc_coverage"
+      ],
+      "safe_usage_notes": [
+        "latest_snapshot_only",
+        "mapped_company_only_scope",
+        "not_full_tdcc_coverage"
+      ],
+      "not_investment_advice": true,
+      "available_tools_or_endpoints": {
+        "dataset_endpoint": "/v2/datasets/ownership-distribution",
+        "lookup_hint": "ticker=2330&market=TWSE",
+        "scope_note": "tdcc_v1_mapped_company_only_latest_snapshot"
+      }
+    }
+  ],
+  "data_count": 17,
+  "known_gaps": [
+    "mapped_company_only_latest_snapshot",
+    "latest_snapshot_only",
+    "no_full_tdcc_universe_claim"
+  ],
+  "data_gaps": [
+    "mapped_company_only_latest_snapshot",
+    "latest_snapshot_only",
+    "no_full_tdcc_universe_claim"
+  ],
+  "query": {
+    "symbol": "2330",
+    "report_date": null,
+    "as_of_date": null,
+    "start_date": null,
+    "end_date": null,
+    "market": null,
+    "holder_bucket": null,
+    "limit": 50,
+    "legacy_aliases_used": {
+      "ticker": false,
+      "date_from": false,
+      "date_to": false,
+      "bucket": false,
+      "offset": false,
+      "sort_by": false,
+      "sort_order": false
+    }
+  },
+  "meta": {
+    "rows_returned": 17,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "ownership_distribution",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-05-29.preview",
+    "release_date": "2026-05-29",
+    "data_as_of": "2026-05-29",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-05-29",
+      "family": "chip_deep",
+      "field_group_type": "derived",
+      "dataset_view": "tdcc_v1_mapped_company_only_latest_snapshot",
+      "known_gaps": [
+        "mapped_company_only_latest_snapshot",
+        "latest_snapshot_only",
+        "no_full_tdcc_universe_claim"
+      ],
+      "scope": "mapped-company-only",
+      "coverage_type": "latest_snapshot",
+      "dataset_id": "ownership_distribution",
+      "report_date": "2026-05-29",
+      "included_tickers": 1978,
+      "excluded_tickers": 2004,
+      "excluded_rows": 34068
+    },
+    "data": [
+      {
+        "security_identity": {
+          "ticker": "2330",
+          "market": "TWSE"
+        },
+        "snapshot_context": {
+          "report_date": "2026-05-29",
+          "scope": "mapped-company-only",
+          "coverage_type": "latest_snapshot"
+        },
+        "distribution_bucket": {
+          "holding_bucket": "TDCC_01",
+          "holder_count": 2149965,
+          "shares": 254881810,
+          "holding_ratio": 0.0098
+        },
+        "source_lineage": {
+          "source_provider": "tdcc_official",
+          "source_role": "shareholding_distribution",
+          "source_family": "dataset_1_5",
+          "lineage": {
+            "source_url": "https://smart.tdcc.com.tw/opendata/getOD.ashx?id=1-5",
+            "report_date": "2026-05-29",
+            "product_scope": "mapped_company_only_latest_snapshot_v1",
+            "market_mapping_policy": "official_issuer_profile_union_only",
+            "market_enrichment_sources": [
+              "https://openapi.twse.com.tw/v1/opendata/t187ap03_L",
+              "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O"
+            ]
+          }
+        },
+        "data_gaps": [
+          "mapped_company_only_latest_snapshot",
+          "excludes_etf_fund_preferred_emerging_unknown_unresolved",
+          "not_full_tdcc_coverage"
+        ],
+        "safe_usage_notes": [
+          "latest_snapshot_only",
+          "mapped_company_only_scope",
+          "not_full_tdcc_coverage"
+        ],
+        "not_investment_advice": true,
+        "available_tools_or_endpoints": {
+          "dataset_endpoint": "/v2/datasets/ownership-distribution",
+          "lookup_hint": "ticker=2330&market=TWSE",
+          "scope_note": "tdcc_v1_mapped_company_only_latest_snapshot"
+        }
+      },
+      {
+        "security_identity": {
+          "ticker": "2330",
+          "market": "TWSE"
+        },
+        "snapshot_context": {
+          "report_date": "2026-05-29",
+          "scope": "mapped-company-only",
+          "coverage_type": "latest_snapshot"
+        },
+        "distribution_bucket": {
+          "holding_bucket": "TDCC_02",
+          "holder_count": 421963,
+          "shares": 806563397,
+          "holding_ratio": 0.0311
+        },
+        "source_lineage": {
+          "source_provider": "tdcc_official",
+          "source_role": "shareholding_distribution",
+          "source_family": "dataset_1_5",
+          "lineage": {
+            "source_url": "https://smart.tdcc.com.tw/opendata/getOD.ashx?id=1-5",
+            "report_date": "2026-05-29",
+            "product_scope": "mapped_company_only_latest_snapshot_v1",
+            "market_mapping_policy": "official_issuer_profile_union_only",
+            "market_enrichment_sources": [
+              "https://openapi.twse.com.tw/v1/opendata/t187ap03_L",
+              "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O"
+            ]
+          }
+        },
+        "data_gaps": [
+          "mapped_company_only_latest_snapshot",
+          "excludes_etf_fund_preferred_emerging_unknown_unresolved",
+          "not_full_tdcc_coverage"
+        ],
+        "safe_usage_notes": [
+          "latest_snapshot_only",
+          "mapped_company_only_scope",
+          "not_full_tdcc_coverage"
+        ],
+        "not_investment_advice": true,
+        "available_tools_or_endpoints": {
+          "dataset_endpoint": "/v2/datasets/ownership-distribution",
+          "lookup_hint": "ticker=2330&market=TWSE",
+          "scope_note": "tdcc_v1_mapped_company_only_latest_snapshot"
+        }
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-05-29",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "tdcc_shareholding_distribution_items",
+      "fallback_chain": [],
+      "policy_notes": [
+        "tdcc_v1_mapped_company_only_latest_snapshot",
+        "contract-aligned filters: ticker/report_date/start_date/end_date/market/holder_bucket",
+        "no_full_tdcc_coverage_claim"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "ownership_distribution",
+      "request_id": "read-api-a653800fb418",
+      "blocking_gate": null
+    },
+    "dataset_id": "ownership_distribution",
+    "dataset_label_zh": "<Chinese value - see the zh page>",
+    "dataset_label_en": "TDCC Shareholding Distribution",
+    "report_date": "2026-05-29",
+    "scope": "mapped-company-only",
+    "coverage_type": "latest_snapshot",
+    "row_count": 17,
+    "included_tickers": 1978,
+    "excluded_tickers": 2004,
+    "excluded_rows": 34068,
+    "known_gaps": [
+      "mapped_company_only_latest_snapshot",
+      "latest_snapshot_only",
+      "no_full_tdcc_universe_claim"
+    ]
   }
 }`,
   },
@@ -3644,9 +6135,9 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     rowsKey: "rows",
     envelopeKeys: ["dataset_id","filters","generated_at","metadata","not_investment_advice","request_context","row_count","rows","warnings"],
     zh: `{
-  "generated_at": "2026-07-20T13:57:36Z",
+  "generated_at": "2026-07-20T18:31:32Z",
   "dataset_id": "return_index_daily",
-  "row_count": 2,
+  "row_count": 50,
   "rows": [
     {
       "trade_date": "2026-07-17",
@@ -3672,7 +6163,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "index_id": null,
     "start_date": null,
     "end_date": null,
-    "limit": 2
+    "limit": 50
   },
   "request_context": {
     "not_investment_advice": true,
@@ -3702,10 +6193,10 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     rowsKey: "items",
     envelopeKeys: ["as_of_date","available_tools_or_endpoints","dataset_id","generated_at","items","row_count","safe_usage_notes","survivorship_bias_warning"],
     zh: `{
-  "generated_at": "2026-07-20T13:57:36Z",
+  "generated_at": "2026-07-20T18:31:32Z",
   "dataset_id": "security-master",
   "as_of_date": "2026-07-20",
-  "row_count": 2,
+  "row_count": 50,
   "survivorship_bias_warning": {
     "enabled": true,
     "level": "warning",
@@ -3713,7 +6204,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   },
   "items": [
     {
-      "generated_at": "2026-07-20T13:57:36Z",
+      "generated_at": "2026-07-20T18:31:32Z",
       "as_of_date": "2026-07-20",
       "ticker": "1260",
       "security_identity": {
@@ -3768,7 +6259,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       ]
     },
     {
-      "generated_at": "2026-07-20T13:57:36Z",
+      "generated_at": "2026-07-20T18:31:32Z",
       "as_of_date": "2026-07-20",
       "ticker": "1269",
       "security_identity": {
@@ -3844,10 +6335,10 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   ]
 }`,
     en: `{
-  "generated_at": "2026-07-20T13:57:36Z",
+  "generated_at": "2026-07-20T18:31:32Z",
   "dataset_id": "security-master",
   "as_of_date": "2026-07-20",
-  "row_count": 2,
+  "row_count": 50,
   "survivorship_bias_warning": {
     "enabled": true,
     "level": "warning",
@@ -3855,7 +6346,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   },
   "items": [
     {
-      "generated_at": "2026-07-20T13:57:36Z",
+      "generated_at": "2026-07-20T18:31:32Z",
       "as_of_date": "2026-07-20",
       "ticker": "1260",
       "security_identity": {
@@ -3910,7 +6401,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       ]
     },
     {
-      "generated_at": "2026-07-20T13:57:36Z",
+      "generated_at": "2026-07-20T18:31:32Z",
       "as_of_date": "2026-07-20",
       "ticker": "1269",
       "security_identity": {
@@ -4002,14 +6493,14 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "date_to": null,
       "event_type": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
-    "min_event_date": "2026-01-22",
+    "min_event_date": "2018-10-01",
     "max_event_date": "2026-03-27"
   },
   "quality": {
-    "row_count": 2,
-    "code_count": 2,
+    "row_count": 50,
+    "code_count": 50,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -4072,7 +6563,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "data_gaps": []
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "twse_only_scope",
     "no_tpex_coverage",
@@ -4086,7 +6577,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "stock_delisting_lifecycle",
     "scope": "stock_delisting_lifecycle_twse_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
   },
@@ -4105,25 +6596,27 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "ticker": null,
       "market": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
-    "min_trade_date": "2026-07-14",
+    "min_trade_date": "2026-07-09",
     "max_trade_date": "2026-07-14"
   },
   "quality": {
-    "row_count": 2,
-    "ticker_count": 2,
+    "row_count": 50,
+    "ticker_count": 50,
     "sensitive_fields_exposed": false
   },
   "lineage": {
     "source_providers": [
+      "tpex_official",
       "twse_official"
     ],
     "source_roles": [
       "official_stock_price_limit_daily"
     ],
     "source_families": [
-      "TWSE_TWT49U_EX_RIGHT"
+      "TWSE_TWT49U_EX_RIGHT",
+      "tpex_mainboard_daily_close_quotes"
     ]
   },
   "error": null,
@@ -4167,7 +6660,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "data_gaps": []
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "tpex_only",
     "no_twse_price_limit_coverage",
@@ -4179,7 +6672,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "stock_price_limit_daily",
     "scope": "tpex_price_limit_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
     en: `{
@@ -4194,25 +6687,27 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "ticker": null,
       "market": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
-    "min_trade_date": "2026-07-14",
+    "min_trade_date": "2026-07-09",
     "max_trade_date": "2026-07-14"
   },
   "quality": {
-    "row_count": 2,
-    "ticker_count": 2,
+    "row_count": 50,
+    "ticker_count": 50,
     "sensitive_fields_exposed": false
   },
   "lineage": {
     "source_providers": [
+      "tpex_official",
       "twse_official"
     ],
     "source_roles": [
       "official_stock_price_limit_daily"
     ],
     "source_families": [
-      "TWSE_TWT49U_EX_RIGHT"
+      "TWSE_TWT49U_EX_RIGHT",
+      "tpex_mainboard_daily_close_quotes"
     ]
   },
   "error": null,
@@ -4256,7 +6751,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "data_gaps": []
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "tpex_only",
     "no_twse_price_limit_coverage",
@@ -4268,7 +6763,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "stock_price_limit_daily",
     "scope": "tpex_price_limit_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
   },
@@ -4288,13 +6783,13 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "date_to": null,
       "event_type": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
-    "min_event_date": "2026-01-19",
+    "min_event_date": "2026-01-09",
     "max_event_date": "2026-04-22"
   },
   "quality": {
-    "row_count": 2,
+    "row_count": 3,
     "security_code_count": 2,
     "sensitive_fields_exposed": false
   },
@@ -4304,9 +6799,11 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     ],
     "source_roles": [
       "official_twse_etf_split_reverse_split_reference_price",
+      "official_twse_par_value_change_announcement",
       "official_twse_par_value_change_reference_price"
     ],
     "source_families": [
+      "twse_change_of_par_value",
       "twse_etf_split_reverse_split_reference_price",
       "twse_reference_price_after_par_value_change"
     ]
@@ -4384,7 +6881,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       ]
     }
   ],
-  "data_count": 2,
+  "data_count": 3,
   "known_gaps": [
     "twse_only_scope",
     "no_tpex_coverage",
@@ -4398,7 +6895,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "stock_split_par_value_events",
     "scope": "stock_split_par_value_events_twse_only",
-    "row_count": 2
+    "row_count": 3
   }
 }`,
   },
@@ -4418,14 +6915,14 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "contract_code": null,
       "investor_type": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_trade_date": "2026-06-05",
     "max_trade_date": "2026-06-05"
   },
   "quality": {
-    "row_count": 2,
-    "contract_count": 1,
+    "row_count": 50,
+    "contract_count": 18,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -4494,7 +6991,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       ]
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "futures_options_institutional_flow_only",
     "no_settlement_price",
@@ -4506,7 +7003,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "taifex_institutional_flow",
     "scope": "taifex_futures_options_institutional_flow_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
     en: `{
@@ -4522,14 +7019,14 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "contract_code": null,
       "investor_type": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_trade_date": "2026-06-05",
     "max_trade_date": "2026-06-05"
   },
   "quality": {
-    "row_count": 2,
-    "contract_count": 1,
+    "row_count": 50,
+    "contract_count": 18,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -4598,7 +7095,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       ]
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "futures_options_institutional_flow_only",
     "no_settlement_price",
@@ -4610,7 +7107,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "taifex_institutional_flow",
     "scope": "taifex_futures_options_institutional_flow_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
   },
@@ -4630,13 +7127,13 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "expiry_month": null,
       "call_put": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_trade_date": "2026-06-04",
     "max_trade_date": "2026-06-04"
   },
   "quality": {
-    "row_count": 2,
+    "row_count": 50,
     "contract_count": 1,
     "sensitive_fields_exposed": false
   },
@@ -4690,7 +7187,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "data_gaps": []
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "options_settlement_only",
     "single_trading_date_baseline",
@@ -4703,7 +7200,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "taifex_options_settlement_price",
     "scope": "taifex_options_settlement_price_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
     en: `{
@@ -4719,13 +7216,13 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "expiry_month": null,
       "call_put": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     },
     "min_trade_date": "2026-06-04",
     "max_trade_date": "2026-06-04"
   },
   "quality": {
-    "row_count": 2,
+    "row_count": 50,
     "contract_count": 1,
     "sensitive_fields_exposed": false
   },
@@ -4779,7 +7276,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "data_gaps": []
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "options_settlement_only",
     "single_trading_date_baseline",
@@ -4792,7 +7289,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "taifex_options_settlement_price",
     "scope": "taifex_options_settlement_price_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
   },
@@ -4897,7 +7394,268 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "macd_hist": null
     }
   ],
-  "count": 2
+  "count": 50
+}`,
+  },
+  "theme-taxonomy": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/theme-taxonomy",
+  "request_id": "req_8e048197993f",
+  "plan_id": "enterprise",
+  "dataset": "theme_taxonomy",
+  "query": {
+    "symbol": "2330",
+    "theme": null,
+    "taxonomy_type": null,
+    "market": null,
+    "as_of_date": null,
+    "limit": 50,
+    "legacy_alias_ticker": null,
+    "legacy_alias_theme_primary": null
+  },
+  "meta": {
+    "rows_returned": 2,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "theme_taxonomy",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-05-30.preview",
+    "release_date": "2026-05-30",
+    "data_as_of": "2026-05-30",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-05-30",
+      "family": "discovery_reference",
+      "field_group_type": "derived",
+      "dataset_view": "theme_taxonomy_v1",
+      "supported_sort_by": [
+        "as_of_date"
+      ],
+      "supported_filter_fields": [
+        "symbol",
+        "theme",
+        "taxonomy_type"
+      ]
+    },
+    "data": [
+      {
+        "symbol": "2330",
+        "theme_id": "24",
+        "theme_name": "24",
+        "taxonomy_type": "industry",
+        "market": "TWSE",
+        "classification_level": "2",
+        "source_name": "tw_feature_engine",
+        "source_url": null,
+        "as_of_date": "2026-05-30",
+        "source_role": "derived_theme_taxonomy",
+        "lineage": {
+          "sources": [
+            "issuer_profiles",
+            "ticker_metadata"
+          ],
+          "theme_policy": "theme fields only from explicit issuer_classification_map entries; no AI inference",
+          "mapping_version": "theme_taxonomy_v1",
+          "taxonomy_version": "v1",
+          "subindustry_policy": "from issuer_classification_map taxonomy subindustry/sub_industry only"
+        },
+        "updated_at": "2026-06-19T05:46:08.775720"
+      },
+      {
+        "symbol": "2330",
+        "theme_id": "24",
+        "theme_name": "24",
+        "taxonomy_type": "sector",
+        "market": "TWSE",
+        "classification_level": "1",
+        "source_name": "tw_feature_engine",
+        "source_url": null,
+        "as_of_date": "2026-05-30",
+        "source_role": "derived_theme_taxonomy",
+        "lineage": {
+          "sources": [
+            "issuer_profiles",
+            "ticker_metadata"
+          ],
+          "theme_policy": "theme fields only from explicit issuer_classification_map entries; no AI inference",
+          "mapping_version": "theme_taxonomy_v1",
+          "taxonomy_version": "v1",
+          "subindustry_policy": "from issuer_classification_map taxonomy subindustry/sub_industry only"
+        },
+        "updated_at": "2026-06-19T05:46:08.775720"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-05-30",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "issuer_classification_map",
+      "fallback_chain": [
+        "issuer_profiles",
+        "ticker_metadata"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "theme_taxonomy uses deterministic mapping only from explicit classification map entries",
+        "ai/confidence/cluster/rank fields excluded from public contract"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "theme_taxonomy",
+      "request_id": "read-api-f235e586efe2",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
+  "total-margin-short": {
+    rowsKey: "rows",
+    envelopeKeys: ["count","dataset","dataset_id","meta","plan_id","rows"],
+    zh: `{
+  "dataset": "total_margin_short",
+  "dataset_id": "total_margin_short",
+  "rows": [
+    {
+      "market": "TWSE",
+      "trade_date": "2026-07-09",
+      "margin_purchase_balance_total": 9614955,
+      "short_sale_balance_total": 203714,
+      "margin_purchase_buy_total": 372813,
+      "margin_purchase_sell_total": 342105,
+      "short_sale_buy_total": 24248,
+      "short_sale_sell_total": 24111,
+      "margin_purchase_amount_total": null,
+      "currency": "TWD",
+      "market_scope": "TWSE",
+      "source_provider": "derived_twmd",
+      "source_role": "derived_market_total_from_margin_short_enhanced",
+      "source_lineage": {
+        "derivation": "sum per-ticker margin_short_enhanced by (market,trade_date)",
+        "verified_vs": "total_margin_short_daily_items official overlap 100%"
+      },
+      "data_gaps": [
+        "margin_purchase_amount_total=金額不在逐檔源→NULL"
+      ],
+      "not_investment_advice": true
+    },
+    {
+      "market": "TWSE",
+      "trade_date": "2026-07-08",
+      "margin_purchase_balance_total": 9590605,
+      "short_sale_balance_total": 205830,
+      "margin_purchase_buy_total": 406961,
+      "margin_purchase_sell_total": 340331,
+      "short_sale_buy_total": 29930,
+      "short_sale_sell_total": 25013,
+      "margin_purchase_amount_total": null,
+      "currency": "TWD",
+      "market_scope": "TWSE",
+      "source_provider": "derived_twmd",
+      "source_role": "derived_market_total_from_margin_short_enhanced",
+      "source_lineage": {
+        "derivation": "sum per-ticker margin_short_enhanced by (market,trade_date)",
+        "verified_vs": "total_margin_short_daily_items official overlap 100%"
+      },
+      "data_gaps": [
+        "margin_purchase_amount_total=金額不在逐檔源→NULL"
+      ],
+      "not_investment_advice": true
+    }
+  ],
+  "count": 50,
+  "plan_id": "enterprise",
+  "meta": {
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "market": "TWSE",
+    "start_date": null,
+    "end_date": "2026-07-20",
+    "private_beta_contract": true,
+    "twse_only_scope": true,
+    "is_limited": false
+  }
+}`,
+    en: `{
+  "dataset": "total_margin_short",
+  "dataset_id": "total_margin_short",
+  "rows": [
+    {
+      "market": "TWSE",
+      "trade_date": "2026-07-09",
+      "margin_purchase_balance_total": 9614955,
+      "short_sale_balance_total": 203714,
+      "margin_purchase_buy_total": 372813,
+      "margin_purchase_sell_total": 342105,
+      "short_sale_buy_total": 24248,
+      "short_sale_sell_total": 24111,
+      "margin_purchase_amount_total": null,
+      "currency": "TWD",
+      "market_scope": "TWSE",
+      "source_provider": "derived_twmd",
+      "source_role": "derived_market_total_from_margin_short_enhanced",
+      "source_lineage": {
+        "derivation": "sum per-ticker margin_short_enhanced by (market,trade_date)",
+        "verified_vs": "total_margin_short_daily_items official overlap 100%"
+      },
+      "data_gaps": [
+        "<Chinese value - see the zh page>"
+      ],
+      "not_investment_advice": true
+    },
+    {
+      "market": "TWSE",
+      "trade_date": "2026-07-08",
+      "margin_purchase_balance_total": 9590605,
+      "short_sale_balance_total": 205830,
+      "margin_purchase_buy_total": 406961,
+      "margin_purchase_sell_total": 340331,
+      "short_sale_buy_total": 29930,
+      "short_sale_sell_total": 25013,
+      "margin_purchase_amount_total": null,
+      "currency": "TWD",
+      "market_scope": "TWSE",
+      "source_provider": "derived_twmd",
+      "source_role": "derived_market_total_from_margin_short_enhanced",
+      "source_lineage": {
+        "derivation": "sum per-ticker margin_short_enhanced by (market,trade_date)",
+        "verified_vs": "total_margin_short_daily_items official overlap 100%"
+      },
+      "data_gaps": [
+        "<Chinese value - see the zh page>"
+      ],
+      "not_investment_advice": true
+    }
+  ],
+  "count": 50,
+  "plan_id": "enterprise",
+  "meta": {
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "market": "TWSE",
+    "start_date": null,
+    "end_date": "2026-07-20",
+    "private_beta_contract": true,
+    "twse_only_scope": true,
+    "is_limited": false
+  }
 }`,
   },
   "tpex-daily-price": {
@@ -4937,7 +7695,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "price_confidence": null
     }
   ],
-  "count": 2,
+  "count": 50,
   "data_as_of": "2026-07-17",
   "source_role": "official_tpex",
   "lineage": {
@@ -5009,7 +7767,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "price_confidence": null
     }
   ],
-  "count": 2,
+  "count": 50,
   "data_as_of": "2026-07-17",
   "source_role": "official_twse",
   "lineage": {
@@ -5159,7 +7917,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
     "blocking_gate": null
   },
   "dataset_id": "valuation_core_daily",
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "raw_payload_excluded",
     "not_investment_advice"
@@ -5209,7 +7967,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "updated_at": "2026-07-17T14:13:15.292023",
       "symbol": "2330",
       "fundamentals_context": {
-        "generated_at": "2026-07-20T13:57:43Z",
+        "generated_at": "2026-07-20T18:31:53Z",
         "ticker": "2330",
         "period": "2026-07-16",
         "period_type": "daily_event",
@@ -5305,7 +8063,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "updated_at": "2026-07-17T14:13:20.617678",
       "symbol": "2330",
       "fundamentals_context": {
-        "generated_at": "2026-07-20T13:57:43Z",
+        "generated_at": "2026-07-20T18:31:53Z",
         "ticker": "2330",
         "period": "2026-07-14",
         "period_type": "daily_event",
@@ -5369,7 +8127,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       }
     }
   ],
-  "count": 2,
+  "count": 50,
   "status": "ok"
 }`,
   },
@@ -5388,12 +8146,12 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "issuer": null,
       "warrant_type": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     }
   },
   "quality": {
-    "row_count": 2,
-    "warrant_count": 2,
+    "row_count": 50,
+    "warrant_count": 50,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -5458,7 +8216,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "latest_snapshot_only",
     "reference_only_not_daily_quotes",
@@ -5471,7 +8229,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "warrants_reference",
     "scope": "warrants_reference_latest_snapshot_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
     en: `{
@@ -5486,12 +8244,12 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "issuer": null,
       "warrant_type": null,
       "source_family": null,
-      "limit": 2
+      "limit": 50
     }
   },
   "quality": {
-    "row_count": 2,
-    "warrant_count": 2,
+    "row_count": 50,
+    "warrant_count": 50,
     "sensitive_fields_exposed": false
   },
   "lineage": {
@@ -5556,7 +8314,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
       "not_investment_advice": true
     }
   ],
-  "data_count": 2,
+  "data_count": 50,
   "known_gaps": [
     "latest_snapshot_only",
     "reference_only_not_daily_quotes",
@@ -5569,7 +8327,7 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   "envelope": {
     "dataset_id": "warrants_reference",
     "scope": "warrants_reference_latest_snapshot_only",
-    "row_count": 2
+    "row_count": 50
   }
 }`,
   },

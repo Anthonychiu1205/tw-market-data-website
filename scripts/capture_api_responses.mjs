@@ -96,9 +96,9 @@ function readDeclaredFields() {
 //      emitting `null` still proves the field exists. Fields that are present but null in every
 //      sampled row are reported separately as "always-null" — informational, never phantom.
 //
-// Returns { present:Set, nullOnly:Set, rowsSampled:number }.
-function collectFieldPresence(parsedBody, rowsKey) {
-  const seen = new Map(); // key -> { any: boolean(non-null seen) }
+// Returns { present:Set, nullOnly:Set }.
+function collectFieldPresence(parsedBody) {
+  const seen = new Map(); // key -> { nonNull: boolean }
 
   function walk(value) {
     if (Array.isArray(value)) {
@@ -116,13 +116,28 @@ function collectFieldPresence(parsedBody, rowsKey) {
   }
 
   walk(parsedBody); // rule 1 + rule 2: whole envelope, all depths
-
-  const rows = rowsKey && Array.isArray(parsedBody[rowsKey]) ? parsedBody[rowsKey] : [];
   return {
     present: new Set(seen.keys()),
     nullOnly: new Set([...seen.entries()].filter(([, v]) => !v.nonNull).map(([k]) => k)),
-    rowsSampled: rows.length,
   };
+}
+
+// Find the row array. The API has (at least) two envelope shapes: a FLAT one with a top-level
+// data/rows/items array, and a NESTED one where the rows live under `envelope`. Both are checked, and
+// the DOTTED PATH ("data" or "envelope.data") is returned so snippets can access it correctly. Only a
+// NON-EMPTY array counts — a 200 with rows_returned:0 documents nothing and must fall through to an
+// honest TODO, never be shown as a real example (rule 2).
+function findRows(obj) {
+  for (const k of ROW_KEYS) {
+    if (Array.isArray(obj[k]) && obj[k].length > 0) return { path: k, rows: obj[k] };
+  }
+  const env = obj.envelope;
+  if (env && typeof env === "object" && !Array.isArray(env)) {
+    for (const k of ROW_KEYS) {
+      if (Array.isArray(env[k]) && env[k].length > 0) return { path: `envelope.${k}`, rows: env[k] };
+    }
+  }
+  return null;
 }
 
 function readSlugs() {
@@ -177,26 +192,30 @@ async function capture({ slug, path }) {
     }
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) continue;
 
-    const trimmed = trim(parsed);
-    const rowsKey = ROW_KEYS.find((k) => Array.isArray(trimmed[k])) ?? null;
-    // A 200 with an empty row array documents nothing — treat it as "not captured" rather than
-    // shipping an example that shows a reader zero rows.
-    if (rowsKey && trimmed[rowsKey].length === 0) {
-      last = { status: 200, text: "200 but the row array was empty" };
+    const found = findRows(parsed);
+    // No non-empty row array anywhere (flat OR nested) → not a usable example. Record why and try the
+    // next param shape; if every shape is empty, this dataset ends up as an honest TODO.
+    if (!found) {
+      const rr =
+        (parsed.meta && parsed.meta.rows_returned) ??
+        (parsed.envelope && parsed.envelope.meta && parsed.envelope.meta.rows_returned);
+      last = { status: 200, text: rr === 0 ? "200 but rows_returned=0 (empty)" : "200 but no non-empty row array" };
       continue;
     }
 
+    const trimmed = trim(parsed);
+    const rowsKey = found.path; // "data" | "rows" | "items" | "envelope.data" | …
     const zh = JSON.stringify(trimmed, null, 2);
     const masked = JSON.stringify(mask(trimmed), null, 2);
     if (CJK.test(masked)) throw new Error(`${slug}: CJK survived masking (a KEY may be Chinese)`);
 
-    const presence = collectFieldPresence(parsed, rowsKey); // parsed, NOT trimmed — full sample
+    const presence = collectFieldPresence(parsed); // parsed, NOT trimmed — full sample
     return {
       slug, ok: true, query, rowsKey, zh,
       en: masked === zh ? null : masked,
       present: [...presence.present],
       nullOnly: [...presence.nullOnly],
-      rowsSampled: presence.rowsSampled,
+      rowsSampled: found.rows.length,
     };
   }
 

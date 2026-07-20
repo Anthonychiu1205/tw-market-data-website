@@ -93,13 +93,26 @@ export function buildCurlSnippet({ backendPath, params }: SnippetInput): string 
   -H "${API_AUTH_HEADER}: $TWMD_API_KEY"`;
 }
 
+// rowsKey may be a dotted path ("data" or "envelope.data") because some datasets nest their row array
+// under `envelope`. These render that path correctly per language so the snippet actually runs.
+function pyRowsAccess(rowsKey: string): string {
+  return `payload${rowsKey.split(".").map((seg) => `["${seg}"]`).join("")}`;
+}
+function jsRowsAccess(rowsKey: string): string {
+  return `payload.${rowsKey}`; // dotted path is already valid JS member access
+}
+function rowsLeaf(rowsKey: string): string {
+  const parts = rowsKey.split(".");
+  return parts[parts.length - 1];
+}
+
 export function buildPythonSnippet({ backendPath, params, rowsKey }: SnippetInput): string {
   const args = exampleArgs(params)
     .map((a) => `        "${a.name}": ${a.quoted ? `"${a.value}"` : a.value},`)
     .join("\n");
   const paramsBlock = args ? `\n    params={\n${args}\n    },` : "";
   const consume = rowsKey
-    ? `for row in payload["${rowsKey}"]:\n    print(row)`
+    ? `for row in ${pyRowsAccess(rowsKey)}:\n    print(row)`
     : `print(payload)`;
   return `import os
 import requests
@@ -118,7 +131,7 @@ export function buildJavaScriptSnippet({ backendPath, params, rowsKey }: Snippet
   const query = queryString(params);
   const url = query ? `${API_BASE_URL}${backendPath}?${query}` : `${API_BASE_URL}${backendPath}`;
   const consume = rowsKey
-    ? `const { ${rowsKey} } = payload;\nconsole.log(${rowsKey});`
+    ? `const ${rowsLeaf(rowsKey)} = ${jsRowsAccess(rowsKey)};\nconsole.log(${rowsLeaf(rowsKey)});`
     : `console.log(payload);`;
   return `const res = await fetch(
   "${url}",
@@ -135,11 +148,13 @@ export function buildTypeScriptSnippet({ backendPath, params, rowsKey }: Snippet
   const url = query ? `${API_BASE_URL}${backendPath}?${query}` : `${API_BASE_URL}${backendPath}`;
   // The envelope differs per dataset, so the type is written from THIS dataset's captured shape.
   // Without a capture we type it as an opaque record instead of guessing a row key.
-  const type = rowsKey
-    ? `type Response = { ${rowsKey}: Record<string, unknown>[] };`
-    : `type Response = Record<string, unknown>;`;
+  // For a nested path the type mirrors the real envelope nesting (e.g. { envelope: { data: Row[] } }).
+  const typeShape = rowsKey
+    ? rowsKey.split(".").reduceRight((inner, seg) => `{ ${seg}: ${inner} }`, "Record<string, unknown>[]")
+    : "Record<string, unknown>";
+  const type = `type Response = ${typeShape};`;
   const consume = rowsKey
-    ? `const { ${rowsKey} }: Response = await res.json();\nconsole.log(${rowsKey});`
+    ? `const payload: Response = await res.json();\nconsole.log(${jsRowsAccess(rowsKey)});`
     : `const payload: Response = await res.json();\nconsole.log(payload);`;
   return `${type}
 

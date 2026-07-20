@@ -22,6 +22,12 @@ function bi(value: Bi, locale: Locale): string {
   return locale === "en" ? value.en : value.zh;
 }
 
+// rowsKey may be a dotted path ("data" or "envelope.data") — render it as chained subscripts so the
+// example runs against the real (sometimes nested) envelope.
+function pyRows(rowsKey: string): string {
+  return `resp.json()${rowsKey.split(".").map((seg) => `["${seg}"]`).join("")}`;
+}
+
 function pythonBasic(backendPath: string, rowsKey: string | null): string {
   return `import requests
 
@@ -31,7 +37,7 @@ resp = requests.get(
     headers={"${API_AUTH_HEADER}": "${API_KEY_PREFIX}..."},
 )
 resp.raise_for_status()
-${rowsKey ? `print(resp.json()["${rowsKey}"])` : "print(resp.json())"}`;
+${rowsKey ? `print(${pyRows(rowsKey)})` : "print(resp.json())"}`;
 }
 
 function pythonFiltered(backendPath: string, rowsKey: string | null): string {
@@ -44,7 +50,7 @@ resp = requests.get(
     headers={"${API_AUTH_HEADER}": "${API_KEY_PREFIX}..."},
 )
 resp.raise_for_status()
-${rowsKey ? `for row in resp.json()["${rowsKey}"]:\n    print(row)` : "print(resp.json())"}`;
+${rowsKey ? `for row in ${pyRows(rowsKey)}:\n    print(row)` : "print(resp.json())"}`;
 }
 
 function curlExample(backendPath: string): string {
