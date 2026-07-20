@@ -77,7 +77,7 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "disposition-securities-period": { datasetSlug: "disposition-securities-period", backendPath: "/v2/datasets/disposition-securities-period", requiredPlan: "pro", creditsCost: 2 },
   // tier aligned to read API (dividend_policy→dividends = pro, explicit)
   "dividends": { datasetSlug: "dividends", backendPath: "/v2/datasets/dividends", requiredPlan: "pro", creditsCost: 2 },
-  "index-constituents": { datasetSlug: "index-constituents", backendPath: "/v2/datasets/index-constituents", requiredPlan: "starter", creditsCost: 2 },
+  "index-constituents": { datasetSlug: "index-constituents", backendPath: "/v2/datasets/index-constituents", requiredPlan: "free", creditsCost: 2 },
   "macro-global": { datasetSlug: "macro-global", backendPath: "/v2/datasets/macro-global", requiredPlan: "starter", creditsCost: 2 },
   "macro-worldbank": { datasetSlug: "macro-worldbank", backendPath: "/v2/datasets/macro-worldbank", requiredPlan: "starter", creditsCost: 2 },
   "market-breadth": { datasetSlug: "market-breadth", backendPath: "/v2/datasets/market-breadth", requiredPlan: "starter", creditsCost: 2 },
@@ -124,7 +124,7 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   // tier aligned to read API (taifex_inst_oi→taifex-institutional-flow = max, explicit)
   "taifex-institutional-flow": { datasetSlug: "taifex-institutional-flow", backendPath: "/v2/datasets/taifex-institutional-flow", requiredPlan: "max", creditsCost: 3 },
   "financials": { datasetSlug: "financials", backendPath: "/v2/datasets/financials", requiredPlan: "pro", creditsCost: 4 },
-  "broker-branch-reference": { datasetSlug: "broker-branch-reference", backendPath: "/v2/datasets/broker-branch-reference", requiredPlan: "max", creditsCost: 4 },
+  "broker-branch-reference": { datasetSlug: "broker-branch-reference", backendPath: "/v2/datasets/broker-branch-reference", requiredPlan: "free", creditsCost: 4 },
 }
 
 export const DATASET_CREDIT_COSTS = Object.fromEntries(
