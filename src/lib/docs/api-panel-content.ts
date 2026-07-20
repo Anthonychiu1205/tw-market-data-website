@@ -167,9 +167,8 @@ export function buildRequestSnippet(language: RequestLanguage, input: SnippetInp
 
 // ── Response bodies ──
 
-// The statuses documented, straight from the read API's captured errors. There is no 400 and no 403:
-// the read API has never been observed emitting either (403/entitlement needs a real entitled key —
-// see API_TRUTH_GAPS).
+// The statuses documented, straight from the read API's captured errors — every one of them has been
+// observed live, including 403 (captured with a Developer-tier key on a dataset its plan excludes).
 export const PANEL_ERRORS: ReadApiError[] = READ_API_ERRORS;
 
 export function panelStatuses(): string[] {

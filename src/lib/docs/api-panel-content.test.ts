@@ -166,11 +166,18 @@ test("/zh shows the real Chinese message; /en shows a marker, not a translation"
 
 test("only statuses actually observed are documented", () => {
   const statuses = panelStatuses();
-  assert.deepEqual(statuses, ["200", "401", "404"]);
-  // 403 has never been reproduced (key validation precedes entitlement) and the read API has never
-  // been seen emitting 400 — documenting either would be a claim, not a record.
-  assert.ok(!statuses.includes("403"));
-  assert.ok(!statuses.includes("400"));
+  // Every one of these was captured live from the read API on 2026-07-20.
+  assert.deepEqual(statuses, ["200", "400", "401", "403", "404", "422"]);
+  // 429 and 5xx have never been observed, so they stay undocumented rather than assumed.
+  assert.ok(!statuses.includes("429"));
+  assert.ok(!statuses.includes("500"));
+});
+
+test("the 403 documents the real read-API code, not the gateway's", () => {
+  const forbidden = READ_API_ERRORS.find((e) => e.status === 403);
+  assert.ok(forbidden);
+  // The gateway calls this plan_not_entitled; the read API does not.
+  assert.equal(forbidden?.code, "commercial_use_not_allowed");
 });
 
 test("data_grade is never emitted into any documented body", () => {
