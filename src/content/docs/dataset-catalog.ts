@@ -126,27 +126,11 @@ const DATASET_META: Record<string, DatasetMeta> = {
 
   // ── Funds & Corporate Intelligence ──
   "fund-etf-metadata": { domain: "funds-intel", zh: "基金／ETF 主檔", en: "Fund / ETF metadata", agency: "Issuer", grade: "reference" },
-  // etf-flow is NOT here: it is delisted from billing (no official source, returns 0 rows) and shown as
-  // a `building` roadmap item instead of `verified` — see DOCS_BUILDING_DATASETS below.
+  // etf-flow is fully removed (owner ruling 2026-07-22): no official source, live endpoint returns 0
+  // rows. Not sold, and not shown as a roadmap item — deleted from docs entirely.
   "etf-holdings": { domain: "funds-intel", zh: "ETF 持股明細", en: "ETF holdings", agency: "Issuer", grade: "reference" },
   "tax-business-registration": { domain: "funds-intel", zh: "稅籍／商業登記", en: "Tax & business registration", agency: "MOEA", grade: "reference" },
 };
-
-// Roadmap ("building") datasets — declared but NOT sellable: no billing policy, no live source yet.
-// Shown in the sidebar with a building badge and rendered non-clickable (honest "coming soon" rather
-// than a `verified` badge on empty data). Kept separate from DATASET_META so they can never leak into
-// the sellable catalog (DOCS_DATASET_CATALOG is billing-derived).
-export type DocsBuildingDataset = { domain: DocsDomainId; slug: string; zh: string; en: string };
-
-export const DOCS_BUILDING_DATASETS: DocsBuildingDataset[] = [
-  // etf-flow: no official source; the live endpoint returns 0 rows. Delisted from billing 2026-07-21
-  // (was falsely `verified` + pro/2cr — a paying customer got empty data). Roadmap until a source lands.
-  { domain: "funds-intel", slug: "etf-flow", zh: "ETF 資金流", en: "ETF flow" },
-];
-
-export function buildingDatasetsByDomain(domainId: DocsDomainId): DocsBuildingDataset[] {
-  return DOCS_BUILDING_DATASETS.filter((d) => d.domain === domainId);
-}
 
 export type DocsDatasetEntry = {
   slug: string;
