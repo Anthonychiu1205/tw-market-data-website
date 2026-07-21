@@ -59,7 +59,7 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "market-index": { datasetSlug: "market-index", backendPath: "/v2/datasets/market-index", requiredPlan: "free", creditsCost: 1 },
   "market-prices": { datasetSlug: "market-prices", backendPath: "/v2/datasets/market-prices", requiredPlan: "free", creditsCost: 1 },
   "market-snapshot": { datasetSlug: "market-snapshot", backendPath: "/v2/datasets/market-snapshot", requiredPlan: "free", creditsCost: 1 },
-  "return-index-daily": { datasetSlug: "return-index-daily", backendPath: "/v2/datasets/return-index-daily", requiredPlan: "starter", creditsCost: 1 },
+  "return-index-daily": { datasetSlug: "return-index-daily", backendPath: "/v2/datasets/return-index-daily", requiredPlan: "pro", creditsCost: 1 },
   "security-master": { datasetSlug: "security-master", backendPath: "/v2/datasets/security-master", requiredPlan: "free", creditsCost: 1 },
   "stock-delisting-lifecycle": { datasetSlug: "stock-delisting-lifecycle", backendPath: "/v2/datasets/stock-delisting-lifecycle", requiredPlan: "free", creditsCost: 1 },
   "stock-split-par-value-events": { datasetSlug: "stock-split-par-value-events", backendPath: "/v2/datasets/stock-split-par-value-events", requiredPlan: "free", creditsCost: 1 },
@@ -70,7 +70,7 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "warrants-reference": { datasetSlug: "warrants-reference", backendPath: "/v2/datasets/warrants-reference", requiredPlan: "free", creditsCost: 1 },
   "adjusted-prices": { datasetSlug: "adjusted-prices", backendPath: "/v2/datasets/adjusted-prices", requiredPlan: "starter", creditsCost: 2 },
   // tier aligned to read API required_plan_for_dataset (business_indicator = max, explicit)
-  "business-indicator-monthly": { datasetSlug: "business-indicator-monthly", backendPath: "/v2/datasets/business-indicator-monthly", requiredPlan: "pro", creditsCost: 2 },
+  "business-indicator-monthly": { datasetSlug: "business-indicator-monthly", backendPath: "/v2/datasets/business-indicator-monthly", requiredPlan: "max", creditsCost: 2 },
   "corporate-actions-enhanced": { datasetSlug: "corporate-actions-enhanced", backendPath: "/v2/datasets/corporate-actions-enhanced", requiredPlan: "pro", creditsCost: 2 },
   "day-trading-suspension": { datasetSlug: "day-trading-suspension", backendPath: "/v2/datasets/day-trading-suspension", requiredPlan: "pro", creditsCost: 2 },
   // tier aligned to read API (attention_disposal→disposition-securities-period = pro, explicit)
@@ -78,7 +78,7 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   // tier aligned to read API (dividend_policy→dividends = pro, explicit)
   "dividends": { datasetSlug: "dividends", backendPath: "/v2/datasets/dividends", requiredPlan: "pro", creditsCost: 2 },
   "index-constituents": { datasetSlug: "index-constituents", backendPath: "/v2/datasets/index-constituents", requiredPlan: "free", creditsCost: 2 },
-  "macro-global": { datasetSlug: "macro-global", backendPath: "/v2/datasets/macro-global", requiredPlan: "pro", creditsCost: 2 },
+  "macro-global": { datasetSlug: "macro-global", backendPath: "/v2/datasets/macro-global", requiredPlan: "enterprise", creditsCost: 2 },
   "macro-worldbank": { datasetSlug: "macro-worldbank", backendPath: "/v2/datasets/macro-worldbank", requiredPlan: "pro", creditsCost: 2 },
   "market-breadth": { datasetSlug: "market-breadth", backendPath: "/v2/datasets/market-breadth", requiredPlan: "starter", creditsCost: 2 },
   "market-overview-snapshots": { datasetSlug: "market-overview-snapshots", backendPath: "/v2/datasets/market-overview-snapshots", requiredPlan: "pro", creditsCost: 2 },

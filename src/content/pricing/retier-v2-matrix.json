@@ -1,7 +1,7 @@
 {
   "spec": "PRICING-RETIER-V2",
   "supersedes": "ab403e34 (v1 ladder)",
-  "generated_utc": "2026-07-20T19:38:00.578536+00:00",
+  "generated_utc": "2026-07-21T02:23:26.330622+00:00",
   "ladder": {
     "free": {
       "price_usd_month": 0,
@@ -22,135 +22,50 @@
     "enterprise": {
       "price_usd_month": 2000,
       "rank": 4
+    },
+    "absent": {
+      "price_usd_month": null,
+      "rank": 99
     }
   },
   "ladder_note": "developer is no longer a premium rung — it merges into starter at $20 as the entry tier, and enterprise takes the $2,000 price point.",
   "principle": "看 = Pro (reading the market) / 做 = Max (PIT, derivatives, intraday)",
-  "datasets_total": 168,
+  "datasets_total": 169,
   "counts_by_tier": {
     "free": 28,
-    "starter": 14,
-    "pro": 95,
-    "max": 27,
-    "enterprise": 4
+    "starter": 11,
+    "pro": 91,
+    "max": 32,
+    "enterprise": 6,
+    "absent": 1
   },
-  "changed": 39,
-  "tightened": 19,
-  "loosened": 20,
+  "changed": 4,
+  "tightened": 4,
+  "loosened": 0,
   "tightened_customer_facing": [
     {
-      "dataset_id": "options_daily_taifex",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+      "dataset_id": "market_value_weight",
+      "before": "starter",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)"
     },
     {
-      "dataset_id": "futures_final_settlement",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+      "dataset_id": "return_index_daily",
+      "before": "starter",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)"
     },
     {
-      "dataset_id": "option_final_settlement",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
+      "dataset_id": "return_index",
+      "before": "starter",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)"
     },
     {
-      "dataset_id": "taifex_institutional_flow",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "derivatives_market",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "features",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "factor_data",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "market_features",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "chip_features",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "futures_daily",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "options_daily",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "futures_institutional_investors_daily",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "options_institutional_investors_daily",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "futures_open_interest_large_traders_daily",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "options_open_interest_large_traders_daily",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "stock_snapshot",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "futures_snapshot",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "options_snapshot",
-      "before": "pro",
-      "after": "max",
-      "reason": "做 = TAIFEX derivatives / intraday / PIT-grade"
-    },
-    {
-      "dataset_id": "historical_prices",
-      "before": "free",
-      "after": "starter",
-      "reason": "raw history + basic reference ($20 entry)"
+      "dataset_id": "market_snapshot",
+      "before": "(unlisted)",
+      "after": "absent",
+      "reason": "dead inventory — no live backing table; not for sale"
     }
   ],
   "populate_01_datasets": [
@@ -192,10 +107,10 @@
     {
       "dataset_id": "broker_master",
       "family": "discovery_reference",
-      "before": "pro",
+      "before": "free",
       "after": "free",
       "reason": "raw daily bars or metadata — funnel",
-      "price_before": 100,
+      "price_before": 0,
       "price_after": 0,
       "populate_01_missing": null
     },
@@ -235,10 +150,10 @@
     {
       "dataset_id": "index_classification",
       "family": "market_structure_corporate_actions",
-      "before": "pro",
+      "before": "free",
       "after": "free",
       "reason": "raw daily bars or metadata — funnel",
-      "price_before": 100,
+      "price_before": 0,
       "price_after": 0,
       "populate_01_missing": null
     },
@@ -255,30 +170,30 @@
     {
       "dataset_id": "index_data",
       "family": "taiwan_macro",
-      "before": "pro",
+      "before": "free",
       "after": "free",
       "reason": "raw daily bars or metadata — funnel",
-      "price_before": 100,
+      "price_before": 0,
       "price_after": 0,
       "populate_01_missing": null
     },
     {
       "dataset_id": "industry_chain",
       "family": "discovery_reference",
-      "before": "pro",
+      "before": "free",
       "after": "free",
       "reason": "raw daily bars or metadata — funnel",
-      "price_before": 100,
+      "price_before": 0,
       "price_after": 0,
       "populate_01_missing": null
     },
     {
       "dataset_id": "industry_chain_membership",
       "family": null,
-      "before": "pro",
+      "before": "free",
       "after": "free",
       "reason": "raw daily bars or metadata — funnel",
-      "price_before": 100,
+      "price_before": 0,
       "price_after": 0,
       "populate_01_missing": null
     },
@@ -389,20 +304,20 @@
     {
       "dataset_id": "ticker_universe",
       "family": "discovery_reference",
-      "before": "pro",
+      "before": "free",
       "after": "free",
       "reason": "raw daily bars or metadata — funnel",
-      "price_before": 100,
+      "price_before": 0,
       "price_after": 0,
       "populate_01_missing": null
     },
     {
       "dataset_id": "time_alignment",
       "family": "market_technical",
-      "before": "pro",
+      "before": "free",
       "after": "free",
       "reason": "raw daily bars or metadata — funnel",
-      "price_before": 100,
+      "price_before": 0,
       "price_after": 0,
       "populate_01_missing": null
     },
@@ -429,10 +344,10 @@
     {
       "dataset_id": "trading_calendar_daily",
       "family": "market_structure_corporate_actions",
-      "before": "pro",
+      "before": "free",
       "after": "free",
       "reason": "raw daily bars or metadata — funnel",
-      "price_before": 100,
+      "price_before": 0,
       "price_after": 0,
       "populate_01_missing": null
     },
@@ -473,20 +388,20 @@
     {
       "dataset_id": "chip_daily",
       "family": "chip",
-      "before": "pro",
+      "before": "starter",
       "after": "starter",
       "reason": "raw history + basic reference ($20 entry)",
-      "price_before": 100,
+      "price_before": 20,
       "price_after": 20,
       "populate_01_missing": null
     },
     {
       "dataset_id": "historical_prices",
       "family": null,
-      "before": "free",
+      "before": "starter",
       "after": "starter",
       "reason": "raw history + basic reference ($20 entry)",
-      "price_before": 0,
+      "price_before": 20,
       "price_after": 20,
       "populate_01_missing": null
     },
@@ -523,20 +438,10 @@
     {
       "dataset_id": "market_breadth",
       "family": "taiwan_macro",
-      "before": "pro",
+      "before": "starter",
       "after": "starter",
       "reason": "raw history + basic reference ($20 entry)",
-      "price_before": 100,
-      "price_after": 20,
-      "populate_01_missing": null
-    },
-    {
-      "dataset_id": "market_value_weight",
-      "family": "market_structure_valuation",
-      "before": "pro",
-      "after": "starter",
-      "reason": "raw history + basic reference ($20 entry)",
-      "price_before": 100,
+      "price_before": 20,
       "price_after": 20,
       "populate_01_missing": null
     },
@@ -561,26 +466,6 @@
       "populate_01_missing": null
     },
     {
-      "dataset_id": "return_index",
-      "family": null,
-      "before": "pro",
-      "after": "starter",
-      "reason": "raw history + basic reference ($20 entry)",
-      "price_before": 100,
-      "price_after": 20,
-      "populate_01_missing": null
-    },
-    {
-      "dataset_id": "return_index_daily",
-      "family": "taiwan_macro",
-      "before": "pro",
-      "after": "starter",
-      "reason": "raw history + basic reference ($20 entry)",
-      "price_before": 100,
-      "price_after": 20,
-      "populate_01_missing": null
-    },
-    {
       "dataset_id": "securities_lending",
       "family": "chip_deep",
       "before": "starter",
@@ -593,10 +478,10 @@
     {
       "dataset_id": "total_margin_short",
       "family": "chip_deep",
-      "before": "pro",
+      "before": "starter",
       "after": "starter",
       "reason": "raw history + basic reference ($20 entry)",
-      "price_before": 100,
+      "price_before": 20,
       "price_after": 20,
       "populate_01_missing": null
     },
@@ -641,16 +526,6 @@
       "populate_01_missing": null
     },
     {
-      "dataset_id": "bond_yield_curve",
-      "family": null,
-      "before": "max",
-      "after": "pro",
-      "reason": "看 = analytical market data (default)",
-      "price_before": 200,
-      "price_after": 100,
-      "populate_01_missing": null
-    },
-    {
       "dataset_id": "broker_trading_daily",
       "family": "chip_deep",
       "before": "pro",
@@ -671,44 +546,12 @@
       "populate_01_missing": null
     },
     {
-      "dataset_id": "business_indicator",
-      "family": null,
-      "before": "max",
-      "after": "pro",
-      "reason": "看 = analytical market data (default)",
-      "price_before": 200,
-      "price_after": 100,
-      "populate_01_missing": null
-    },
-    {
-      "dataset_id": "business_indicator_monthly",
-      "family": "taiwan_macro",
-      "before": "pro",
-      "after": "pro",
-      "reason": "看 = analytical market data (default)",
-      "price_before": 100,
-      "price_after": 100,
-      "populate_01_missing": [
-        "unit"
-      ]
-    },
-    {
       "dataset_id": "capital_formation_events",
       "family": "discovery_reference",
       "before": "pro",
       "after": "pro",
       "reason": "看 = analytical market data (default)",
       "price_before": 100,
-      "price_after": 100,
-      "populate_01_missing": null
-    },
-    {
-      "dataset_id": "capital_markets",
-      "family": null,
-      "before": "max",
-      "after": "pro",
-      "reason": "看 = analytical market data (default)",
-      "price_before": 200,
       "price_after": 100,
       "populate_01_missing": null
     },
@@ -795,10 +638,10 @@
     {
       "dataset_id": "company_risk",
       "family": null,
-      "before": "max",
+      "before": "pro",
       "after": "pro",
       "reason": "看 = analytical market data (default)",
-      "price_before": 200,
+      "price_before": 100,
       "price_after": 100,
       "populate_01_missing": null
     },
@@ -1137,16 +980,6 @@
       "populate_01_missing": null
     },
     {
-      "dataset_id": "fx",
-      "family": null,
-      "before": "developer",
-      "after": "pro",
-      "reason": "看 = analytical market data (default)",
-      "price_before": 2000,
-      "price_after": 100,
-      "populate_01_missing": null
-    },
-    {
       "dataset_id": "global_event_news_daily",
       "family": "global_event_news",
       "before": "pro",
@@ -1213,7 +1046,7 @@
       "family": "chip_deep",
       "before": "pro",
       "after": "pro",
-      "reason": "看 = analytical market data (default)",
+      "reason": "derived market-level aggregate (看)",
       "price_before": 100,
       "price_after": 100,
       "populate_01_missing": null
@@ -1279,26 +1112,6 @@
       "populate_01_missing": null
     },
     {
-      "dataset_id": "macro_global",
-      "family": "global_macro",
-      "before": "pro",
-      "after": "pro",
-      "reason": "看 = analytical market data (default)",
-      "price_before": 100,
-      "price_after": 100,
-      "populate_01_missing": null
-    },
-    {
-      "dataset_id": "macro_international",
-      "family": null,
-      "before": "developer",
-      "after": "pro",
-      "reason": "看 = analytical market data (default)",
-      "price_before": 2000,
-      "price_after": 100,
-      "populate_01_missing": null
-    },
-    {
       "dataset_id": "macro_worldbank",
       "family": "global_macro",
       "before": "pro",
@@ -1349,6 +1162,16 @@
       "populate_01_missing": [
         "listed_count"
       ]
+    },
+    {
+      "dataset_id": "market_value_weight",
+      "family": "market_structure_valuation",
+      "before": "starter",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 20,
+      "price_after": 100,
+      "populate_01_missing": null
     },
     {
       "dataset_id": "monthly_revenue",
@@ -1407,6 +1230,26 @@
       "after": "pro",
       "reason": "看 = analytical market data (default)",
       "price_before": 100,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "return_index",
+      "family": null,
+      "before": "starter",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 20,
+      "price_after": 100,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "return_index_daily",
+      "family": "taiwan_macro",
+      "before": "starter",
+      "after": "pro",
+      "reason": "看 = analytical market data (default)",
+      "price_before": 20,
       "price_after": 100,
       "populate_01_missing": null
     },
@@ -1568,92 +1411,144 @@
       "populate_01_missing": null
     },
     {
+      "dataset_id": "bond_yield_curve",
+      "family": null,
+      "before": "max",
+      "after": "max",
+      "reason": "R1: Taiwan macro (rate/economy view) = Max",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "business_indicator",
+      "family": null,
+      "before": "max",
+      "after": "max",
+      "reason": "R1: Taiwan macro (rate/economy view) = Max",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "business_indicator_monthly",
+      "family": "taiwan_macro",
+      "before": "max",
+      "after": "max",
+      "reason": "R1: Taiwan macro (rate/economy view) = Max",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": [
+        "unit"
+      ]
+    },
+    {
+      "dataset_id": "capital_markets",
+      "family": null,
+      "before": "max",
+      "after": "max",
+      "reason": "R1: Taiwan macro (rate/economy view) = Max",
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
       "dataset_id": "chip_features",
       "family": "chip",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "derivatives_market",
       "family": "derivatives_daily",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "factor_data",
       "family": "market_technical",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "features",
       "family": "market_technical",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "futures_daily",
       "family": "derivatives_daily",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "futures_final_settlement",
       "family": "derivatives_market_structure",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "futures_institutional_investors_daily",
       "family": "derivatives_daily",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "futures_open_interest_large_traders_daily",
       "family": "derivatives_daily",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "futures_snapshot",
       "family": "realtime_snapshot",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
+      "price_after": 200,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "fx",
+      "family": null,
+      "before": "max",
+      "after": "max",
+      "reason": "R1: Taiwan macro (rate/economy view) = Max",
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
@@ -1670,80 +1565,80 @@
     {
       "dataset_id": "market_features",
       "family": "market_technical",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "option_final_settlement",
       "family": "derivatives_market_structure",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "options_daily",
       "family": "derivatives_daily",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "options_daily_taifex",
       "family": "derivatives_daily",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "options_institutional_investors_daily",
       "family": "derivatives_daily",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "options_open_interest_large_traders_daily",
       "family": "derivatives_daily",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "options_snapshot",
       "family": "realtime_snapshot",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
     {
       "dataset_id": "stock_snapshot",
       "family": "realtime_snapshot",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
@@ -1790,10 +1685,10 @@
     {
       "dataset_id": "taifex_institutional_flow",
       "family": "derivatives_market_structure",
-      "before": "pro",
+      "before": "max",
       "after": "max",
       "reason": "做 = TAIFEX derivatives / intraday / PIT-grade",
-      "price_before": 100,
+      "price_before": 200,
       "price_after": 200,
       "populate_01_missing": null
     },
@@ -1868,6 +1763,26 @@
       "populate_01_missing": null
     },
     {
+      "dataset_id": "macro_global",
+      "family": "global_macro",
+      "before": "enterprise",
+      "after": "enterprise",
+      "reason": "full-text / serve-layer / commercial",
+      "price_before": 2000,
+      "price_after": 2000,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "macro_international",
+      "family": null,
+      "before": "enterprise",
+      "after": "enterprise",
+      "reason": "full-text / serve-layer / commercial",
+      "price_before": 2000,
+      "price_after": 2000,
+      "populate_01_missing": null
+    },
+    {
       "dataset_id": "transcripts",
       "family": null,
       "before": "enterprise",
@@ -1875,6 +1790,16 @@
       "reason": "full-text / serve-layer / commercial",
       "price_before": 2000,
       "price_after": 2000,
+      "populate_01_missing": null
+    },
+    {
+      "dataset_id": "market_snapshot",
+      "family": null,
+      "before": "(unlisted)",
+      "after": "absent",
+      "reason": "dead inventory — no live backing table; not for sale",
+      "price_before": null,
+      "price_after": null,
       "populate_01_missing": null
     }
   ]
