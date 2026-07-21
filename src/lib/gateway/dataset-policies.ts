@@ -58,7 +58,6 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "issuer-profile": { datasetSlug: "issuer-profile", backendPath: "/v2/datasets/issuer-profile", requiredPlan: "free", creditsCost: 1 },
   "market-index": { datasetSlug: "market-index", backendPath: "/v2/datasets/market-index", requiredPlan: "free", creditsCost: 1 },
   "market-prices": { datasetSlug: "market-prices", backendPath: "/v2/datasets/market-prices", requiredPlan: "free", creditsCost: 1 },
-  "market-snapshot": { datasetSlug: "market-snapshot", backendPath: "/v2/datasets/market-snapshot", requiredPlan: "free", creditsCost: 1 },
   "return-index-daily": { datasetSlug: "return-index-daily", backendPath: "/v2/datasets/return-index-daily", requiredPlan: "starter", creditsCost: 1 },
   "security-master": { datasetSlug: "security-master", backendPath: "/v2/datasets/security-master", requiredPlan: "free", creditsCost: 1 },
   "stock-delisting-lifecycle": { datasetSlug: "stock-delisting-lifecycle", backendPath: "/v2/datasets/stock-delisting-lifecycle", requiredPlan: "free", creditsCost: 1 },

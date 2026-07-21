@@ -60,7 +60,6 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "index-classification": { domain: "market-prices", zh: "指數分類", en: "Index classification", agency: "TWSE", grade: "reference" },
   "index-constituents": { domain: "market-prices", zh: "指數成分股", en: "Index constituents", agency: "TWSE", grade: "derived" },
   "return-index-daily": { domain: "market-prices", zh: "報酬指數日線", en: "Return index (daily)", agency: "TWSE", grade: "derived" },
-  "market-snapshot": { domain: "market-prices", zh: "市場快照", en: "Market snapshot", agency: "TWSE", grade: "verified" },
   "market-overview-snapshots": { domain: "market-prices", zh: "市場概況快照", en: "Market overview snapshots", agency: "TWSE", grade: "reference" },
   "market-breadth": { domain: "market-prices", zh: "市場廣度", en: "Market breadth", agency: "TWSE", grade: "derived" },
   "technical-indicators": { domain: "market-prices", zh: "技術指標", en: "Technical indicators", agency: "TWSE / TPEx", grade: "derived" },

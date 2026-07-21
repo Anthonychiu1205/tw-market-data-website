@@ -23,7 +23,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 // owner/backend decision before it can be guarded; until then it is exempted WITH A REASON so the gap
 // is visible rather than silently passing. Do not add to this list to dodge a real mismatch.
 const NOT_IN_MATRIX = {
-  "market-snapshot": "No backend dataset id / no ENDPOINT_REGISTRY route — flagged as possible dead inventory (see pricing audit). Needs classification.",
+  // market-snapshot was delisted (backend: dead inventory / not for sale) — no longer a billing slug.
   "institutional-flow-market-aggregate": "Derived aggregate view; not listed as its own id in the retier matrix. Needs a canonical tier from the backend.",
 };
 

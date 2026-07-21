@@ -25,6 +25,7 @@ import { DocsArticlePage } from "@/src/components/docs/docs-article-page";
 import { DOCS_DATASET_CATALOG } from "@/src/content/docs/dataset-catalog";
 import { getDatasetDocContent } from "@/src/content/docs/dataset-pages";
 import { articleSlugs, getArticlePage } from "@/src/content/docs/article-pages";
+import { RETIRED_REDIRECTS, getRetiredRedirect } from "@/src/content/docs/retired-redirects";
 
 type DocsDynamicPageProps = {
   params: Promise<{ slug: string[]; locale: string }>;
@@ -51,6 +52,8 @@ export async function generateStaticParams() {
     ...DOCS_DATASET_CATALOG.map((d) => ({ slug: ["api", d.domain, d.slug] })),
     // v5 overview + guide article pages
     ...articleSlugs().map((slug) => ({ slug })),
+    // retired (delisted) dataset URLs → render the "retired, use X instead" note, not a 404
+    ...RETIRED_REDIRECTS.map((r) => ({ slug: r.slugParts })),
   ];
 }
 
@@ -80,6 +83,15 @@ export async function generateMetadata({ params }: DocsDynamicPageProps): Promis
     return {
       title: isEn ? `Docs | ${title}` : `文件｜${title}`,
       description: isEn ? article.subtitle.en : article.subtitle.zh,
+      alternates: buildAlternates(l, `/docs/${slug.join("/")}`),
+    };
+  }
+
+  // Retired dataset page (delisted) → keep the URL resolvable with a redirect title.
+  const retired = getRetiredRedirect(slug);
+  if (retired) {
+    return {
+      title: isEn ? `Docs | ${retired.title.en}` : `文件｜${retired.title.zh}`,
       alternates: buildAlternates(l, `/docs/${slug.join("/")}`),
     };
   }
@@ -129,6 +141,30 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
   if (getArticlePage(slug)) {
     const locale = await getLocale();
     return <DocsArticlePage slugParts={slug} locale={locale} />;
+  }
+
+  // Retired (delisted) dataset → honest "retired, use X instead" note, not a 404.
+  const retired = getRetiredRedirect(slug);
+  if (retired) {
+    const locale = await getLocale();
+    const en = locale === "en";
+    const title = en ? retired.title.en : retired.title.zh;
+    return (
+      <DocsPageShell
+        page={{ title, subtitle: en ? retired.note.en : retired.note.zh, href: `/docs/${slug.join("/")}`, sections: [] }}
+        pageLabel={en ? "Retired" : "已下架"}
+      >
+        <ul className="mt-6 list-disc space-y-2 pl-5 text-slate-700">
+          {retired.alternatives.map((alt) => (
+            <li key={alt.href}>
+              <Link href={alt.href} className="underline underline-offset-2 hover:text-slate-950">
+                {en ? alt.en : alt.zh}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </DocsPageShell>
+    );
   }
 
   const page = getDocsPageBySlug(slug);
