@@ -82,6 +82,7 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "institutional-flow-market-aggregate": { domain: "capital-flows", zh: "法人市場匯總", en: "Institutional flow (market aggregate)", agency: "TWSE", grade: "derived" },
   "institutional-ownership": { domain: "capital-flows", zh: "法人持股", en: "Institutional ownership", agency: "TWSE", grade: "verified" },
   "margin-short": { domain: "capital-flows", zh: "融資融券", en: "Margin & short", agency: "TWSE", grade: "reference" },
+  // crosswalk-verified 2026-07-21: returns rows (enterprise 實打, compute-on-fly) — legitimately `derived`, not empty.
   "margin-short-enhanced": { domain: "capital-flows", zh: "增強融資融券", en: "Enhanced margin & short", agency: "TWSE", grade: "derived" },
   "total-margin-short": { domain: "capital-flows", zh: "整體融資融券匯總", en: "Total margin & short", agency: "TWSE", grade: "reference" },
   "securities-lending": { domain: "capital-flows", zh: "借券資料", en: "Securities lending", agency: "TWSE", grade: "verified" },
@@ -105,6 +106,7 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "issuer-profile": { domain: "structure-reference", zh: "公司基本資料", en: "Issuer profile", agency: "TWSE / TPEx", grade: "reference" },
   "broker-branch-reference": { domain: "structure-reference", zh: "券商分點參考", en: "Broker-branch reference", agency: "TWSE", grade: "reference" },
   "theme-taxonomy": { domain: "structure-reference", zh: "主題分類", en: "Theme taxonomy", agency: "TWMD", grade: "reference" },
+  // crosswalk-verified 2026-07-21: compute-on-fly, returns rows with proper filter params (owner enterprise 實打) — `derived`, not lying.
   "screener": { domain: "structure-reference", zh: "選股器", en: "Screener", agency: "TWSE / TPEx", grade: "derived" },
   "warrants-reference": { domain: "structure-reference", zh: "權證參考", en: "Warrants reference", agency: "TWSE / TPEx", grade: "reference" },
 
