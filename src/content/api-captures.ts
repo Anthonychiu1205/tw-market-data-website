@@ -8331,6 +8331,601 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   }
 }`,
   },
+  "company-risk-events": {
+    rowsKey: "data",
+    envelopeKeys: ["data"],
+    zh: `{
+  "data": [
+    {
+      "ticker": null,
+      "market": "TW",
+      "event_date": "2026-06-30",
+      "event_type": "regulatory_penalty",
+      "event_subtype": "540",
+      "authority": null,
+      "summary": null,
+      "penalty_amount": null,
+      "source_event_ref": "FSC:202606300001",
+      "source_provider": "FSC",
+      "source_role": "official_fsc_mops_penalty",
+      "source_family": "FSC_MOPS_LEGAL_RISK",
+      "lineage": {
+        "row_index": 0,
+        "source_hash": "legal_risk_bulk",
+        "payload_date": "20260630",
+        "request_date": "2026-06-30",
+        "endpoint_name": "legal_risk",
+        "source_authority": "FSC RSS 10292 / MOPS 22817"
+      },
+      "data_gaps": []
+    },
+    {
+      "ticker": "1240",
+      "market": "TPEx",
+      "event_date": "2026-06-05",
+      "event_type": "litigation_or_risk_management_summary",
+      "event_subtype": "anti_competition_litigation_loss",
+      "authority": "TPEx ESG disclosure",
+      "summary": "anti-competition litigation monetary loss summary",
+      "penalty_amount": null,
+      "source_event_ref": "22b9b719e2f0089d7c5d029d",
+      "source_provider": "tpex_official",
+      "source_role": "company_risk_events",
+      "source_family": "tpex_esg_litigation",
+      "lineage": {
+        "row_index": 0,
+        "source_url": "https://www.tpex.org.tw/openapi/v1/t187ap46_O_20",
+        "report_year": 2024
+      },
+      "data_gaps": [
+        "amount_not_disclosed_or_zero"
+      ]
+    }
+  ]
+}`,
+  },
+  "convertible-bonds": {
+    rowsKey: "data",
+    envelopeKeys: ["data"],
+    zh: `{
+  "data": [
+    {
+      "bond_code": "11011",
+      "cb_name": "台泥一永",
+      "as_of_date": "2026-07-16",
+      "conversion_price": 34.0,
+      "conversion_start_date": "2025-03-11",
+      "conversion_end_date": "2029-12-10",
+      "put_price": 0.0,
+      "redemption_price": 0.0,
+      "issuance_amount": 8000000000.0,
+      "outstanding_balance": 8000000000.0,
+      "reference_price": 100.1,
+      "underlying_stock_price": 23.95,
+      "coupon_rate": 0.0,
+      "cb_delisting_date": null,
+      "market": "TPEx"
+    },
+    {
+      "bond_code": "12561",
+      "cb_name": "鮮活果汁一KY",
+      "as_of_date": "2026-07-16",
+      "conversion_price": 182.5,
+      "conversion_start_date": "2026-01-09",
+      "conversion_end_date": "2028-10-08",
+      "put_price": 0.0,
+      "redemption_price": 0.0,
+      "issuance_amount": 200000000.0,
+      "outstanding_balance": 199500000.0,
+      "reference_price": 106.0,
+      "underlying_stock_price": 189.0,
+      "coupon_rate": 0.0,
+      "cb_delisting_date": null,
+      "market": "TPEx"
+    }
+  ]
+}`,
+    en: `{
+  "data": [
+    {
+      "bond_code": "11011",
+      "cb_name": "<Chinese value - see the zh page>",
+      "as_of_date": "2026-07-16",
+      "conversion_price": 34.0,
+      "conversion_start_date": "2025-03-11",
+      "conversion_end_date": "2029-12-10",
+      "put_price": 0.0,
+      "redemption_price": 0.0,
+      "issuance_amount": 8000000000.0,
+      "outstanding_balance": 8000000000.0,
+      "reference_price": 100.1,
+      "underlying_stock_price": 23.95,
+      "coupon_rate": 0.0,
+      "cb_delisting_date": null,
+      "market": "TPEx"
+    },
+    {
+      "bond_code": "12561",
+      "cb_name": "<Chinese value - see the zh page>",
+      "as_of_date": "2026-07-16",
+      "conversion_price": 182.5,
+      "conversion_start_date": "2026-01-09",
+      "conversion_end_date": "2028-10-08",
+      "put_price": 0.0,
+      "redemption_price": 0.0,
+      "issuance_amount": 200000000.0,
+      "outstanding_balance": 199500000.0,
+      "reference_price": 106.0,
+      "underlying_stock_price": 189.0,
+      "coupon_rate": 0.0,
+      "cb_delisting_date": null,
+      "market": "TPEx"
+    }
+  ]
+}`,
+  },
+  "derivatives-market": {
+    rowsKey: "data",
+    envelopeKeys: ["data"],
+    zh: `{
+  "data": [
+    {
+      "contract_code": "BRF",
+      "symbol": "BRF",
+      "as_of_date": "2026-07-16",
+      "derivative_type": "futures",
+      "contract_type": "202612",
+      "open_interest": null,
+      "volume": 0.0,
+      "settlement_price": null,
+      "open": null,
+      "high": null,
+      "low": null,
+      "close": null,
+      "market": "TAIFEX",
+      "source_name": "twse_official",
+      "source_url": null
+    },
+    {
+      "contract_code": "BRF",
+      "symbol": "BRF",
+      "as_of_date": "2026-07-16",
+      "derivative_type": "futures",
+      "contract_type": "202612",
+      "open_interest": 0.0,
+      "volume": 0.0,
+      "settlement_price": 2603.0,
+      "open": null,
+      "high": null,
+      "low": null,
+      "close": null,
+      "market": "TAIFEX",
+      "source_name": "twse_official",
+      "source_url": null
+    }
+  ]
+}`,
+  },
+  "macro-global": {
+    rowsKey: "data",
+    envelopeKeys: ["data"],
+    zh: `{
+  "data": [
+    {
+      "series_id": "DGS1",
+      "series_name": "US公債殖利率 1年",
+      "obs_date": "2026-07-02",
+      "value": 3.96,
+      "unit": "pct",
+      "freq": "D",
+      "source_group": "USTreasury",
+      "release_role": "actual",
+      "source_provider": "us_treasury_official",
+      "source_role": "official_ust_par_yield_curve",
+      "source_family": "USTREASURY_PAR_YIELD",
+      "lineage": {},
+      "data_gaps": []
+    },
+    {
+      "series_id": "DGS10",
+      "series_name": "US公債殖利率 10年",
+      "obs_date": "2026-07-02",
+      "value": 4.49,
+      "unit": "pct",
+      "freq": "D",
+      "source_group": "USTreasury",
+      "release_role": "actual",
+      "source_provider": "us_treasury_official",
+      "source_role": "official_ust_par_yield_curve",
+      "source_family": "USTREASURY_PAR_YIELD",
+      "lineage": {},
+      "data_gaps": []
+    }
+  ]
+}`,
+    en: `{
+  "data": [
+    {
+      "series_id": "DGS1",
+      "series_name": "<Chinese value - see the zh page>",
+      "obs_date": "2026-07-02",
+      "value": 3.96,
+      "unit": "pct",
+      "freq": "D",
+      "source_group": "USTreasury",
+      "release_role": "actual",
+      "source_provider": "us_treasury_official",
+      "source_role": "official_ust_par_yield_curve",
+      "source_family": "USTREASURY_PAR_YIELD",
+      "lineage": {},
+      "data_gaps": []
+    },
+    {
+      "series_id": "DGS10",
+      "series_name": "<Chinese value - see the zh page>",
+      "obs_date": "2026-07-02",
+      "value": 4.49,
+      "unit": "pct",
+      "freq": "D",
+      "source_group": "USTreasury",
+      "release_role": "actual",
+      "source_provider": "us_treasury_official",
+      "source_role": "official_ust_par_yield_curve",
+      "source_family": "USTREASURY_PAR_YIELD",
+      "lineage": {},
+      "data_gaps": []
+    }
+  ]
+}`,
+  },
+  "macro-worldbank": {
+    rowsKey: "data",
+    envelopeKeys: ["data"],
+    zh: `{
+  "data": [
+    {
+      "country_iso": "ABW",
+      "country_name": "Aruba",
+      "indicator_code": "FI.RES.TOTL.CD",
+      "indicator_name": "Total reserves (includes gold, current US$)",
+      "year": 2025,
+      "value": 2231431960.0,
+      "source_group": "WorldBank",
+      "license": "CC-BY",
+      "lineage": {
+        "source": "worldbank_wdi_v2",
+        "endpoint": "api.worldbank.org"
+      }
+    },
+    {
+      "country_iso": "ABW",
+      "country_name": "Aruba",
+      "indicator_code": "FI.RES.XGLD.CD",
+      "indicator_name": "Total reserves minus gold (current US$)",
+      "year": 2025,
+      "value": 1794651960.0,
+      "source_group": "WorldBank",
+      "license": "CC-BY",
+      "lineage": {
+        "source": "worldbank_wdi_v2",
+        "endpoint": "api.worldbank.org"
+      }
+    }
+  ]
+}`,
+  },
+  "market-breadth": {
+    rowsKey: "data",
+    envelopeKeys: ["data"],
+    zh: `{
+  "data": [
+    {
+      "market": "TWSE",
+      "as_of_date": "2026-07-16",
+      "breadth_version": "v1",
+      "advancers": 371,
+      "decliners": 597,
+      "unchanged": 81,
+      "limit_up_count": 17,
+      "limit_down_count": 7,
+      "advance_decline_ratio": 0.621441,
+      "breadth_ratio": -0.215443,
+      "total_traded_value": null,
+      "total_volume": null,
+      "provider": "twse_official",
+      "source_role": "derived_market_breadth",
+      "lineage": {
+        "derived_from": "twse_mi_index_market_breadth",
+        "upstream_lineage": {
+          "request_type": "MS",
+          "parser_source_date": "2026-07-16",
+          "source_lineage_rows": [
+            {
+              "row_number": 0,
+              "table_index": 7,
+              "table_title": "漲跌證券數合計"
+            },
+            {
+              "row_number": 1,
+              "table_index": 7,
+              "table_title": "漲跌證券數合計"
+            },
+            {
+              "row_number": 2,
+              "table_index": 7,
+              "table_title": "漲跌證券數合計"
+            },
+            {
+              "row_number": 3,
+              "table_index": 7,
+              "table_title": "漲跌證券數合計"
+            },
+            {
+              "row_number": 4,
+              "table_index": 7,
+              "table_title": "漲跌證券數合計"
+            }
+          ]
+        }
+      },
+      "updated_at": "2026-07-17T17:34:12.204238"
+    },
+    {
+      "market": "TWSE",
+      "as_of_date": "2026-07-15",
+      "breadth_version": "v1",
+      "advancers": 893,
+      "decliners": 125,
+      "unchanged": 42,
+      "limit_up_count": 36,
+      "limit_down_count": 0,
+      "advance_decline_ratio": 7.144,
+      "breadth_ratio": 0.724528,
+      "total_traded_value": null,
+      "total_volume": null,
+      "provider": "twse_official",
+      "source_role": "derived_market_breadth",
+      "lineage": {
+        "derived_from": "twse_mi_index_market_breadth",
+        "upstream_lineage": {
+          "request_type": "MS",
+          "parser_source_date": "2026-07-15",
+          "source_lineage_rows": [
+            {
+              "row_number": 0,
+              "table_index": 7,
+              "table_title": "漲跌證券數合計"
+            },
+            {
+              "row_number": 1,
+              "table_index": 7,
+              "table_title": "漲跌證券數合計"
+            },
+            {
+              "row_number": 2,
+              "table_index": 7,
+              "table_title": "漲跌證券數合計"
+            },
+            {
+              "row_number": 3,
+              "table_index": 7,
+              "table_title": "漲跌證券數合計"
+            },
+            {
+              "row_number": 4,
+              "table_index": 7,
+              "table_title": "漲跌證券數合計"
+            }
+          ]
+        }
+      },
+      "updated_at": "2026-07-17T17:34:12.204238"
+    }
+  ]
+}`,
+    en: `{
+  "data": [
+    {
+      "market": "TWSE",
+      "as_of_date": "2026-07-16",
+      "breadth_version": "v1",
+      "advancers": 371,
+      "decliners": 597,
+      "unchanged": 81,
+      "limit_up_count": 17,
+      "limit_down_count": 7,
+      "advance_decline_ratio": 0.621441,
+      "breadth_ratio": -0.215443,
+      "total_traded_value": null,
+      "total_volume": null,
+      "provider": "twse_official",
+      "source_role": "derived_market_breadth",
+      "lineage": {
+        "derived_from": "twse_mi_index_market_breadth",
+        "upstream_lineage": {
+          "request_type": "MS",
+          "parser_source_date": "2026-07-16",
+          "source_lineage_rows": [
+            {
+              "row_number": 0,
+              "table_index": 7,
+              "table_title": "<Chinese value - see the zh page>"
+            },
+            {
+              "row_number": 1,
+              "table_index": 7,
+              "table_title": "<Chinese value - see the zh page>"
+            },
+            {
+              "row_number": 2,
+              "table_index": 7,
+              "table_title": "<Chinese value - see the zh page>"
+            },
+            {
+              "row_number": 3,
+              "table_index": 7,
+              "table_title": "<Chinese value - see the zh page>"
+            },
+            {
+              "row_number": 4,
+              "table_index": 7,
+              "table_title": "<Chinese value - see the zh page>"
+            }
+          ]
+        }
+      },
+      "updated_at": "2026-07-17T17:34:12.204238"
+    },
+    {
+      "market": "TWSE",
+      "as_of_date": "2026-07-15",
+      "breadth_version": "v1",
+      "advancers": 893,
+      "decliners": 125,
+      "unchanged": 42,
+      "limit_up_count": 36,
+      "limit_down_count": 0,
+      "advance_decline_ratio": 7.144,
+      "breadth_ratio": 0.724528,
+      "total_traded_value": null,
+      "total_volume": null,
+      "provider": "twse_official",
+      "source_role": "derived_market_breadth",
+      "lineage": {
+        "derived_from": "twse_mi_index_market_breadth",
+        "upstream_lineage": {
+          "request_type": "MS",
+          "parser_source_date": "2026-07-15",
+          "source_lineage_rows": [
+            {
+              "row_number": 0,
+              "table_index": 7,
+              "table_title": "<Chinese value - see the zh page>"
+            },
+            {
+              "row_number": 1,
+              "table_index": 7,
+              "table_title": "<Chinese value - see the zh page>"
+            },
+            {
+              "row_number": 2,
+              "table_index": 7,
+              "table_title": "<Chinese value - see the zh page>"
+            },
+            {
+              "row_number": 3,
+              "table_index": 7,
+              "table_title": "<Chinese value - see the zh page>"
+            },
+            {
+              "row_number": 4,
+              "table_index": 7,
+              "table_title": "<Chinese value - see the zh page>"
+            }
+          ]
+        }
+      },
+      "updated_at": "2026-07-17T17:34:12.204238"
+    }
+  ]
+}`,
+  },
+  "tax-business-registration": {
+    rowsKey: "data",
+    envelopeKeys: ["data"],
+    zh: `{
+  "data": [
+    {
+      "company_id": "62202234",
+      "business_registration_number": "62202234",
+      "tax_id": "62202234",
+      "company_name": "鼎海策營造有限公司",
+      "registered_address": "臺中市太平區宜昌路360號1樓",
+      "status": "核准設立",
+      "representative": "陳啓政",
+      "incorporation_date": "2026-04-30",
+      "source_as_of_date": "2026-04-30",
+      "source_provider": "moea_business_development_administration",
+      "source_role": "company_establishment_roster_monthly",
+      "source_family": "data_gov_tw_moea_company_establishment_roster_monthly_csv",
+      "lineage": {
+        "source_file_url": "https://data.gcis.nat.gov.tw/od/file?oid=05D3A71E-0652-4C64-A52D-956699492FFF",
+        "official_boundary": "public_company_establishment_registration_reference",
+        "source_row_number": null,
+        "source_dataset_url": "https://data.gov.tw/dataset/6047"
+      },
+      "data_gaps": []
+    },
+    {
+      "company_id": "62202261",
+      "business_registration_number": "62202261",
+      "tax_id": "62202261",
+      "company_name": "出賢文教有限公司",
+      "registered_address": "臺中市南區西川里柳川東路一段82號1樓",
+      "status": "核准設立",
+      "representative": "許芳瑜",
+      "incorporation_date": "2026-04-30",
+      "source_as_of_date": "2026-04-30",
+      "source_provider": "moea_business_development_administration",
+      "source_role": "company_establishment_roster_monthly",
+      "source_family": "data_gov_tw_moea_company_establishment_roster_monthly_csv",
+      "lineage": {
+        "source_file_url": "https://data.gcis.nat.gov.tw/od/file?oid=05D3A71E-0652-4C64-A52D-956699492FFF",
+        "official_boundary": "public_company_establishment_registration_reference",
+        "source_row_number": null,
+        "source_dataset_url": "https://data.gov.tw/dataset/6047"
+      },
+      "data_gaps": []
+    }
+  ]
+}`,
+    en: `{
+  "data": [
+    {
+      "company_id": "62202234",
+      "business_registration_number": "62202234",
+      "tax_id": "62202234",
+      "company_name": "<Chinese value - see the zh page>",
+      "registered_address": "<Chinese value - see the zh page>",
+      "status": "<Chinese value - see the zh page>",
+      "representative": "<Chinese value - see the zh page>",
+      "incorporation_date": "2026-04-30",
+      "source_as_of_date": "2026-04-30",
+      "source_provider": "moea_business_development_administration",
+      "source_role": "company_establishment_roster_monthly",
+      "source_family": "data_gov_tw_moea_company_establishment_roster_monthly_csv",
+      "lineage": {
+        "source_file_url": "https://data.gcis.nat.gov.tw/od/file?oid=05D3A71E-0652-4C64-A52D-956699492FFF",
+        "official_boundary": "public_company_establishment_registration_reference",
+        "source_row_number": null,
+        "source_dataset_url": "https://data.gov.tw/dataset/6047"
+      },
+      "data_gaps": []
+    },
+    {
+      "company_id": "62202261",
+      "business_registration_number": "62202261",
+      "tax_id": "62202261",
+      "company_name": "<Chinese value - see the zh page>",
+      "registered_address": "<Chinese value - see the zh page>",
+      "status": "<Chinese value - see the zh page>",
+      "representative": "<Chinese value - see the zh page>",
+      "incorporation_date": "2026-04-30",
+      "source_as_of_date": "2026-04-30",
+      "source_provider": "moea_business_development_administration",
+      "source_role": "company_establishment_roster_monthly",
+      "source_family": "data_gov_tw_moea_company_establishment_roster_monthly_csv",
+      "lineage": {
+        "source_file_url": "https://data.gcis.nat.gov.tw/od/file?oid=05D3A71E-0652-4C64-A52D-956699492FFF",
+        "official_boundary": "public_company_establishment_registration_reference",
+        "source_row_number": null,
+        "source_dataset_url": "https://data.gov.tw/dataset/6047"
+      },
+      "data_gaps": []
+    }
+  ]
+}`,
+  },
 };
 
 export function getApiCapture(slug: string): ApiCapture | null {
