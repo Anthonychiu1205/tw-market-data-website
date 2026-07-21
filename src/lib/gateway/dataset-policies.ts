@@ -102,7 +102,6 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   // tier aligned to read API (institutional_flow = starter, explicit)
   "institutional-flow": { datasetSlug: "institutional-flow", backendPath: "/v2/datasets/institutional-flow", requiredPlan: "starter", creditsCost: 2 },
   "institutional-flow-market-aggregate": { datasetSlug: "institutional-flow-market-aggregate", backendPath: "/v2/datasets/institutional-flow-market-aggregate", requiredPlan: "pro", creditsCost: 2 },
-  "institutional-ownership": { datasetSlug: "institutional-ownership", backendPath: "/v2/datasets/institutional-ownership", requiredPlan: "pro", creditsCost: 2 },
   // tier aligned to read API (margin_short = starter, explicit)
   "margin-short": { datasetSlug: "margin-short", backendPath: "/v2/datasets/margin-short", requiredPlan: "starter", creditsCost: 2 },
   // securities-lending: backendPath intentionally kept at the legacy chip-deep path — the retiring

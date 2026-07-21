@@ -11,16 +11,18 @@ export type RetiredRedirect = {
 };
 
 export const RETIRED_REDIRECTS: RetiredRedirect[] = [
+  // market-snapshot is NOT here: owner ruled a FULL delete (no note) — see PR #117. This mechanism now
+  // serves institutional-ownership only, which owner ruled 下架導流 (delist with a pointer).
   {
-    slugParts: ["api", "market-prices", "market-snapshot"],
-    title: { zh: "市場快照（已下架）", en: "Market snapshot (retired)" },
+    slugParts: ["api", "capital-flows", "institutional-ownership"],
+    title: { zh: "法人持股（已下架）", en: "Institutional ownership (retired)" },
     note: {
-      zh: "此資料集已下架——後端標記為無實體來源表（不可販售），且其內容與下列現有資料集重疊。請改用：",
-      en: "This dataset is retired — the backend marks it as having no live backing table (not for sale), and its content overlaps the live datasets below. Use instead:",
+      zh: "此資料集已下架。相同性質的法人／持股資料請改用：",
+      en: "This dataset is retired. For equivalent ownership data, use instead:",
     },
     alternatives: [
-      { href: "/docs/api/market-prices/market-index", zh: "市場指數（指數內容）", en: "Market indices (index content)" },
-      { href: "/docs/api/market-prices/market-breadth", zh: "市場廣度（漲跌家數）", en: "Market breadth (advancers / decliners)" },
+      // foreign-holding is NOT a real docs page; ownership-distribution is the only valid target.
+      { href: "/docs/api/capital-flows/ownership-distribution", zh: "股權分散（TDCC 持股分佈）", en: "Ownership distribution (TDCC holder distribution)" },
     ],
   },
 ];
