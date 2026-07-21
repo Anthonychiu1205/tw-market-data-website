@@ -60,7 +60,6 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "index-classification": { domain: "market-prices", zh: "指數分類", en: "Index classification", agency: "TWSE", grade: "reference" },
   "index-constituents": { domain: "market-prices", zh: "指數成分股", en: "Index constituents", agency: "TWSE", grade: "derived" },
   "return-index-daily": { domain: "market-prices", zh: "報酬指數日線", en: "Return index (daily)", agency: "TWSE", grade: "derived" },
-  "market-snapshot": { domain: "market-prices", zh: "市場快照", en: "Market snapshot", agency: "TWSE", grade: "verified" },
   "market-overview-snapshots": { domain: "market-prices", zh: "市場概況快照", en: "Market overview snapshots", agency: "TWSE", grade: "reference" },
   "market-breadth": { domain: "market-prices", zh: "市場廣度", en: "Market breadth", agency: "TWSE", grade: "derived" },
   "technical-indicators": { domain: "market-prices", zh: "技術指標", en: "Technical indicators", agency: "TWSE / TPEx", grade: "derived" },
@@ -83,6 +82,7 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "institutional-flow-market-aggregate": { domain: "capital-flows", zh: "法人市場匯總", en: "Institutional flow (market aggregate)", agency: "TWSE", grade: "derived" },
   "institutional-ownership": { domain: "capital-flows", zh: "法人持股", en: "Institutional ownership", agency: "TWSE", grade: "verified" },
   "margin-short": { domain: "capital-flows", zh: "融資融券", en: "Margin & short", agency: "TWSE", grade: "reference" },
+  // crosswalk-verified 2026-07-21: returns rows (enterprise 實打, compute-on-fly) — legitimately `derived`, not empty.
   "margin-short-enhanced": { domain: "capital-flows", zh: "增強融資融券", en: "Enhanced margin & short", agency: "TWSE", grade: "derived" },
   "total-margin-short": { domain: "capital-flows", zh: "整體融資融券匯總", en: "Total margin & short", agency: "TWSE", grade: "reference" },
   "securities-lending": { domain: "capital-flows", zh: "借券資料", en: "Securities lending", agency: "TWSE", grade: "verified" },
@@ -106,6 +106,7 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "issuer-profile": { domain: "structure-reference", zh: "公司基本資料", en: "Issuer profile", agency: "TWSE / TPEx", grade: "reference" },
   "broker-branch-reference": { domain: "structure-reference", zh: "券商分點參考", en: "Broker-branch reference", agency: "TWSE", grade: "reference" },
   "theme-taxonomy": { domain: "structure-reference", zh: "主題分類", en: "Theme taxonomy", agency: "TWMD", grade: "reference" },
+  // crosswalk-verified 2026-07-21: compute-on-fly, returns rows with proper filter params (owner enterprise 實打) — `derived`, not lying.
   "screener": { domain: "structure-reference", zh: "選股器", en: "Screener", agency: "TWSE / TPEx", grade: "derived" },
   "warrants-reference": { domain: "structure-reference", zh: "權證參考", en: "Warrants reference", agency: "TWSE / TPEx", grade: "reference" },
 
@@ -125,10 +126,27 @@ const DATASET_META: Record<string, DatasetMeta> = {
 
   // ── Funds & Corporate Intelligence ──
   "fund-etf-metadata": { domain: "funds-intel", zh: "基金／ETF 主檔", en: "Fund / ETF metadata", agency: "Issuer", grade: "reference" },
-  "etf-flow": { domain: "funds-intel", zh: "ETF 資金流", en: "ETF flow", agency: "Issuer", grade: "verified" },
+  // etf-flow is NOT here: it is delisted from billing (no official source, returns 0 rows) and shown as
+  // a `building` roadmap item instead of `verified` — see DOCS_BUILDING_DATASETS below.
   "etf-holdings": { domain: "funds-intel", zh: "ETF 持股明細", en: "ETF holdings", agency: "Issuer", grade: "reference" },
   "tax-business-registration": { domain: "funds-intel", zh: "稅籍／商業登記", en: "Tax & business registration", agency: "MOEA", grade: "reference" },
 };
+
+// Roadmap ("building") datasets — declared but NOT sellable: no billing policy, no live source yet.
+// Shown in the sidebar with a building badge and rendered non-clickable (honest "coming soon" rather
+// than a `verified` badge on empty data). Kept separate from DATASET_META so they can never leak into
+// the sellable catalog (DOCS_DATASET_CATALOG is billing-derived).
+export type DocsBuildingDataset = { domain: DocsDomainId; slug: string; zh: string; en: string };
+
+export const DOCS_BUILDING_DATASETS: DocsBuildingDataset[] = [
+  // etf-flow: no official source; the live endpoint returns 0 rows. Delisted from billing 2026-07-21
+  // (was falsely `verified` + pro/2cr — a paying customer got empty data). Roadmap until a source lands.
+  { domain: "funds-intel", slug: "etf-flow", zh: "ETF 資金流", en: "ETF flow" },
+];
+
+export function buildingDatasetsByDomain(domainId: DocsDomainId): DocsBuildingDataset[] {
+  return DOCS_BUILDING_DATASETS.filter((d) => d.domain === domainId);
+}
 
 export type DocsDatasetEntry = {
   slug: string;

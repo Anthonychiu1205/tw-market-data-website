@@ -23,10 +23,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 // owner/backend decision before it can be guarded; until then it is exempted WITH A REASON so the gap
 // is visible rather than silently passing. Do not add to this list to dodge a real mismatch.
 const NOT_IN_MATRIX = {
-  // Backend now lists market_snapshot with after="absent" + "dead inventory — no live backing table;
-  // not for sale". It is exempted here (kept at free, not charged) but SHOULD BE DELISTED — see the
-  // "not for sale" handling below. Tracked for owner: remove the slug from this SSOT.
-  "market-snapshot": "Backend marks it dead inventory / not for sale (matrix after=absent). DELIST pending owner.",
+  // market-snapshot was delisted (backend: dead inventory / not for sale) — no longer a billing slug.
   "institutional-flow-market-aggregate": "Derived aggregate view; not listed as its own id in the retier matrix. Needs a canonical tier from the backend.",
 };
 

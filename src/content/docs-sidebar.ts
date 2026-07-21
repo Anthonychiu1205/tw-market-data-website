@@ -3,6 +3,7 @@ import type { DatasetGrade } from "@/src/lib/docs/dataset-grade";
 import { buildDatasetSearchHaystack, type DocsDatasetSearchEntry } from "@/src/lib/docs/dataset-search";
 import {
   DOCS_DOMAINS,
+  buildingDatasetsByDomain,
   datasetsByDomain,
   domainDisplayName,
   type DocsDomainId,
@@ -101,12 +102,22 @@ export const docsSidebarApiGroups: DocsSidebarNavGroupSource[] = DOCS_DOMAINS.ma
     label: domain.zh,
     labelEn: domain.en,
     groupIcon: DOMAIN_ICON[domain.id],
-    items: datasets.map((d) => ({
-      title: d.zh,
-      titleEn: d.en,
-      href: `/docs/api/${d.domain}/${d.slug}`,
-      grade: d.grade,
-    })),
+    items: [
+      ...datasets.map((d) => ({
+        title: d.zh,
+        titleEn: d.en,
+        href: `/docs/api/${d.domain}/${d.slug}`,
+        grade: d.grade,
+      })),
+      // Roadmap datasets: shown with a building badge, non-clickable (not a sellable link).
+      ...buildingDatasetsByDomain(domain.id).map((d) => ({
+        title: d.zh,
+        titleEn: d.en,
+        href: `/docs/api/${domain.id}/${d.slug}`,
+        grade: "building" as const,
+        building: true,
+      })),
+    ],
   };
 });
 
