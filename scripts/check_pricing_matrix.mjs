@@ -23,9 +23,16 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 // owner/backend decision before it can be guarded; until then it is exempted WITH A REASON so the gap
 // is visible rather than silently passing. Do not add to this list to dodge a real mismatch.
 const NOT_IN_MATRIX = {
-  "market-snapshot": "No backend dataset id / no ENDPOINT_REGISTRY route — flagged as possible dead inventory (see pricing audit). Needs classification.",
+  // Backend now lists market_snapshot with after="absent" + "dead inventory — no live backing table;
+  // not for sale". It is exempted here (kept at free, not charged) but SHOULD BE DELISTED — see the
+  // "not for sale" handling below. Tracked for owner: remove the slug from this SSOT.
+  "market-snapshot": "Backend marks it dead inventory / not for sale (matrix after=absent). DELIST pending owner.",
   "institutional-flow-market-aggregate": "Derived aggregate view; not listed as its own id in the retier matrix. Needs a canonical tier from the backend.",
 };
+
+// Matrix entries the backend explicitly marks as not-sellable. A website slug pointing at one of these
+// must be delisted, not priced — surfaced distinctly so it is not mistaken for a tier mismatch.
+const NOT_FOR_SALE = new Set(["absent"]);
 
 const matrix = JSON.parse(readFileSync(join(root, "src/content/pricing/retier-v2-matrix.json"), "utf8"));
 const canonical = new Map(matrix.matrix.map((r) => [r.dataset_id, r.after]));
@@ -42,12 +49,15 @@ const exemptedSeen = new Set();
 for (const { slug, requiredPlan } of website) {
   const id = slug.replace(/-/g, "_");
   const want = canonical.get(id);
-  if (want === undefined) {
+  if (want === undefined || NOT_FOR_SALE.has(want)) {
     if (slug in NOT_IN_MATRIX) {
       exemptedSeen.add(slug);
       continue;
     }
-    mismatches.push(`${slug}: not found in the retier matrix and not in the documented exemption list`);
+    const why = NOT_FOR_SALE.has(want)
+      ? `backend marks it not-for-sale (after="${want}") — delist it, do not price it`
+      : "not found in the retier matrix and not in the documented exemption list";
+    mismatches.push(`${slug}: ${why}`);
     continue;
   }
   if (want !== requiredPlan) {
