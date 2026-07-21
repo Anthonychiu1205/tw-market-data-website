@@ -97,7 +97,6 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "cash-flow-statement": { datasetSlug: "cash-flow-statement", backendPath: "/v2/datasets/cash-flow-statement", requiredPlan: "pro", creditsCost: 2 },
   "convertible-bonds": { datasetSlug: "convertible-bonds", backendPath: "/v2/datasets/convertible-bonds", requiredPlan: "pro", creditsCost: 2 },
   "derivatives-market": { datasetSlug: "derivatives-market", backendPath: "/v2/datasets/derivatives-market", requiredPlan: "max", creditsCost: 2 },
-  "etf-flow": { datasetSlug: "etf-flow", backendPath: "/v2/datasets/etf-flow", requiredPlan: "pro", creditsCost: 2 },
   "etf-holdings": { datasetSlug: "etf-holdings", backendPath: "/v2/datasets/etf-holdings", requiredPlan: "pro", creditsCost: 2 },
   "events": { datasetSlug: "events", backendPath: "/v2/datasets/events", requiredPlan: "pro", creditsCost: 2 },
   "income-statement": { datasetSlug: "income-statement", backendPath: "/v2/datasets/income-statement", requiredPlan: "pro", creditsCost: 2 },
