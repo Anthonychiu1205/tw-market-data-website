@@ -473,6 +473,133 @@ print("current foreign buying streak:", streak, "days")`,
       },
     ],
   },
+
+  // ── For AI agents: OpenAPI spec ──
+  // Links the REAL generated spec at /openapi.{json,yaml} (single source, regenerated at build) rather
+  // than re-listing endpoints here (which would drift). Server / version read from that spec.
+  {
+    slug: "ai-agents/openapi-spec",
+    pageLabel: { en: "For AI agents", zh: "為 AI Agent" },
+    title: { en: "OpenAPI spec", zh: "OpenAPI 規格" },
+    subtitle: {
+      en: "A machine-readable description of the dataset endpoints, for agents and code generators.",
+      zh: "資料集端點的機器可讀描述,供 agent 與程式碼產生器使用。",
+    },
+    sections: [
+      {
+        id: "where",
+        heading: { en: "Where it lives", zh: "位置" },
+        paragraphs: [
+          { en: "The spec is served at the domain root in both formats, generated from the same source as the docs so it cannot drift:", zh: "規格以兩種格式提供於網域根層,與文件同源生成,故不會漂移:" },
+        ],
+        code: {
+          language: "bash",
+          code: `curl "https://twmarketdata.com/openapi.json"
+curl "https://twmarketdata.com/openapi.yaml"`,
+        },
+        bullets: [
+          { en: "Title: TW Market Data API. Server: https://twmarketdata.com.", zh: "標題:TW Market Data API。伺服器:https://twmarketdata.com。" },
+          { en: "It describes the /v2/datasets/* dataset endpoints as a machine-readable summary; per-field detail lives on each dataset's docs page.", zh: "它以機器可讀摘要描述 /v2/datasets/* 資料集端點;逐欄位細節在各資料集的文件頁。" },
+        ],
+      },
+      {
+        id: "use",
+        heading: { en: "Use it", zh: "怎麼用" },
+        bullets: [
+          { en: "Import the JSON into an OpenAPI client / SDK generator to get typed request builders.", zh: "把 JSON 匯入 OpenAPI client／SDK 產生器,取得型別化的請求建構器。" },
+          { en: "All calls still need your X-API-Key header — the spec documents the shape, not your credentials.", zh: "所有呼叫仍需 X-API-Key 標頭——規格描述的是結構,不含你的憑證。" },
+        ],
+      },
+    ],
+  },
+
+  // ── For AI agents: llms.txt ──
+  {
+    slug: "ai-agents/llms-txt",
+    pageLabel: { en: "For AI agents", zh: "為 AI Agent" },
+    title: { en: "llms.txt", zh: "llms.txt" },
+    subtitle: {
+      en: "A single machine-readable index an agent reads first to know what exists — and what deliberately does not.",
+      zh: "agent 先讀的單一機器可讀索引——知道有什麼、以及刻意沒有什麼。",
+    },
+    sections: [
+      {
+        id: "what",
+        heading: { en: "What it is", zh: "它是什麼" },
+        paragraphs: [
+          { en: "/llms.txt is the site's machine-readable index for agents: the allowed dataset ids, the not_available list (data deliberately not offered), the usage rules, and links to the OpenAPI spec.", zh: "/llms.txt 是給 agent 的全站機器可讀索引:允許的 dataset id、not_available 清單(刻意不提供的資料)、使用規則,以及 OpenAPI 規格連結。" },
+        ],
+        code: {
+          language: "bash",
+          code: `curl "https://twmarketdata.com/llms.txt"`,
+        },
+      },
+      {
+        id: "urls",
+        heading: { en: "The two files", zh: "兩個檔案" },
+        bullets: [
+          { en: "/llms.txt — the compact index (dataset ids, rules, not_available, OpenAPI links).", zh: "/llms.txt — 精簡索引(dataset id、規則、not_available、OpenAPI 連結)。" },
+          { en: "/llms-full.txt — the full bundle: every guide + endpoint page + coverage.", zh: "/llms-full.txt — 完整包:每個 guide＋端點頁＋涵蓋。" },
+          { en: "Both live at the domain root (they are not localized); a /zh-TW/llms.txt request redirects to the root.", zh: "兩者皆位於網域根層(不 localize);/zh-TW/llms.txt 會轉址到根路徑。" },
+        ],
+      },
+      {
+        id: "how",
+        heading: { en: "How an agent uses it", zh: "agent 如何使用" },
+        bullets: [
+          { en: "Fetch it once at the start, then work only from the dataset ids it lists — do not guess ids.", zh: "開始時抓一次,之後只用它列出的 dataset id——不要猜 id。" },
+          { en: "Treat not_available as authoritative: if data is listed there, tell the user it is intentionally not offered rather than inventing it.", zh: "把 not_available 視為權威:若某資料列在其中,告訴使用者它刻意不提供,而非編造。" },
+        ],
+      },
+    ],
+  },
+
+  // ── For AI agents: MCP server (BETA — live + connectable, not GA) ──
+  // Corrected from the earlier "Preview Skeleton" draft: the hosted MCP is verifiably LIVE (2026-07-22:
+  // v1.28.1, 4 tools) but BETA. Neither "no hosted MCP" (false) nor "已上線 GA" (overclaim). owner ruling.
+  {
+    slug: "ai-agents/mcp-server",
+    pageLabel: { en: "For AI agents", zh: "為 AI Agent" },
+    title: { en: "MCP Server", zh: "MCP Server" },
+    subtitle: {
+      en: "Beta — the hosted MCP server is live and connectable, but not yet GA.",
+      zh: "Beta——hosted MCP 伺服器已上線可連,但尚非正式版(GA)。",
+    },
+    sections: [
+      {
+        id: "status",
+        heading: { en: "Status — Beta", zh: "狀態 — Beta" },
+        paragraphs: [
+          { en: "The hosted MCP server is live at mcp.twmarketdata.com/mcp and connectable today. It is beta, not GA — the surface may change before general availability, and the REST API remains the stable path.", zh: "hosted MCP 伺服器已上線於 mcp.twmarketdata.com/mcp,今天即可連。它是 beta、非 GA——介面在正式版前可能調整,穩定路徑仍請用 REST API。" },
+        ],
+      },
+      {
+        id: "connect",
+        heading: { en: "Connect", zh: "連上" },
+        paragraphs: [
+          { en: "It speaks streamable-HTTP MCP and authenticates with your X-API-Key. With Claude Code:", zh: "它使用 streamable-HTTP MCP,以你的 X-API-Key 認證。以 Claude Code 為例:" },
+        ],
+        code: {
+          language: "bash",
+          code: `claude mcp add --transport http tw-market-data \\
+  https://mcp.twmarketdata.com/mcp \\
+  --header "X-API-Key: sk_live_..."`,
+        },
+      },
+      {
+        id: "tools",
+        heading: { en: "The tools it exposes", zh: "它提供的工具" },
+        paragraphs: [
+          { en: "Server tw-market-data (v1.28.1) exposes four tools; an agent discovers them automatically after connecting:", zh: "伺服器 tw-market-data(v1.28.1)提供四個工具;agent 連上後會自動探索:" },
+        ],
+        bullets: [
+          { en: "list_datasets — find datasets. describe_dataset — read a dataset's semantics + timing rules.", zh: "list_datasets — 找資料集。describe_dataset — 讀資料集語意與時間規則。" },
+          { en: "query_dataset — fetch rows (pass as_of for point-in-time-safe backtests). find_related — cross-table reasoning.", zh: "query_dataset — 取資料(回測帶 as_of 防未來函數)。find_related — 跨表推理。" },
+          { en: "Same official data and same credits as REST — the MCP tools are a protocol wrapper, not a separate dataset.", zh: "與 REST 同一份官方資料、同一套扣點——MCP 工具是協定封裝,非另一份資料。" },
+        ],
+      },
+    ],
+  },
 ];
 
 export const ARTICLE_PAGES: Record<string, ArticlePage> = Object.fromEntries(ARTICLES.map((a) => [a.slug, a]));
