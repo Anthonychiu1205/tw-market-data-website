@@ -25,6 +25,23 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const NOT_IN_MATRIX = {
   // market-snapshot was delisted (backend: dead inventory / not for sale) — no longer a billing slug.
   "institutional-flow-market-aggregate": "Derived aggregate view; not listed as its own id in the retier matrix. Needs a canonical tier from the backend.",
+  // Wave L building datasets (61 → 79): tiers pinned from WAVE_L_REGISTRY.json; exempt until infra re-vendors the retier matrix post-serving (8/1).
+  "price-move-context": "Wave L building page (grade=building until 8/1 serving); tier starter per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "futures-daily-context": "Wave L building page (grade=building until 8/1 serving); tier starter per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "limit-events": "Wave L building page (grade=building until 8/1 serving); tier starter per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "shareholding-concentration": "Wave L building page (grade=building until 8/1 serving); tier starter per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "competitor-fx": "Wave L building page (grade=building until 8/1 serving); tier starter per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "export-orders-monthly": "Wave L building page (grade=building until 8/1 serving); tier starter per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "production-value-index-monthly": "Wave L building page (grade=building until 8/1 serving); tier starter per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "customs-trade-monthly": "Wave L building page (grade=building until 8/1 serving); tier starter per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "institutional-positioning": "Wave L building page (grade=building until 8/1 serving); tier pro per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "major-event-taxonomy": "Wave L building page (grade=building until 8/1 serving); tier pro per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "factor-library": "Wave L building page (grade=building until 8/1 serving); tier pro per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "factor-returns": "Wave L building page (grade=building until 8/1 serving); tier pro per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "lending-utilization": "Wave L building page (grade=building until 8/1 serving); tier pro per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "margin-system-stats": "Wave L building page (grade=building until 8/1 serving); tier pro per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "short-restriction-flags": "Wave L building page (grade=building until 8/1 serving); tier pro per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  "trading-rules-reference": "Wave L building page (grade=building until 8/1 serving); tier free per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
 };
 
 // Matrix entries the backend explicitly marks as not-sellable. A website slug pointing at one of these

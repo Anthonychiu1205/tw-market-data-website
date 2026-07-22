@@ -122,6 +122,26 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "taifex-institutional-flow": { datasetSlug: "taifex-institutional-flow", backendPath: "/v2/datasets/taifex-institutional-flow", requiredPlan: "max", creditsCost: 3 },
   "financials": { datasetSlug: "financials", backendPath: "/v2/datasets/financials", requiredPlan: "pro", creditsCost: 4 },
   "broker-branch-reference": { datasetSlug: "broker-branch-reference", backendPath: "/v2/datasets/broker-branch-reference", requiredPlan: "free", creditsCost: 4 },
+
+  // ── Wave L: 18 new sellable slugs (building; 61 → 79). Tiers from WAVE_L_REGISTRY.json. ──
+  "price-move-context": { datasetSlug: "price-move-context", backendPath: "/v2/datasets/price-move-context", requiredPlan: "starter", creditsCost: 2 },
+  "futures-daily-context": { datasetSlug: "futures-daily-context", backendPath: "/v2/datasets/futures-daily-context", requiredPlan: "starter", creditsCost: 2 },
+  "limit-events": { datasetSlug: "limit-events", backendPath: "/v2/datasets/limit-events", requiredPlan: "starter", creditsCost: 2 },
+  "shareholding-concentration": { datasetSlug: "shareholding-concentration", backendPath: "/v2/datasets/shareholding-concentration", requiredPlan: "starter", creditsCost: 2 },
+  "competitor-fx": { datasetSlug: "competitor-fx", backendPath: "/v2/datasets/competitor-fx", requiredPlan: "starter", creditsCost: 2 },
+  "export-orders-monthly": { datasetSlug: "export-orders-monthly", backendPath: "/v2/datasets/export-orders-monthly", requiredPlan: "starter", creditsCost: 2 },
+  "production-value-index-monthly": { datasetSlug: "production-value-index-monthly", backendPath: "/v2/datasets/production-value-index-monthly", requiredPlan: "starter", creditsCost: 2 },
+  "customs-trade-monthly": { datasetSlug: "customs-trade-monthly", backendPath: "/v2/datasets/customs-trade-monthly", requiredPlan: "starter", creditsCost: 2 },
+  "capital-formation-events": { datasetSlug: "capital-formation-events", backendPath: "/v2/datasets/capital-formation-events", requiredPlan: "starter", creditsCost: 2 },
+  "industry-chain": { datasetSlug: "industry-chain", backendPath: "/v2/datasets/industry-chain", requiredPlan: "starter", creditsCost: 2 },
+  "institutional-positioning": { datasetSlug: "institutional-positioning", backendPath: "/v2/datasets/institutional-positioning", requiredPlan: "pro", creditsCost: 2 },
+  "major-event-taxonomy": { datasetSlug: "major-event-taxonomy", backendPath: "/v2/datasets/major-event-taxonomy", requiredPlan: "pro", creditsCost: 2 },
+  "factor-library": { datasetSlug: "factor-library", backendPath: "/v2/datasets/factor-library", requiredPlan: "pro", creditsCost: 2 },
+  "factor-returns": { datasetSlug: "factor-returns", backendPath: "/v2/datasets/factor-returns", requiredPlan: "pro", creditsCost: 2 },
+  "lending-utilization": { datasetSlug: "lending-utilization", backendPath: "/v2/datasets/lending-utilization", requiredPlan: "pro", creditsCost: 2 },
+  "margin-system-stats": { datasetSlug: "margin-system-stats", backendPath: "/v2/datasets/margin-system-stats", requiredPlan: "pro", creditsCost: 2 },
+  "short-restriction-flags": { datasetSlug: "short-restriction-flags", backendPath: "/v2/datasets/short-restriction-flags", requiredPlan: "pro", creditsCost: 2 },
+  "trading-rules-reference": { datasetSlug: "trading-rules-reference", backendPath: "/v2/datasets/trading-rules-reference", requiredPlan: "free", creditsCost: 1 },
 }
 
 export const DATASET_CREDIT_COSTS = Object.fromEntries(

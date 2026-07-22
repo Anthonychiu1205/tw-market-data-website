@@ -142,6 +142,29 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
     />
   ) : undefined;
 
+  // Dataset JSON-LD (L5b) — one per dataset docs page, for Google Dataset Search / AEO. The description
+  // is the English one-liner (CJK-free); building datasets still emit it (the page is live even before
+  // serving). No fabricated fields: only what the catalog + content already assert.
+  const org = { "@type": "Organization", name: "TW Market Data", url: "https://twmarketdata.com" };
+  const datasetLd = {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    name: entry.en,
+    description: content ? content.description.en : entry.en,
+    url: `https://twmarketdata.com${href}`,
+    isAccessibleForFree: entry.requiredPlan === "free",
+    spatialCoverage: "Taiwan",
+    license: "https://twmarketdata.com/terms",
+    creator: org,
+    publisher: org,
+    keywords: [entry.en, entry.slug, "Taiwan stock market data", entry.agency],
+    includedInDataCatalog: {
+      "@type": "DataCatalog",
+      name: "TW Market Data Datasets",
+      url: "https://twmarketdata.com/datasets",
+    },
+  };
+
   return (
     <DocsPageShell
       page={{ title, subtitle, href, sections: tocSections }}
@@ -150,6 +173,7 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
       rightPanelTitle={en ? "Request & Response" : "請求與回應"}
       rightPanelContent={apiPanel}
     >
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetLd) }} />
       {/* Grade badge + real facts line (agency / plan / price). The 對帳 verification section is
           intentionally deferred until the backend produces real verified dates. */}
       <div className="mt-6 flex flex-wrap items-center gap-2 text-sm">
