@@ -634,6 +634,87 @@ export const answerPages: readonly AnswerPageEntry[] = [
     ],
     status: "published",
   },
+
+  // Wave L — the F+5 regime-history free reference page. Every fact carries its confidence exactly as the
+  // regime YAML records it (high = dated, needs_verification = 'approximately'), with official TWSE
+  // source URLs shown for the high-confidence entries. This is the trust / citation anchor page.
+  {
+    slug: "taiwan-market-microstructure-timeline",
+    locale: "en",
+    question: "Taiwan Stock Market Rule-Change Timeline: Price Limits, Matching, Odd-Lot, Tick Size and Settlement",
+    metaTitle: "Taiwan Market Microstructure Timeline (Price Limits, Matching, Odd-Lot, Tick Size) | TW Market Data",
+    description:
+      "A dated, source-cited timeline of the Taiwan stock market rule changes that a long backtest crosses — the ±7%→±10% price limit, continuous matching, intraday odd-lot, tick-size tiers and T+2 settlement.",
+    shortAnswer:
+      "Taiwan's market microstructure has changed several times over the last two decades, and a backtest that spans those dates crosses real structural breaks. This page lists each change with the exact date where it is officially documented, and marks the ones we are still verifying as approximate rather than inventing a date. Where an official Taiwan Stock Exchange source is on hand, it is cited.",
+    sections: [
+      {
+        heading: "Daily price limit: ±7% → ±10% (1 June 2015)",
+        body:
+          "The daily price limit on listed common stocks was ±7% of the previous close for years, through the last trading day of 29 May 2015, and was widened to ±10% from 1 June 2015 — the level still in force. This is the single most important break for daily-return work, because it changes the maximum possible one-day move. Confidence: high (the 2015 widening is officially documented and widely reported).",
+      },
+      {
+        heading: "Intraday matching: call auction → continuous matching (23 March 2020)",
+        body:
+          "Until 22 March 2020 intraday trades were matched by call auction (a match roughly every few seconds); continuous matching took effect from 23 March 2020. This changes intraday microstructure — fills, spreads, tick-by-tick behaviour — not the daily percentage move, so it matters for intraday models rather than end-of-day factors. Confidence: medium (we are still confirming the exact final call-auction session against the official announcement).",
+      },
+      {
+        heading: "Intraday odd-lot trading (26 October 2020)",
+        body:
+          "Odd lots (1–999 shares) could only be traded in a separate after-hours session until 23 October 2020; regular-session intraday odd-lot trading launched on 26 October 2020. If you study small-order or retail-sized activity, odd-lot volume before that date is not comparable to after it. Confidence: high. Source: Taiwan Stock Exchange — twse.com.tw/market_insights/zh/detail/8a8216d6933460a401936c53f6d9018e",
+      },
+      {
+        heading: "Tick size: current 6-tier table (1 March 2005)",
+        body:
+          "The minimum price increment steps up by price band, and the tier table in force today took effect on 1 March 2005. The coarser pre-2005 tiers are not listed here — there is no verified official source for them on hand, and we will not guess. Confidence: high for the 2005 table. Source: Taiwan Stock Exchange — twse.com.tw/downloads/zh/trading/introduce/introduce004.pdf",
+      },
+      {
+        heading: "Same-day (day) trading: opened in stages, dates being verified",
+        body:
+          "Same-day 'buy-first' day trading opened first and 'sell-first' was broadened a few months later, both around 2014; the day-trade securities-transaction-tax was later halved (to 0.15%), around 2017. These mark a rise in turnover and short-horizon activity that shifts volume and volatility baselines. Confidence: needs verification — treat 'around 2014' and 'around 2017' as approximate; we do not state a precise date we have not confirmed.",
+      },
+      {
+        heading: "Settlement and ex-rights reference (stable)",
+        bullets: [
+          "Settlement cycle — T+2 (high confidence): Taiwan equities settle two business days after the trade. Stable; affects when cash and delivery land, not the price series.",
+          "Ex-rights / ex-dividend reference price (high confidence): computed from the official TWSE TWT49U calculation, the same source behind the ex-rights price-adjustment factors — no separate regime date is needed.",
+        ],
+      },
+      {
+        heading: "How to use this timeline",
+        body:
+          "Rather than hardcode any of these, split a long sample at the dated breaks, or tag each row with the rule that actually applied. For the daily price limit specifically, the stock-price-limit-daily dataset gives the per-day limit-up / limit-down price so limit-hit days are handled automatically across 2015. The entries marked 'needs verification' are research stubs — we raise them to dated facts only once checked against an official source, never by guessing.",
+      },
+    ],
+    faq: [
+      {
+        question: "When did Taiwan widen the daily price limit to 10%?",
+        answer:
+          "On 1 June 2015, from ±7% (through 29 May 2015) to ±10%, which is still the limit today. Confidence: high.",
+      },
+      {
+        question: "When did Taiwan launch intraday odd-lot trading?",
+        answer:
+          "On 26 October 2020. Before that, odd lots (1–999 shares) traded only in an after-hours session (through 23 October 2020). Confidence: high, per the Taiwan Stock Exchange.",
+      },
+      {
+        question: "When did the current tick-size table take effect?",
+        answer:
+          "The 6-tier table in force today took effect on 1 March 2005 (Taiwan Stock Exchange). Pre-2005 tiers are not listed because there is no verified official source on hand.",
+      },
+      {
+        question: "Why are the day-trading dates shown as approximate?",
+        answer:
+          "Because they are still being verified against an official source. Same-day trading opened in stages around 2014 and the day-trade tax was halved around 2017, but we do not state a precise date we have not confirmed — an acknowledged 'approximately' is more honest than a wrong date.",
+      },
+    ],
+    cta: { label: "Price-limit dataset (docs)", href: "/docs/api/market-prices/stock-price-limit-daily" },
+    relatedLinks: [
+      { label: "Price-limit history (7%→10%) explained", href: "/answers/taiwan-stock-price-limit-history-7-to-10-percent" },
+      { label: "Three institutional investors explained", href: "/answers/taiwan-three-institutional-investors-explained" },
+    ],
+    status: "published",
+  },
 ];
 
 export function getAnswerPageBySlug(slug: string): AnswerPageEntry | undefined {
