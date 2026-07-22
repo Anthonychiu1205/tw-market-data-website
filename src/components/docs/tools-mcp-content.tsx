@@ -393,14 +393,14 @@ http_headers = { "X-API-Key" = "sk_live_你的key" }`}
               <tr>
                 <td className="px-3 py-2 font-mono text-xs text-slate-700">list_datasets</td>
                 <td className="px-3 py-2 text-xs text-slate-600">
-                  {en ? "List all available datasets (filter by category / plan tier)" : "列出所有可用資料集(可依類別/方案層過濾)"}
+                  {en ? "Discovery entry point — lists available datasets (id / name / category / tier / one-line description); use it first to find the right data" : "探索入口——列出可用資料集(id／中文名／category／tier／一句描述);先用它找對的資料"}
                 </td>
                 <td className="px-3 py-2 text-xs text-slate-600">{en ? "Free" : "免費"}</td>
               </tr>
               <tr>
                 <td className="px-3 py-2 font-mono text-xs text-slate-700">describe_dataset</td>
                 <td className="px-3 py-2 text-xs text-slate-600">
-                  {en ? "See a dataset's fields, semantics, and update cadence" : "看某個資料集的欄位、語義、更新頻率"}
+                  {en ? "Full semantics of one dataset: grain (what a row is), field meanings + units, point-in-time / time-correctness rules, relations and agent hints" : "單一資料集的完整語意:grain(一列代表什麼)、欄位意義＋單位、point-in-time／時間正確性規則、關聯與 agent 提示"}
                 </td>
                 <td className="px-3 py-2 text-xs text-slate-600">{en ? "Free" : "免費"}</td>
               </tr>
