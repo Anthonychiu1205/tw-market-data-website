@@ -7,6 +7,7 @@ import { getDatasetDocContent, type Bi, type DatasetDocContent } from "@/src/con
 import { DATASET_GRADE_COLORS, datasetGradeLabel } from "@/src/lib/docs/dataset-grade";
 import { API_AUTH_HEADER, API_BASE_URL as CAPTURED_BASE_URL, API_KEY_PREFIX, API_TRUTH_CAPTURED_AT } from "@/src/content/api-truth";
 import { apiCaptureBody, getApiCapture } from "@/src/content/api-captures";
+import { VERIFIED_REQUEST_EXAMPLES } from "@/src/content/docs/verified-request-examples";
 
 // Bilingual renderer for a v5 dataset endpoint page. Genuinely en + zh (no "coming soon" banner) so
 // /en is fully usable and the CJK guards can scan it. All facts come from the catalog (grade / agency /
@@ -28,33 +29,58 @@ function pyRows(rowsKey: string): string {
   return `resp.json()${rowsKey.split(".").map((seg) => `["${seg}"]`).join("")}`;
 }
 
-function pythonBasic(backendPath: string, rowsKey: string | null): string {
+// Per-dataset verified example params (real working filters from the backend fixture), or a generic
+// symbol=2330 fallback for datasets not in the fixture. This is why one dataset's example uses
+// index_code / rate_code / series_id / ticker etc. instead of a made-up symbol — the example actually
+// returns rows against the live API.
+function exampleParamsFor(slug: string): Record<string, string> {
+  const p = VERIFIED_REQUEST_EXAMPLES[slug];
+  return p && Object.keys(p).length > 0 ? p : { symbol: "2330" };
+}
+// The minimal (non-date) params — the smallest call that returns rows.
+function coreParamsFor(slug: string): Record<string, string> {
+  const entries = Object.entries(exampleParamsFor(slug)).filter(([k]) => k !== "date_from" && k !== "date_to");
+  return entries.length > 0 ? Object.fromEntries(entries) : { symbol: "2330" };
+}
+function toQuery(params: Record<string, string>): string {
+  const q = Object.entries(params)
+    .map(([k, v]) => `${k}=${v}`)
+    .join("&");
+  return q ? `?${q}` : "";
+}
+function toPyParams(params: Record<string, string>): string {
+  return Object.entries(params)
+    .map(([k, v]) => `"${k}": "${v}"`)
+    .join(", ");
+}
+
+function pythonBasic(backendPath: string, slug: string, rowsKey: string | null): string {
   return `import requests
 
 resp = requests.get(
     "${API_BASE}${backendPath}",
-    params={"symbol": "2330", "limit": 5},
+    params={${toPyParams(coreParamsFor(slug))}},
     headers={"${API_AUTH_HEADER}": "${API_KEY_PREFIX}..."},
 )
 resp.raise_for_status()
 ${rowsKey ? `print(${pyRows(rowsKey)})` : "print(resp.json())"}`;
 }
 
-function pythonFiltered(backendPath: string, rowsKey: string | null): string {
+function pythonFiltered(backendPath: string, slug: string, rowsKey: string | null): string {
   return `import requests
 
-# Same call, narrowed to a date range.
+# The full verified example — the same call with every supported filter set.
 resp = requests.get(
     "${API_BASE}${backendPath}",
-    params={"symbol": "2330", "start_date": "2026-01-01", "end_date": "2026-06-30"},
+    params={${toPyParams(exampleParamsFor(slug))}},
     headers={"${API_AUTH_HEADER}": "${API_KEY_PREFIX}..."},
 )
 resp.raise_for_status()
 ${rowsKey ? `for row in ${pyRows(rowsKey)}:\n    print(row)` : "print(resp.json())"}`;
 }
 
-function curlExample(backendPath: string): string {
-  return `curl "${API_BASE}${backendPath}?symbol=2330&limit=5" \\
+function curlExample(backendPath: string, slug: string): string {
+  return `curl "${API_BASE}${backendPath}${toQuery(exampleParamsFor(slug))}" \\
   -H "${API_AUTH_HEADER}: ${API_KEY_PREFIX}..."`;
 }
 
@@ -262,7 +288,7 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
               <li>{rowsKey ? (en ? `Send the request and read the ${rowsKey} array.` : `送出請求並讀取 ${rowsKey} 陣列。`) : (en ? "Send the request and read the returned payload." : "送出請求並讀取回傳內容。")}</li>
             </ol>
             <div className="mt-4">
-              <CodeBlock code={curlExample(entry.backendPath)} language="bash" />
+              <CodeBlock code={curlExample(entry.backendPath, entry.slug)} language="bash" />
             </div>
           </section>
 
@@ -297,9 +323,9 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
           <section className="mt-10">
             <SectionHeading id="python">{en ? "Python" : "Python 範例"}</SectionHeading>
             <p className="mt-3 text-sm text-slate-500">{en ? "A first call:" : "第一個呼叫："}</p>
-            <div className="mt-2"><CodeBlock code={pythonBasic(entry.backendPath, rowsKey)} language="python" /></div>
+            <div className="mt-2"><CodeBlock code={pythonBasic(entry.backendPath, entry.slug, rowsKey)} language="python" /></div>
             <p className="mt-4 text-sm text-slate-500">{en ? "With a date-range filter:" : "帶日期區間篩選："}</p>
-            <div className="mt-2"><CodeBlock code={pythonFiltered(entry.backendPath, rowsKey)} language="python" /></div>
+            <div className="mt-2"><CodeBlock code={pythonFiltered(entry.backendPath, entry.slug, rowsKey)} language="python" /></div>
           </section>
 
           {/* OpenAPI */}
