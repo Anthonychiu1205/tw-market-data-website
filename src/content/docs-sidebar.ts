@@ -50,9 +50,7 @@ export type DocsIconName =
   // SDKS
   | "git-branch"
   | "file-code"
-  | "code-2"
-  // HELP
-  | "life-buoy";
+  | "code-2";
 
 export type DocsSidebarNavItem = {
   title: string;
@@ -92,10 +90,17 @@ const DOMAIN_ICON: Record<DocsDomainId, DocsIconName> = {
   "funds-intel": "book-open",
 };
 
+// Within each group, datasets are ordered by grade so the colour reflects trust at a glance:
+// 綠 verified → 藍 derived → 灰 reference (→ building roadmap items, appended last below). Array.sort is
+// stable, so datasets of the same grade keep their catalog order.
+const GRADE_SORT_RANK: Record<DatasetGrade, number> = { verified: 0, derived: 1, reference: 2, building: 3 };
+
 // The 8 collapsible "資料 API" groups, generated from the catalog. Every listed item is a REAL dataset
 // (no filler); the count is the real dataset count; each carries its derived grade for the badge.
 export const docsSidebarApiGroups: DocsSidebarNavGroupSource[] = DOCS_DOMAINS.map((domain) => {
-  const datasets = datasetsByDomain(domain.id);
+  const datasets = [...datasetsByDomain(domain.id)].sort(
+    (a, b) => GRADE_SORT_RANK[a.grade] - GRADE_SORT_RANK[b.grade],
+  );
   return {
     id: domain.id,
     label: domain.zh,
@@ -158,9 +163,9 @@ export const docsSidebarSdkItems: DocsSidebarNavItemSource[] = [
   { title: "JavaScript / TypeScript SDK", titleEn: "JavaScript / TypeScript SDK", href: "/docs/sdk/javascript-sdk", icon: "code-2" },
 ];
 
-export const docsSidebarHelpItems: DocsSidebarNavItemSource[] = [
-  { title: "幫助中心", titleEn: "Help center", href: "/help-center", icon: "life-buoy" },
-];
+// The "幫助中心 / Help center" sidebar section was removed (owner ruling): it had no real content and
+// misled readers. The standalone /help-center page still exists (linked elsewhere) — only the docs
+// sidebar entry is gone.
 
 // Every icon in the nav must be unique (Part 1 §F). Rather than trust a manual audit, derive the list
 // from the entries themselves and fail at module load — i.e. at build time, since the sidebar is
@@ -172,7 +177,6 @@ export function collectDocsSidebarIconNames(): { href: string; icon: DocsIconNam
     ...docsSidebarOverviewItems,
     ...docsSidebarGuideItems,
     ...docsSidebarSdkItems,
-    ...docsSidebarHelpItems,
   ].map((entry) => ({ href: entry.href, icon: entry.icon }));
 }
 
@@ -219,7 +223,6 @@ export type DocsSidebar = {
   overviewItems: DocsSidebarNavItem[];
   guideItems: DocsSidebarNavItem[];
   sdkItems: DocsSidebarNavItem[];
-  helpItems: DocsSidebarNavItem[];
 };
 
 export function getDocsSidebar(locale: AppLocale): DocsSidebar {
@@ -231,7 +234,6 @@ export function getDocsSidebar(locale: AppLocale): DocsSidebar {
     overviewItems: docsSidebarOverviewItems.map((item) => projectItem(item, en)),
     guideItems: docsSidebarGuideItems.map((item) => projectItem(item, en)),
     sdkItems: docsSidebarSdkItems.map((item) => projectItem(item, en)),
-    helpItems: docsSidebarHelpItems.map((item) => projectItem(item, en)),
   };
 }
 

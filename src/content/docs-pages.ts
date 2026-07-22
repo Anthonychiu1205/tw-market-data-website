@@ -12049,9 +12049,8 @@ export const docsSidebarAiAgentItems: DocsSidebarNavItem[] = [
   { title: "Agent Workflow Examples", href: "/docs/ai-agents/agent-workflow-examples", icon: "advanced", status: "preview" },
 ];
 
-export const docsSidebarHelpItems: DocsSidebarNavItem[] = [
-  { title: "幫助中心", href: "/help-center", icon: "support", status: "production" },
-];
+// docsSidebarHelpItems removed — the "幫助中心" docs-sidebar section was retired (owner ruling: no real
+// content, misleading). This legacy v4 export had no remaining consumers.
 
 export const docsSidebarApiGroups: DocsSidebarNavGroup[] = docsSidebarNav;
 
