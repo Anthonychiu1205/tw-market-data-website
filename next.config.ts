@@ -39,6 +39,16 @@ const nextConfig: NextConfig = {
   // content-heavy pages (docs/[...slug]) can exceed the 60s default and fail after 3 retries;
   // Vercel's build infra finishes them well under this. Raise the ceiling for build reliability.
   staticPageGenerationTimeout: 300,
+  // Root agent-resources (llms.txt, llms-full.txt, openapi.*) live at the domain root by convention —
+  // they are NOT localized. A locale-prefixed request (e.g. /zh-TW/llms.txt, which a reader may guess
+  // from the docs URL) would otherwise 404; redirect it to the canonical root path.
+  async redirects() {
+    return [
+      { source: "/:locale(en|zh-TW)/llms.txt", destination: "/llms.txt", permanent: true },
+      { source: "/:locale(en|zh-TW)/llms-full.txt", destination: "/llms-full.txt", permanent: true },
+      { source: "/:locale(en|zh-TW)/openapi.:ext(json|yaml)", destination: "/openapi.:ext", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {
