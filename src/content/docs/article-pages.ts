@@ -233,6 +233,246 @@ print(resp.json()["data"])`,
       },
     ],
   },
+
+  // ── Guide: How to read institutional flows (三大法人籌碼) ──
+  // Response fields / values below are a REAL capture (2330, 2026-07-17) from the live API — the field
+  // names are the actual response keys (foreign_net_buy_sell, not the shorthand foreign_net).
+  {
+    slug: "guides/institutional-flows",
+    pageLabel: { en: "Guide", zh: "指南" },
+    title: { en: "How to read institutional flows", zh: "如何查三大法人籌碼" },
+    subtitle: {
+      en: "Get one stock's daily foreign / investment-trust / dealer net buy-sell, then count a buying streak.",
+      zh: "查一檔股票每日的外資／投信／自營淨買賣超,再算連續買超天數。",
+    },
+    sections: [
+      {
+        id: "goal",
+        heading: { en: "Goal", zh: "目標" },
+        paragraphs: [
+          {
+            en: "Pull the daily institutional flow for one stock — how many shares foreign investors, investment trusts and dealers each net-bought or net-sold. The source is the official TWSE T86 report; it is on the Starter plan.",
+            zh: "抓一檔股票每日的三大法人籌碼——外資、投信、自營各淨買或淨賣多少。來源為官方 TWSE T86 報表,屬 Starter 方案。",
+          },
+        ],
+      },
+      {
+        id: "step-1-key",
+        heading: { en: "Step 1 — Get a key", zh: "步驟 1 — 取得金鑰" },
+        paragraphs: [
+          { en: "Issue an API key in the dashboard and send it in the X-API-Key header on every request.", zh: "在儀表板核發 API 金鑰,每次請求都在 X-API-Key 標頭帶上。" },
+        ],
+      },
+      {
+        id: "step-2-request",
+        heading: { en: "Step 2 — Request one stock's flow", zh: "步驟 2 — 請求單檔籌碼" },
+        paragraphs: [
+          { en: "Filter by symbol and a date range. This is a real request for TSMC (2330):", zh: "以 symbol 與日期範圍篩選。以下是台積電（2330）的真實請求:" },
+        ],
+        code: {
+          language: "bash",
+          code: `curl -H "X-API-Key: sk_live_..." \\
+  "https://api.twmarketdata.com/v2/datasets/institutional-flow?symbol=2330&start_date=2026-07-14&end_date=2026-07-18"`,
+        },
+      },
+      {
+        id: "step-3-response",
+        heading: { en: "Step 3 — Read the response", zh: "步驟 3 — 讀回應" },
+        paragraphs: [
+          { en: "A real 200 response (one row shown, 2330 on 2026-07-17). The envelope is { dataset, count, rows }:", zh: "真實 200 回應（顯示一列,2330 於 2026-07-17）。信封為 { dataset, count, rows }:" },
+        ],
+        code: {
+          language: "json",
+          code: `{
+  "dataset": "institutional_flow",
+  "count": 4,
+  "rows": [
+    {
+      "symbol": "2330",
+      "date": "2026-07-17",
+      "foreign_net_buy_sell": -44183964.0,
+      "investment_trust_net_buy_sell": 1488520.0,
+      "dealer_net_buy_sell": 2759348.0,
+      "total_institutional_net_buy_sell": -39936096.0,
+      "source_role": "official_twse_t86",
+      "lineage": { "endpoint_name": "T86", "source_authority": "TWSE T86", "payload_date": "20260717" }
+    }
+  ]
+}`,
+        },
+      },
+      {
+        id: "fields",
+        heading: { en: "The fields you want", zh: "你要看的欄位" },
+        bullets: [
+          { en: "foreign_net_buy_sell — foreign investors' net buy/sell (negative = net sell). On 2026-07-17 this was -44,183,964.", zh: "foreign_net_buy_sell — 外資淨買賣（負值＝賣超）。2026-07-17 為 -44,183,964。" },
+          { en: "investment_trust_net_buy_sell — investment trusts' net (here +1,488,520, a net buy).", zh: "investment_trust_net_buy_sell — 投信淨買賣（此處 +1,488,520,為買超）。" },
+          { en: "dealer_net_buy_sell — dealers' net (here +2,759,348).", zh: "dealer_net_buy_sell — 自營商淨買賣（此處 +2,759,348）。" },
+          { en: "total_institutional_net_buy_sell — the three summed (-39,936,096). source_role + lineage trace every row back to the TWSE T86 report.", zh: "total_institutional_net_buy_sell — 三者合計（-39,936,096）。source_role 與 lineage 讓每列可回溯官方 TWSE T86 報表。" },
+        ],
+      },
+      {
+        id: "use-case",
+        heading: { en: "Use it — a foreign buying streak", zh: "用途 — 外資連續買超天數" },
+        paragraphs: [
+          { en: "Sort rows by date and count consecutive days where foreign_net_buy_sell > 0. A break resets the count.", zh: "把 rows 依 date 排序,數 foreign_net_buy_sell > 0 的連續天數;中斷即歸零。" },
+        ],
+        code: {
+          language: "python",
+          code: `import requests
+
+rows = requests.get(
+    "https://api.twmarketdata.com/v2/datasets/institutional-flow",
+    params={"symbol": "2330", "start_date": "2026-06-01", "end_date": "2026-07-18"},
+    headers={"X-API-Key": "sk_live_..."},
+).json()["rows"]
+
+streak = 0
+for r in sorted(rows, key=lambda x: x["date"]):
+    streak = streak + 1 if r["foreign_net_buy_sell"] > 0 else 0
+print("current foreign buying streak:", streak, "days")`,
+        },
+      },
+    ],
+  },
+
+  // ── Guide: How to check market status (大盤狀態) ──
+  // market-index is a REAL capture (TAIEX, 2026-07-17). market-breadth returns empty for the windows
+  // tried against the live API, so it is honestly marked TODO rather than shown with a fabricated body.
+  {
+    slug: "guides/market-status",
+    pageLabel: { en: "Guide", zh: "指南" },
+    title: { en: "How to check market status", zh: "如何看市場狀態" },
+    subtitle: {
+      en: "Read the day's benchmark index level and change from the official TWSE index feed.",
+      zh: "從官方 TWSE 指數資料讀當日大盤點位與漲跌。",
+    },
+    sections: [
+      {
+        id: "goal",
+        heading: { en: "Goal", zh: "目標" },
+        paragraphs: [
+          { en: "See where the market closed today: the TAIEX level and its daily change, from the official TWSE index feed.", zh: "看今天大盤收在哪:加權指數（TAIEX）點位與當日漲跌,來自官方 TWSE 指數資料。" },
+        ],
+      },
+      {
+        id: "step-1-index",
+        heading: { en: "Step 1 — Fetch the benchmark index", zh: "步驟 1 — 取大盤指數" },
+        paragraphs: [
+          { en: "Request market-index filtered to the TAIEX. A real request:", zh: "請求 market-index 並篩選 TAIEX。真實請求:" },
+        ],
+        code: {
+          language: "bash",
+          code: `curl -H "X-API-Key: sk_live_..." \\
+  "https://api.twmarketdata.com/v2/datasets/market-index?symbol=TAIEX&start_date=2026-07-14&end_date=2026-07-18"`,
+        },
+      },
+      {
+        id: "step-2-response",
+        heading: { en: "Step 2 — Read the level and change", zh: "步驟 2 — 讀點位與漲跌" },
+        paragraphs: [
+          { en: "A real 200 response (one item, TAIEX on 2026-07-17). Note this dataset's envelope is { dataset_id, row_count, items } and the fields are nested (the Chinese index name is omitted here to keep the sample ASCII — index_code identifies it):", zh: "真實 200 回應（一筆,TAIEX 於 2026-07-17）。注意此資料集信封為 { dataset_id, row_count, items },欄位為巢狀（此處省略中文指數名以保持範例純 ASCII,index_code 即可識別）:" },
+        ],
+        code: {
+          language: "json",
+          code: `{
+  "dataset_id": "market_index",
+  "row_count": 4,
+  "items": [
+    {
+      "index_identity": { "index_code": "TWSE_TAIEX", "index_type": "price" },
+      "market_identity": { "as_of_date": "2026-07-17", "source_role": "official_twse_mi_index" },
+      "index_level": { "value": 42671.27 },
+      "daily_change": { "points": -2953.71, "return_pct": -6.47 }
+    }
+  ]
+}`,
+        },
+        bullets: [
+          { en: "index_level.value — the index level (42,671.27).", zh: "index_level.value — 指數點位（42,671.27）。" },
+          { en: "daily_change.points / daily_change.return_pct — the day's move (-2,953.71 points, -6.47%).", zh: "daily_change.points／daily_change.return_pct — 當日漲跌（-2,953.71 點,-6.47%）。" },
+          { en: "index_identity.index_code is TWSE_TAIEX (the response also carries the Chinese index_name — see the zh page).", zh: "index_identity.index_code 為 TWSE_TAIEX（回應另含中文 index_name「發行量加權股價指數」）。" },
+        ],
+      },
+      {
+        id: "breadth-todo",
+        heading: { en: "Advancers / decliners (breadth)", zh: "漲跌家數（市場廣度）" },
+        paragraphs: [
+          { en: "TODO — the market-breadth endpoint requires a market filter and returned no rows for the windows tested against the live API, so a real example is not shown here yet rather than a fabricated one. It will be filled once the dataset is re-verified.", zh: "TODO — market-breadth 端點需要 market 過濾,且對實測窗口回空,故此處先不放範例（不編造),待資料集復驗後補真回應。" },
+        ],
+      },
+    ],
+  },
+
+  // ── Guide: How to wire a strategy / AI agent (策略・AI Agent) ──
+  // The empty-result body is a REAL capture: {dataset, rows:[], count:0}. count:0 is the anti-
+  // hallucination signal an agent must honour. /meta/boundaries (A2) is not live yet — marked as such.
+  {
+    slug: "guides/strategy-ai-agent",
+    pageLabel: { en: "Guide", zh: "指南" },
+    title: { en: "How to wire a strategy / AI agent", zh: "如何接策略・AI Agent" },
+    subtitle: {
+      en: "Let an agent use TW Market Data without hallucinating — read the index, trust empty results, know the gaps.",
+      zh: "讓 agent 用 TW Market Data 而不幻覺——讀索引、相信空結果、知道缺口。",
+    },
+    sections: [
+      {
+        id: "step-1-index",
+        heading: { en: "Step 1 — Read the index first", zh: "步驟 1 — 先讀索引" },
+        paragraphs: [
+          { en: "Point the agent at /llms.txt — the machine-readable index of datasets, rules and OpenAPI links. Fetch it once, then work only from the dataset ids it lists.", zh: "讓 agent 先讀 /llms.txt——資料集、規則與 OpenAPI 連結的機器可讀索引。抓一次,之後只用它列出的 dataset id 作業。" },
+        ],
+        code: {
+          language: "bash",
+          code: `curl "https://twmarketdata.com/llms.txt"`,
+        },
+      },
+      {
+        id: "step-2-call",
+        heading: { en: "Step 2 — Call datasets with your key", zh: "步驟 2 — 用金鑰打資料集" },
+        paragraphs: [
+          { en: "Every data call carries X-API-Key. The envelope is { rows / items, count }; read count before touching the rows.", zh: "每次資料呼叫帶 X-API-Key。信封為 { rows／items, count };先看 count 再讀 rows。" },
+        ],
+      },
+      {
+        id: "step-3-empty",
+        heading: { en: "Step 3 — Trust an empty result", zh: "步驟 3 — 相信空結果" },
+        paragraphs: [
+          { en: "When a range has no data, the API returns an honest empty result — not an error, not a guess. This is a real response:", zh: "當範圍內無資料,API 回誠實的空結果——不是錯誤,也不是猜測。這是真實回應:" },
+        ],
+        code: {
+          language: "json",
+          code: `{
+  "dataset": "institutional_flow",
+  "rows": [],
+  "count": 0
+}`,
+        },
+      },
+      {
+        id: "step-3b-rule",
+        heading: { en: "The rule for the agent", zh: "給 agent 的規則" },
+        bullets: [
+          { en: "count == 0 means CONFIRMED no data in range. The agent must say \"no data in that range\" — never invent a number to fill the gap.", zh: "count == 0 代表「範圍內確認查無」。agent 必須回「該範圍無資料」——絕不編數字填空。" },
+          { en: "This is the single most important anti-hallucination check: read count, then decide.", zh: "這是最重要的反幻覺檢查:先讀 count,再決定。" },
+        ],
+      },
+      {
+        id: "step-4-boundaries",
+        heading: { en: "Step 4 — Know the permanent gaps", zh: "步驟 4 — 知道永久缺口" },
+        paragraphs: [
+          { en: "Some data is deliberately not offered (copyright, no source). A /meta/boundaries endpoint that declares these permanent gaps is in preview and not live yet — until it ships, treat the not_available list in /llms.txt as the source of truth for what is intentionally absent.", zh: "部分資料刻意不提供（版權、無來源）。宣告這些永久缺口的 /meta/boundaries 端點仍在 preview、尚未上線——上線前,以 /llms.txt 的 not_available 清單為「刻意不提供」的真相來源。" },
+        ],
+      },
+      {
+        id: "disclaimer",
+        heading: { en: "Disclaimer", zh: "免責" },
+        paragraphs: [
+          { en: "TW Market Data provides data only — not investment advice, not stock recommendations, not trading signals. An agent built on it must not present its output as any of those.", zh: "TW Market Data 僅提供資料——非投資建議、非個股推薦、非交易訊號。基於它建置的 agent 不得把輸出呈現為上述任何一種。" },
+        ],
+      },
+    ],
+  },
 ];
 
 export const ARTICLE_PAGES: Record<string, ArticlePage> = Object.fromEntries(ARTICLES.map((a) => [a.slug, a]));
