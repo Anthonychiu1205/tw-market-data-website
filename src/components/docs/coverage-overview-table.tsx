@@ -16,7 +16,9 @@ import { DATASET_GRADE_COLORS, datasetGradeLabel, type DatasetGrade } from "@/sr
 // Datasets whose serving is being repaired (repoint in progress). Their grade is already downgraded off
 // "verified" in the catalog; the table additionally flags them so a reader is not misled into treating
 // the numbers (where present) as a settled service.
-const SERVING_REPAIR = new Set<string>(["corporate-actions", "chip-flows"]);
+// chip-flows moved to grade "building" (即將開放) — its Building badge conveys the state, so it is no
+// longer tagged here to avoid double-labelling. corporate-actions stays reference + serving-repair.
+const SERVING_REPAIR = new Set<string>(["corporate-actions"]);
 
 const DOMAIN_ORDER: Record<DocsDomainId, number> = Object.fromEntries(
   DOCS_DOMAINS.map((d, i) => [d.id, i]),
