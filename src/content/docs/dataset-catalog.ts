@@ -53,8 +53,9 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "twse-daily-price": { domain: "market-prices", zh: "TWSE 日線價格", en: "TWSE daily prices", agency: "TWSE", grade: "verified" },
   "tpex-daily-price": { domain: "market-prices", zh: "TPEx 日線價格", en: "TPEx daily prices", agency: "TPEx", grade: "verified" },
   "market-prices": { domain: "market-prices", zh: "整合日線價格", en: "Unified daily prices", agency: "TWSE / TPEx", grade: "verified" },
-  // price-enhanced: owner 驗證 serving(direct-fn 對 prod 實測回列、repoint deployed)→ 升 verified。
-  "price-enhanced": { domain: "market-prices", zh: "增強價格欄位", en: "Enhanced price fields", agency: "TWSE / TPEx", grade: "verified" },
+  // price-enhanced: owner 驗證 serving → verified。真服務 = 除權除息價格調整因子(TWSE TWT49U),非
+  // OHLCV/增強價格欄位;名稱與內容已對齊真回應(event_type/factor/pre_event_close/reference_price)。slug 保留。
+  "price-enhanced": { domain: "market-prices", zh: "除權除息價格調整因子", en: "Ex-rights & dividend adjustment factors", agency: "TWSE", grade: "verified" },
   "adjusted-prices": { domain: "market-prices", zh: "還原價格", en: "Adjusted prices", agency: "TWSE / TPEx", grade: "derived" },
   "market-index": { domain: "market-prices", zh: "市場指數", en: "Market indices", agency: "TWSE", grade: "verified" },
   "index-data": { domain: "market-prices", zh: "指數資料", en: "Index data", agency: "TWSE", grade: "verified" },
