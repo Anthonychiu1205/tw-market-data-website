@@ -4,6 +4,9 @@ import { siteConfig } from "@/src/config/site";
 import { getAllBlogPosts } from "@/src/content/blog-posts";
 import { getPublishedAnswerPages } from "@/src/content/answer-pages";
 import { docsPages } from "@/src/content/docs-pages";
+import { datasetSeoEntries } from "@/src/content/datasets";
+import { DOCS_DATASET_CATALOG } from "@/src/content/docs/dataset-catalog";
+import { articleSlugs } from "@/src/content/docs/article-pages";
 import { localizedPath } from "@/src/i18n/seo";
 import { LOCALES } from "@/src/i18n/locales";
 
@@ -42,12 +45,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: Array<{ path: string; changeFrequency: ChangeFrequency; priority: number }> = [
     { path: "/", changeFrequency: "weekly", priority: 1 },
     { path: "/datasets", changeFrequency: "weekly", priority: 0.9 },
-    { path: "/datasets/twse-daily-price", changeFrequency: "weekly", priority: 0.85 },
-    { path: "/datasets/monthly-revenue", changeFrequency: "weekly", priority: 0.85 },
-    { path: "/datasets/income-statement", changeFrequency: "weekly", priority: 0.85 },
-    { path: "/datasets/balance-sheet", changeFrequency: "weekly", priority: 0.85 },
-    { path: "/datasets/institutional-flow", changeFrequency: "weekly", priority: 0.85 },
-    { path: "/datasets/securities-lending", changeFrequency: "weekly", priority: 0.85 },
+    // Every /datasets/<slug> SEO page and every /docs/api/<domain>/<slug> reference page is enumerated
+    // below from the SAME SSOT the pages render from (datasetSeoEntries + DOCS_DATASET_CATALOG), so a
+    // new dataset can never be missing from the sitemap (the old hardcoded 6-slug list dropped the rest).
     { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
     { path: "/compare/twmarketdata-vs-finmind-vs-tej", changeFrequency: "monthly", priority: 0.8 },
     { path: "/connect", changeFrequency: "weekly", priority: 0.85 },
@@ -74,6 +74,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .filter((page) => page.href.startsWith("/docs/"))
     .filter((page) => !page.href.includes("/coming-soon/"))
     .map((page) => page.href);
+
+  // SSOT-driven dataset + docs pages (never hardcoded, so nothing can silently drop out):
+  // every /datasets/<slug> SEO page, every /docs/api/<domain>/<slug> reference page (61 in the
+  // catalog), and every v5 article/guide/ai-agents page.
+  const datasetSeoRoutes = datasetSeoEntries.map((d) => `/datasets/${d.slug}`);
+  const datasetDocsRoutes = DOCS_DATASET_CATALOG.map((d) => `/docs/api/${d.domain}/${d.slug}`);
+  const articleRoutes = articleSlugs().map((parts) => `/docs/${parts.join("/")}`);
 
   const blogRoutes = getAllBlogPosts().map((post) => `/blog/${post.slug}`);
 
@@ -104,6 +111,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     if (!seen.has(path)) {
       seen.add(path);
       pagePaths.push({ path, changeFrequency: "weekly", priority: 0.72 });
+    }
+  }
+  for (const path of datasetSeoRoutes) {
+    if (!seen.has(path)) {
+      seen.add(path);
+      pagePaths.push({ path, changeFrequency: "weekly", priority: 0.85 });
+    }
+  }
+  for (const path of datasetDocsRoutes) {
+    if (!seen.has(path)) {
+      seen.add(path);
+      pagePaths.push({ path, changeFrequency: "weekly", priority: 0.78 });
+    }
+  }
+  for (const path of articleRoutes) {
+    if (!seen.has(path)) {
+      seen.add(path);
+      pagePaths.push({ path, changeFrequency: "weekly", priority: 0.7 });
     }
   }
   for (const path of blogRoutes) {

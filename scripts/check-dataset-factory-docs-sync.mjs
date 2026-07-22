@@ -2,7 +2,6 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const ROOT = process.cwd();
-const SOURCE_MANIFEST = "/Volumes/DEV_USB/Projects/tw-feature-engine/docs/generated/dataset_website_sync_manifest.json";
 
 const failures = [];
 
@@ -22,15 +21,14 @@ const docsPagesPath = resolve(ROOT, "src/content/docs-pages.ts");
 const docsSidebarPath = resolve(ROOT, "src/content/docs-sidebar.ts");
 const sitePath = resolve(ROOT, "src/content/site.ts");
 const homeSourcePath = resolve(ROOT, "src/content/home-source-of-truth.ts");
-const llmsPath = resolve(ROOT, "public/llms.txt");
-// NOTE: llms-full.txt ownership moved to the website (app/llms-full.txt/route.ts, generated from
-// the docs source), so it is no longer a pipeline-synced static file and is not checked here.
+// NOTE: llms.txt + llms-full.txt ownership moved to the website (app/llms.txt/route.ts +
+// app/llms-full.txt/route.ts, generated from the storefront catalog SSOT at build time), so they are
+// no longer pipeline-synced static files and are not checked here — the website is the single source.
 
 const docsPages = requireFile(docsPagesPath);
 const docsSidebar = requireFile(docsSidebarPath);
 const siteContent = requireFile(sitePath);
 const homeSourceContent = requireFile(homeSourcePath);
-const llms = requireFile(llmsPath);
 
 assert(docsPages.includes("/v2/datasets/valuation-core-daily"), "docs-pages missing valuation-core-daily route");
 assert(!docsPages.includes("/v2/datasets/valuations"), "docs-pages still references stale /v2/datasets/valuations route");
@@ -77,23 +75,15 @@ for (const [label, content] of [
   ["docs-sidebar", docsSidebar],
   ["site", siteContent],
   ["home-source-of-truth", homeSourceContent],
-  ["llms", llms],
 ]) {
   if (secretsLikePattern.test(content)) {
     failures.push(`${label} contains secrets-like pattern`);
   }
 }
 
-if (existsSync(SOURCE_MANIFEST)) {
-  try {
-    const manifest = JSON.parse(readFileSync(SOURCE_MANIFEST, "utf8"));
-    const sourceLlmsPath = resolve("/Volumes/DEV_USB/Projects/tw-feature-engine", manifest.llms?.source_path ?? "docs/generated/llms.txt");
-    const sourceLlms = requireFile(sourceLlmsPath);
-    assert(llms === sourceLlms, "public/llms.txt is not synced to feature-engine generated llms.txt");
-  } catch {
-    failures.push("source manifest parse failed");
-  }
-}
+// llms.txt is no longer synced from the backend — it is generated from the website catalog SSOT
+// (app/llms.txt/route.ts). The former "public/llms.txt === feature-engine llms.txt" assertion is
+// intentionally removed; the single source is now the website.
 
 if (failures.length > 0) {
   console.error("check:dataset-factory-docs failed");
