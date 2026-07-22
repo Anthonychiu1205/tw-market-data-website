@@ -24,7 +24,6 @@ import {
   Landmark,
   Layers,
   LayoutGrid,
-  LifeBuoy,
   Megaphone,
   Network,
   Plug,
@@ -155,8 +154,6 @@ const NAV_ICON_COMPONENTS: Record<DocsIconName, typeof Activity> = {
   "git-branch": GitBranch,
   "file-code": FileCode,
   "code-2": Code2,
-  // HELP
-  "life-buoy": LifeBuoy,
 };
 
 function NavIcon({ name, className }: { name: DocsIconName; className?: string }) {
@@ -526,9 +523,6 @@ export function DocsPageShell({ page, children, tocSections, rightPanelTitle, ri
 
               <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">SDKS</p>
               {renderFlatSidebarItems(sidebar.sdkItems)}
-
-              <p className="px-3 pb-2 pt-5 text-xs font-semibold uppercase tracking-wide text-slate-950">HELP</p>
-              {renderFlatSidebarItems(sidebar.helpItems)}
             </nav>
             <div className="h-28 shrink-0" aria-hidden="true" />
           </div>
