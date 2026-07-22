@@ -23,7 +23,9 @@ export type CoverageFact = {
   rows?: string;
   symbols?: string;
   window: Bi;
-  frequency: Bi;
+  // Optional: the coverage manifest (DB ground-truth) provides row_count + date range but NOT update
+  // frequency, so it is only present where a real cadence is known — never fabricated.
+  frequency?: Bi;
 };
 
 export type DatasetDocContent = {
@@ -78,12 +80,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_canonical", type: "string", desc: { en: "Canonical source id (e.g. official_twse).", zh: "正規來源識別（如 official_twse）。" } },
       { name: "updated_at", type: "string", desc: { en: "When this row was last refreshed.", zh: "此列最後更新時間。" } },
     ],
-    coverage: {
-      rows: fmt(twse.rows),
-      symbols: fmt(twse.stocks),
-      window: { en: `${twse.earliestDate} → ${twse.latestDate}`, zh: `${twse.earliestDate} → ${twse.latestDate}` },
-      frequency: { en: "Daily (trading days)", zh: "每日（交易日）" },
-    },
+    coverage: { rows: "5,230,134", window: { en: "2004-02-11 – 2026-07-21", zh: "2004-02-11 至 2026-07-21" } },
     params: STANDARD_PARAMS,
     notes: [
       {
@@ -113,12 +110,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_monthly_revenue).", zh: "正規來源角色（official_mops_monthly_revenue）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream endpoint + authority (e.g. MOPS t187ap05).", zh: "上游端點與權威來源（如 MOPS t187ap05）。" } },
     ],
-    coverage: {
-      rows: fmt(rev.rows),
-      symbols: fmt(rev.stocks),
-      window: { en: `${rev.earliestPeriod} → ${rev.latestPeriod}`, zh: `${rev.earliestPeriod} → ${rev.latestPeriod}` },
-      frequency: { en: "Monthly", zh: "每月" },
-    },
+    coverage: { rows: "331,109", window: { en: "2010-02-10 – 2026-07-10", zh: "2010-02-10 至 2026-07-10" } },
     params: STANDARD_PARAMS,
     notes: [
       {
@@ -149,7 +141,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "dealer_net", type: "number", desc: { en: "Dealer net (shares).", zh: "自營商買賣超（股）。" } },
       { name: "source_role", type: "string", desc: { en: "official_twse_t86.", zh: "official_twse_t86。" } },
     ],
-    coverage: null,
+    coverage: { rows: "11,744,999", window: { en: "2012-05-02 – 2026-07-17", zh: "2012-05-02 至 2026-07-17" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE T86 daily report (present through the latest trading day).",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;來源為官方 TWSE T86 每日報表(涵蓋至最新交易日)。",
@@ -182,11 +174,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "as_of", type: "string", desc: { en: "Date the rate took effect.", zh: "利率生效日期。" } },
       { name: "source_role", type: "string", desc: { en: "cbc_official.", zh: "cbc_official。" } },
     ],
-    coverage: {
-      rows: undefined,
-      window: { en: "Latest set values (as of 2026-05-27)", zh: "最新設定值（截至 2026-05-27）" },
-      frequency: { en: "On policy change", zh: "政策調整時更新" },
-    },
+    coverage: { rows: "165", window: { en: "2000-12-29 – 2026-05-27", zh: "2000-12-29 至 2026-05-27" } },
     params: REFERENCE_PARAMS,
   },
 
@@ -210,10 +198,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "industry", type: "string", desc: { en: "Industry classification.", zh: "產業分類。" } },
       { name: "source_role", type: "string", desc: { en: "official_twse_issuer_profile.", zh: "official_twse_issuer_profile。" } },
     ],
-    coverage: {
-      window: { en: "Active securities (current snapshot)", zh: "現用證券（當前快照）" },
-      frequency: { en: "Snapshot", zh: "快照" },
-    },
+    coverage: { rows: "91,660", window: { en: "Reference data, no time series", zh: "參考資料，無時間序列" } },
     params: REFERENCE_PARAMS,
     notes: [
       {
@@ -243,7 +228,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "title", type: "string", desc: { en: "Event title.", zh: "事件標題。" } },
       { name: "source_role", type: "string", desc: { en: "official_mops_major_event.", zh: "official_mops_major_event。" } },
     ],
-    coverage: null,
+    coverage: { rows: "1,709", window: { en: "2012-01-12 – 2026-06-30", zh: "2012-01-12 至 2026-06-30" } },
     coverageTodo: {
       en: "TODO — exact event counts and the coverage window are pending a measured snapshot; the source is the official MOPS / TWSE / TPEx announcement venues (present through the latest disclosure).",
       zh: "TODO — 精確事件數與涵蓋視窗待量測快照;來源為官方 MOPS／TWSE／TPEx 公告管道(涵蓋至最新揭露)。",
@@ -271,7 +256,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "open_interest", type: "number", desc: { en: "Open interest.", zh: "未平倉量。" } },
       { name: "source_role", type: "string", desc: { en: "official_taifex.", zh: "official_taifex。" } },
     ],
-    coverage: null,
+    coverage: { rows: "5,960,037", window: { en: "1998-07-21 – 2026-07-16", zh: "1998-07-21 至 2026-07-16" } },
     coverageTodo: {
       en: "TODO — real example values, exact row counts and the coverage window are pending an entitled key at doc-build time. The data exists (TAIFEX futures, daily, coverage from the late 1990s) but was not queryable from this build session, so no numbers are shown rather than fabricated ones.",
       zh: "TODO — 真實範例值、精確列數與涵蓋視窗待建置時具權限的金鑰。資料存在(TAIFEX 期貨、每日、涵蓋自 1990 年代末),但本建置階段無法查詢,故不顯示數字而非捏造。",
@@ -304,7 +289,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "issuer", type: "string", desc: { en: "Issuing institution.", zh: "發行機構。" } },
       { name: "fund_type", type: "string", desc: { en: "Fund / ETF type.", zh: "基金／ETF 類型。" } },
     ],
-    coverage: null,
+    coverage: { rows: "257", window: { en: "Reference data, no time series", zh: "參考資料，無時間序列" } },
     coverageTodo: {
       en: "TODO — real example values and exact counts are pending a measured snapshot / entitled key at doc-build time; the dataset is issuer-sourced fund & ETF reference metadata.",
       zh: "TODO — 真實範例值與精確計數待建置時的量測快照／具權限金鑰;此資料集為發行機構來源的基金與 ETF 參考 metadata。",
@@ -336,7 +321,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "eps", type: "number", desc: { en: "Basic earnings per share (TWD).", zh: "基本每股盈餘(新台幣元)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_income_statement).", zh: "正規來源角色(official_mops_income_statement)。" } },
     ],
-    coverage: null,
+    coverage: { rows: "90,713", window: { en: "2013-03-31 – 2026-03-31", zh: "2013-03-31 至 2026-03-31" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS income-statement filings (present through the latest disclosed reporting period). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;來源為官方 MOPS 損益表申報(涵蓋至最新揭露之申報期間)。寧不顯示計數也不捏造。",
@@ -371,7 +356,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "total_equity", type: "number", desc: { en: "Total equity (TWD thousands).", zh: "權益總額(新台幣仟元)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_balance_sheet).", zh: "正規來源角色(official_mops_balance_sheet)。" } },
     ],
-    coverage: null,
+    coverage: { rows: "103,577", window: { en: "2013-03-31 – 2026-03-31", zh: "2013-03-31 至 2026-03-31" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS balance-sheet filings (present through the latest disclosed reporting period). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;來源為官方 MOPS 資產負債表申報(涵蓋至最新揭露之申報期間)。寧不顯示計數也不捏造。",
@@ -406,7 +391,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "financing_cash_flow", type: "number", desc: { en: "Net cash from financing activities (TWD thousands).", zh: "籌資活動之淨現金流量(新台幣仟元)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_cash_flow_statement).", zh: "正規來源角色(official_mops_cash_flow_statement)。" } },
     ],
-    coverage: null,
+    coverage: { rows: "77,712", window: { en: "2013-03-31 – 2026-03-31", zh: "2013-03-31 至 2026-03-31" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS cash-flow-statement filings (present through the latest disclosed reporting period). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;來源為官方 MOPS 現金流量表申報(涵蓋至最新揭露之申報期間)。寧不顯示計數也不捏造。",
@@ -442,7 +427,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "operating_cash_flow", type: "number", desc: { en: "Operating cash flow from the cash-flow statement (TWD thousands).", zh: "現金流量表營業活動淨現金流量(新台幣仟元)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_financial_statements).", zh: "正規來源角色(official_mops_financial_statements)。" } },
     ],
-    coverage: null,
+    coverage: { rows: "90,713", window: { en: "2013-03-31 – 2026-03-31", zh: "2013-03-31 至 2026-03-31" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS financial-statement filings (present through the latest disclosed reporting period). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;來源為官方 MOPS 財報申報(涵蓋至最新揭露之申報期間)。寧不顯示計數也不捏造。",
@@ -514,7 +499,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "ttm_revenue", type: "number", desc: { en: "Trailing-twelve-month revenue (TWD thousands).", zh: "近十二個月營收(新台幣仟元)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_mops_monthly_revenue_enhanced).", zh: "正規來源角色(derived_mops_monthly_revenue_enhanced)。" } },
     ],
-    coverage: null,
+    coverage: { rows: "331,109", window: { en: "2010-02-10 – 2026-07-10", zh: "2010-02-10 至 2026-07-10" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the metrics are computed from the official MOPS monthly-revenue disclosure (present through the latest disclosed month). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;指標由官方 MOPS 月營收申報計算(涵蓋至最新揭露月份)。寧不顯示計數也不捏造。",
@@ -549,7 +534,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "ex_dividend_date", type: "string", desc: { en: "Ex-dividend date.", zh: "除息(權)日。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_mops_dividend_policy).", zh: "正規來源角色(official_mops_dividend_policy)。" } },
     ],
-    coverage: null,
+    coverage: { rows: "9,069", window: { en: "2015-04-17 – 2026-06-02", zh: "2015-04-17 至 2026-06-02" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official MOPS dividend-policy filings (present through the latest disclosed distribution). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;來源為官方 MOPS 股利政策申報(涵蓋至最新揭露之配發)。寧不顯示計數也不捏造。",
@@ -583,7 +568,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_ndc_business_indicator).", zh: "正規來源角色（official_ndc_business_indicator）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream endpoint + authority (e.g. NDC business-cycle monitoring release).", zh: "上游端點與權威來源（如 NDC 景氣對策信號發布）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "608", window: { en: "2020-01-01 – 2026-04-01", zh: "2020-01-01 至 2026-04-01" } },
     coverageTodo: {
       en: "TODO — exact indicator / row counts and the coverage window are pending a measured snapshot; the source is the official NDC monthly business-cycle release (present through the latest published month). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確指標／列數與涵蓋視窗待量測快照;來源為官方 NDC 每月景氣指標發布(涵蓋至最新公布月份)。不顯示數字而非捏造。",
@@ -622,7 +607,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (international_macro).", zh: "正規來源角色（international_macro）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream international body + release for the value.", zh: "數值所屬的上游國際機構與發布。" } },
     ],
-    coverage: null,
+    coverage: { rows: "119,463", window: { en: "1947-01-01 – 2026-07-02", zh: "1947-01-01 至 2026-07-02" } },
     coverageTodo: {
       en: "TODO — exact indicator / country / row counts and the coverage window are pending a measured snapshot; the source is international statistical bodies (present through their latest releases). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確指標／國家／列數與涵蓋視窗待量測快照;來源為國際統計機構(涵蓋至其最新發布)。不顯示數字而非捏造。",
@@ -661,7 +646,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (worldbank_indicator).", zh: "正規來源角色（worldbank_indicator）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream World Bank indicator + release for the value.", zh: "數值所屬的上游世界銀行指標與發布。" } },
     ],
-    coverage: null,
+    coverage: { rows: "1,362,467", window: { en: "1960 – 2025", zh: "1960 至 2025" } },
     coverageTodo: {
       en: "TODO — exact indicator / country / row counts and the coverage window are pending a measured snapshot; the source is the World Bank (present through its latest published year). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確指標／國家／列數與涵蓋視窗待量測快照;來源為世界銀行(涵蓋至其最新公布年度)。不顯示數字而非捏造。",
@@ -700,7 +685,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "listing_date", type: "string", desc: { en: "Date the security was listed.", zh: "上市櫃日期。" } },
       { name: "source_role", type: "string", desc: { en: "official_twse_issuer_profile.", zh: "official_twse_issuer_profile。" } },
     ],
-    coverage: null,
+    coverage: { rows: "1,084", window: { en: "Reference data, no time series", zh: "參考資料，無時間序列" } },
     coverageTodo: {
       en: "TODO — exact issuer counts and the active-snapshot window are pending a measured snapshot; the source is the official TWSE / TPEx issuer registers (current listed companies).",
       zh: "TODO — 精確發行公司數與現用快照視窗待量測快照;來源為官方 TWSE／TPEx 發行人登記(現有上市櫃公司)。",
@@ -734,7 +719,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "branch_name", type: "string", desc: { en: "Branch name.", zh: "分點名稱。" } },
       { name: "source_role", type: "string", desc: { en: "official_twse_broker_branch.", zh: "official_twse_broker_branch。" } },
     ],
-    coverage: null,
+    coverage: { rows: "811", window: { en: "Reference data, no time series", zh: "參考資料，無時間序列" } },
     coverageTodo: {
       en: "TODO — exact broker / branch counts and the active-snapshot window are pending a measured snapshot; the source is the official TWSE broker-branch register (current active branches).",
       zh: "TODO — 精確券商／分點數與現用快照視窗待量測快照;來源為官方 TWSE 券商分點登記(現有有效分點)。",
@@ -768,7 +753,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "level", type: "number", desc: { en: "Depth in the taxonomy tree.", zh: "分類樹層級深度。" } },
       { name: "source_role", type: "string", desc: { en: "twmd_theme_taxonomy.", zh: "twmd_theme_taxonomy。" } },
     ],
-    coverage: null,
+    coverage: { rows: "2,160", window: { en: "2026-05-30 (single-day snapshot)", zh: "2026-05-30（單日快照）" } },
     coverageTodo: {
       en: "TODO — exact theme-node counts and the taxonomy version window are pending a measured snapshot; the source is the TWMD-maintained theme taxonomy (current curated tree).",
       zh: "TODO — 精確主題節點數與分類版本視窗待量測快照;來源為 TWMD 維護的主題分類(現行策展樹)。",
@@ -802,7 +787,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "as_of", type: "string", desc: { en: "Data date the screen was computed against.", zh: "本次篩選計算所依據的資料日期。" } },
       { name: "source_role", type: "string", desc: { en: "twmd_derived_screener.", zh: "twmd_derived_screener。" } },
     ],
-    coverage: null,
+    coverage: { rows: "7,625,469", window: { en: "2006-01-02 – 2026-07-16", zh: "2006-01-02 至 2026-07-16" } },
     coverageTodo: {
       en: "TODO — the size of the screenable universe and the data window are pending a measured snapshot; the screen is computed over official TWSE / TPEx market and financial data (current trading day).",
       zh: "TODO — 可篩選宇宙的規模與資料視窗待量測快照;篩選係在官方 TWSE／TPEx 市場與財務資料上計算(當前交易日)。",
@@ -837,7 +822,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "last_trading_date", type: "string", desc: { en: "Last trading date of the warrant.", zh: "權證最後交易日。" } },
       { name: "source_role", type: "string", desc: { en: "official_twse_warrant_master.", zh: "official_twse_warrant_master。" } },
     ],
-    coverage: null,
+    coverage: { rows: "51,570", window: { en: "Reference data, no time series", zh: "參考資料，無時間序列" } },
     coverageTodo: {
       en: "TODO — exact warrant counts and the active-snapshot window are pending a measured snapshot; the source is the official TWSE / TPEx warrant register (currently listed warrants).",
       zh: "TODO — 精確權證檔數與現用快照視窗待量測快照;來源為官方 TWSE／TPEx 權證登記(現有上市權證)。",
@@ -877,15 +862,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_tpex).", zh: "正規來源角色（official_tpex）。" } },
       { name: "updated_at", type: "string", desc: { en: "When this row was last refreshed.", zh: "此列最後更新時間。" } },
     ],
-    coverage: {
-      rows: fmt(coverageFacts.tpexDailyPrice.rows),
-      symbols: fmt(coverageFacts.tpexDailyPrice.stocks),
-      window: {
-        en: `${coverageFacts.tpexDailyPrice.earliestDate} → latest trading day`,
-        zh: `${coverageFacts.tpexDailyPrice.earliestDate} → 最新交易日`,
-      },
-      frequency: { en: "Daily (trading days)", zh: "每日（交易日）" },
-    },
+    coverage: { rows: "1,121", window: { en: "2023-06-01 – 2026-05-28", zh: "2023-06-01 至 2026-05-28" } },
     params: STANDARD_PARAMS,
     notes: [
       {
@@ -917,7 +894,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "turnover", type: "number", desc: { en: "Turnover value (TWD).", zh: "成交金額（新台幣）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse / official_tpex).", zh: "正規來源角色（official_twse／official_tpex）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "5,230,134", window: { en: "2004-02-11 – 2026-07-21", zh: "2004-02-11 至 2026-07-21" } },
     coverageTodo: {
       en: "TODO — the combined row / symbol counts and coverage window are pending a measured snapshot; the sources are the official TWSE and TPEx daily quote feeds (present through the latest trading day). The per-board totals are documented on the twse-daily-price and tpex-daily-price pages; no combined number is shown rather than a fabricated one.",
       zh: "TODO — 合併後的列數／標的數與涵蓋視窗待量測快照;來源為官方 TWSE 與 TPEx 日成交行情(涵蓋至最新交易日)。各市場分別的總數見 twse-daily-price 與 tpex-daily-price 頁面;寧不顯示合併數字也不捏造。",
@@ -982,7 +959,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "adj_factor", type: "number", desc: { en: "Cumulative adjustment factor applied.", zh: "所套用之累積還原係數。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_adjusted_prices).", zh: "正規來源角色（derived_adjusted_prices）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "5,230,134", window: { en: "2004-02-11 – 2026-07-21", zh: "2004-02-11 至 2026-07-21" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the adjusted series is computed from the official TWSE / TPEx daily price and corporate-action inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;還原序列由官方 TWSE／TPEx 日價格與公司行動輸入計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
@@ -1016,7 +993,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "open", type: "number", desc: { en: "Index opening level.", zh: "指數開盤水準。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_index).", zh: "正規來源角色（official_twse_index）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "4,156", window: { en: "2009-01-05 – 2026-07-17", zh: "2009-01-05 至 2026-07-17" } },
     coverageTodo: {
       en: "TODO — exact index / row counts and the coverage window are pending a measured snapshot; the source is the official TWSE index publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確指數／列數與涵蓋視窗待量測快照;來源為官方 TWSE 指數發布(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
@@ -1051,7 +1028,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "change_pct", type: "number", desc: { en: "Percent change vs previous session.", zh: "較前一交易日之漲跌幅。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_index).", zh: "正規來源角色（official_twse_index）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "4,156", window: { en: "2009-01-05 – 2026-07-17", zh: "2009-01-05 至 2026-07-17" } },
     coverageTodo: {
       en: "TODO — exact index / row counts and the coverage window are pending a measured snapshot; the source is the official TWSE index publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確指數／列數與涵蓋視窗待量測快照;來源為官方 TWSE 指數發布(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
@@ -1085,7 +1062,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "family", type: "string", desc: { en: "Index family the code belongs to.", zh: "指數代碼所屬家族。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_index_master).", zh: "正規來源角色（official_twse_index_master）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "5", window: { en: "2026-05-22 – 2026-05-28", zh: "2026-05-22 至 2026-05-28" } },
     coverageTodo: {
       en: "TODO — exact index counts and the classification-snapshot window are pending a measured snapshot; the source is the official TWSE index register (current published indices).",
       zh: "TODO — 精確指數數與分類快照視窗待量測快照;來源為官方 TWSE 指數登記(現行公布指數)。",
@@ -1119,7 +1096,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "as_of", type: "string", desc: { en: "Data date the membership was resolved against.", zh: "成分解析所依據的資料日期。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_index_constituents).", zh: "正規來源角色（derived_index_constituents）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "546", window: { en: "2026-07-01 (single-day snapshot)", zh: "2026-07-01（單日快照）" } },
     coverageTodo: {
       en: "TODO — exact index / constituent counts and the coverage window are pending a measured snapshot; membership comes from the official TWSE index definition and weights are computed from official market data (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確指數／成分股數與涵蓋視窗待量測快照;成分來自官方 TWSE 指數定義,權重由官方市場資料計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
@@ -1153,7 +1130,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "change_pct", type: "number", desc: { en: "Percent change vs previous session (derived).", zh: "較前一交易日之漲跌幅（推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_return_index).", zh: "正規來源角色（derived_return_index）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "10,830", window: { en: "2003-01-02 – 2026-07-17", zh: "2003-01-02 至 2026-07-17" } },
     coverageTodo: {
       en: "TODO — exact index / row counts and the coverage window are pending a measured snapshot; the return index is computed from the official TWSE price index and corporate-action inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確指數／列數與涵蓋視窗待量測快照;報酬指數由官方 TWSE 價格指數與公司行動輸入計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
@@ -1223,7 +1200,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "decliners", type: "number", desc: { en: "Count of declining securities.", zh: "下跌家數。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_market_overview).", zh: "正規來源角色（official_twse_market_overview）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "354", window: { en: "2023-06-01 – 2026-05-28", zh: "2023-06-01 至 2026-05-28" } },
     coverageTodo: {
       en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx market-summary publication. Coverage is partial while the historical backfill is completed, so no counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數與涵蓋視窗待量測快照;來源為官方 TWSE／TPEx 市場總計發布。歷史回補完成前涵蓋為部分,寧不顯示計數也不捏造。",
@@ -1258,7 +1235,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "ad_ratio", type: "number", desc: { en: "Advance/decline ratio (derived).", zh: "漲跌比（推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_market_breadth).", zh: "正規來源角色（derived_market_breadth）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "4,136", window: { en: "2017-12-18 – 2026-07-16", zh: "2017-12-18 至 2026-07-16" } },
     coverageTodo: {
       en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the metrics are computed from the official TWSE / TPEx per-security daily prices. Coverage is partial while the historical backfill is completed, so no counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數與涵蓋視窗待量測快照;指標由官方 TWSE／TPEx 逐檔日價格計算。歷史回補完成前涵蓋為部分,寧不顯示計數也不捏造。",
@@ -1293,7 +1270,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "macd", type: "number", desc: { en: "MACD line (derived).", zh: "MACD 線（推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_technical_indicators).", zh: "正規來源角色（derived_technical_indicators）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "9,065,059", window: { en: "1994-01-05 – 2026-05-29", zh: "1994-01-05 至 2026-05-29" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the indicators are computed from the official TWSE / TPEx daily price (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;指標由官方 TWSE／TPEx 日價格計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
@@ -1328,7 +1305,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "limit_down", type: "number", desc: { en: "Lower limit price.", zh: "跌停價。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_price_limit).", zh: "正規來源角色（official_twse_price_limit）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "38,742", window: { en: "2003-06-02 – 2026-07-14", zh: "2003-06-02 至 2026-07-14" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx price-limit publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;來源為官方 TWSE／TPEx 漲跌停價發布(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
@@ -1357,7 +1334,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "dividend_yield", type: "number", desc: { en: "Dividend yield (ratio, derived).", zh: "殖利率（比值,推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_valuation_core).", zh: "正規來源角色（derived_valuation_core）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "704,522", window: { en: "2023-06-01 – 2026-05-28", zh: "2023-06-01 至 2026-05-28" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the ratios are computed from the official TWSE / TPEx daily price and MOPS earnings / dividend inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;比率由官方 TWSE／TPEx 日價格與 MOPS 盈餘／股利輸入計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
@@ -1392,7 +1369,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "per", type: "number", desc: { en: "Price-to-earnings ratio (derived).", zh: "本益比（推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_valuation_data).", zh: "正規來源角色（derived_valuation_data）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "7,625,469", window: { en: "2006-01-02 – 2026-07-16", zh: "2006-01-02 至 2026-07-16" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the figures are computed from the official TWSE / TPEx daily price and MOPS financial inputs (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;數字由官方 TWSE／TPEx 日價格與 MOPS 財務輸入計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
@@ -1427,7 +1404,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "total_net", type: "number", desc: { en: "Combined three-investor net (shares).", zh: "三大法人合計買賣超（股）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_twse_institutional_aggregate).", zh: "正規來源角色（derived_twse_institutional_aggregate）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "11,744,999", window: { en: "2012-05-02 – 2026-07-17", zh: "2012-05-02 至 2026-07-17" } },
     coverageTodo: {
       en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the figures are aggregated from the official TWSE T86 daily report (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數與涵蓋視窗待量測快照；數字由官方 TWSE T86 每日報表加總（涵蓋至最新交易日）。寧不顯示計數也不捏造。",
@@ -1533,7 +1510,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "short_margin_ratio", type: "number", desc: { en: "Short balance as a ratio of margin balance.", zh: "券資比（融券餘額占融資餘額比值）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_twse_margin_enhanced).", zh: "正規來源角色（derived_twse_margin_enhanced）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "7,798,493", window: { en: "2000-11-28 – 2026-07-09", zh: "2000-11-28 至 2026-07-09" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the metrics are computed from the official TWSE margin trading report (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；指標由官方 TWSE 信用交易報表計算（涵蓋至最新交易日）。寧不顯示計數也不捏造。",
@@ -1567,7 +1544,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "margin_change", type: "number", desc: { en: "Day-over-day change in total margin balance (TWD thousands).", zh: "融資總餘額日變動（新台幣仟元）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_margin_total).", zh: "正規來源角色（official_twse_margin_total）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "9,936", window: { en: "2000-11-28 – 2026-07-09", zh: "2000-11-28 至 2026-07-09" } },
     coverageTodo: {
       en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the source is the official TWSE margin trading report. This is a preview surface with partial, snapshot-only coverage, so no counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數與涵蓋視窗待量測快照；來源為官方 TWSE 信用交易報表。此為預覽面，涵蓋為部分且僅快照，故不顯示計數而非捏造。",
@@ -1601,7 +1578,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "lending_balance", type: "number", desc: { en: "Outstanding securities-lending balance (shares).", zh: "借券未償還餘額（股）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_securities_lending).", zh: "正規來源角色（official_twse_securities_lending）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "3,514,626", window: { en: "2007-01-02 – 2026-07-17", zh: "2007-01-02 至 2026-07-17" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE securities-lending report (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；來源為官方 TWSE 借券報表（涵蓋至最新交易日）。寧不顯示計數也不捏造。",
@@ -1671,7 +1648,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "shares", type: "number", desc: { en: "Shares held in the tier.", zh: "該級距持有股數。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_tdcc_shareholding_distribution).", zh: "正規來源角色（official_tdcc_shareholding_distribution）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "33,626", window: { en: "2026-05-29 (single-day snapshot)", zh: "2026-05-29（單日快照）" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TDCC shareholding-distribution table (present through the latest weekly release). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；來源為官方 TDCC 股權分散表（涵蓋至最新每週發布）。寧不顯示計數也不捏造。",
@@ -1740,7 +1717,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "reason", type: "string", desc: { en: "Normalized suspension reason code.", zh: "正規化暫停事由代碼。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_day_trading_suspension).", zh: "正規來源角色（official_twse_day_trading_suspension）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "38", window: { en: "2026-06-03 – 2026-06-09", zh: "2026-06-03 至 2026-06-09" } },
     coverageTodo: {
       en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE day-trading suspension announcement. This is a preview surface with partial, snapshot-only coverage, so no counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；來源為官方 TWSE 現股當沖暫停公告。此為預覽面，涵蓋為部分且僅快照，故不顯示計數而非捏造。",
@@ -1777,7 +1754,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "record_date", type: "string", desc: { en: "Shareholder record date.", zh: "股東基準日。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_corporate_action).", zh: "正規來源角色（official_twse_corporate_action）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "3", window: { en: "2025-06-12 – 2025-09-15", zh: "2025-06-12 至 2025-09-15" } },
     coverageTodo: {
       en: "TODO — exact action / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx / MOPS corporate-action announcements (present through the latest disclosure). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確行動數／標的數與涵蓋視窗待量測快照；來源為官方 TWSE／TPEx／MOPS 公司行動公告（涵蓋至最新揭露）。寧不顯示計數也不捏造。",
@@ -1813,7 +1790,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "cumulative_factor", type: "number", desc: { en: "Cumulative adjustment factor to date (derived).", zh: "截至當日之累積調整因子（推導）。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_corporate_action_enhanced).", zh: "正規來源角色（derived_corporate_action_enhanced）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "275", window: { en: "2001-01-20 – 2026-07-20", zh: "2001-01-20 至 2026-07-20" } },
     coverageTodo: {
       en: "TODO — exact action / symbol counts and the coverage window are pending a measured snapshot; the adjustment factors are computed from the official TWSE / TPEx / MOPS corporate-action disclosures (present through the latest disclosure). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確行動數／標的數與涵蓋視窗待量測快照；調整因子由官方 TWSE／TPEx／MOPS 公司行動揭露計算（涵蓋至最新揭露）。寧不顯示計數也不捏造。",
@@ -1848,7 +1825,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "effective_date", type: "string", desc: { en: "Date the change takes effect.", zh: "變更生效日。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_par_value_event).", zh: "正規來源角色（official_twse_par_value_event）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "3", window: { en: "2026-01-09 – 2026-04-22", zh: "2026-01-09 至 2026-04-22" } },
     coverageTodo: {
       en: "TODO — exact event / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx split and par-value announcements (present through the latest disclosure). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確事件數／標的數與涵蓋視窗待量測快照；來源為官方 TWSE／TPEx 分割與面額變更公告（涵蓋至最新揭露）。寧不顯示計數也不捏造。",
@@ -1883,7 +1860,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "reason", type: "string", desc: { en: "Reason for the status change as disclosed.", zh: "揭露之狀態變更原因。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_delisting_lifecycle).", zh: "正規來源角色（official_twse_delisting_lifecycle）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "263", window: { en: "Reference data, no time series", zh: "參考資料，無時間序列" } },
     coverageTodo: {
       en: "TODO — exact security counts and the coverage window are pending a measured snapshot; the source is the official TWSE / TPEx listing and delisting records (present through the latest status change). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確證券數與涵蓋視窗待量測快照；來源為官方 TWSE／TPEx 上市與下市紀錄（涵蓋至最新狀態變更）。寧不顯示計數也不捏造。",
@@ -1918,7 +1895,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_risk_event).", zh: "正規來源角色（official_twse_risk_event）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream authority + release for the flag.", zh: "標記所屬的上游權威來源與發布。" } },
     ],
-    coverage: null,
+    coverage: { rows: "1,709", window: { en: "2012-01-12 – 2026-06-30", zh: "2012-01-12 至 2026-06-30" } },
     coverageTodo: {
       en: "TODO — this is a private-beta preview with partial coverage; exact event / symbol counts and the coverage window are pending a measured snapshot. The source is the official TWSE / TPEx risk-related announcements. No counts are shown rather than fabricated ones.",
       zh: "TODO — 此為私測預覽，涵蓋為部分；精確事件數／標的數與涵蓋視窗待量測快照。來源為官方 TWSE／TPEx 風險相關公告。寧不顯示計數也不捏造。",
@@ -1957,7 +1934,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_disposition).", zh: "正規來源角色（official_twse_disposition）。" } },
       { name: "lineage", type: "object", desc: { en: "Upstream authority + release for the disposition.", zh: "處置所屬的上游權威來源與發布。" } },
     ],
-    coverage: null,
+    coverage: { rows: "1,709", window: { en: "2012-01-12 – 2026-06-30", zh: "2012-01-12 至 2026-06-30" } },
     coverageTodo: {
       en: "TODO — this is a private-beta preview with partial coverage; exact disposition / symbol counts and the coverage window are pending a measured snapshot. The source is the official TWSE disposition announcements. No counts are shown rather than fabricated ones.",
       zh: "TODO — 此為私測預覽，涵蓋為部分；精確處置數／標的數與涵蓋視窗待量測快照。來源為官方 TWSE 處置公告。寧不顯示計數也不捏造。",
@@ -1997,7 +1974,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "governance_score", type: "number", desc: { en: "Governance pillar score.", zh: "公司治理構面分數。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_twse_tesg).", zh: "正規來源角色（derived_twse_tesg）。" } },
     ],
-    coverage: null,
+    coverage: { rows: "10,088", window: { en: "2026-06-05 (single-day snapshot)", zh: "2026-06-05（單日快照）" } },
     coverageTodo: {
       en: "TODO — exact company counts and the coverage window are pending a measured snapshot; the scores are compiled from the official TWSE corporate sustainability disclosures (present through the latest assessment period). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確公司數與涵蓋視窗待量測快照；分數由官方 TWSE 企業永續揭露彙整（涵蓋至最新評估期間）。寧不顯示計數也不捏造。",
@@ -2035,7 +2012,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "open_interest", type: "number", desc: { en: "Open interest.", zh: "未平倉量。" } },
       { name: "source_role", type: "string", desc: { en: "official_taifex.", zh: "official_taifex。" } },
     ],
-    coverage: null,
+    coverage: { rows: "20,813,351", window: { en: "2001-12-24 – 2026-06-04", zh: "2001-12-24 至 2026-06-04" } },
     coverageTodo: {
       en: "TODO — real example values, exact row counts and the coverage window are pending an entitled key at doc-build time. The data exists (TAIFEX options, daily) but was not queryable from this build session, so no numbers are shown rather than fabricated ones.",
       zh: "TODO — 真實範例值、精確列數與涵蓋視窗待建置時具權限的金鑰。資料存在(TAIFEX 選擇權、每日),但本建置階段無法查詢,故不顯示數字而非捏造。",
@@ -2070,7 +2047,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "settlement_price", type: "number", desc: { en: "Official daily settlement price.", zh: "官方每日結算價。" } },
       { name: "source_role", type: "string", desc: { en: "official_taifex.", zh: "official_taifex。" } },
     ],
-    coverage: null,
+    coverage: { rows: "10,022", window: { en: "2026-06-04 (single-day snapshot)", zh: "2026-06-04（單日快照）" } },
     coverageTodo: {
       en: "TODO — real example values, exact row counts and the coverage window are pending an entitled key at doc-build time. The data exists (TAIFEX options settlement prices, daily) but was not queryable from this build session, so no numbers are shown rather than fabricated ones.",
       zh: "TODO — 真實範例值、精確列數與涵蓋視窗待建置時具權限的金鑰。資料存在(TAIFEX 選擇權結算價、每日),但本建置階段無法查詢,故不顯示數字而非捏造。",
@@ -2105,7 +2082,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "dealer_net", type: "number", desc: { en: "Dealer net position (contracts).", zh: "自營商淨部位(口)。" } },
       { name: "source_role", type: "string", desc: { en: "official_taifex.", zh: "official_taifex。" } },
     ],
-    coverage: null,
+    coverage: { rows: "303", window: { en: "2024-01-03 – 2026-06-05", zh: "2024-01-03 至 2026-06-05" } },
     coverageTodo: {
       en: "TODO — real example values, exact row counts and the coverage window are pending an entitled key at doc-build time. The data exists (TAIFEX institutional futures & options positions, daily) but was not queryable from this build session, so no numbers are shown rather than fabricated ones.",
       zh: "TODO — 真實範例值、精確列數與涵蓋視窗待建置時具權限的金鑰。資料存在(TAIFEX 期貨與選擇權三大法人部位、每日),但本建置階段無法查詢,故不顯示數字而非捏造。",
@@ -2140,7 +2117,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "conversion_price", type: "number", desc: { en: "Current conversion price (TWD).", zh: "當前轉換價格(新台幣元)。" } },
       { name: "source_role", type: "string", desc: { en: "official_tpex.", zh: "official_tpex。" } },
     ],
-    coverage: null,
+    coverage: { rows: "609,220", window: { en: "2017-01-17 – 2026-07-16", zh: "2017-01-17 至 2026-07-16" } },
     coverageTodo: {
       en: "TODO — real example values, exact row / issue counts and the coverage window are pending a measured snapshot; the source is the official TPEx convertible-bond feed (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 真實範例值、精確列數／檔數與涵蓋視窗待量測快照;來源為官方 TPEx 可轉債資料(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
@@ -2175,7 +2152,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "conversion_price", type: "number", desc: { en: "Reference conversion price (TWD).", zh: "參考轉換價格(新台幣元)。" } },
       { name: "source_role", type: "string", desc: { en: "official_tpex.", zh: "official_tpex。" } },
     ],
-    coverage: null,
+    coverage: { rows: "1,474", window: { en: "Reference data, no time series", zh: "參考資料，無時間序列" } },
     coverageTodo: {
       en: "TODO — real example values and exact issue counts are pending a measured snapshot; this is the TPEx-sourced convertible-bond reference master (present through the latest listed issue). No counts are shown rather than fabricated ones.",
       zh: "TODO — 真實範例值與精確檔數待量測快照;此為 TPEx 來源的可轉債參考主檔(涵蓋至最新上櫃檔次)。寧不顯示計數也不捏造。",
@@ -2245,7 +2222,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "as_of", type: "string", desc: { en: "Disclosure date of this holdings snapshot.", zh: "此持股快照之揭露日期。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (issuer_etf_holdings).", zh: "正規來源角色(issuer_etf_holdings)。" } },
     ],
-    coverage: null,
+    coverage: { rows: "9,425", window: { en: "2026-06-04 – 2026-07-16", zh: "2026-06-04 至 2026-07-16" } },
     coverageTodo: {
       en: "TODO — exact ETF / constituent-row counts are pending a measured snapshot; the source is issuer holdings disclosure. Note this is an issuer-limited latest snapshot: only ETFs the issuer publishes holdings for, and only the most recent disclosure — not market-wide or historical. No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確 ETF 檔數／成分列數待量測快照;來源為發行機構持股揭露。注意此為發行機構受限的最新快照:僅涵蓋發行機構有揭露持股的 ETF,且僅最新一期——非全市場亦非歷史。寧不顯示計數也不捏造。",
@@ -2284,7 +2261,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "registered_city", type: "string", desc: { en: "Registered location (city / county).", zh: "登記所在地(縣市)。" } },
       { name: "source_role", type: "string", desc: { en: "Canonical source role (moea_business_registration).", zh: "正規來源角色(moea_business_registration)。" } },
     ],
-    coverage: null,
+    coverage: { rows: "3,626", window: { en: "Reference data, no time series", zh: "參考資料，無時間序列" } },
     coverageTodo: {
       en: "TODO — exact registered-business counts are pending a measured snapshot; the source is the MOEA public business-registration dataset via data.gov.tw. Note this is public business-registration reference only (registered name, status, capital) — not private tax-filing or confidential tax data. No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確登記商業家數待量測快照;來源為經濟部(MOEA)經由 data.gov.tw 的公開商業登記資料集。注意此僅為公開商業登記參考(登記名稱、狀態、資本額)——非私人稅務申報或機密稅籍資料。寧不顯示計數也不捏造。",

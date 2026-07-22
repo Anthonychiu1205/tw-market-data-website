@@ -198,10 +198,12 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
                       <td className="py-2 pr-4 text-slate-500">{en ? "Window" : "涵蓋起訖"}</td>
                       <td className="py-2 text-slate-800">{bi(content.coverage.window, locale)}</td>
                     </tr>
-                    <tr className="border-b border-slate-100">
-                      <td className="py-2 pr-4 text-slate-500">{en ? "Frequency" : "更新頻率"}</td>
-                      <td className="py-2 text-slate-800">{bi(content.coverage.frequency, locale)}</td>
-                    </tr>
+                    {content.coverage.frequency ? (
+                      <tr className="border-b border-slate-100">
+                        <td className="py-2 pr-4 text-slate-500">{en ? "Frequency" : "更新頻率"}</td>
+                        <td className="py-2 text-slate-800">{bi(content.coverage.frequency, locale)}</td>
+                      </tr>
+                    ) : null}
                     <tr>
                       <td className="py-2 pr-4 text-slate-500">{en ? "Grade" : "分級"}</td>
                       <td className="py-2 font-medium" style={{ color: gradeColor }}>{datasetGradeLabel(entry.grade, locale)}</td>
