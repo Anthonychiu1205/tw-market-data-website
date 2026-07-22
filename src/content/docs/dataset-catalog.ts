@@ -85,14 +85,17 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "margin-short-enhanced": { domain: "capital-flows", zh: "增強融資融券", en: "Enhanced margin & short", agency: "TWSE", grade: "derived" },
   "total-margin-short": { domain: "capital-flows", zh: "整體融資融券匯總", en: "Total margin & short", agency: "TWSE", grade: "reference" },
   "securities-lending": { domain: "capital-flows", zh: "借券資料", en: "Securities lending", agency: "TWSE", grade: "verified" },
-  // chip-flows: serving 未達真服務標準(repoint 修復中)→ 暫降 reference(灰),不主張已驗證;修好後升回。
-  "chip-flows": { domain: "capital-flows", zh: "籌碼流向", en: "Chip flows", agency: "TWSE", grade: "reference" },
+  // chip-flows: live 端點實測回 0 列(籌碼流向聚合 ETL 尚在建置)→ 標 building「即將開放」,不列
+  // verified、不填假涵蓋;ETL backfill 後升回真分級。owner ruling 2026-07-22。
+  "chip-flows": { domain: "capital-flows", zh: "籌碼流向", en: "Chip flows", agency: "TWSE", grade: "building" },
   "ownership-distribution": { domain: "capital-flows", zh: "股權分散", en: "Ownership distribution", agency: "TDCC", grade: "verified" },
   "insider-director-holdings": { domain: "capital-flows", zh: "董監持股", en: "Insider & director holdings", agency: "MOPS", grade: "verified" },
   "day-trading-suspension": { domain: "capital-flows", zh: "現股當沖暫停", en: "Day-trading suspension", agency: "TWSE", grade: "reference" },
 
   // ── Companies & Events ──
-  "events": { domain: "companies-events", zh: "事件日曆", en: "Events calendar", agency: "TWSE / TPEx / MOPS", grade: "verified" },
+  // events: live 端點實測回 0 列(統一事件日曆聚合尚未 backfill)→ 標 building「即將開放」,不掛假
+  // 「已驗證」。owner ruling 2026-07-22(badge-race lock:此值鎖 building,勿 revert 回 verified)。
+  "events": { domain: "companies-events", zh: "事件日曆", en: "Events calendar", agency: "TWSE / TPEx / MOPS", grade: "building" },
   // corporate-actions: serving 未達真服務標準(repoint 修復中)→ 暫降 reference(灰),移除假「已驗證」綠章;修好後升回。
   "corporate-actions": { domain: "companies-events", zh: "公司行動", en: "Corporate actions", agency: "TWSE / TPEx / MOPS", grade: "reference" },
   "corporate-actions-enhanced": { domain: "companies-events", zh: "增強公司行動", en: "Enhanced corporate actions", agency: "TWSE / TPEx / MOPS", grade: "derived" },

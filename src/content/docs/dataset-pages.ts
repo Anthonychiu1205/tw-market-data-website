@@ -212,13 +212,13 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
   "events": {
     slug: "events",
     description: {
-      en: "Corporate events calendar — material announcements and scheduled events across TWSE / TPEx / MOPS, normalized into one timeline.",
-      zh: "公司事件日曆——TWSE／TPEx／MOPS 的重大訊息與排定事件,正規化為單一時間軸。",
+      en: "Coming soon — a unified corporate events calendar across TWSE / TPEx / MOPS. The underlying table exists, but the serving endpoint returns no rows yet, so this dataset is being finished before it goes live.",
+      zh: "即將開放——整合 TWSE／TPEx／MOPS 的統一公司事件日曆。底層資料表已存在,但服務端點目前尚未回傳資料,故此資料集仍在完成中。",
     },
     overview: [
       {
-        en: "events returns one row per company event with a normalized type and its source. It merges announcements from multiple official venues so an agent can watch a single stream instead of three.",
-        zh: "events 每筆公司事件回傳一列,附正規化類型與來源。它整合多個官方管道的公告,讓 agent 只需關注單一資料流而非三個。",
+        en: "events will return one row per company event with a normalized type and its source, merging announcements from multiple official venues into one stream. The serving endpoint currently returns no rows (the aggregation is not wired through yet), so the fields below are the planned schema, not a served response. It will move off \"Building\" once the endpoint serves the table.",
+        zh: "events 未來會每筆公司事件回傳一列(附正規化類型與來源),整合多個官方管道的公告為單一資料流。服務端點目前不回傳資料(聚合尚未接通),故下方欄位為規劃 schema,非已服務的回應。端點接通資料表後才會脫離「建置中」。",
       },
     ],
     fields: [
@@ -228,7 +228,10 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       { name: "title", type: "string", desc: { en: "Event title.", zh: "事件標題。" } },
       { name: "source_role", type: "string", desc: { en: "official_mops_major_event.", zh: "official_mops_major_event。" } },
     ],
-    coverage: { rows: "1,709", window: { en: "2012-01-12 – 2026-06-30", zh: "2012-01-12 至 2026-06-30" } },
+    // coverage null: the underlying table holds ~1,709 rows (DB snapshot) but the serving endpoint
+    // returns 0, so showing a row count would imply queryability it does not have (鐵則②). Restore a
+    // real coverage figure only once the endpoint serves the table.
+    coverage: null,
     coverageTodo: {
       en: "TODO — exact event counts and the coverage window are pending a measured snapshot; the source is the official MOPS / TWSE / TPEx announcement venues (present through the latest disclosure).",
       zh: "TODO — 精確事件數與涵蓋視窗待量測快照;來源為官方 MOPS／TWSE／TPEx 公告管道(涵蓋至最新揭露)。",
@@ -1562,17 +1565,18 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
     ],
   },
 
-  // capital-flows / chip-flows — DERIVED, combined chip indicators from institutional + margin → TODO coverage
+  // capital-flows / chip-flows — BUILDING「即將開放」: 聚合 ETL 尚在建置,live 實測回 0 列。欄位為
+  // 規劃 schema(roadmap),尚未服務;coverage 留 null 不填假數字。ETL backfill 後改回真分級與描述。
   "chip-flows": {
     slug: "chip-flows",
     description: {
-      en: "Combined chip-flow indicators per stock per trading day, computed from the official institutional-flow and margin trading data.",
-      zh: "每檔股票每交易日的綜合籌碼流向指標，由官方三大法人與信用交易資料計算而得。",
+      en: "Coming soon — a combined chip-flow view per stock per trading day. The aggregation pipeline is still being built, so this dataset does not return rows yet.",
+      zh: "即將開放——每檔股票每交易日的綜合籌碼流向視圖。聚合建置中,目前尚未回傳資料。",
     },
     overview: [
       {
-        en: "chip-flows is a derived dataset: it combines the official TWSE institutional flows and margin trading balances into a single per-stock daily view of who is accumulating or distributing. The lineage block names what each figure was derived from, so the composite stays auditable rather than a black box.",
-        zh: "chip-flows 為推導型資料集：將官方 TWSE 三大法人買賣超與信用交易餘額合併為每檔股票每日一列的籌碼流向視圖，呈現誰在吸貨或出貨。lineage 欄位標明每個數字的推導來源，綜合值可稽核而非黑箱。",
+        en: "chip-flows is being built: it will combine the official TWSE institutional flows and margin trading balances into a single per-stock daily view of who is accumulating or distributing. The aggregation ETL is not live yet, so the endpoint currently returns no rows — the fields below are the planned schema, not a served response. It will move off \"Building\" once the pipeline backfills.",
+        zh: "chip-flows 建置中:未來會把官方 TWSE 三大法人買賣超與信用交易餘額,合併為每檔股票每日一列的籌碼流向視圖。聚合 ETL 尚未上線,端點目前不回傳資料——下方欄位為規劃 schema,非已服務的回應。ETL backfill 後才會脫離「建置中」。",
       },
     ],
     fields: [
