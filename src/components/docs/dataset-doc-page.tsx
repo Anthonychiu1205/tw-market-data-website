@@ -7,7 +7,7 @@ import { getDatasetDocContent, type Bi, type DatasetDocContent } from "@/src/con
 import { DATASET_GRADE_COLORS, datasetGradeLabel } from "@/src/lib/docs/dataset-grade";
 import { API_AUTH_HEADER, API_BASE_URL as CAPTURED_BASE_URL, API_KEY_PREFIX, API_TRUTH_CAPTURED_AT } from "@/src/content/api-truth";
 import { apiCaptureBody, getApiCapture } from "@/src/content/api-captures";
-import { VERIFIED_REQUEST_EXAMPLES } from "@/src/content/docs/verified-request-examples";
+import { VERIFIED_DATASET_PARAMS } from "@/src/content/docs/verified-request-examples";
 
 // Bilingual renderer for a v5 dataset endpoint page. Genuinely en + zh (no "coming soon" banner) so
 // /en is fully usable and the CJK guards can scan it. All facts come from the catalog (grade / agency /
@@ -29,17 +29,18 @@ function pyRows(rowsKey: string): string {
   return `resp.json()${rowsKey.split(".").map((seg) => `["${seg}"]`).join("")}`;
 }
 
-// Per-dataset verified example params (real working filters from the backend fixture), or a generic
-// symbol=2330 fallback for datasets not in the fixture. This is why one dataset's example uses
-// index_code / rate_code / series_id / ticker etc. instead of a made-up symbol — the example actually
-// returns rows against the live API.
+// Per-dataset verified params drive BOTH the request examples and the param table from ONE source, so
+// they can never disagree. index_code / rate_code / ticker etc. appear instead of a made-up symbol
+// because these are the real params (openapi authority + verified fixture); dates use start_date/end_date
+// (the fixture's date_from is ignored by the backend). Fallback: generic symbol=2330.
 function exampleParamsFor(slug: string): Record<string, string> {
-  const p = VERIFIED_REQUEST_EXAMPLES[slug];
-  return p && Object.keys(p).length > 0 ? p : { symbol: "2330" };
+  const ps = VERIFIED_DATASET_PARAMS[slug];
+  if (!ps || ps.length === 0) return { symbol: "2330" };
+  return Object.fromEntries(ps.map((p) => [p.name, p.example]));
 }
 // The minimal (non-date) params — the smallest call that returns rows.
 function coreParamsFor(slug: string): Record<string, string> {
-  const entries = Object.entries(exampleParamsFor(slug)).filter(([k]) => k !== "date_from" && k !== "date_to");
+  const entries = Object.entries(exampleParamsFor(slug)).filter(([k]) => k !== "start_date" && k !== "end_date");
   return entries.length > 0 ? Object.fromEntries(entries) : { symbol: "2330" };
 }
 function toQuery(params: Record<string, string>): string {
@@ -124,12 +125,20 @@ export function DatasetDocPage({ slugParts, locale }: { slugParts: string[]; loc
 
   // The sticky Request/Response panel makes this a data-API page: the shell switches to the wide
   // right column and drops the TOC (article pages keep the TOC and stay single-column).
+  // Param table is driven by the SAME verified spec as the request examples (openapi authority + fixture
+  // filter names), so the table can never say start_date while the example uses a different param. Only
+  // the name/required/type/desc are shown in the table (the `example` field feeds the code samples).
+  const verifiedParams = VERIFIED_DATASET_PARAMS[entry.slug];
+  const tableParams =
+    verifiedParams && verifiedParams.length > 0
+      ? verifiedParams.map(({ example: _example, ...p }) => p)
+      : content?.params ?? [];
   const apiPanel = content ? (
     <DatasetApiPanel
       locale={locale}
       datasetSlug={entry.slug}
       backendPath={entry.backendPath}
-      params={content.params}
+      params={tableParams}
     />
   ) : undefined;
 
