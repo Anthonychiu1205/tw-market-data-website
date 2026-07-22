@@ -715,6 +715,155 @@ export const answerPages: readonly AnswerPageEntry[] = [
     ],
     status: "published",
   },
+
+  // Wave L5c flagship (EN). Real numbers are the F+1 price_move_context dry-run (266,097 candidate rows).
+  // The dataset DDL is NOT APPLIED yet, so the article introduces the concept + evidence and is honest
+  // that the dataset is coming — no fabricated live query.
+  {
+    slug: "introducing-price-move-context-cards",
+    locale: "en",
+    question: "Introducing Price-Move Context Cards for Taiwan Stocks",
+    metaTitle: "Price-Move Context Cards for Taiwan Stocks (era-aware limit flag, excess-vs-market) | TW Market Data",
+    description:
+      "A price-move context card turns a big single-day move in a Taiwan stock into structured context: how big, whether it hit the era's price limit, how much was excess over the market, and whether an official event explains it.",
+    shortAnswer:
+      "A price-move context card is a per-stock, per-day summary of a large price move: its magnitude bucket, an era-aware price-limit flag (±7% before 1 June 2015, ±10% after), how much of the move was excess over the market (TAIEX), and whether an official corporate event explains it. Across a dry run of 266,097 big-move rows, 90.4% had no official event on record — most large single-day moves in Taiwan are not explained by a filing. The dataset is being built; this introduces what it will contain.",
+    sections: [
+      {
+        heading: "What a card answers",
+        bullets: [
+          "How big was the move — a magnitude bucket: 5–7%, 7–9.5%, or ≥9.5% (the ≥9.5% band is the price-limit zone).",
+          "Did it hit the daily price limit — an era-aware flag: ±7% before 1 June 2015, ±10% on/after (method 'approx' until an exact per-day limit table lands).",
+          "How much was excess over the market — the move minus the TAIEX move that day (a −10.23% stock on a −1.78% market is −8.45% excess, not just 'down with the market').",
+          "Was there an official event — a no-official-event flag when no filing/corporate action is on record for that stock-day.",
+        ],
+      },
+      {
+        heading: "The real numbers (dry run over 266,097 rows)",
+        body:
+          "The candidate build over Taiwan history produced 266,097 big-move card rows. The magnitude split: 5–7% moves were 43.9% (116,915), 7–9.5% were 11.8% (31,339), and ≥9.5% (limit zone) were 17.6% (46,903). A further 26.7% (70,940) were 'relative-only' hits — under a 5% absolute move but ≥4% excess over the market. By track, 55.7% (148,154) qualified on both the absolute and the relative test.",
+      },
+      {
+        heading: "The headline finding: most big moves have no filing",
+        body:
+          "Of the 266,097 rows, 240,681 (90.4%) carried no official event on record for that stock-day. That is the point of the card: a large move is not the same as a news event. If your pipeline assumes every big move maps to a disclosure, this says otherwise nine times out of ten — the card lets you separate event-driven moves from the far larger set that are flow- or market-driven.",
+      },
+      {
+        heading: "Example cards (from the deterministic sample)",
+        code:
+          "move = -10.23%   market = -1.78%   excess = -8.45%   limit-flag = true    event = none\nmove =  +5.14%   market = +0.24%   excess = +4.90%   limit-flag = false   event = none\nmove =  +7.00%   market = -1.07%   excess = +8.07%   limit-flag = false   event = none",
+      },
+      {
+        heading: "Honest limits (stated, not hidden)",
+        bullets: [
+          "Market-relative is blind on some days: the TAIEX reference is null before 2009-01-05 and on data gaps, so those rows carry only the absolute track — they are honestly marked, not guessed.",
+          "The limit flag is method 'approx': it fires within about 0.5% of the era's band; an exact per-day limit (rounding, special sessions) is a later refinement. A single fixed 9.5% flag would miss every pre-2015 7%-limit hit, so the flag is era-corrected.",
+          "The factor evidence behind it is marked unverified: cross-sectional IC for the candidate factors was measured over a sample of 160 liquid ordinary equities across 7,498 trading days (as of 2024-12-31), and is labelled 'unverified' until an out-of-sample check confirms it — the numbers are shown with that caveat, not as settled alpha.",
+        ],
+      },
+      {
+        heading: "Coming soon",
+        body:
+          "The price-move context dataset is still being built — the numbers above are from a dry run, not a live endpoint. When it lands it will be a derived, insert-only daily dataset you can query per symbol. Until then, the era-aware limit logic it relies on is already usable today through the stock-price-limit-daily dataset.",
+      },
+    ],
+    faq: [
+      {
+        question: "What is a price-move context card?",
+        answer:
+          "A per-stock, per-day summary of a large price move: its magnitude bucket, an era-aware price-limit flag, its excess over the market (TAIEX), and whether an official event explains it.",
+      },
+      {
+        question: "Do most big Taiwan stock moves have a news event behind them?",
+        answer:
+          "No. In a dry run of 266,097 big-move rows, 90.4% had no official event on record for that stock-day — most large single-day moves are flow- or market-driven, not filing-driven.",
+      },
+      {
+        question: "Can I query the price-move context dataset now?",
+        answer:
+          "Not yet — it is being built and the figures here come from a dry run. The era-aware daily price-limit information it uses is already available via the stock-price-limit-daily dataset.",
+      },
+    ],
+    cta: { label: "Price-limit dataset (docs)", href: "/docs/api/market-prices/stock-price-limit-daily" },
+    relatedLinks: [
+      { label: "Price-limit history (7%→10%) explained", href: "/answers/taiwan-stock-price-limit-history-7-to-10-percent" },
+      { label: "Market microstructure timeline", href: "/answers/taiwan-market-microstructure-timeline" },
+    ],
+    status: "published",
+  },
+
+  // Wave L5c flagship — zh-Hant 對照 (renders on /zh-TW only). Same real F+1 dry-run numbers.
+  {
+    slug: "taiwan-price-move-context-cards",
+    locale: "zh-Hant",
+    question: "台股大波動日情境卡:一眼看懂單日大漲大跌的脈絡",
+    metaTitle: "台股大波動日情境卡(era-aware 限價旗、超額報酬)| TW Market Data",
+    description:
+      "大波動情境卡把台股單日大漲大跌整理成結構化脈絡:漲跌幅多大、有沒有觸及當代漲跌幅限制、超越大盤多少、有沒有官方事件可解釋。",
+    shortAnswer:
+      "大波動日情境卡是「每檔股票每交易日」的單日大波動摘要:漲跌幅級距、era-aware 限價旗(2015-06-01 前 ±7%、之後 ±10%)、超越大盤(TAIEX)多少的超額,以及有沒有官方事件可解釋。在 266,097 筆大波動的乾跑資料中,90.4% 查無官方事件——台股多數單日大波動並非由公告驅動。資料集建置中,本文先說明它將包含什麼。",
+    sections: [
+      {
+        heading: "一張卡回答的四件事",
+        bullets: [
+          "波動多大——級距:5–7%、7–9.5%、或 ≥9.5%(≥9.5% 為限價區)。",
+          "有沒有觸及漲跌幅限制——era-aware 限價旗:2015-06-01 前 ±7%、之後 ±10%(方法為 approx,待逐日精確限價表落地)。",
+          "超越大盤多少——漲跌幅減當日 TAIEX 漲跌幅(某股 -10.23%、大盤 -1.78% → 超額 -8.45%,不是「只是跟著大盤跌」)。",
+          "有沒有官方事件——當該股當日查無公告/公司行動時標 no-official-event。",
+        ],
+      },
+      {
+        heading: "真實數字(266,097 筆乾跑)",
+        body:
+          "台股歷史的候選建置產生 266,097 筆大波動卡列。級距分布:5–7% 佔 43.9%(116,915)、7–9.5% 佔 11.8%(31,339)、≥9.5%(限價區)佔 17.6%(46,903)。另有 26.7%(70,940)為「僅相對」命中——絕對漲跌幅未達 5% 但超越大盤 ≥4%。以命中軌道看,55.7%(148,154)同時通過絕對與相對測試。",
+      },
+      {
+        heading: "重點發現:多數大波動沒有公告",
+        body:
+          "266,097 筆中,240,681 筆(90.4%)該股當日查無官方事件。這正是情境卡的用意:大波動不等於新聞事件。若你的流程假設每次大波動都對應一則揭露,這份資料說十次有九次並非如此——情境卡讓你把「事件驅動」與數量大得多的「資金/大盤驅動」波動分開。",
+      },
+      {
+        heading: "範例卡(取自決定性抽樣)",
+        code:
+          "漲跌 = -10.23%   大盤 = -1.78%   超額 = -8.45%   限價旗 = true    事件 = 無\n漲跌 =  +5.14%   大盤 = +0.24%   超額 = +4.90%   限價旗 = false   事件 = 無\n漲跌 =  +7.00%   大盤 = -1.07%   超額 = +8.07%   限價旗 = false   事件 = 無",
+      },
+      {
+        heading: "誠實的限制(明講不藏)",
+        bullets: [
+          "相對大盤在部分日子是盲的:TAIEX 參考在 2009-01-05 前與資料缺口為 null,那些列僅有絕對軌道——照實標記,不猜。",
+          "限價旗方法為 approx:在當代限價 ±0.5% 內觸發;逐日精確限價(進位、特殊盤)為後續細修。單一固定 9.5% 旗會漏掉 2015 前所有 7% 限價命中,故此旗為 era 校正。",
+          "背後的因子證據標為 unverified:候選因子的橫斷面 IC 在 160 檔流動性普通股、7,498 個交易日(截至 2024-12-31)的樣本上量測,在 out-of-sample 複核前標為「未驗證」——數字附此註呈現,非既定 alpha。",
+        ],
+      },
+      {
+        heading: "即將開放",
+        body:
+          "大波動情境卡資料集仍在建置——上方數字來自乾跑,非即時端點。上線後會是可依代碼查詢的推導型、僅新增每日資料集。在那之前,它所依賴的 era-aware 逐日漲跌幅限制,今天已可透過 stock-price-limit-daily 資料集取得。",
+      },
+    ],
+    faq: [
+      {
+        question: "什麼是大波動日情境卡?",
+        answer:
+          "每檔股票每交易日的單日大波動摘要:漲跌幅級距、era-aware 限價旗、超越大盤(TAIEX)的超額,以及有沒有官方事件可解釋。",
+      },
+      {
+        question: "台股多數大波動背後都有新聞事件嗎?",
+        answer:
+          "不是。266,097 筆大波動乾跑資料中,90.4% 該股當日查無官方事件——多數單日大波動由資金/大盤驅動,而非公告驅動。",
+      },
+      {
+        question: "現在可以查詢大波動情境卡資料集嗎?",
+        answer:
+          "還不行——建置中,本文數字來自乾跑。它所用的 era-aware 逐日漲跌幅限制,已可透過 stock-price-limit-daily 資料集取得。",
+      },
+    ],
+    cta: { label: "漲跌停價資料集(文件)", href: "/docs/api/market-prices/stock-price-limit-daily" },
+    relatedLinks: [
+      { label: "漲跌幅制度沿革(7%→10%)", href: "/answers/taiwan-stock-price-limit-history-7-to-10-percent" },
+    ],
+    status: "published",
+  },
 ];
 
 export function getAnswerPageBySlug(slug: string): AnswerPageEntry | undefined {
