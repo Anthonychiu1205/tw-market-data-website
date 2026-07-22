@@ -85,14 +85,16 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "margin-short-enhanced": { domain: "capital-flows", zh: "增強融資融券", en: "Enhanced margin & short", agency: "TWSE", grade: "derived" },
   "total-margin-short": { domain: "capital-flows", zh: "整體融資融券匯總", en: "Total margin & short", agency: "TWSE", grade: "reference" },
   "securities-lending": { domain: "capital-flows", zh: "借券資料", en: "Securities lending", agency: "TWSE", grade: "verified" },
-  "chip-flows": { domain: "capital-flows", zh: "籌碼流向", en: "Chip flows", agency: "TWSE", grade: "derived" },
+  // chip-flows: serving 未達真服務標準(repoint 修復中)→ 暫降 reference(灰),不主張已驗證;修好後升回。
+  "chip-flows": { domain: "capital-flows", zh: "籌碼流向", en: "Chip flows", agency: "TWSE", grade: "reference" },
   "ownership-distribution": { domain: "capital-flows", zh: "股權分散", en: "Ownership distribution", agency: "TDCC", grade: "verified" },
   "insider-director-holdings": { domain: "capital-flows", zh: "董監持股", en: "Insider & director holdings", agency: "MOPS", grade: "verified" },
   "day-trading-suspension": { domain: "capital-flows", zh: "現股當沖暫停", en: "Day-trading suspension", agency: "TWSE", grade: "reference" },
 
   // ── Companies & Events ──
   "events": { domain: "companies-events", zh: "事件日曆", en: "Events calendar", agency: "TWSE / TPEx / MOPS", grade: "verified" },
-  "corporate-actions": { domain: "companies-events", zh: "公司行動", en: "Corporate actions", agency: "TWSE / TPEx / MOPS", grade: "verified" },
+  // corporate-actions: serving 未達真服務標準(repoint 修復中)→ 暫降 reference(灰),移除假「已驗證」綠章;修好後升回。
+  "corporate-actions": { domain: "companies-events", zh: "公司行動", en: "Corporate actions", agency: "TWSE / TPEx / MOPS", grade: "reference" },
   "corporate-actions-enhanced": { domain: "companies-events", zh: "增強公司行動", en: "Enhanced corporate actions", agency: "TWSE / TPEx / MOPS", grade: "derived" },
   "stock-split-par-value-events": { domain: "companies-events", zh: "股票分割／面額事件", en: "Stock split & par-value events", agency: "TWSE / TPEx", grade: "verified" },
   "stock-delisting-lifecycle": { domain: "companies-events", zh: "下市生命週期", en: "Delisting lifecycle", agency: "TWSE / TPEx", grade: "reference" },
