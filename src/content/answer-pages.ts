@@ -498,12 +498,28 @@ export const answerPages: readonly AnswerPageEntry[] = [
         code:
           'curl "https://api.twmarketdata.com/v2/datasets/stock-price-limit-daily?symbol=2330" \\\n  -H "X-API-Key: sk_live_..."',
       },
+      {
+        heading: "The price limit is not the only regime change in Taiwan history",
+        body:
+          "The 2015 price-limit widening is the cleanest structural break because it is a single, well-documented date. But a Taiwan backtest that spans a decade or more also crosses other microstructure changes. Where the exact date is well-established we state it; where it is still being confirmed against the official announcement we say so rather than invent a date — a wrong date is worse than an acknowledged 'approximately'.",
+        bullets: [
+          "Intraday matching — continuous matching (2020): the exchange moved from call-auction matching (a match roughly every few seconds) to continuous matching on 23 March 2020. This changes intraday microstructure (fills, spreads, tick-by-tick behaviour), not the daily percentage move, so it matters for intraday models more than for end-of-day factors. We are still confirming the exact final call-auction session against the official announcement.",
+          "Day (same-day) trading — enabled in stages around 2014: same-day 'buy-first' trading opened first and 'sell-first' was broadened a few months later, with the day-trade securities-transaction-tax later halved (to 0.15%). The exact effective dates are still being verified, so treat 'around 2014' and 'around 2017' as approximate — they mark a rise in turnover and short-horizon activity, which shifts volume and volatility baselines.",
+          "Settlement cycle — T+2 (well established): Taiwan equities settle two business days after the trade. This is stable and affects when cash and delivery land, not the price series itself.",
+          "Tick size — tiers changed over time: the minimum price increment varies by price band and has been revised. We do not publish the exact revision dates yet rather than guess; if your model depends on tick granularity in a specific era, verify against the official trading-rules document.",
+        ],
+      },
     ],
     faq: [
       {
         question: "When did Taiwan change its stock price limit from 7% to 10%?",
         answer:
           "On 1 June 2015. The Taiwan Stock Exchange and the Taipei Exchange widened the daily price limit for listed stocks from ±7% to ±10% on that trading day, and ±10% remains the limit today.",
+      },
+      {
+        question: "What other Taiwan market regime changes should a backtest account for?",
+        answer:
+          "Besides the 2015 price-limit change, the move to continuous intraday matching on 23 March 2020 (intraday microstructure), the staged opening of same-day day trading around 2014, and the standing T+2 settlement cycle. Exact dates for the day-trading changes are still being confirmed, so treat them as approximate rather than precise.",
       },
       {
         question: "Does the ±10% limit apply to every Taiwan security?",
