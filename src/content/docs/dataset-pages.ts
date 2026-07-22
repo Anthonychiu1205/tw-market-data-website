@@ -905,38 +905,39 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
     params: STANDARD_PARAMS,
   },
 
-  // price-enhanced — derived, TWSE / TPEx; computed change/amplitude/VWAP on top of official daily price.
+  // price-enhanced — ex-rights/dividend price adjustment factors from the official TWSE TWT49U report
+  // (NOT OHLCV). Real fields captured by owner: event_type / factor / pre_event_close / reference_price.
   "price-enhanced": {
     slug: "price-enhanced",
     description: {
-      en: "Daily price with the common derived fields pre-computed — change, percent change, intraday amplitude and turnover-weighted average price on top of the official quote.",
-      zh: "增強價格欄位,已預先計算常用衍生值——在官方報價之上加上漲跌、漲跌幅、振幅與成交均價。",
+      en: "Ex-rights / ex-dividend price adjustment factors per stock per event — the back-adjustment factor and reference price from the official TWSE TWT49U calculation.",
+      zh: "每檔股票每次除權除息事件的價格調整因子（還原因子）與參考價,來源為官方 TWSE TWT49U 除權除息計算結果。",
     },
     overview: [
       {
-        en: "price-enhanced is a derived dataset: it starts from the official TWSE / TPEx daily quote and adds the change, percent-change, amplitude and volume-weighted price fields an agent would otherwise compute itself. The lineage block points back to the underlying official price so the base values stay auditable.",
-        zh: "price-enhanced 為推導型資料集:以官方 TWSE／TPEx 日報價為基礎,附上原本需自行計算的漲跌、漲跌幅、振幅與成交均價欄位。lineage 欄位回指底層官方價格,基準數值可稽核。",
+        en: "price-enhanced returns one row per stock per ex-rights / ex-dividend event with the adjustment factor used to back-adjust historical prices, the pre-event close and the reference price, sourced from the official TWSE TWT49U report. It is the correct source for building a continuous back-adjusted price series — it is not an OHLCV or derived-indicator dataset.",
+        zh: "price-enhanced 每檔股票每次除權除息事件回傳一列,含用於還原歷史價格的調整因子、除權息前收盤價與參考價,來源為官方 TWSE TWT49U。這是建立連續還原股價序列的正確來源——並非 OHLCV 或衍生指標資料集。",
       },
     ],
     fields: [
       { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
-      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
-      { name: "close", type: "number", desc: { en: "Closing price (from the official quote).", zh: "收盤價（取自官方報價）。" } },
-      { name: "change", type: "number", desc: { en: "Change vs previous close (derived).", zh: "較前一日收盤之漲跌（推導）。" } },
-      { name: "change_pct", type: "number", desc: { en: "Percent change vs previous close (derived).", zh: "較前一日收盤之漲跌幅（推導）。" } },
-      { name: "vwap", type: "number", desc: { en: "Turnover / volume weighted average price (derived).", zh: "成交金額／成交量之成交均價（推導）。" } },
-      { name: "source_role", type: "string", desc: { en: "Canonical source role (derived_price_enhanced).", zh: "正規來源角色（derived_price_enhanced）。" } },
+      { name: "date", type: "string", desc: { en: "Ex-rights / ex-dividend date.", zh: "除權息日。" } },
+      { name: "event_type", type: "string", desc: { en: "Corporate-action type (ex-dividend / ex-rights / both).", zh: "事件類型（除息／除權／除權息）。" } },
+      { name: "factor", type: "number", desc: { en: "Price adjustment (back-adjustment) factor for the event.", zh: "該事件的價格調整（還原）因子。" } },
+      { name: "pre_event_close", type: "number", desc: { en: "Closing price the trading day before the event.", zh: "除權息前一交易日收盤價。" } },
+      { name: "reference_price", type: "number", desc: { en: "Ex-rights / ex-dividend reference price.", zh: "除權息參考價。" } },
+      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_twt49u).", zh: "正規來源角色（official_twse_twt49u）。" } },
     ],
     coverage: null,
     coverageTodo: {
-      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the fields are computed from the official TWSE / TPEx daily price (present through the latest trading day). No counts are shown rather than fabricated ones.",
-      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;欄位由官方 TWSE／TPEx 日價格計算(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
+      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE TWT49U ex-rights/dividend report (present through the latest event). No counts are shown rather than fabricated ones.",
+      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照;來源為官方 TWSE TWT49U 除權除息報表（涵蓋至最新事件）。寧不顯示計數也不捏造。",
     },
     params: STANDARD_PARAMS,
     notes: [
       {
-        en: "Derived, not disclosed: every enhanced field is computed from the official daily quote, so it inherits any upstream correction to that quote.",
-        zh: "推導而非官方揭露:每個增強欄位皆由官方日報價計算,會承接該報價的任何上游更正。",
+        en: "Use the factor to back-adjust a historical price series across the event; the reference price is the official ex-rights/dividend reference, not a traded price.",
+        zh: "以 factor 對跨事件的歷史股價序列做還原;reference_price 為官方除權息參考價,非實際成交價。",
       },
     ],
   },
