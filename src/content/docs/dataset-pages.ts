@@ -1441,40 +1441,10 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
     ],
   },
 
-  // capital-flows / institutional-ownership — verified, TWSE per-stock foreign/institutional holdings → TODO coverage
-  "institutional-ownership": {
-    slug: "institutional-ownership",
-    description: {
-      en: "Foreign and institutional holdings per listed stock per trading day, sourced from the official TWSE shareholding disclosure — shares held and holding ratio.",
-      zh: "每檔上市股票每交易日的外資與法人持股，來源為官方 TWSE 持股揭露——持有股數與持股比率。",
-    },
-    overview: [
-      {
-        en: "institutional-ownership returns one row per stock per trading day with the foreign and institutional shares held and the corresponding holding ratio, sourced from the official TWSE shareholding disclosure. Each row carries its source role so the holding figure is traceable to the official report rather than taken on trust.",
-        zh: "institutional-ownership 以官方 TWSE 持股揭露為源，每交易日每檔股票回傳一列，含外資與法人持有股數及對應持股比率；每列附來源角色，持股數字可回溯官方報表而非僅憑信任。",
-      },
-    ],
-    fields: [
-      { name: "symbol", type: "string", desc: { en: "Ticker.", zh: "股票代碼。" } },
-      { name: "date", type: "string", desc: { en: "Trading date.", zh: "交易日。" } },
-      { name: "foreign_shares_held", type: "number", desc: { en: "Shares held by foreign investors.", zh: "外資持有股數。" } },
-      { name: "foreign_holding_ratio", type: "number", desc: { en: "Foreign holding as a ratio of issued shares (0-1).", zh: "外資持股占已發行股數比率（0-1）。" } },
-      { name: "issued_shares", type: "number", desc: { en: "Total issued shares for the ratio base.", zh: "作為比率分母的已發行股數。" } },
-      { name: "source_role", type: "string", desc: { en: "Canonical source role (official_twse_shareholding).", zh: "正規來源角色（official_twse_shareholding）。" } },
-    ],
-    coverage: null,
-    coverageTodo: {
-      en: "TODO — exact row / symbol counts and the coverage window are pending a measured snapshot; the source is the official TWSE shareholding disclosure (present through the latest trading day). No counts are shown rather than fabricated ones.",
-      zh: "TODO — 精確列數／標的數與涵蓋視窗待量測快照；來源為官方 TWSE 持股揭露（涵蓋至最新交易日）。寧不顯示計數也不捏造。",
-    },
-    params: STANDARD_PARAMS,
-    notes: [
-      {
-        en: "The holding ratio uses issued shares as the base; the disclosed figure is a settlement-dated snapshot, so it lags trades by the standard settlement cycle.",
-        zh: "持股比率以已發行股數為分母；揭露數字為交割日基準的快照，故較成交落後一個標準交割週期。",
-      },
-    ],
-  },
+  // institutional-ownership REMOVED (owner ruling): the dataset returns 0 rows in practice and has no
+  // live backing table, so its "verified" grade + foreign_shares_held / foreign_holding_ratio fields
+  // were an unbacked claim. Delisted from the catalog + billing SSOT; its old URL now renders the honest
+  // retired note in retired-redirects.ts (→ ownership-distribution; foreign-holding is roadmap).
 
   // capital-flows / margin-short — reference (private-beta / preview), TWSE margin & short balances → TODO coverage
   "margin-short": {

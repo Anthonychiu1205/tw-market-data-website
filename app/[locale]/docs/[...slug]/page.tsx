@@ -155,13 +155,22 @@ export default async function DocsDynamicPage({ params }: DocsDynamicPageProps) 
         pageLabel={en ? "Retired" : "已下架"}
       >
         <ul className="mt-6 list-disc space-y-2 pl-5 text-slate-700">
-          {retired.alternatives.map((alt) => (
-            <li key={alt.href}>
-              <Link href={alt.href} className="underline underline-offset-2 hover:text-slate-950">
+          {retired.alternatives.map((alt) =>
+            alt.roadmap ? (
+              <li key={alt.href} className="text-slate-500">
                 {en ? alt.en : alt.zh}
-              </Link>
-            </li>
-          ))}
+                <span className="ml-2 rounded border border-amber-500/40 px-1.5 py-0.5 text-xs text-amber-700">
+                  {en ? "Roadmap" : "規劃中"}
+                </span>
+              </li>
+            ) : (
+              <li key={alt.href}>
+                <Link href={alt.href} className="underline underline-offset-2 hover:text-slate-950">
+                  {en ? alt.en : alt.zh}
+                </Link>
+              </li>
+            ),
+          )}
         </ul>
       </DocsPageShell>
     );
