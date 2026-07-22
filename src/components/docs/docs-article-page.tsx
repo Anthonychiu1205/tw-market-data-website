@@ -1,5 +1,6 @@
 import { DocsPageShell } from "@/src/components/docs/docs-page-shell";
 import { CodeBlock } from "@/src/components/docs/code-block";
+import { CoverageOverviewTable } from "@/src/components/docs/coverage-overview-table";
 import { SectionHeading } from "@/src/components/docs/section-heading";
 import { getArticlePage, type ArticlePage } from "@/src/content/docs/article-pages";
 import { findDocsSidebarLink } from "@/src/content/docs-sidebar";
@@ -57,10 +58,19 @@ export function DocsArticlePage({ slugParts, locale }: { slugParts: string[]; lo
     const subtitle = bi(article.subtitle, locale);
     const pageLabel = bi(article.pageLabel, locale);
     const href = `/docs/${slugParts.join("/")}`;
-    const tocSections = article.sections.map((s) => ({ id: s.id, label: bi(s.heading, locale) }));
+    // The coverage-overview page appends the full per-dataset table (owner ruling: "一表到底").
+    const isCoverageOverview = article.slug === "coverage-overview";
+    const fullTableToc = isCoverageOverview ? [{ id: "full-table", label: en ? "All datasets" : "全部資料集" }] : [];
+    const tocSections = [...article.sections.map((s) => ({ id: s.id, label: bi(s.heading, locale) })), ...fullTableToc];
     return (
       <DocsPageShell page={{ title, subtitle, href, sections: tocSections }} tocSections={tocSections} pageLabel={pageLabel}>
         <ArticleBody article={article} locale={locale} />
+        {isCoverageOverview ? (
+          <div className="mt-12">
+            <SectionHeading id="full-table">{en ? "All datasets" : "全部資料集"}</SectionHeading>
+            <CoverageOverviewTable locale={locale} />
+          </div>
+        ) : null}
       </DocsPageShell>
     );
   }
