@@ -34,7 +34,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const l = (locale === "en" ? "en" : "zh-TW") as AppLocale;
   const isEn = l === "en";
   return {
-    title: isEn ? "Taiwan Stock Market Data API Infrastructure" : "台股資料 API 基礎設施",
+    title: isEn
+      ? "Taiwan Stock Market Data API — TWSE/TPEx Historical Data & Institutional Flows"
+      : "台股市場資料 API — TWSE/TPEx 歷史行情與三大法人籌碼",
     description: isEn
       ? "TWSE-first verified Taiwan financial data API — verified datasets with explicitly labeled coverage windows, sources, and limitations."
       : "TWSE-first verified Taiwan financial data API，提供已驗證資料集並明確標示 coverage window、來源與限制。",

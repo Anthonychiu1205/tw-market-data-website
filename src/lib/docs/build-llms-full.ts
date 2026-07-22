@@ -4,6 +4,8 @@ import { authenticationLlmsMarkdown, quickStartLlmsMarkdown } from "@/src/conten
 import { siteConfig } from "@/src/config/site";
 import { datasetCoverageTable, getNonListableDatasets } from "@/src/content/coverage-facts";
 import { datasetSeoEntries } from "@/src/content/datasets";
+import { DOCS_DATASET_CATALOG } from "@/src/content/docs/dataset-catalog";
+import { VERIFIED_DATASET_PARAMS } from "@/src/content/docs/verified-request-examples";
 import { docsPages, type ApiReferenceContent, type DocsPageEntry } from "@/src/content/docs-pages";
 
 // /llms-full.txt is generated from the docs SOURCE (docs-pages.ts + the guide components +
@@ -83,6 +85,14 @@ export function buildLlmsFullText(): string {
     "",
     "## 資料集目錄 (Dataset catalog)",
     ...datasetSeoEntries.map((d) => `- ${d.name} (${d.slug}) — ${d.shortDescription} · docs: ${d.docsHref}`),
+    "",
+    // Full 61-dataset index from the storefront catalog SSOT (same source as /llms.txt), so the two
+    // agent indexes stay in sync. grade + production_ready mirror what the site actually sells.
+    `## 完整資料集清單 (All ${DOCS_DATASET_CATALOG.length} datasets — grade + production_ready)`,
+    ...DOCS_DATASET_CATALOG.map(
+      (d) =>
+        `- ${d.slug}; grade=${d.grade}; production_ready=${VERIFIED_DATASET_PARAMS[d.slug] ? "true" : "false"}; route=/v2/datasets/${d.slug}`,
+    ),
     "",
     // Honest gap disclosure: datasets we deliberately do NOT offer. Without this an agent can only
     // infer absence, and may assume we serve e.g. filing full text. Driven by the coverage-facts SSOT.
