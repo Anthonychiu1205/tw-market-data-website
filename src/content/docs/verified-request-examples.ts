@@ -1,10 +1,8 @@
 // VERIFIED per-dataset request params — vendored, single source for BOTH the param table and
 // the request examples so they can never disagree. Authority (owner ruling): backend /openapi.json
 // drives param name / required / type for the endpoints it documents; the verified fixture drives the
-// required-filter NAMES (index_code / rate_code / series_id / country / dataset_name, ticker vs symbol)
-// for endpoints openapi does not cover. Date params use the openapi names start_date/end_date — the
-// fixture's date_from is IGNORED by the backend (start_date returns the correctly-filtered range; the
-// per-endpoint names can differ, so this is generated per endpoint). Do NOT hand-edit; re-vendor from
+// required-filter NAMES for endpoints openapi does not cover. Date params use start_date/end_date (the
+// fixture's date_from is ignored by the backend). Do NOT hand-edit; re-vendor from
 // _handoffs/verified_slug_example_params.json × backend /openapi.json.
 import type { ParamDoc } from "@/src/content/docs/dataset-pages";
 
@@ -24,7 +22,7 @@ export const VERIFIED_DATASET_PARAMS: Record<string, VerifiedParam[]> = {
     { name: "limit", required: false, type: "integer", example: "5", desc: { en: "Maximum rows to return.", zh: "回傳筆數上限。" } },
   ],
   "market-prices": [
-    { name: "symbol", required: false, type: "string", example: "2330", desc: { en: "Ticker, e.g. 2330.", zh: "股票代碼，例如 2330。" } },
+    { name: "ticker", required: false, type: "string", example: "2330", desc: { en: "Ticker, e.g. 2330.", zh: "股票代碼，例如 2330。" } },
     { name: "start_date", required: false, type: "string", example: "2026-06-01", desc: { en: "Start of the query range (YYYY-MM-DD).", zh: "查詢起始日期（YYYY-MM-DD）。" } },
     { name: "end_date", required: false, type: "string", example: "2026-07-15", desc: { en: "End of the query range (YYYY-MM-DD).", zh: "查詢結束日期（YYYY-MM-DD）。" } },
   ],
@@ -99,4 +97,10 @@ export const VERIFIED_DATASET_PARAMS: Record<string, VerifiedParam[]> = {
   "taifex-options-settlement-price": [],
   "taifex-institutional-flow": [],
   "convertible-bonds": [],
+  "price-enhanced": [
+    { name: "ticker", required: false, type: "string", example: "2330", desc: { en: "Ticker, e.g. 2330.", zh: "股票代碼，例如 2330。" } },
+  ],
+  "financial-metrics": [
+    { name: "ticker", required: false, type: "string", example: "2330", desc: { en: "Ticker, e.g. 2330.", zh: "股票代碼，例如 2330。" } },
+  ],
 };

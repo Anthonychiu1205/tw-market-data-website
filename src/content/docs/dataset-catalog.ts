@@ -53,7 +53,8 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "twse-daily-price": { domain: "market-prices", zh: "TWSE 日線價格", en: "TWSE daily prices", agency: "TWSE", grade: "verified" },
   "tpex-daily-price": { domain: "market-prices", zh: "TPEx 日線價格", en: "TPEx daily prices", agency: "TPEx", grade: "verified" },
   "market-prices": { domain: "market-prices", zh: "整合日線價格", en: "Unified daily prices", agency: "TWSE / TPEx", grade: "verified" },
-  "price-enhanced": { domain: "market-prices", zh: "增強價格欄位", en: "Enhanced price fields", agency: "TWSE / TPEx", grade: "derived" },
+  // price-enhanced: owner 驗證 serving(direct-fn 對 prod 實測回列、repoint deployed)→ 升 verified。
+  "price-enhanced": { domain: "market-prices", zh: "增強價格欄位", en: "Enhanced price fields", agency: "TWSE / TPEx", grade: "verified" },
   "adjusted-prices": { domain: "market-prices", zh: "還原價格", en: "Adjusted prices", agency: "TWSE / TPEx", grade: "derived" },
   "market-index": { domain: "market-prices", zh: "市場指數", en: "Market indices", agency: "TWSE", grade: "verified" },
   "index-data": { domain: "market-prices", zh: "指數資料", en: "Index data", agency: "TWSE", grade: "verified" },
@@ -74,7 +75,8 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "balance-sheet": { domain: "financials", zh: "資產負債表", en: "Balance sheet", agency: "MOPS", grade: "verified" },
   "cash-flow-statement": { domain: "financials", zh: "現金流量表", en: "Cash-flow statement", agency: "MOPS", grade: "verified" },
   "financials": { domain: "financials", zh: "財報三表合併", en: "Financial statements (combined)", agency: "MOPS", grade: "verified" },
-  "financial-metrics": { domain: "financials", zh: "財務比率指標", en: "Financial metrics", agency: "MOPS", grade: "derived" },
+  // financial-metrics: owner 驗證 serving(direct-fn 對 prod 實測回列、repoint deployed)→ 升 verified。
+  "financial-metrics": { domain: "financials", zh: "財務比率指標", en: "Financial metrics", agency: "MOPS", grade: "verified" },
   "dividends": { domain: "financials", zh: "股利政策", en: "Dividend policy", agency: "MOPS", grade: "verified" },
 
   // ── Capital Flows ──
