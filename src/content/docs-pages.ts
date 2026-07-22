@@ -2761,7 +2761,8 @@ const comingSoonTopics: Array<{ title: string; href: string; topicId: string }> 
   { title: "持有結構", href: "/docs/coming-soon/ownership-distribution", topicId: "ownership_distribution" },
   { title: "主題資產流向", href: "/docs/coming-soon/etf-flow", topicId: "etf_flow" },
   { title: "分類擴充", href: "/docs/coming-soon/index-constituents", topicId: "index_constituents" },
-  { title: "資金持有結構", href: "/docs/coming-soon/institutional-ownership", topicId: "institutional_ownership" },
+  // institutional_ownership REMOVED — the dataset is delisted (0 rows, no backing table), not "coming
+  // soon"; its old docs URL renders the honest retired note (see retired-redirects.ts).
   { title: "固定收益擴充", href: "/docs/coming-soon/convertible-bonds", topicId: "convertible_bonds" },
   { title: "進階市場資料", href: "/docs/coming-soon/derivatives-market", topicId: "derivatives_market" },
   { title: "產業關聯資料", href: "/docs/coming-soon/supply-chain", topicId: "supply_chain" },
