@@ -6,8 +6,9 @@ import { Link } from "@/src/i18n/navigation";
 import { CodeBlock } from "@/src/components/docs/code-block";
 import { SectionHeading } from "@/src/components/docs/section-heading";
 
-// Tools / MCP docs page content (/docs/tools-and-mcp). Content is transcribed from the published
-// source (docs_tools-and-mcp_上線版_20260716.md) — MCP is LIVE, framed as "已上線", not preview.
+// Tools / MCP docs page content (/docs/tools-and-mcp). The MCP server is LIVE and connectable
+// (verified 2026-07-22: v1.28.1, 4 tools) but BETA, not GA — framed as beta here (owner ruling),
+// neither "已上線 GA" (overclaim) nor "skeleton" (false: it works). The REST API is the stable path.
 // Every code block uses CodeBlock (built-in copy). The "連上" client picker uses native <details>
 // accordions so it needs no client JS. Only clients that actually connect over the X-API-Key header
 // are listed; OAuth-only clients (ChatGPT / Claude web/desktop) are explicitly marked "開發中".
@@ -91,6 +92,12 @@ export async function ToolsMcpContent() {
             ? ". Which to use depends on your scenario: REST for writing code, MCP if you want an AI assistant to query Taiwan stocks directly."
             : "。用哪個看你的場景:寫程式用 REST,想讓 AI 助理直接會查台股用 MCP。"}
         </blockquote>
+        <div className="rounded-md border border-amber-500/40 bg-amber-50/50 px-4 py-3 text-sm leading-7 text-amber-900">
+          <strong>{en ? "MCP is in beta" : "MCP 為 beta 階段"}</strong>
+          {en
+            ? " — the server (v1.28.1, tools: list_datasets / describe_dataset / query_dataset / find_related) is live and connectable, but not yet GA. The REST API is the stable path. Details below may change before general availability."
+            : "——伺服器(v1.28.1,工具:list_datasets／describe_dataset／query_dataset／find_related)已上線可連,但尚非正式版(GA)。穩定路徑請用 REST API;下方細節在 GA 前可能調整。"}
+        </div>
       </header>
 
       {/* 先拿一把 API key */}
@@ -119,8 +126,8 @@ export async function ToolsMcpContent() {
       <section className="space-y-4 border-b border-slate-200 pb-8">
         <SectionHeading id="mcp">
           {en
-            ? "A. Use MCP so your AI can query Taiwan stocks in one click (easiest)"
-            : "A. 用 MCP 讓你的 AI 一鍵會查台股(最簡單)"}
+            ? "A. Use MCP so your AI can query Taiwan stocks in one click (beta)"
+            : "A. 用 MCP 讓你的 AI 一鍵會查台股(beta)"}
         </SectionHeading>
         <p className="text-sm leading-7 text-slate-600">
           {en ? "Once MCP is connected, your AI assistant " : "MCP 上線後,你的 AI 助理會"}
