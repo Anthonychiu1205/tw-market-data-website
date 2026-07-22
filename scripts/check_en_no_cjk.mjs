@@ -26,7 +26,10 @@ const EN_DIR = join(root, ".next", "server", "app", "en");
 const CJK = /[㐀-䶿一-鿿぀-ヿ　-〿！-｠￠-￦]/;
 const CJK_RUN = /[㐀-䶿一-鿿぀-ヿ　-〿！-｠￠-￦]+/g;
 
-const WHITELIST = ["中文"]; // language switcher label — intentional on /en
+// Intentional CJK on /en: the 中文 language-switcher label, and the Taiwan-market terms used as
+// bilingual anchors in the EN AEO articles (the 三大法人 explainer) — these help both English and
+// Chinese search intent and are deliberate, not leaks.
+const WHITELIST = ["中文", "三大法人", "外資", "投信", "自營商"];
 
 // A page that renders the §2.5 "coming soon" notice is DELIBERATELY untranslated (docs / not-yet-en
 // blog): it tells the reader in English that the body is Chinese-only. Those are the accepted interim

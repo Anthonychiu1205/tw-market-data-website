@@ -447,6 +447,176 @@ export const answerPages: readonly AnswerPageEntry[] = [
     ],
     status: "published",
   },
+
+  // EN content-moat article A — Taiwan price-limit regime (7%→10%, 2015-06-01). Facts are the confirmed
+  // regime transition; no fabricated confidence values.
+  {
+    slug: "taiwan-stock-price-limit-history-7-to-10-percent",
+    locale: "en",
+    question: "Taiwan Stock Price Limit History: The 7%→10% Rule Change and Why It Matters for Backtesting",
+    metaTitle: "Taiwan Stock Price Limit History (7% → 10%, June 2015) | TW Market Data",
+    description:
+      "On 1 June 2015 Taiwan widened its daily stock price limit from ±7% to ±10%. Here is what changed, and why any backtest that spans that date has a structural break to handle.",
+    shortAnswer:
+      "On 1 June 2015 the Taiwan Stock Exchange (TWSE) and the Taipei Exchange (TPEx) widened the daily price limit for listed stocks from ±7% to ±10%. That one date splits Taiwan's price history into two regimes: before it a stock could move at most 7% in a day, after it 10%. Any backtest, factor or risk model that runs across that boundary and assumes a single fixed limit will mislabel limit-hit days on the wrong side of the change.",
+    sections: [
+      {
+        heading: "The rule change: ±7% to ±10% on 1 June 2015",
+        body:
+          "For years the daily price limit on Taiwan-listed common stocks was ±7% of the previous close. On 1 June 2015 the regulator widened it to ±10%, the level still in force today. The change was market-wide and took effect on a specific trading day, so it is a clean cut-over, not a gradual drift — the same stock that could gap at most 7% on 29 May 2015 could gap 10% the very next trading session. Because the boundary is a single date rather than a moving threshold, it is easy to handle correctly once you know it is there, and easy to get silently wrong if you don't.",
+      },
+      {
+        heading: "Why Taiwan caps daily moves in the first place",
+        body:
+          "Daily price limits are a circuit-breaker-style mechanism: they slow disorderly moves, give investors an overnight cooling-off period, and reduce the risk of a single-day cascade. Taiwan, Korea and several other Asian markets have used them for decades, which is why Taiwan price series behave differently from an uncapped market like the US. The trade-off is exactly the data problem below — a limit protects the market but truncates the very returns a quant model is trying to measure. The 2015 widening from 7% to 10% was a deliberate loosening of that trade-off: give prices more room to find their level intraday, at the cost of larger permitted single-day swings.",
+      },
+      {
+        heading: "Why a daily price limit changes your data at all",
+        body:
+          "A price limit is a hard cap on the daily return. When a stock hits limit-up or limit-down, the printed close is the capped price, not a free-market clearing price — buyers or sellers are queued at the limit and cannot trade through it. That has two consequences for data: the observed return is truncated (you never see the 12% day the stock 'wanted' to make), and volume on a locked limit day is thin and non-representative because most of the queued interest never executes. Widening the cap from 7% to 10% moves where that truncation happens, so the shape of the daily-return distribution is not stationary across 2015-06-01.",
+      },
+      {
+        heading: "What a limit day looks like in the data",
+        body:
+          "On a locked limit-up day you typically see the open, high, low and close all pinned at (or very near) the limit price, a large bid queue that never clears, and thin realized volume relative to the interest. The next session often gaps again in the same direction as the backlog unwinds. If your pipeline treats those pinned prints as ordinary observations — feeding them into a volatility estimate, a mean-reversion signal, or a fill assumption in a backtest — you will over-trust prices that were never tradable. The practical fix is to flag limit-hit days explicitly (close at or beyond the applicable limit) and decide, per strategy, whether to skip, cap, or specially handle them.",
+      },
+      {
+        heading: "What the change does to a backtest",
+        body:
+          "The break sits at 2015-06-01. A momentum or reversal factor built on daily returns sees a different return distribution before and after: the tails are wider post-2015, and the frequency of limit-locked days drops because moves that would have hit the old 7% cap now have room to run to 10%. If you hardcode ±10% across all history, every pre-2015 day that closed between 7% and 10% is impossible in reality — a sign your limit logic is wrong for that era.",
+        bullets: [
+          "Volatility-scaled strategies: your realized-vol estimate has a regime shift at 2015-06-01; a fixed lookback that straddles the date blends two distributions.",
+          "Limit-hit signals (e.g. 'bought the day after a limit-up'): the base rate of limit events is not comparable across the boundary.",
+          "Gap and overnight-return models: the maximum possible gap is era-dependent — 7% before, 10% after.",
+          "Safest handling: either split the sample at 2015-06-01, or tag each day with the limit that actually applied and normalize moves against it.",
+        ],
+      },
+      {
+        heading: "How to get the applicable limit per day",
+        body:
+          "Rather than hardcode a limit, read the per-day price-limit context from the stock-price-limit-daily dataset. It gives the limit-up and limit-down price for each stock each trading day, so you can tag whether a close hit the limit and normalize the move against the limit that was actually in force — which automatically handles the 2015 change and any per-instrument exceptions.",
+        code:
+          'curl "https://api.twmarketdata.com/v2/datasets/stock-price-limit-daily?symbol=2330" \\\n  -H "X-API-Key: sk_live_..."',
+      },
+    ],
+    faq: [
+      {
+        question: "When did Taiwan change its stock price limit from 7% to 10%?",
+        answer:
+          "On 1 June 2015. The Taiwan Stock Exchange and the Taipei Exchange widened the daily price limit for listed stocks from ±7% to ±10% on that trading day, and ±10% remains the limit today.",
+      },
+      {
+        question: "Does the ±10% limit apply to every Taiwan security?",
+        answer:
+          "No. The ±10% limit applies to ordinary listed stocks. Certain instruments and the first trading days of new listings have historically had different limits or none at all, so read the per-day limit field rather than assuming a single number for every symbol.",
+      },
+      {
+        question: "How do I stop the 2015 change from biasing my backtest?",
+        answer:
+          "Either split your sample at 2015-06-01 and fit each regime separately, or tag every day with the limit that actually applied (from stock-price-limit-daily) and normalize returns against it so limit-hit days are comparable across the boundary.",
+      },
+    ],
+    cta: { label: "Price-limit dataset (docs)", href: "/docs/api/market-prices/stock-price-limit-daily" },
+    relatedLinks: [
+      { label: "Unified daily prices", href: "/docs/api/market-prices/market-prices" },
+      { label: "Three institutional investors explained", href: "/answers/taiwan-three-institutional-investors-explained" },
+    ],
+    status: "published",
+  },
+
+  // EN content-moat article B — the 三大法人, with a REAL institutional-flow capture (2330, 2026-07-17)
+  // and honest boundaries. CJK anchor terms (三大法人/外資/投信/自營商) are intentional and whitelisted.
+  {
+    slug: "taiwan-three-institutional-investors-explained",
+    locale: "en",
+    question: "Taiwan's Three Institutional Investors (三大法人) Explained for Quant Developers",
+    metaTitle: "Taiwan's Three Institutional Investors (三大法人) — Developer Data Guide | TW Market Data",
+    description:
+      "Foreign investors, investment trusts and dealers — the 三大法人. What each group is, when the TWSE T86 report publishes, and how to read the daily net buy/sell with a real API example.",
+    shortAnswer:
+      "Taiwan's three institutional investors — foreign investors (外資), investment trusts (投信) and dealers (自營商), collectively the 三大法人 — are the institutional buy/sell aggregates the Taiwan Stock Exchange publishes after every trading day in its T86 report. For each listed stock you get the net shares each group bought or sold that day. It is a clean, official daily signal — but it is aggregate net flow, not order-level data.",
+    sections: [
+      {
+        heading: "Who the three are",
+        bullets: [
+          "Foreign investors (外資) — offshore institutions trading Taiwan equities (the largest and most watched group). Their net buying/selling is treated as a directional signal by most desks.",
+          "Investment trusts (投信) — domestic Taiwanese fund houses (mutual funds). Often used as a 'local smart money' read, especially near quarter-end window-dressing.",
+          "Dealers (自營商) — the proprietary and hedging books of brokerage firms. The smallest of the three and the noisiest, since a chunk is hedging rather than a directional view.",
+        ],
+      },
+      {
+        heading: "When and how the data is published",
+        body:
+          "The Taiwan Stock Exchange publishes the T86 report after market close on each trading day (typically the same evening). It is one row per stock per trading day — end-of-day, not intraday. There is no live/streaming version of institutional flow; you get the settled daily figure once, after the session. For point-in-time correctness this matters: a signal computed 'as of' a given trading day should only use T86 rows whose publication time is on or before that day, otherwise you are peeking at flow that was not public when your model would have traded. Treat the flow for date D as knowable only after D's close.",
+      },
+      {
+        heading: "How to read it — a real example",
+        body:
+          "Query the institutional-flow dataset by symbol and date range. This is a real request and a real response row for TSMC (2330) on 2026-07-17:",
+        code:
+          'curl "https://api.twmarketdata.com/v2/datasets/institutional-flow?symbol=2330&start_date=2026-06-01&end_date=2026-07-15" \\\n  -H "X-API-Key: sk_live_..."\n\n# One real response row (2330, 2026-07-17):\n# {\n#   "symbol": "2330",\n#   "date": "2026-07-17",\n#   "foreign_net_buy_sell": -44183964.0,\n#   "investment_trust_net_buy_sell": 1488520.0,\n#   "dealer_net_buy_sell": 2759348.0,\n#   "total_institutional_net_buy_sell": -39936096.0,\n#   "source_role": "official_twse_t86"\n# }',
+      },
+      {
+        heading: "The fields you actually use",
+        bullets: [
+          "foreign_net_buy_sell — foreign investors' net shares (buy minus sell). Negative means net selling; on 2026-07-17 it was -44,183,964 for 2330.",
+          "investment_trust_net_buy_sell / dealer_net_buy_sell — the same net-share figure for trusts (+1,488,520) and dealers (+2,759,348).",
+          "total_institutional_net_buy_sell — the three summed (-39,936,096). source_role traces every row to the official TWSE T86 report.",
+          "Common use: count consecutive days of foreign net buying, or rank stocks by trust net flow near quarter-end.",
+        ],
+      },
+      {
+        heading: "Build a signal: a foreign-buying streak",
+        body:
+          "A simple, widely-used read is the foreign net-buying streak — how many consecutive trading days foreign investors have been net buyers of a stock. Sort the rows by date and count the run of positive foreign_net_buy_sell values; a break resets it. Because the flow for each day is only public after that day's close, the streak as of today uses data through the prior session, which keeps it point-in-time safe.",
+        code:
+          'import requests\n\nrows = requests.get(\n    "https://api.twmarketdata.com/v2/datasets/institutional-flow",\n    params={"symbol": "2330", "start_date": "2026-06-01", "end_date": "2026-07-15"},\n    headers={"X-API-Key": "sk_live_..."},\n).json()["rows"]\n\nstreak = 0\nfor r in sorted(rows, key=lambda x: x["date"]):\n    streak = streak + 1 if r["foreign_net_buy_sell"] > 0 else 0\nprint("current foreign net-buying streak:", streak, "days")',
+      },
+      {
+        heading: "How the three are used in practice",
+        body:
+          "The three groups are read differently. Foreign flow is the headline directional signal because foreigns hold the largest share of the free float in the large-cap names; a sustained foreign net-buy run in a stock like 2330 is watched closely. Investment-trust flow is read as domestic conviction and gets extra attention near quarter- and year-end, when funds are widely believed to shade positions for reporting (window dressing). Dealer flow is the noisiest of the three: a meaningful part is hedging against warrants and other book positions rather than a directional bet, so it is usually used as a secondary confirmation, not a standalone signal.",
+      },
+      {
+        heading: "What this data does NOT tell you",
+        body:
+          "The T86 figures are aggregate daily net flow, and it is worth being explicit about the gaps rather than letting a model assume them (these permanent limits are declared in /meta/boundaries):",
+        bullets: [
+          "No order flow — you see one net number per group per day, not individual orders, order sizes, or intraday timing. Don't reconstruct microstructure from it.",
+          "No foreign cost basis — the figure is net shares, not the price foreign investors paid or their average holding cost. You cannot infer their P&L or entry price from this dataset.",
+          "It is net, not gross: a small net number can hide large offsetting buys and sells.",
+        ],
+      },
+    ],
+    faq: [
+      {
+        question: "What are the 三大法人?",
+        answer:
+          "The three institutional investor groups the TWSE reports daily: foreign investors (外資), investment trusts (投信) and dealers (自營商). Together they are Taiwan's most-watched institutional flow signal.",
+      },
+      {
+        question: "When is the institutional flow data available each day?",
+        answer:
+          "After market close on each trading day, from the TWSE T86 report — typically the same evening. It is an end-of-day figure; there is no intraday or streaming version.",
+      },
+      {
+        question: "Is this order flow or tick data?",
+        answer:
+          "No. It is the aggregate daily net buy/sell (in shares) for each group, one row per stock per day — not order-level data, order sizes, or intraday timing.",
+      },
+      {
+        question: "Can I get foreign investors' average cost or entry price?",
+        answer:
+          "No. The dataset reports net shares bought or sold, not prices paid. You cannot infer foreign investors' cost basis or P&L from it — that gap is declared in /meta/boundaries.",
+      },
+    ],
+    cta: { label: "Institutional-flow dataset (docs)", href: "/docs/api/capital-flows/institutional-flow" },
+    relatedLinks: [
+      { label: "Institutional investor flow data", href: "/answers/taiwan-institutional-investor-flow-data" },
+      { label: "Price-limit history (7%→10%)", href: "/answers/taiwan-stock-price-limit-history-7-to-10-percent" },
+    ],
+    status: "published",
+  },
 ];
 
 export function getAnswerPageBySlug(slug: string): AnswerPageEntry | undefined {
