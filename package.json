@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/check_pricing_matrix.mjs && node scripts/generate_openapi.mjs && node scripts/release_migrate.mjs && prisma generate && next build && node scripts/check_en_no_cjk.mjs && node scripts/check_demo_en_cjk.mjs",
+    "build": "node scripts/check_pricing_matrix.mjs && node scripts/generate_openapi.mjs && node scripts/release_migrate.mjs && prisma generate && next build && node scripts/check_en_no_cjk.mjs && node scripts/check_demo_en_cjk.mjs && node scripts/check_zh_not_english.mjs",
     "migrate:deploy": "prisma migrate deploy",
     "migrate:status": "prisma migrate status",
     "start": "next start",
@@ -27,7 +27,7 @@
     "generate:openapi": "node scripts/generate_openapi.mjs",
     "check:openapi": "node scripts/generate_openapi.mjs --check",
     "check:en-no-cjk": "node scripts/check_en_no_cjk.mjs",
-    "check:demo-en-cjk": "node scripts/check_demo_en_cjk.mjs"
+    "check:demo-en-cjk": "node scripts/check_demo_en_cjk.mjs && node scripts/check_zh_not_english.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",

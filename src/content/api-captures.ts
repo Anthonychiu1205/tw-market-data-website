@@ -8331,7 +8331,889 @@ export const API_CAPTURES: Record<string, ApiCapture> = {
   }
 }`,
   },
-};
+
+  // ── Wave L building datasets — real sample responses (from WAVE_L_REGISTRY.json sample_response) ──
+  "price-move-context": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "price-move-context",
+  "row_count": 3,
+  "data": [
+    {
+      "symbol": "2383",
+      "trade_date": "2024-03-08",
+      "market": "TWSE",
+      "pct_change": -0.06130268,
+      "market_pct_change": 0.0047,
+      "relative_to_market": -0.06600268,
+      "magnitude_bucket": "5-7",
+      "hit_track": "both",
+      "limit_move_flag": false,
+      "limit_move_flag_method": "approx",
+      "inst_net": -1674540.0,
+      "margin_delta": 149.0,
+      "day_trade_ratio": 0.43539399,
+      "threshold_version": "pmc_v1"
+    },
+    {
+      "symbol": "2383",
+      "trade_date": "2024-03-12",
+      "market": "TWSE",
+      "pct_change": -0.09274194,
+      "market_pct_change": 0.0096,
+      "relative_to_market": -0.10234194,
+      "magnitude_bucket": "7-9.5",
+      "hit_track": "both",
+      "limit_move_flag": false,
+      "limit_move_flag_method": "approx",
+      "inst_net": -3745311.0,
+      "margin_delta": 211.0,
+      "day_trade_ratio": 0.30444614,
+      "threshold_version": "pmc_v1"
+    },
+    {
+      "symbol": "2383",
+      "trade_date": "2024-03-13",
+      "market": "TWSE",
+      "pct_change": -0.1,
+      "market_pct_change": 0.0007,
+      "relative_to_market": -0.1007,
+      "magnitude_bucket": ">=9.5",
+      "hit_track": "both",
+      "limit_move_flag": true,
+      "limit_move_flag_method": "approx",
+      "inst_net": -3728133.0,
+      "margin_delta": 1090.0,
+      "day_trade_ratio": 0.34246184,
+      "threshold_version": "pmc_v1"
+    }
+  ]
+}`,
+  },
+  "futures-daily-context": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "futures-daily-context",
+  "row_count": 3,
+  "data": [
+    {
+      "contract": "TX",
+      "trade_date": "2026-07-16",
+      "near_contract_month": "202608",
+      "futures_close": 45700.0,
+      "spot_close": 45624.98,
+      "basis": 75.02,
+      "basis_pct": 0.1644,
+      "open_interest": 106669.0,
+      "oi_delta": 95677.0,
+      "days_to_settlement": 34,
+      "put_call_ratio": null
+    },
+    {
+      "contract": "TX",
+      "trade_date": "2026-07-15",
+      "near_contract_month": "202607",
+      "futures_close": 45830.0,
+      "spot_close": 45631.59,
+      "basis": 198.41,
+      "basis_pct": 0.4348,
+      "open_interest": 10992.0,
+      "oi_delta": -9070.0,
+      "days_to_settlement": 0,
+      "put_call_ratio": null
+    },
+    {
+      "contract": "TX",
+      "trade_date": "2026-07-14",
+      "near_contract_month": "202607",
+      "futures_close": 44815.0,
+      "spot_close": 44737.95,
+      "basis": 77.05,
+      "basis_pct": 0.1722,
+      "open_interest": 20062.0,
+      "oi_delta": -33067.0,
+      "days_to_settlement": 1,
+      "put_call_ratio": null
+    }
+  ]
+}`,
+  },
+  "limit-events": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "limit-events",
+  "row_count": 3,
+  "data": [
+    {
+      "symbol": "1303",
+      "market": "TWSE",
+      "trade_date": "2026-07-01",
+      "direction": "up",
+      "prev_close": 166.5,
+      "close": 183.0,
+      "pct_change": 0.0990990990990991,
+      "limit_pct_applied": 0.1,
+      "locked_at_close": true,
+      "method": "approx",
+      "limit_confirmed": null
+    },
+    {
+      "symbol": "1435",
+      "market": "TWSE",
+      "trade_date": "2026-07-01",
+      "direction": "up",
+      "prev_close": 27.35,
+      "close": 30.05,
+      "pct_change": 0.0987202925045704,
+      "limit_pct_applied": 0.1,
+      "locked_at_close": true,
+      "method": "approx",
+      "limit_confirmed": null
+    },
+    {
+      "symbol": "1447",
+      "market": "TWSE",
+      "trade_date": "2026-07-01",
+      "direction": "up",
+      "prev_close": 7.52,
+      "close": 8.27,
+      "pct_change": 0.0997340425531915,
+      "limit_pct_applied": 0.1,
+      "locked_at_close": true,
+      "method": "approx",
+      "limit_confirmed": null
+    }
+  ]
+}`,
+  },
+  "shareholding-concentration": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "shareholding-concentration",
+  "row_count": 1,
+  "data": [
+    {
+      "ticker": "1101",
+      "market": "TWSE",
+      "report_date": "2026-05-29",
+      "holder_count_total": 523992,
+      "large_holder_count_400": 933,
+      "large_holder_pct_400": 0.5477,
+      "large_holder_pct_1000": 0.5056,
+      "retail_pct": 0.0027
+    }
+  ]
+}`,
+  },
+  "competitor-fx": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "competitor-fx",
+  "row_count": 3,
+  "data": [
+    {
+      "rate_date": "2026-06-30",
+      "usd_jpy": 162.26,
+      "usd_krw": 1553.5,
+      "usd_cny": 6.7852,
+      "usd_twd": 31.837,
+      "jpy_per_twd": 5.096586,
+      "krw_per_twd": 48.795427,
+      "cny_per_twd": 0.213123
+    },
+    {
+      "rate_date": "2026-06-29",
+      "usd_jpy": 161.82,
+      "usd_krw": 1543.7,
+      "usd_cny": 6.7929,
+      "usd_twd": 31.845,
+      "jpy_per_twd": 5.081488,
+      "krw_per_twd": 48.475428,
+      "cny_per_twd": 0.213311
+    },
+    {
+      "rate_date": "2026-06-26",
+      "usd_jpy": 161.62,
+      "usd_krw": 1540.4,
+      "usd_cny": 6.7997,
+      "usd_twd": 31.86,
+      "jpy_per_twd": 5.072819,
+      "krw_per_twd": 48.349027,
+      "cny_per_twd": 0.213424
+    }
+  ]
+}`,
+  },
+  "export-orders-monthly": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "export-orders-monthly",
+  "row_count": 3,
+  "data": [
+    {
+      "dataset_key": "export_orders_monthly",
+      "period_month": "2026-06-01",
+      "stat_item": "外銷訂單金額_美元",
+      "item_code": "電子產品",
+      "item_name": "電子產品",
+      "value": 40501.0,
+      "unit": "百萬美元",
+      "attribution": "經濟部統計處"
+    },
+    {
+      "dataset_key": "export_orders_monthly",
+      "period_month": "2026-05-01",
+      "stat_item": "外銷訂單金額_美元",
+      "item_code": "電子產品",
+      "item_name": "電子產品",
+      "value": 37242.0,
+      "unit": "百萬美元",
+      "attribution": "經濟部統計處"
+    },
+    {
+      "dataset_key": "export_orders_monthly",
+      "period_month": "2026-04-01",
+      "stat_item": "外銷訂單金額_美元",
+      "item_code": "電子產品",
+      "item_name": "電子產品",
+      "value": 35939.0,
+      "unit": "百萬美元",
+      "attribution": "經濟部統計處"
+    }
+  ]
+}`,
+    en: `{
+  "dataset_id": "export-orders-monthly",
+  "row_count": 3,
+  "data": [
+    {
+      "dataset_key": "export_orders_monthly",
+      "period_month": "2026-06-01",
+      "stat_item": "<Chinese value - see the zh page>",
+      "item_code": "<Chinese value - see the zh page>",
+      "item_name": "<Chinese value - see the zh page>",
+      "value": 40501.0,
+      "unit": "<Chinese value - see the zh page>",
+      "attribution": "<Chinese value - see the zh page>"
+    },
+    {
+      "dataset_key": "export_orders_monthly",
+      "period_month": "2026-05-01",
+      "stat_item": "<Chinese value - see the zh page>",
+      "item_code": "<Chinese value - see the zh page>",
+      "item_name": "<Chinese value - see the zh page>",
+      "value": 37242.0,
+      "unit": "<Chinese value - see the zh page>",
+      "attribution": "<Chinese value - see the zh page>"
+    },
+    {
+      "dataset_key": "export_orders_monthly",
+      "period_month": "2026-04-01",
+      "stat_item": "<Chinese value - see the zh page>",
+      "item_code": "<Chinese value - see the zh page>",
+      "item_name": "<Chinese value - see the zh page>",
+      "value": 35939.0,
+      "unit": "<Chinese value - see the zh page>",
+      "attribution": "<Chinese value - see the zh page>"
+    }
+  ]
+}`,
+  },
+  "production-value-index-monthly": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "production-value-index-monthly",
+  "row_count": 3,
+  "data": [
+    {
+      "dataset_key": "production_value_index_monthly",
+      "period_month": "2026-05-01",
+      "stat_item": "生產價值指數",
+      "item_code": "C",
+      "item_name": "製造業",
+      "value": 116.42,
+      "unit": "110年=100",
+      "attribution": "經濟部統計處"
+    },
+    {
+      "dataset_key": "production_value_index_monthly",
+      "period_month": "2026-04-01",
+      "stat_item": "生產價值指數",
+      "item_code": "C",
+      "item_name": "製造業",
+      "value": 110.94,
+      "unit": "110年=100",
+      "attribution": "經濟部統計處"
+    },
+    {
+      "dataset_key": "production_value_index_monthly",
+      "period_month": "2026-03-01",
+      "stat_item": "生產價值指數",
+      "item_code": "C",
+      "item_name": "製造業",
+      "value": 118.01,
+      "unit": "110年=100",
+      "attribution": "經濟部統計處"
+    }
+  ]
+}`,
+    en: `{
+  "dataset_id": "production-value-index-monthly",
+  "row_count": 3,
+  "data": [
+    {
+      "dataset_key": "production_value_index_monthly",
+      "period_month": "2026-05-01",
+      "stat_item": "<Chinese value - see the zh page>",
+      "item_code": "C",
+      "item_name": "<Chinese value - see the zh page>",
+      "value": 116.42,
+      "unit": "<Chinese value - see the zh page>",
+      "attribution": "<Chinese value - see the zh page>"
+    },
+    {
+      "dataset_key": "production_value_index_monthly",
+      "period_month": "2026-04-01",
+      "stat_item": "<Chinese value - see the zh page>",
+      "item_code": "C",
+      "item_name": "<Chinese value - see the zh page>",
+      "value": 110.94,
+      "unit": "<Chinese value - see the zh page>",
+      "attribution": "<Chinese value - see the zh page>"
+    },
+    {
+      "dataset_key": "production_value_index_monthly",
+      "period_month": "2026-03-01",
+      "stat_item": "<Chinese value - see the zh page>",
+      "item_code": "C",
+      "item_name": "<Chinese value - see the zh page>",
+      "value": 118.01,
+      "unit": "<Chinese value - see the zh page>",
+      "attribution": "<Chinese value - see the zh page>"
+    }
+  ]
+}`,
+  },
+  "customs-trade-monthly": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "customs-trade-monthly",
+  "row_count": 3,
+  "data": [
+    {
+      "dataset_key": "customs_trade_monthly",
+      "period_month": "2026-05-01",
+      "stat_item": "海關進出口",
+      "item_code": "export_total",
+      "item_name": "出口總值",
+      "value": 2475945706.0,
+      "unit": "新臺幣千元",
+      "attribution": "財政部關務署"
+    },
+    {
+      "dataset_key": "customs_trade_monthly",
+      "period_month": "2026-04-01",
+      "stat_item": "海關進出口",
+      "item_code": "export_total",
+      "item_name": "出口總值",
+      "value": 2153671224.0,
+      "unit": "新臺幣千元",
+      "attribution": "財政部關務署"
+    },
+    {
+      "dataset_key": "customs_trade_monthly",
+      "period_month": "2026-03-01",
+      "stat_item": "海關進出口",
+      "item_code": "export_total",
+      "item_name": "出口總值",
+      "value": 2536953556.0,
+      "unit": "新臺幣千元",
+      "attribution": "財政部關務署"
+    }
+  ]
+}`,
+    en: `{
+  "dataset_id": "customs-trade-monthly",
+  "row_count": 3,
+  "data": [
+    {
+      "dataset_key": "customs_trade_monthly",
+      "period_month": "2026-05-01",
+      "stat_item": "<Chinese value - see the zh page>",
+      "item_code": "export_total",
+      "item_name": "<Chinese value - see the zh page>",
+      "value": 2475945706.0,
+      "unit": "<Chinese value - see the zh page>",
+      "attribution": "<Chinese value - see the zh page>"
+    },
+    {
+      "dataset_key": "customs_trade_monthly",
+      "period_month": "2026-04-01",
+      "stat_item": "<Chinese value - see the zh page>",
+      "item_code": "export_total",
+      "item_name": "<Chinese value - see the zh page>",
+      "value": 2153671224.0,
+      "unit": "<Chinese value - see the zh page>",
+      "attribution": "<Chinese value - see the zh page>"
+    },
+    {
+      "dataset_key": "customs_trade_monthly",
+      "period_month": "2026-03-01",
+      "stat_item": "<Chinese value - see the zh page>",
+      "item_code": "export_total",
+      "item_name": "<Chinese value - see the zh page>",
+      "value": 2536953556.0,
+      "unit": "<Chinese value - see the zh page>",
+      "attribution": "<Chinese value - see the zh page>"
+    }
+  ]
+}`,
+  },
+  "capital-formation-events": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "capital-formation-events",
+  "row_count": 3,
+  "data": [
+    {
+      "ticker": "1459",
+      "market": "TWSE",
+      "event_date": "2026-08-03",
+      "event_type": "capital_reduction",
+      "event_subtype": null,
+      "announcement_date": null,
+      "effective_date": "2026-08-03",
+      "ratio_value": null
+    },
+    {
+      "ticker": "1304",
+      "market": "TW",
+      "event_date": "2026-07-17",
+      "event_type": "capital_reduction",
+      "event_subtype": "capital_reduction_other",
+      "announcement_date": "2026-07-17",
+      "effective_date": null,
+      "ratio_value": null
+    },
+    {
+      "ticker": "6176",
+      "market": "TW",
+      "event_date": "2026-07-17",
+      "event_type": "capital_reduction",
+      "event_subtype": "cash_reduction",
+      "announcement_date": "2026-07-17",
+      "effective_date": null,
+      "ratio_value": null
+    }
+  ]
+}`,
+  },
+  "industry-chain": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "industry-chain",
+  "row_count": 3,
+  "data": [
+    {
+      "ticker": "2401",
+      "chain_name": "半導體",
+      "node_name": "IP設計/IC設計代工服務",
+      "node_position": null,
+      "market": "TW",
+      "capture_date": "2026-07-02"
+    },
+    {
+      "ticker": "3035",
+      "chain_name": "半導體",
+      "node_name": "IP設計/IC設計代工服務",
+      "node_position": null,
+      "market": "TW",
+      "capture_date": "2026-07-02"
+    },
+    {
+      "ticker": "3443",
+      "chain_name": "半導體",
+      "node_name": "IP設計/IC設計代工服務",
+      "node_position": null,
+      "market": "TW",
+      "capture_date": "2026-07-02"
+    }
+  ]
+}`,
+    en: `{
+  "dataset_id": "industry-chain",
+  "row_count": 3,
+  "data": [
+    {
+      "ticker": "2401",
+      "chain_name": "<Chinese value - see the zh page>",
+      "node_name": "<Chinese value - see the zh page>",
+      "node_position": null,
+      "market": "TW",
+      "capture_date": "2026-07-02"
+    },
+    {
+      "ticker": "3035",
+      "chain_name": "<Chinese value - see the zh page>",
+      "node_name": "<Chinese value - see the zh page>",
+      "node_position": null,
+      "market": "TW",
+      "capture_date": "2026-07-02"
+    },
+    {
+      "ticker": "3443",
+      "chain_name": "<Chinese value - see the zh page>",
+      "node_name": "<Chinese value - see the zh page>",
+      "node_position": null,
+      "market": "TW",
+      "capture_date": "2026-07-02"
+    }
+  ]
+}`,
+  },
+  "institutional-positioning": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "institutional-positioning",
+  "row_count": 3,
+  "data": [
+    {
+      "ticker": "2330",
+      "market": "TWSE",
+      "trade_date": "2026-07-16",
+      "foreign_net_buy": -4214736.0,
+      "investment_trust_net_buy": 528374.0,
+      "dealer_net_buy": 1061380.0,
+      "institutional_net_buy_total": -2624982.0,
+      "foreign_pct": null,
+      "foreign_pct_percentile": null,
+      "buy_streak": 0,
+      "sell_streak": 6
+    },
+    {
+      "ticker": "2330",
+      "market": "TWSE",
+      "trade_date": "2026-07-15",
+      "foreign_net_buy": -3427281.0,
+      "investment_trust_net_buy": -596431.0,
+      "dealer_net_buy": 455841.0,
+      "institutional_net_buy_total": -3567871.0,
+      "foreign_pct": null,
+      "foreign_pct_percentile": null,
+      "buy_streak": 0,
+      "sell_streak": 5
+    },
+    {
+      "ticker": "2330",
+      "market": "TWSE",
+      "trade_date": "2026-07-14",
+      "foreign_net_buy": -12416209.0,
+      "investment_trust_net_buy": 1841069.0,
+      "dealer_net_buy": 2569779.0,
+      "institutional_net_buy_total": -8005361.0,
+      "foreign_pct": 69.54,
+      "foreign_pct_percentile": 0.105088,
+      "buy_streak": 0,
+      "sell_streak": 4
+    }
+  ]
+}`,
+  },
+  "major-event-taxonomy": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "major-event-taxonomy",
+  "row_count": 3,
+  "data": [
+    {
+      "ticker": "6176",
+      "event_date": "2026-07-17",
+      "event_time": "16:33:29",
+      "subject": "公告本公司辦理現金減資完成實收資本額變更登記",
+      "market": "TW",
+      "event_class": "減資",
+      "confidence": 0.95
+    },
+    {
+      "ticker": "8277",
+      "event_date": "2026-07-17",
+      "event_time": "15:35:08",
+      "subject": "公告本公司董事長訂定減資基準日、減資換股基準日\r\n及減資換股作業計劃書等相關事宜",
+      "market": "TW",
+      "event_class": "減資",
+      "confidence": 0.95
+    },
+    {
+      "ticker": "1304",
+      "event_date": "2026-07-17",
+      "event_time": "16:26:36",
+      "subject": "代重要子公司聯聚國際投資股份有限公司\r\n公告減資變更登記完成",
+      "market": "TW",
+      "event_class": "減資",
+      "confidence": 0.95
+    }
+  ]
+}`,
+    en: `{
+  "dataset_id": "major-event-taxonomy",
+  "row_count": 3,
+  "data": [
+    {
+      "ticker": "6176",
+      "event_date": "2026-07-17",
+      "event_time": "16:33:29",
+      "subject": "<Chinese value - see the zh page>",
+      "market": "TW",
+      "event_class": "<Chinese value - see the zh page>",
+      "confidence": 0.95
+    },
+    {
+      "ticker": "8277",
+      "event_date": "2026-07-17",
+      "event_time": "15:35:08",
+      "subject": "<Chinese value - see the zh page>",
+      "market": "TW",
+      "event_class": "<Chinese value - see the zh page>",
+      "confidence": 0.95
+    },
+    {
+      "ticker": "1304",
+      "event_date": "2026-07-17",
+      "event_time": "16:26:36",
+      "subject": "<Chinese value - see the zh page>",
+      "market": "TW",
+      "event_class": "<Chinese value - see the zh page>",
+      "confidence": 0.95
+    }
+  ]
+}`,
+  },
+  "factor-library": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "factor-library",
+  "row_count": 3,
+  "data": [
+    {
+      "ticker": "2330",
+      "trade_date": "2026-05-08",
+      "factor_name": "mom_return_1m_z",
+      "factor_value": 0.36200502,
+      "factor_family": "momentum",
+      "formula_version": "factor_library_v1.0.0",
+      "as_of_source_date": null
+    },
+    {
+      "ticker": "2330",
+      "trade_date": "2026-05-08",
+      "factor_name": "mom_return_3m_z",
+      "factor_value": 0.47261153,
+      "factor_family": "momentum",
+      "formula_version": "factor_library_v1.0.0",
+      "as_of_source_date": null
+    },
+    {
+      "ticker": "2330",
+      "trade_date": "2026-05-08",
+      "factor_name": "mom_return_6m_z",
+      "factor_value": 0.54743423,
+      "factor_family": "momentum",
+      "formula_version": "factor_library_v1.0.0",
+      "as_of_source_date": null
+    }
+  ]
+}`,
+  },
+  "factor-returns": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "factor-returns",
+  "row_count": 3,
+  "data": [
+    {
+      "factor_name": "dividend_yield_z",
+      "trade_date": "2026-05-08",
+      "horizon": "1m",
+      "decile_spread_return": -0.02889607,
+      "top_decile_return": 0.00038349,
+      "bottom_decile_return": 0.02927956,
+      "n_universe": 645,
+      "return_basis": "adj_close_hfq",
+      "forward_end_date": "2026-06-08"
+    },
+    {
+      "factor_name": "dividend_yield_z",
+      "trade_date": "2026-05-11",
+      "horizon": "1m",
+      "decile_spread_return": -0.02100226,
+      "top_decile_return": 0.01405615,
+      "bottom_decile_return": 0.03505842,
+      "n_universe": 646,
+      "return_basis": "adj_close_hfq",
+      "forward_end_date": "2026-06-09"
+    },
+    {
+      "factor_name": "dividend_yield_z",
+      "trade_date": "2026-05-12",
+      "horizon": "1m",
+      "decile_spread_return": 0.03417932,
+      "top_decile_return": 0.02408166,
+      "bottom_decile_return": -0.01009766,
+      "n_universe": 802,
+      "return_basis": "adj_close_hfq",
+      "forward_end_date": "2026-06-10"
+    }
+  ]
+}`,
+  },
+  "lending-utilization": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "lending-utilization",
+  "row_count": 3,
+  "data": [
+    {
+      "ticker": "2330",
+      "market": "TWSE",
+      "trade_date": "2026-07-17",
+      "lending_balance": 263251000.0,
+      "shares_issued": null,
+      "utilisation_pct": null,
+      "utilisation_pctile": null
+    },
+    {
+      "ticker": "2330",
+      "market": "TWSE",
+      "trade_date": "2026-07-16",
+      "lending_balance": 263097000.0,
+      "shares_issued": null,
+      "utilisation_pct": null,
+      "utilisation_pctile": null
+    },
+    {
+      "ticker": "2330",
+      "market": "TWSE",
+      "trade_date": "2026-07-15",
+      "lending_balance": 262443000.0,
+      "shares_issued": null,
+      "utilisation_pct": null,
+      "utilisation_pctile": null
+    }
+  ]
+}`,
+  },
+  "margin-system-stats": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "margin-system-stats",
+  "row_count": 3,
+  "data": [
+    {
+      "market": "TWSE",
+      "trade_date": "2026-07-09",
+      "margin_purchase_balance_total": 9614955.0,
+      "short_sale_balance_total": 203714.0,
+      "short_to_margin_balance_ratio": 0.021187,
+      "margin_net_flow": 30708.0,
+      "maintenance_ratio": null
+    },
+    {
+      "market": "TWSE",
+      "trade_date": "2026-07-08",
+      "margin_purchase_balance_total": 9590605.0,
+      "short_sale_balance_total": 205830.0,
+      "short_to_margin_balance_ratio": 0.021462,
+      "margin_net_flow": 66630.0,
+      "maintenance_ratio": null
+    },
+    {
+      "market": "TWSE",
+      "trade_date": "2026-07-07",
+      "margin_purchase_balance_total": 9531735.0,
+      "short_sale_balance_total": 213844.0,
+      "short_to_margin_balance_ratio": 0.022435,
+      "margin_net_flow": -122958.0,
+      "maintenance_ratio": null
+    }
+  ]
+}`,
+  },
+  "short-restriction-flags": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "short-restriction-flags",
+  "row_count": 3,
+  "data": [
+    {
+      "ticker": "8383",
+      "market": "TPEx",
+      "trade_date": "2026-07-31",
+      "has_short_sale_control": false,
+      "ms_limit_value": null,
+      "sbl_limit_value": null,
+      "disposition_active": true,
+      "restriction_note": null
+    },
+    {
+      "ticker": "6907",
+      "market": "TPEx",
+      "trade_date": "2026-07-30",
+      "has_short_sale_control": false,
+      "ms_limit_value": null,
+      "sbl_limit_value": null,
+      "disposition_active": true,
+      "restriction_note": null
+    },
+    {
+      "ticker": "6173",
+      "market": "TPEx",
+      "trade_date": "2026-07-30",
+      "has_short_sale_control": false,
+      "ms_limit_value": null,
+      "sbl_limit_value": null,
+      "disposition_active": true,
+      "restriction_note": null
+    }
+  ]
+}`,
+  },
+  "trading-rules-reference": {
+    rowsKey: "data",
+    envelopeKeys: ["dataset_id", "row_count", "data"],
+    zh: `{
+  "dataset_id": "trading-rules-reference",
+  "row_count": 1,
+  "data": [
+    {
+      "rule_key": "twse_tpex_daily_price_limit",
+      "effective_date": "2015-06-01",
+      "prior_value": "7%",
+      "new_value": "10%",
+      "market": "TWSE,TPEX",
+      "source_url": "https://www.twse.com.tw/zh/products/rule/limit.html",
+      "source_authority": "TWSE",
+      "rule_domain": "price_limit"
+    }
+  ]
+}`,
+  },};
 
 export function getApiCapture(slug: string): ApiCapture | null {
   return API_CAPTURES[slug] ?? null;
