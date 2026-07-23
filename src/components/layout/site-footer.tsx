@@ -24,10 +24,12 @@ export function SiteFooter({ onContactClick }: SiteFooterProps) {
   const locale = useLocale();
 
   return (
-    // min-height reserves the footer's rendered space so late font swap / link reflow / client mount
-    // cannot grow it and shift the page (CLS). Sized to the two-line disclaimer + link row on desktop.
+    // The footer is the CLS *victim*, not the cause: the homepage used to suspend on its top-level data
+    // fetches, so the route loading.tsx skeleton painted short and then the full page replaced it — the
+    // footer jumped ~4700px. The fix is upstream (page.tsx streams its data regions into height-reserved
+    // Suspense fallbacks; the route skeleton was removed) — so the footer needs no min-height of its own.
     <footer className="border-t border-slate-200 bg-slate-50">
-      <Container className="flex min-h-[112px] flex-col items-center justify-center gap-3 py-6 sm:min-h-[104px]">
+      <Container className="flex flex-col items-center justify-center gap-3 py-6">
         <p className="text-center text-xs text-slate-500">
           {investmentDisclaimer(locale === "en" ? "en" : "zh-TW")}
         </p>

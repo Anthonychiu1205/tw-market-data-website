@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -71,14 +73,66 @@ const PILLARS = [
   { key: "clearBoundary", metricKey: "clear_boundary", metricFallback: "scoped dataset claims" },
 ] as const;
 
+// Pre-resolved pillar copy (all `t()` text) so the grid can render with plain strings — no translator
+// threading. Only the small metric sub-label comes from the (streamed) coverage API.
+type PillarStatic = { key: string; metricKey: string; metricFallback: string; value: string; label: string; description: string };
+
+// Shared grid markup used by BOTH the streamed real metrics and its fallback, so the block's height is
+// byte-identical either way and only the sub-label text swaps in — zero layout shift.
+function PillarsGrid({ pillars, coverageByKey }: { pillars: PillarStatic[]; coverageByKey: Record<string, string> }) {
+  return (
+    <div className="grid grid-cols-1 gap-y-8 md:grid-cols-4">
+      {pillars.map((pillar, index) => (
+        <div
+          key={pillar.key}
+          className={`md:border-l md:border-slate-200 md:pl-8 ${index === 0 ? "md:border-l-0 md:pl-0" : ""}`}
+        >
+          <p className="text-3xl font-semibold leading-none tracking-tight text-slate-900 sm:text-4xl">{pillar.value}</p>
+          <p className="mt-2 text-base font-semibold text-slate-900">{pillar.label}</p>
+          <p className="mt-1 text-xs font-medium text-slate-500">{coverageByKey[pillar.metricKey] ?? pillar.metricFallback}</p>
+          <p className="mt-2 text-sm text-slate-600">{pillar.description}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// The three data-dependent regions below stream in their own Suspense boundaries so the page shell (hero
+// + all static sections = most of the page height) is server-rendered in the FIRST chunk. The footer
+// therefore sits at its final position from first paint — no whole-page loading.tsx swap, no CLS. Each
+// fallback reserves the region's exact rendered height (getHomepageDemoData is fetch-deduped across the
+// two demo boundaries within a single render, so this is still one network call).
+async function PillarsMetrics({ pillars, locale }: { pillars: PillarStatic[]; locale: string }) {
+  const coverageMetrics = await getHomepageCoverageMetrics(locale);
+  const coverageByKey = Object.fromEntries(coverageMetrics.map((metric) => [metric.key, metric.value])) as Record<string, string>;
+  return <PillarsGrid pillars={pillars} coverageByKey={coverageByKey} />;
+}
+
+async function SourceOfTruthStreamed() {
+  const demoData = await getHomepageDemoData();
+  return <SourceOfTruthSectionDeferred realById={demoData.sourceOfTruth.byId} />;
+}
+
+async function ApiDemoStreamed() {
+  const demoData = await getHomepageDemoData();
+  return <ApiDemoSectionDeferred data={demoData.apiDemo} />;
+}
+
 export default async function HomePage() {
   const t = await getTranslations("home");
   const locale = await getLocale();
-  const coverageMetrics = await getHomepageCoverageMetrics(locale);
-  const coverageByKey = Object.fromEntries(coverageMetrics.map((metric) => [metric.key, metric.value])) as Record<string, string>;
-  // Real values for the demo panels, fetched server-side (daily ISR). Only serialized data crosses to
-  // the client — the service token never leaves this server module (demo-real-data is `server-only`).
-  const demoData = await getHomepageDemoData();
+  // Resolve all pillar copy up front (translations are request-local, not network) so the grid renders
+  // with plain strings. The real coverage metrics and the demo-panel data are NOT awaited here — they
+  // stream into their own Suspense boundaries below, keeping the page shell from suspending (which is
+  // what previously triggered the whole-page loading.tsx skeleton and the footer CLS).
+  const pillarStatic: PillarStatic[] = PILLARS.map((pillar) => ({
+    key: pillar.key,
+    metricKey: pillar.metricKey,
+    metricFallback: pillar.metricFallback,
+    value: t(`pillars.${pillar.key}.value`),
+    label: t(`pillars.${pillar.key}.label`),
+    description: t(`pillars.${pillar.key}.description`),
+  }));
 
   return (
     <>
@@ -125,28 +179,22 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-y-8 md:grid-cols-4">
-            {PILLARS.map((pillar, index) => (
-              <div
-                key={pillar.key}
-                className={`md:border-l md:border-slate-200 md:pl-8 ${index === 0 ? "md:border-l-0 md:pl-0" : ""}`}
-              >
-                <p className="text-3xl font-semibold leading-none tracking-tight text-slate-900 sm:text-4xl">{t(`pillars.${pillar.key}.value`)}</p>
-                <p className="mt-2 text-base font-semibold text-slate-900">{t(`pillars.${pillar.key}.label`)}</p>
-                <p className="mt-1 text-xs font-medium text-slate-500">{coverageByKey[pillar.metricKey] ?? pillar.metricFallback}</p>
-                <p className="mt-2 text-sm text-slate-600">{t(`pillars.${pillar.key}.description`)}</p>
-              </div>
-            ))}
-          </div>
+          <Suspense fallback={<PillarsGrid pillars={pillarStatic} coverageByKey={{}} />}>
+            <PillarsMetrics pillars={pillarStatic} locale={locale} />
+          </Suspense>
         </MarketingContainer>
       </section>
 
       <MarketCoverageShowcase />
       <AgentWorkflowShowcase />
       <AgentDocumentsShowcase />
-      <SourceOfTruthSectionDeferred realById={demoData.sourceOfTruth.byId} />
+      <Suspense fallback={<div className="min-h-[730px]" />}>
+        <SourceOfTruthStreamed />
+      </Suspense>
       <AiAgentWorkflowSection />
-      <ApiDemoSectionDeferred data={demoData.apiDemo} />
+      <Suspense fallback={<div className="min-h-[833px]" />}>
+        <ApiDemoStreamed />
+      </Suspense>
 
       <section className="bg-white py-14">
         <MarketingContainer>

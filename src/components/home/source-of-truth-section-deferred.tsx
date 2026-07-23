@@ -51,5 +51,5 @@ export function SourceOfTruthSectionDeferred({ realById }: { realById?: SourceOf
     return () => observer.disconnect();
   }, [shouldLoad]);
 
-  return <div ref={hostRef}>{shouldLoad ? <SourceOfTruthSection realById={realById} /> : <SourceOfTruthSectionSkeleton />}</div>;
+  return <div ref={hostRef} className="min-h-[730px]">{shouldLoad ? <SourceOfTruthSection realById={realById} /> : <SourceOfTruthSectionSkeleton />}</div>;
 }

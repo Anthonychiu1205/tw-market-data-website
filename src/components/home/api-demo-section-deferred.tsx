@@ -54,5 +54,5 @@ export function ApiDemoSectionDeferred({ data }: { data?: ApiDemoRealData }) {
     return () => observer.disconnect();
   }, [shouldLoad]);
 
-  return <div ref={hostRef}>{shouldLoad ? <ApiDemoSection data={data} /> : <ApiDemoSectionSkeleton />}</div>;
+  return <div ref={hostRef} className="min-h-[833px]">{shouldLoad ? <ApiDemoSection data={data} /> : <ApiDemoSectionSkeleton />}</div>;
 }
