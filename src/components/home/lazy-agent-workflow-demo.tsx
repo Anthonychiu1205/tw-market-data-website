@@ -48,5 +48,5 @@ export function LazyAgentWorkflowDemo({ config }: LazyAgentWorkflowDemoProps) {
     return () => observer.disconnect();
   }, [shouldLoad]);
 
-  return <div ref={hostRef}>{shouldLoad ? <AgentWorkflowDemo config={config} /> : <WorkflowDemoSkeleton />}</div>;
+  return <div ref={hostRef} className="min-h-[530px]">{shouldLoad ? <AgentWorkflowDemo config={config} /> : <WorkflowDemoSkeleton />}</div>;
 }

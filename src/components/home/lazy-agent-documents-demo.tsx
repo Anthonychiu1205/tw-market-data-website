@@ -42,5 +42,5 @@ export function LazyAgentDocumentsDemo() {
     return () => observer.disconnect();
   }, [shouldLoad]);
 
-  return <div ref={hostRef}>{shouldLoad ? <AgentDocumentsDemo /> : <DocumentsDemoSkeleton />}</div>;
+  return <div ref={hostRef} className="min-h-[530px]">{shouldLoad ? <AgentDocumentsDemo /> : <DocumentsDemoSkeleton />}</div>;
 }
