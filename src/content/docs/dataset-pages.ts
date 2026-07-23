@@ -625,6 +625,10 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
         en: "For this macro dataset the symbol param is an indicator code (e.g. gdp_growth), not a stock ticker.",
         zh: "此總經資料集的 symbol 參數為指標代碼（如 gdp_growth），非股票代碼。",
       },
+      {
+        en: "Coverage was recently extended with the US Federal Funds Rate (FEDFUNDS) and the Broad US Dollar Index (DTWEXBGS). The US GDP series (GDP, GDPC1) were recalibrated to billions of USD in July 2026 to match the upstream FRED units.",
+        zh: "涵蓋範圍近期擴充,新增美國聯邦資金利率(FEDFUNDS)與廣義美元指數(DTWEXBGS);美國 GDP 序列(GDP、GDPC1)已於 2026 年 7 月校正為十億美元,對齊上游 FRED 單位。",
+      },
     ],
   },
 
