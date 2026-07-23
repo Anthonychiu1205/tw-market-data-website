@@ -5,6 +5,7 @@ import { getAllBlogPosts } from "@/src/content/blog-posts";
 import { getPublishedAnswerPages } from "@/src/content/answer-pages";
 import { docsPages } from "@/src/content/docs-pages";
 import { datasetSeoEntries } from "@/src/content/datasets";
+import { factsTopics } from "@/src/content/facts";
 import { DOCS_DATASET_CATALOG } from "@/src/content/docs/dataset-catalog";
 import { articleSlugs } from "@/src/content/docs/article-pages";
 import { localizedPath } from "@/src/i18n/seo";
@@ -86,6 +87,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const blogRoutes = getAllBlogPosts().map((post) => `/blog/${post.slug}`);
 
+  // Published /facts/<slug> statistics pages (SSOT: facts.ts `published` flag), so a Facts page enters
+  // the sitemap the moment it goes live — never before (audit-first: unpublished topics are not routes).
+  const factsRoutes = factsTopics.filter((t) => t.published).map((t) => `/facts/${t.slug}`);
+
   // Answer pages are authored per-locale (distinct slugs); each exists in one locale only, so emit
   // each at its own locale prefix (no cross-locale hreflang pair).
   const localeAnswerRows: MetadataRoute.Sitemap = [];
@@ -137,6 +142,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     if (!seen.has(path)) {
       seen.add(path);
       pagePaths.push({ path, changeFrequency: "monthly", priority: 0.7 });
+    }
+  }
+  for (const path of factsRoutes) {
+    if (!seen.has(path)) {
+      seen.add(path);
+      pagePaths.push({ path, changeFrequency: "weekly", priority: 0.7 });
     }
   }
 

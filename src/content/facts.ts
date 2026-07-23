@@ -24,7 +24,7 @@ export const factsTopics: readonly FactsTopic[] = [
       zh: "台股制度變更的人讀時間軸:漲跌幅、當沖、盤中零股與 tick 規則的沿革。",
     },
     coverage: { en: "Updated per rule revision", zh: "隨制度版本更新" },
-    published: false,
+    published: true,
   },
   {
     slug: "seasonality",
