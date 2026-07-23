@@ -2253,6 +2253,416 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       },
     ],
   },
+
+  // ── Wave L building pages (coverage_limits verbatim on zh; en = same facts, CJK term-names stripped) ──
+  // price-move-context — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "price-move-context": {
+    slug: "price-move-context",
+    description: { en: "One row per (symbol, trade_date, market) on days a stock made a large move — firing when |Δ%|≥5% OR its excess over TAIEX ≥4% (sign-independent). Bundles the move, magnitude bucket, an era-aware limit-move flag, same-day corporate/chip context (institutional net, margin delta, day-trade ratio), and any official event on that date. Derived from TWMD normalized prices + TAIEX + official event/dividend/chip tables. Not a forecast, not a recommendation.", zh: "One row per (symbol, trade_date, market) on days a stock made a large move — firing when |Δ%|≥5% OR its excess over TAIEX ≥4% (sign-independent). Bundles the move, magnitude bucket, an era-aware limit-move flag, same-day corporate/chip context (institutional net, margin delta, day-trade ratio), and any official event on that date. Derived from TWMD normalized prices + TAIEX + official event/dividend/chip tables. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "pct_change", type: "ratio", desc: { en: "stock daily return", zh: "stock daily return" } },
+      { name: "market_pct_change", type: "ratio", desc: { en: "TAIEX return; NULL on TAIEX-gap days", zh: "TAIEX return; NULL on TAIEX-gap days" } },
+      { name: "relative_to_market", type: "ratio", desc: { en: "stock−market excess (signed)", zh: "stock−market excess (signed)" } },
+      { name: "magnitude_bucket", type: "enum", desc: { en: "<5 / >=5 / >=9.5 …", zh: "<5 / >=5 / >=9.5 …" } },
+      { name: "hit_track", type: "enum", desc: { en: "absolute / relative / both", zh: "absolute / relative / both" } },
+      { name: "limit_move_flag", type: "bool", desc: { en: "era-approx limit hit", zh: "era-approx limit hit" } },
+      { name: "limit_move_flag_method", type: "enum", desc: { en: "'approx' (v0)", zh: "'approx' (v0)" } },
+      { name: "events", type: "json", desc: { en: "official events on date; [] if none", zh: "official events on date; [] if none" } },
+      { name: "inst_net", type: "shares", desc: { en: "institutional net", zh: "institutional net" } },
+      { name: "margin_delta", type: "lots", desc: { en: "margin balance Δ", zh: "margin balance Δ" } },
+      { name: "day_trade_ratio", type: "ratio", desc: { en: "day-trade share", zh: "day-trade share" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "266,097 rows, 2010-01-04..2026-07-21. coverage_start=2010 (NOT 2004 — pct_change unpopulated before ~2010). ~115 TAIEX-gap trading days (~18k rows, 6.8%) carry market_pct_change=NULL and are relative-blind (absolute track only). limit_move_flag is era-aware (±7% pre-2015-06-01 / ±10% after) with limit_move_flag_method='approx' pending the R-02 exact per-day limit. threshold_version=pmc_v1.", zh: "266,097 rows, 2010-01-04..2026-07-21. coverage_start=2010 (NOT 2004 — pct_change unpopulated before ~2010). ~115 TAIEX-gap trading days (~18k rows, 6.8%) carry market_pct_change=NULL and are relative-blind (absolute track only). limit_move_flag is era-aware (±7% pre-2015-06-01 / ±10% after) with limit_move_flag_method='approx' pending the R-02 exact per-day limit. threshold_version=pmc_v1." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // futures-daily-context — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "futures-daily-context": {
+    slug: "futures-daily-context",
+    description: { en: "Per-contract daily futures context: near-month futures close vs spot index (basis and basis%), open interest and its daily change, days-to-settlement with a settlement flag, three-institution net OI, and put/call ratio. Derived from TAIFEX daily futures + spot index. Not a forecast, not a recommendation.", zh: "Per-contract daily futures context: near-month futures close vs spot index (basis and basis%), open interest and its daily change, days-to-settlement with a settlement flag, three-institution net OI, and put/call ratio. Derived from TAIFEX daily futures + spot index. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "futures_close", type: "index_pts", desc: { en: "", zh: "" } },
+      { name: "spot_close", type: "index_pts", desc: { en: "", zh: "" } },
+      { name: "basis", type: "index_pts", desc: { en: "futures−spot", zh: "futures−spot" } },
+      { name: "basis_pct", type: "ratio", desc: { en: "", zh: "" } },
+      { name: "open_interest", type: "contracts", desc: { en: "", zh: "" } },
+      { name: "oi_delta", type: "contracts", desc: { en: "daily Δ", zh: "daily Δ" } },
+      { name: "days_to_settlement", type: "days", desc: { en: "", zh: "" } },
+      { name: "settlement_flag", type: "bool", desc: { en: "", zh: "" } },
+      { name: "inst_net_oi_foreign", type: "contracts", desc: { en: "NULL pre-2023-07", zh: "NULL pre-2023-07" } },
+      { name: "put_call_ratio", type: "ratio", desc: { en: "NULL where no options data", zh: "NULL where no options data" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "6,923 rows, 1998-07-21..2026-07-16. Three-institution net OI columns (inst_net_oi_*) are only populated where TAIFEX institutional OI exists (free source = 3-year rolling from 2023-07; earlier rows carry NULL inst OI). put_call_ratio populated where options data exists.", zh: "6,923 rows, 1998-07-21..2026-07-16. Three-institution net OI columns (inst_net_oi_*) are only populated where TAIFEX institutional OI exists (free source = 3-year rolling from 2023-07; earlier rows carry NULL inst OI). put_call_ratio populated where options data exists." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // limit-events — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "limit-events": {
+    slug: "limit-events",
+    description: { en: "One row per (symbol, trade_date, direction) where a stock closed locked at its daily price limit. Carries prev_close, close, pct_change, the era limit band applied, whether it locked at close, consecutive-limit count, and volume at the limit. Derived from TWMD normalized prices + the price-limit rule history. Not a forecast, not a recommendation.", zh: "One row per (symbol, trade_date, direction) where a stock closed locked at its daily price limit. Carries prev_close, close, pct_change, the era limit band applied, whether it locked at close, consecutive-limit count, and volume at the limit. Derived from TWMD normalized prices + the price-limit rule history. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "direction", type: "enum", desc: { en: "up / down", zh: "up / down" } },
+      { name: "prev_close", type: "TWD", desc: { en: "not split-adjusted (R-02 pending)", zh: "not split-adjusted (R-02 pending)" } },
+      { name: "close", type: "TWD", desc: { en: "", zh: "" } },
+      { name: "pct_change", type: "ratio", desc: { en: "", zh: "" } },
+      { name: "limit_pct_applied", type: "ratio", desc: { en: "era band", zh: "era band" } },
+      { name: "approx_band_pp", type: "pp", desc: { en: "", zh: "" } },
+      { name: "locked_at_close", type: "bool", desc: { en: "", zh: "" } },
+      { name: "consecutive_count", type: "int", desc: { en: "", zh: "" } },
+      { name: "volume_at_limit", type: "shares", desc: { en: "", zh: "" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "333,951 rows, 1994-01-10..2026-07-17. method='approx' on ALL rows — the flag is the era band (±7% pre-2015-06-01 / ±10% after), NOT the exact per-day limit. prev_close is not yet split/ex-right-adjusted; exact per-day limit + split-aware prev_close awaits R-02, which will graduate method to a v1. Until then approx is the honest signal.", zh: "333,951 rows, 1994-01-10..2026-07-17. method='approx' on ALL rows — the flag is the era band (±7% pre-2015-06-01 / ±10% after), NOT the exact per-day limit. prev_close is not yet split/ex-right-adjusted; exact per-day limit + split-aware prev_close awaits R-02, which will graduate method to a v1. Until then approx is the honest signal." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // shareholding-concentration — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "shareholding-concentration": {
+    slug: "shareholding-concentration",
+    description: { en: "Per-ticker TDCC big-holder concentration: total holder count, count and % held by ≥400-lot and ≥1000-lot holders, retail %, and week-over-week deltas. Derived from the TDCC 15-tier distribution. Not a forecast, not a recommendation.", zh: "Per-ticker TDCC big-holder concentration: total holder count, count and % held by ≥400-lot and ≥1000-lot holders, retail %, and week-over-week deltas. Derived from the TDCC 集保股權分散表 15-tier distribution. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "holder_count_total", type: "holders", desc: { en: "", zh: "" } },
+      { name: "large_holder_count_400", type: "holders", desc: { en: "≥400 lots", zh: "≥400 lots" } },
+      { name: "large_holder_pct_400", type: "ratio", desc: { en: "", zh: "" } },
+      { name: "large_holder_pct_1000", type: "ratio", desc: { en: "≥1000 lots", zh: "≥1000 lots (千張大戶)" } },
+      { name: "retail_pct", type: "ratio", desc: { en: "", zh: "" } },
+      { name: "large_holder_pct_1000_wow_delta", type: "ratio", desc: { en: "NULL on single snapshot", zh: "NULL on single snapshot" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "1,978 rows at report_date 2026-05-29 — CURRENT-WEEK SNAPSHOT only (the view surfaces the latest TDCC weekly report). wow_delta columns are NULL on the first/only snapshot (no prior week in-view to diff). tier_map_version=tdcc_15tier_v1. Historical weekly series is available in the underlying table but this serving view is latest-snapshot.", zh: "1,978 rows at report_date 2026-05-29 — CURRENT-WEEK SNAPSHOT only (the view surfaces the latest TDCC weekly report). wow_delta columns are NULL on the first/only snapshot (no prior week in-view to diff). tier_map_version=tdcc_15tier_v1. Historical weekly series is available in the underlying table but this serving view is latest-snapshot." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // competitor-fx — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "competitor-fx": {
+    slug: "competitor-fx",
+    description: { en: "Daily USD crosses for the three Asian export-competitor currencies (JPY, KRW, CNY) plus USD/TWD, and each expressed per-TWD (jpy_per_twd, krw_per_twd, cny_per_twd) — coordinates only, no signal. Derived from CBC official FX. Not a forecast, not a recommendation.", zh: "Daily USD crosses for the three Asian export-competitor currencies (JPY, KRW, CNY) plus USD/TWD, and each expressed per-TWD (jpy_per_twd, krw_per_twd, cny_per_twd) — coordinates only, no signal. Derived from CBC official FX. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "usd_jpy", type: "rate", desc: { en: "", zh: "" } },
+      { name: "usd_krw", type: "rate", desc: { en: "", zh: "" } },
+      { name: "usd_cny", type: "rate", desc: { en: "", zh: "" } },
+      { name: "usd_twd", type: "rate", desc: { en: "", zh: "" } },
+      { name: "jpy_per_twd", type: "rate", desc: { en: "cross", zh: "cross" } },
+      { name: "krw_per_twd", type: "rate", desc: { en: "cross", zh: "cross" } },
+      { name: "cny_per_twd", type: "rate", desc: { en: "cross", zh: "cross" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "8,324 rows, 1993-01-05..2026-06-30. Per-TWD ratios are arithmetic cross-rates from the USD legs (derivation_method carries the formula). CBC official daily fixings; days where a leg is absent carry NULL for that cross.", zh: "8,324 rows, 1993-01-05..2026-06-30. Per-TWD ratios are arithmetic cross-rates from the USD legs (derivation_method carries the formula). CBC official daily fixings; days where a leg is absent carry NULL for that cross." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // export-orders-monthly — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "export-orders-monthly": {
+    slug: "export-orders-monthly",
+    description: { en: "Official monthly Taiwan government statistic (), one row per (item, month). Fields honestly mapped from the source CSV; unit= (USD mn). Machine-carried attribution (OGDL v1 ⇄ CC BY 4.0). Not a forecast, not a recommendation.", zh: "Official monthly Taiwan government statistic (外銷訂單金額(按貨品別)), one row per (item, month). Fields honestly mapped from the source CSV; unit=百萬美元 (USD mn). Machine-carried attribution (OGDL v1 ⇄ CC BY 4.0). Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "stat_item", type: "text", desc: { en: "", zh: "統計項目" } },
+      { name: "item_code", type: "code", desc: { en: "", zh: "貨品別" } },
+      { name: "item_name", type: "text", desc: { en: "label", zh: "繁中 label" } },
+      { name: "value", type: "numeric", desc: { en: "(USD mn)", zh: "百萬美元 (USD mn)" } },
+      { name: "unit", type: "text", desc: { en: "", zh: "" } },
+      { name: "attribution", type: "text", desc: { en: "(first-class)", zh: "機關全名 (first-class)" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "4,590 rows, 1984-01..2026-06, 9. HONEST GAP: only 9 of the 12 official classes have an opendata CSV; 3 (//) have NO machine-readable file and are absent. OGDL v1 (OK, attribution required). ROC dates converted +1911; period_month = first-of-month.", zh: "4,590 rows, 1984-01..2026-06, 9 貨品別. HONEST GAP: only 9 of the 12 official 貨品 classes have an opendata 金額 CSV; 3 (資訊與通信產品/運輸工具及其設備/其他) have NO machine-readable file and are absent. OGDL v1 (商用OK, attribution required). ROC 民國 dates converted +1911; period_month = first-of-month." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // production-value-index-monthly — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "production-value-index-monthly": {
+    slug: "production-value-index-monthly",
+    description: { en: "Official monthly Taiwan government statistic, one row per (item, month). Fields honestly mapped from the source CSV; unit= (110=100). Machine-carried attribution (OGDL v1 ⇄ CC BY 4.0). Not a forecast, not a recommendation.", zh: "Official monthly Taiwan government statistic (製造業生產價值指數), one row per (item, month). Fields honestly mapped from the source CSV; unit=指數 (110年=100). Machine-carried attribution (OGDL v1 ⇄ CC BY 4.0). Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "stat_item", type: "text", desc: { en: "", zh: "統計項目" } },
+      { name: "item_code", type: "code", desc: { en: "", zh: "行業代碼" } },
+      { name: "item_name", type: "text", desc: { en: "label", zh: "繁中 label" } },
+      { name: "value", type: "numeric", desc: { en: "(110=100)", zh: "指數 (110年=100)" } },
+      { name: "unit", type: "text", desc: { en: "", zh: "" } },
+      { name: "attribution", type: "text", desc: { en: "(first-class)", zh: "機關全名 (first-class)" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "16,756 rows, 1982-01..2026-05, 32 (C= + 4 I1-I4 + 27). OGDL v1 (OK, attribution required). ROC dates converted +1911; period_month = first-of-month.", zh: "16,756 rows, 1982-01..2026-05, 32 行業 (C=製造業 + 4 群 I1-I4 + 27 細業). OGDL v1 (商用OK, attribution required). ROC 民國 dates converted +1911; period_month = first-of-month." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // customs-trade-monthly — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "customs-trade-monthly": {
+    slug: "customs-trade-monthly",
+    description: { en: "Official monthly Taiwan government statistic, one row per (item, month). Fields honestly mapped from the source CSV; unit= (NTD k). Machine-carried attribution (OGDL v1 ⇄ CC BY 4.0). Not a forecast, not a recommendation.", zh: "Official monthly Taiwan government statistic (海關進出口貿易統計), one row per (item, month). Fields honestly mapped from the source CSV; unit=新臺幣千元 (NTD k). Machine-carried attribution (OGDL v1 ⇄ CC BY 4.0). Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "stat_item", type: "text", desc: { en: "", zh: "統計項目" } },
+      { name: "item_code", type: "code", desc: { en: "metric", zh: "metric" } },
+      { name: "item_name", type: "text", desc: { en: "label", zh: "繁中 label" } },
+      { name: "value", type: "numeric", desc: { en: "(NTD k)", zh: "新臺幣千元 (NTD k)" } },
+      { name: "unit", type: "text", desc: { en: "", zh: "" } },
+      { name: "attribution", type: "text", desc: { en: "(first-class)", zh: "機關全名 (first-class)" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "1,043 rows, 2014-01..2026-05, 7 metrics (//////), source wide→long. OGDL v1 (OK, attribution required). ROC dates converted +1911; period_month = first-of-month.", zh: "1,043 rows, 2014-01..2026-05, 7 metrics (出口總值/出口/復出口/進口總值/進口/復進口/出入超), source wide→long. OGDL v1 (商用OK, attribution required). ROC 民國 dates converted +1911; period_month = first-of-month." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // capital-formation-events — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "capital-formation-events": {
+    slug: "capital-formation-events",
+    description: { en: "Capital-formation events per ticker: cash capital-increase schedules (TWSE TWT48U) AND capital-reduction history — cash reduction, loss-offset, share-swap, and other — with event dates, subtypes, and ratio where disclosed. NOTE: this supersedes the prior 5-row cash-increase-only baseline. Not a forecast, not a recommendation.", zh: "Capital-formation events per ticker: cash capital-increase schedules (TWSE TWT48U) AND capital-reduction (減資) history — cash reduction, loss-offset, share-swap, and other — with event dates, subtypes, and ratio where disclosed. NOTE: this supersedes the prior 5-row cash-increase-only baseline. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "event_type", type: "enum", desc: { en: "cash_capital_increase_schedule | capital_reduction", zh: "cash_capital_increase_schedule | capital_reduction" } },
+      { name: "event_subtype", type: "enum", desc: { en: "cash/loss_offset/share_swap/other reduction", zh: "cash/loss_offset/share_swap/other reduction" } },
+      { name: "ratio_value", type: "ratio", desc: { en: "NULL unless % in subject", zh: "NULL unless % in subject" } },
+      { name: "price_per_share", type: "TWD", desc: { en: "cash-increase only", zh: "cash-increase only" } },
+      { name: "effective_date", type: "date", desc: { en: "", zh: "" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "14,595 rows, 2005-01-03..2026-08-03. UPDATE from the prior private-beta baseline (which was 5 cash-increase rows only): now includes G5 HISTORY = 14,589 capital-reduction events (source mops_major_event class + TWTAUU snapshot). ratio_value is populated only where a % is literally present in the announcement subject (~0.3% of rows); rest NULL ( — never guessed). cash_amount/stock_amount largely NULL (in announcement body, not this feed).", zh: "14,595 rows, 2005-01-03..2026-08-03. UPDATE from the prior private-beta baseline (which was 5 cash-increase rows only): now includes G5 減資 HISTORY = 14,589 capital-reduction events (source mops_major_event 減資 class + TWTAUU snapshot). ratio_value is populated only where a % is literally present in the announcement subject (~0.3% of 減資 rows); rest NULL (禁捏造 — never guessed). cash_amount/stock_amount largely NULL (in announcement body, not this feed)." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // industry-chain — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "industry-chain": {
+    slug: "industry-chain",
+    description: { en: "Ticker membership in TPEx industry value chains (, AI,, …) with the chain node each company sits in. Sourced from the TPEx (ic.tpex.org.tw). Not a forecast, not a recommendation.", zh: "Ticker membership in TPEx industry value chains (半導體, 電腦及週邊, AI, 雲端運算, 醫療器材 …) with the chain node each company sits in. Sourced from the TPEx 產業價值鏈資訊平台 (ic.tpex.org.tw). Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "chain_name", type: "text", desc: { en: "", zh: "價值鏈名" } },
+      { name: "node_name", type: "text", desc: { en: "", zh: "鏈節點" } },
+      { name: "node_position", type: "enum", desc: { en: "NULL (not sourced)", zh: "NULL (not sourced)" } },
+      { name: "ticker", type: "code", desc: { en: "", zh: "" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "6,934 rows, 47 chains / 2,418 tickers / 401 nodes. SINGLE SNAPSHOT captured 2026-07-02 (trade_date=capture_date; no forward refresh, no history yet — monthly re-snapshot queued in Phase-2 autowrite). node_position (//) is NULL on all rows (not exposed by the source at capture).", zh: "6,934 rows, 47 chains / 2,418 tickers / 401 nodes. SINGLE SNAPSHOT captured 2026-07-02 (trade_date=capture_date; no forward refresh, no history yet — monthly re-snapshot queued in Phase-2 autowrite). node_position (上/中/下游) is NULL on all rows (not exposed by the source at capture)." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // institutional-positioning — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "institutional-positioning": {
+    slug: "institutional-positioning",
+    description: { en: "Per-ticker daily institutional positioning: foreign / investment-trust / dealer net buys and their total, foreign ownership % and its percentile, buy/sell streaks, and institutional share of volume. Derived from the foreign-holding + institutional-flow families. Not a forecast, not a recommendation.", zh: "Per-ticker daily institutional positioning: foreign / investment-trust / dealer net buys and their total, foreign ownership % and its percentile, buy/sell streaks, and institutional share of volume. Derived from the foreign-holding + institutional-flow families. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "foreign_net_buy", type: "shares", desc: { en: "", zh: "" } },
+      { name: "investment_trust_net_buy", type: "shares", desc: { en: "", zh: "" } },
+      { name: "dealer_net_buy", type: "shares", desc: { en: "", zh: "" } },
+      { name: "institutional_net_buy_total", type: "shares", desc: { en: "", zh: "" } },
+      { name: "foreign_pct", type: "ratio", desc: { en: "", zh: "" } },
+      { name: "foreign_pct_percentile", type: "ratio", desc: { en: "within-history rank, NOT a rating", zh: "within-history rank, NOT a rating" } },
+      { name: "buy_streak", type: "days", desc: { en: "", zh: "" } },
+      { name: "sell_streak", type: "days", desc: { en: "", zh: "" } },
+      { name: "inst_share_of_volume", type: "ratio", desc: { en: "NULL where volume absent", zh: "NULL where volume absent" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "Per-ticker daily from ~2013 (first sample 2013-01-11). foreign_pct_percentile is a within-history rank coordinate (not a rating). inst_share_of_volume NULL where volume is unavailable. This is a heavy aggregation VIEW — serving should be ticker+date-bounded (full scans time out).", zh: "Per-ticker daily from ~2013 (first sample 2013-01-11). foreign_pct_percentile is a within-history rank coordinate (not a rating). inst_share_of_volume NULL where volume is unavailable. This is a heavy aggregation VIEW — serving should be ticker+date-bounded (full scans time out)." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // major-event-taxonomy — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "major-event-taxonomy": {
+    slug: "major-event-taxonomy",
+    description: { en: "MOPS (material announcements) classified into an event taxonomy (,, …) with the announcement subject, date/time, a rule version, and a classification confidence score. Not a forecast, not a recommendation.", zh: "MOPS 重大訊息 (material announcements) classified into an event taxonomy (併購, 減資, 增資, 背書保證 …) with the announcement subject, date/time, a rule version, and a classification confidence score. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "event_class", type: "enum", desc: { en: "////…", zh: "併購/減資/增資/背書保證/…" } },
+      { name: "subject", type: "text", desc: { en: "verbatim subject", zh: "verbatim 重訊 subject" } },
+      { name: "event_time", type: "time", desc: { en: "", zh: "" } },
+      { name: "confidence", type: "ratio", desc: { en: "classifier confidence (type, not impact)", zh: "classifier confidence (type, not impact)" } },
+      { name: "rule_version", type: "text", desc: { en: "mops_taxonomy_v1", zh: "mops_taxonomy_v1" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "1,017,099 rows, 2005-01-01..2026-07-18. event_class is a rule-based classification (rule_version=mops_taxonomy_v1) with a confidence score — it is a label of the announcement TYPE, not a judgement of impact. subject is the verbatim subject. Some announcements are corrections/updates of earlier ones.", zh: "1,017,099 rows, 2005-01-01..2026-07-18. event_class is a rule-based classification (rule_version=mops_taxonomy_v1) with a confidence score — it is a label of the announcement TYPE, not a judgement of impact. subject is the verbatim 重訊 subject. Some announcements are corrections/updates of earlier ones." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // factor-library — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "factor-library": {
+    slug: "factor-library",
+    description: { en: "Cross-sectional equity factor VALUES (size / value / momentum / quality / low-vol families) — one row per (ticker, date, factor_name), each with its raw factor_value, family, definition, and formula_version. Factor values are COORDINATES only: no signal, no score, no buy/sell label. Not a forecast, not a recommendation.", zh: "Cross-sectional equity factor VALUES (size / value / momentum / quality / low-vol families) — one row per (ticker, date, factor_name), each with its raw factor_value, family, definition, and formula_version. Factor values are COORDINATES only: no signal, no score, no buy/sell label. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "factor_name", type: "text", desc: { en: "e.g. dividend_yield_z", zh: "e.g. dividend_yield_z" } },
+      { name: "factor_value", type: "numeric", desc: { en: "raw coordinate", zh: "raw coordinate" } },
+      { name: "factor_family", type: "enum", desc: { en: "size/value/momentum/quality/low_vol", zh: "size/value/momentum/quality/low_vol" } },
+      { name: "factor_definition", type: "text", desc: { en: "", zh: "" } },
+      { name: "formula_version", type: "text", desc: { en: "", zh: "" } },
+      { name: "as_of_source_date", type: "date", desc: { en: "PIT input date", zh: "PIT input date" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "276,456 rows, 2026-05-08..2026-05-28 (a 3-week prototype window — NOT deep history yet). factor_value is a raw coordinate; as_of_source_date carries the input data date (PIT). formula_version pins the recipe. RED-LINE: zero signal/score/rating columns by design.", zh: "276,456 rows, 2026-05-08..2026-05-28 (a 3-week prototype window — NOT deep history yet). factor_value is a raw coordinate; as_of_source_date carries the input data date (PIT). formula_version pins the recipe. RED-LINE: zero signal/score/rating columns by design." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // factor-returns — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "factor-returns": {
+    slug: "factor-returns",
+    description: { en: "Realized decile-spread returns per factor: for each (factor_name, date, horizon), the top-decile return, bottom-decile return, and their spread — a statistical FACT computed from the factor library, with universe/decile counts and the return basis. No good/bad label. Not a forecast, not a recommendation.", zh: "Realized decile-spread returns per factor: for each (factor_name, date, horizon), the top-decile return, bottom-decile return, and their spread — a statistical FACT computed from the factor library, with universe/decile counts and the return basis. No good/bad label. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "horizon", type: "enum", desc: { en: "1m / …", zh: "1m / …" } },
+      { name: "decile_spread_return", type: "ratio", desc: { en: "top−bottom (identity)", zh: "top−bottom (identity)" } },
+      { name: "top_decile_return", type: "ratio", desc: { en: "", zh: "" } },
+      { name: "bottom_decile_return", type: "ratio", desc: { en: "", zh: "" } },
+      { name: "n_universe", type: "int", desc: { en: "", zh: "" } },
+      { name: "return_basis", type: "text", desc: { en: "", zh: "" } },
+      { name: "forward_end_date", type: "date", desc: { en: "realized horizon end", zh: "realized horizon end" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "390 rows, 2026-05-08..2026-05-28 (prototype window, same as factor_library). decile_spread_return = top_decile_return − bottom_decile_return (identity, recomputable). return_basis + formula_version carried. Short window → not a long-run factor premium claim.", zh: "390 rows, 2026-05-08..2026-05-28 (prototype window, same as factor_library). decile_spread_return = top_decile_return − bottom_decile_return (identity, recomputable). return_basis + formula_version carried. Short window → not a long-run factor premium claim." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // lending-utilization — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "lending-utilization": {
+    slug: "lending-utilization",
+    description: { en: "Per-ticker daily securities-lending utilization: lending balance vs shares issued → utilisation_pct and its percentile, with a coverage note. Derived from the securities-lending + foreign-holding families. Not a forecast, not a recommendation.", zh: "Per-ticker daily securities-lending utilization: lending balance vs shares issued → utilisation_pct and its percentile, with a coverage note. Derived from the securities-lending + foreign-holding families. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "lending_balance", type: "shares", desc: { en: "", zh: "" } },
+      { name: "shares_issued", type: "shares", desc: { en: "NULL ~19.5%", zh: "NULL ~19.5%" } },
+      { name: "utilisation_pct", type: "ratio", desc: { en: "NULL where denominator absent", zh: "NULL where denominator absent" } },
+      { name: "utilisation_pctile", type: "ratio", desc: { en: "within-history coordinate", zh: "within-history coordinate" } },
+      { name: "utilisation_note", type: "text", desc: { en: "", zh: "" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "3,514,626 rows, 2007-01-02..2026-07-17. utilisation_pct denominator (shares_issued) coverage ~80.5% — where shares_issued is unavailable, utilisation_pct is NULL and utilisation_note explains. utilisation_pctile is a within-history coordinate.", zh: "3,514,626 rows, 2007-01-02..2026-07-17. utilisation_pct denominator (shares_issued) coverage ~80.5% — where shares_issued is unavailable, utilisation_pct is NULL and utilisation_note explains. utilisation_pctile is a within-history coordinate." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // margin-system-stats — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "margin-system-stats": {
+    slug: "margin-system-stats",
+    description: { en: "Market-level daily margin/short-sale system stats: total margin-purchase balance, total short-sale balance, short-to-margin ratio, net flows, and turnover intensity. Derived from the total margin/short family. Not a forecast, not a recommendation.", zh: "Market-level daily margin/short-sale system stats: total margin-purchase balance, total short-sale balance, short-to-margin ratio, net flows, and turnover intensity. Derived from the total margin/short family. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "margin_purchase_balance_total", type: "TWD", desc: { en: "", zh: "" } },
+      { name: "short_sale_balance_total", type: "shares", desc: { en: "", zh: "" } },
+      { name: "short_to_margin_balance_ratio", type: "ratio", desc: { en: "", zh: "" } },
+      { name: "margin_net_flow", type: "TWD", desc: { en: "", zh: "" } },
+      { name: "maintenance_ratio", type: "ratio", desc: { en: "NULL — not loaded (honest gap)", zh: "NULL — not loaded (honest gap)" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "9,936 rows, 2000-11-28..2026-07-09, per market. maintenance_ratio is NULL — the official system-wide is not loaded (maintenance_ratio_note flags this HONEST GAP). All other fields are computed from official balances.", zh: "9,936 rows, 2000-11-28..2026-07-09, per market. maintenance_ratio is NULL — the official system-wide 整體維持率 is not loaded (maintenance_ratio_note flags this HONEST GAP). All other fields are computed from official balances." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // short-restriction-flags — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "short-restriction-flags": {
+    slug: "short-restriction-flags",
+    description: { en: "Per-ticker daily short-sale restriction state: whether a short-sale control is active, margin-short and SBL limit values, disposition-active flag, and a restriction note. Derived from short-sale-balance-control + attention/disposition events. Not a forecast, not a recommendation.", zh: "Per-ticker daily short-sale restriction state: whether a short-sale control is active, margin-short and SBL limit values, disposition-active flag, and a restriction note. Derived from short-sale-balance-control + attention/disposition events. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "has_short_sale_control", type: "bool", desc: { en: "", zh: "" } },
+      { name: "ms_limit_value", type: "", desc: { en: "", zh: "" } },
+      { name: "sbl_limit_value", type: "", desc: { en: "", zh: "" } },
+      { name: "disposition_active", type: "bool", desc: { en: "", zh: "" } },
+      { name: "restriction_note", type: "text", desc: { en: "scope per row", zh: "scope per row" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "42,609 rows, 2009-12-29..2026-07-31, 1,646 tickers. HONEST GAP: the official (below-par short-sale eligibility) list is not loaded — has_short_sale_control reflects the control/disposition sources present; restriction_note explains scope per row.", zh: "42,609 rows, 2009-12-29..2026-07-31, 1,646 tickers. HONEST GAP: the official 平盤下不得放空 (below-par short-sale eligibility) list is not loaded — has_short_sale_control reflects the control/disposition sources present; restriction_note explains scope per row." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
+  // trading-rules-reference — Wave L building. coverage_limits VERBATIM on zh (逐字照抄); en = same facts, CJK term-names stripped.
+  "trading-rules-reference": {
+    slug: "trading-rules-reference",
+    description: { en: "Reference timeline of Taiwan market-microstructure rule changes (daily price-limit widening, day-trading opening, tick-size, etc.) — one entry per (rule_domain, rule_key, effective_date) with prior/new value, market, description, and an official source_url. Not a forecast, not a recommendation.", zh: "Reference timeline of Taiwan market-microstructure rule changes (daily price-limit widening, day-trading opening, tick-size, etc.) — one entry per (rule_domain, rule_key, effective_date) with prior/new value, market, description, and an official source_url. Not a forecast, not a recommendation." },
+    overview: [
+      { en: "This dataset is in build and not yet queryable via the API. The coverage and honest limitations below are the real database state; it moves off \"Building\" once serving lands (targeted 8/1).", zh: "即將開放——此資料集建置中,尚未可透過 API 查詢。下方涵蓋與誠實限制為真實資料庫狀態;serving 上線(預計 8/1)後脫離「建置中」。" },
+    ],
+    fields: [
+      { name: "rule_domain", type: "enum", desc: { en: "price_limit / day_trading / tick_size …", zh: "price_limit / day_trading / tick_size …" } },
+      { name: "rule_key", type: "text", desc: { en: "", zh: "" } },
+      { name: "effective_date", type: "date", desc: { en: "", zh: "" } },
+      { name: "prior_value", type: "text", desc: { en: "", zh: "" } },
+      { name: "new_value", type: "text", desc: { en: "", zh: "" } },
+      { name: "market", type: "enum", desc: { en: "TWSE,TPEX", zh: "TWSE,TPEX" } },
+      { name: "source_url", type: "url", desc: { en: "required", zh: "required (無出處不入表)" } },
+      { name: "source_authority", type: "text", desc: { en: "", zh: "" } },
+    ],
+    coverage: null,
+    coverageTodo: { en: "FILE-BACKED (F+5 YAML, not a DB table): src/feature_engine/data_gateway/reference/trading_rules_reference.yaml, rule_version=v1. RED-LINE: — every entry carries a source_url; entries with source_verification=pending_owner are flagged until the owner confirms the URL resolves to the cited announcement.", zh: "FILE-BACKED (F+5 YAML, not a DB table): src/feature_engine/data_gateway/reference/trading_rules_reference.yaml, rule_version=v1. RED-LINE: 無出處不入表 — every entry carries a source_url; entries with source_verification=pending_owner are flagged until the owner confirms the URL resolves to the cited announcement." },
+    params: STANDARD_PARAMS,
+    notes: [
+      { en: "In build (not yet generally available): not yet served over the API. The figures above are the measured database state (WAVE_L_REGISTRY), shown honestly before serving lands — not a live endpoint yet.", zh: "建置中/即將開放:尚未經 API 服務。上方數字為量測的資料庫狀態(WAVE_L_REGISTRY),serving 上線前誠實呈現,非即時端點。" },
+    ],
+  },
 };
 
 export function getDatasetDocContent(slug: string): DatasetDocContent | null {

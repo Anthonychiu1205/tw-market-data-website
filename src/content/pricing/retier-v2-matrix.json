@@ -181,8 +181,8 @@
       "dataset_id": "industry_chain",
       "family": "discovery_reference",
       "before": "free",
-      "after": "free",
-      "reason": "raw daily bars or metadata — funnel",
+      "after": "starter",
+      "reason": "raw daily bars or metadata — funnel | Wave L re-tier → starter (WAVE_L_REGISTRY.json)",
       "price_before": 0,
       "price_after": 0,
       "populate_01_missing": null
@@ -549,8 +549,8 @@
       "dataset_id": "capital_formation_events",
       "family": "discovery_reference",
       "before": "pro",
-      "after": "pro",
-      "reason": "看 = analytical market data (default)",
+      "after": "starter",
+      "reason": "看 = analytical market data (default) | Wave L re-tier → starter (WAVE_L_REGISTRY.json)",
       "price_before": 100,
       "price_after": 100,
       "populate_01_missing": null
@@ -1802,5 +1802,31 @@
       "price_after": null,
       "populate_01_missing": null
     }
-  ]
+  ],
+  "wave_l_pin": {
+    "date": "2026-07-23",
+    "from": 61,
+    "to": 79,
+    "note": "Wave L: 18 new sellable slugs added as building (即將開放) for SEO ahead of 8/1 serving. Tiers from WAVE_L_REGISTRY.json (Starter 10 / Pro 7 / Free 1). capital_formation_events + industry_chain re-tiered to starter (were pro/free). The 16 not-yet-in-matrix building slugs are documented exemptions in check_pricing_matrix.mjs until infra re-vendors post-serving.",
+    "building_slugs": [
+      "price-move-context",
+      "futures-daily-context",
+      "limit-events",
+      "shareholding-concentration",
+      "competitor-fx",
+      "export-orders-monthly",
+      "production-value-index-monthly",
+      "customs-trade-monthly",
+      "capital-formation-events",
+      "industry-chain",
+      "institutional-positioning",
+      "major-event-taxonomy",
+      "factor-library",
+      "factor-returns",
+      "lending-utilization",
+      "margin-system-stats",
+      "short-restriction-flags",
+      "trading-rules-reference"
+    ]
+  }
 }
