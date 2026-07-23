@@ -71,6 +71,63 @@ async function fetchDataRows(slug: string): Promise<Record<string, unknown>[] | 
   }
 }
 
+// ── /v2/facts statistics endpoints (unified envelope, keyless) ───────────────────────────────────
+// Contract: _handoffs/FACTS_SERVING_for_website.md. Every page reads as_of / sample_period / methodology
+// / coverage_note straight from meta and the numbers straight from data[] — never hand-filled. A stat
+// with no data returns 404 (facts_stat_unavailable), which we surface as an honest "unavailable" page
+// rather than an empty table.
+export type FactsStatMeta = {
+  as_of: string | null;
+  sample_period: { start: string; end: string } | null;
+  methodology: string | null;
+  coverage_note: string | null;
+  source_refs?: unknown;
+  row_count: number;
+  license?: string | null;
+};
+
+export type FactsStatRow = { dimension: Record<string, unknown>; metrics: Record<string, number> };
+
+export type FactsStat = {
+  meta: FactsStatMeta;
+  rows: FactsStatRow[];
+  csvUrl: string;
+  jsonUrl: string;
+};
+
+export async function getFactsStat(endpointSlug: string): Promise<FactsStat | null> {
+  const path = `/v2/facts/${endpointSlug}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(`${FETCH_BASE}${path}`, {
+      headers: apiHeaders(),
+      signal: controller.signal,
+      next: { revalidate: REVALIDATE_SECONDS },
+    });
+    // 404 = stat unavailable (or serving disabled) → caller renders the honest unavailable state.
+    if (!res.ok) {
+      if (res.status !== 404) console.warn(`[facts] ${path} responded ${res.status}`);
+      return null;
+    }
+    const json = (await res.json()) as { meta?: FactsStatMeta; data?: FactsStatRow[] };
+    const rows = Array.isArray(json.data) ? json.data : [];
+    if (!json.meta || rows.length === 0) return null;
+    return {
+      meta: json.meta,
+      rows, // backend already sorts human-order (month 1→12, year asc, bucket) — passthrough.
+      csvUrl: `${PUBLIC_API}${path}?format=csv`,
+      jsonUrl: `${PUBLIC_API}${path}`,
+    };
+  } catch (error) {
+    const name = error instanceof Error ? error.name : "UnknownError";
+    console.warn(`[facts] fetch ${path} failed: ${name}`);
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // rules-history — Taiwan market-microstructure rule-change timeline (trading_rules_reference).
 export async function getRulesHistory(): Promise<FactsDataset<RuleChange> | null> {
   const slug = "trading-rules-reference";

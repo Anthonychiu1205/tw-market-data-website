@@ -34,7 +34,7 @@ export const factsTopics: readonly FactsTopic[] = [
       zh: "台股逐月統計:各月平均報酬、上漲年比例與量能分布。",
     },
     coverage: { en: "From ~2003", zh: "約 2003 年起" },
-    published: false,
+    published: true,
   },
   {
     slug: "delisting",
