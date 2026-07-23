@@ -4,6 +4,8 @@
     "pricing": "Pricing",
     "docs": "Docs",
     "blog": "Blog",
+    "resources": "Resources",
+    "facts": "Market Facts",
     "contact": "Contact",
     "dashboard": "Dashboard",
     "signIn": "Sign in",
@@ -16,7 +18,7 @@
   "footer": {
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "help": "Help Center",
+    "facts": "Market Facts",
     "contact": "Contact us"
   },
   "contactModal": {

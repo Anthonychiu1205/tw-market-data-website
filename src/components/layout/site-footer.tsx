@@ -13,7 +13,10 @@ const policyLinks = [
   { href: "/terms", labelKey: "terms" },
 ] as const;
 
-const supportLinks = [{ href: "/help", labelKey: "help" }] as const;
+// NAV-01: the footer "Help Center" entry point is retired here — the /help-center page itself is kept
+// (still indexed, still reachable via /help and /faq redirects) — and its slot now points at the new
+// Market Facts statistics room (/facts).
+const supportLinks = [{ href: "/facts", labelKey: "facts" }] as const;
 
 type SiteFooterProps = {
   onContactClick: () => void;

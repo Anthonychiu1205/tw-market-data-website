@@ -11,9 +11,11 @@ import { LanguageSwitcher } from "./language-switcher";
 import { MarketingContainer } from "../ui/marketing-container";
 import { buttonClass } from "../ui/button";
 
+type NavLabelKey = "product" | "pricing" | "docs" | "blog" | "resources" | "facts";
+
 type NavItem = {
   href: string;
-  labelKey: "product" | "pricing" | "docs" | "blog";
+  labelKey: NavLabelKey;
   withArrow?: boolean;
   isMega?: boolean;
 };
@@ -22,13 +24,18 @@ const navItems: NavItem[] = [
   { href: "/product", labelKey: "product", withArrow: true, isMega: true },
   { href: "/pricing", labelKey: "pricing" },
   { href: "/docs", labelKey: "docs" },
+];
+
+// NAV-01: Blog + Market Facts live under a single "Resources" dropdown — no standalone Blog nav entry
+// (avoids a duplicate entry point). These are real /blog and /facts links, crawlable and agent-friendly.
+const resourcesItems: { href: string; labelKey: NavLabelKey }[] = [
   { href: "/blog", labelKey: "blog" },
+  { href: "/facts", labelKey: "facts" },
 ];
 
 const mobileNavItems: NavItem[] = [
   { href: "/pricing", labelKey: "pricing" },
   { href: "/docs", labelKey: "docs" },
-  { href: "/blog", labelKey: "blog" },
 ];
 
 type SiteHeaderProps = {
@@ -40,15 +47,38 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
   const locale = useLocale();
   const productMegaMenuColumns = getProductMegaMenuColumns(locale === "en" ? "en" : "zh-TW");
   const [isProductsMenuOpen, setIsProductsMenuOpen] = useState(false);
+  const [isResourcesMenuOpen, setIsResourcesMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const hasHydratedRef = useRef(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resourcesCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resourcesButtonRef = useRef<HTMLButtonElement | null>(null);
 
   const clearCloseTimer = useCallback(() => {
     if (!closeTimerRef.current) return;
     clearTimeout(closeTimerRef.current);
     closeTimerRef.current = null;
   }, []);
+
+  const clearResourcesCloseTimer = useCallback(() => {
+    if (!resourcesCloseTimerRef.current) return;
+    clearTimeout(resourcesCloseTimerRef.current);
+    resourcesCloseTimerRef.current = null;
+  }, []);
+
+  const openResourcesMenu = useCallback(() => {
+    if (!hasHydratedRef.current) return;
+    clearResourcesCloseTimer();
+    setIsResourcesMenuOpen(true);
+  }, [clearResourcesCloseTimer]);
+
+  const scheduleCloseResourcesMenu = useCallback(() => {
+    if (!hasHydratedRef.current) return;
+    clearResourcesCloseTimer();
+    resourcesCloseTimerRef.current = setTimeout(() => {
+      setIsResourcesMenuOpen(false);
+    }, 100);
+  }, [clearResourcesCloseTimer]);
 
   const openProductsMenu = useCallback(() => {
     if (!hasHydratedRef.current) return;
@@ -66,8 +96,11 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
 
   useEffect(() => {
     hasHydratedRef.current = true;
-    return () => clearCloseTimer();
-  }, [clearCloseTimer]);
+    return () => {
+      clearCloseTimer();
+      clearResourcesCloseTimer();
+    };
+  }, [clearCloseTimer, clearResourcesCloseTimer]);
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
@@ -185,6 +218,71 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
                 </Link>
               ),
             )}
+
+            {/* NAV-01: Resources dropdown — hover + click dual-trigger (touch-friendly), keyboard
+                operable (Enter/Space toggles, Esc closes and returns focus, Tab walks the items), and
+                real <a href> links so it stays crawlable and agent-friendly. */}
+            <div
+              className="relative"
+              onMouseEnter={openResourcesMenu}
+              onMouseLeave={scheduleCloseResourcesMenu}
+              onFocusCapture={openResourcesMenu}
+              onBlurCapture={(event) => {
+                const nextFocusedNode = event.relatedTarget as Node | null;
+                if (nextFocusedNode && event.currentTarget.contains(nextFocusedNode)) {
+                  return;
+                }
+                scheduleCloseResourcesMenu();
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Escape" && isResourcesMenuOpen) {
+                  setIsResourcesMenuOpen(false);
+                  resourcesButtonRef.current?.focus();
+                }
+              }}
+            >
+              <button
+                ref={resourcesButtonRef}
+                type="button"
+                aria-expanded={isResourcesMenuOpen}
+                aria-haspopup="menu"
+                onClick={() => setIsResourcesMenuOpen((previous) => !previous)}
+                className={`inline-flex items-center gap-1 rounded-md px-3 py-1.5 text-[15px] font-medium leading-6 transition ${
+                  isResourcesMenuOpen
+                    ? "bg-slate-100 text-slate-900"
+                    : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                }`}
+              >
+                {t("resources")}
+                <span className={`text-xs transition-transform ${isResourcesMenuOpen ? "rotate-180 text-slate-700" : "text-slate-500"}`}>
+                  ▾
+                </span>
+              </button>
+
+              <div
+                role="menu"
+                aria-label={t("resources")}
+                className={`absolute left-1/2 top-full z-40 w-56 max-w-[calc(100vw-2rem)] -translate-x-1/2 pt-3 transition duration-150 ${
+                  isResourcesMenuOpen
+                    ? "pointer-events-auto visible translate-y-0 opacity-100"
+                    : "pointer-events-none invisible translate-y-1 opacity-0"
+                }`}
+              >
+                <div className="rounded-xl border border-slate-200 bg-white p-2 shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+                  {resourcesItems.map((entry) => (
+                    <Link
+                      key={entry.labelKey}
+                      href={entry.href}
+                      role="menuitem"
+                      onClick={() => setIsResourcesMenuOpen(false)}
+                      className="block rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900"
+                    >
+                      {t(entry.labelKey)}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
           </nav>
         </div>
 
@@ -240,6 +338,20 @@ export function SiteHeader({ onContactClick }: SiteHeaderProps) {
 
             <nav className="space-y-1 border-t border-slate-200 pt-4">
               {mobileNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="block rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-900"
+                >
+                  {t(item.labelKey)}
+                </Link>
+              ))}
+
+              {/* NAV-01: on mobile the Resources dropdown collapses into the hamburger at the same level —
+                  a labelled group with the same Blog + Market Facts links. */}
+              <p className="px-3 pt-3 text-xs font-semibold tracking-wide text-slate-400">{t("resources")}</p>
+              {resourcesItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}

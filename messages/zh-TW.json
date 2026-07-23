@@ -3,7 +3,9 @@
     "product": "產品功能",
     "pricing": "方案價格",
     "docs": "文件",
-    "blog": "觀點文章",
+    "blog": "部落格",
+    "resources": "資源",
+    "facts": "統計資料",
     "contact": "聯絡我們",
     "dashboard": "儀表板",
     "signIn": "登入",
@@ -16,7 +18,7 @@
   "footer": {
     "privacy": "隱私政策",
     "terms": "服務條款",
-    "help": "幫助中心",
+    "facts": "統計資料",
     "contact": "聯繫我們"
   },
   "contactModal": {
