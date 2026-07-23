@@ -56,6 +56,6 @@ export const factsTopics: readonly FactsTopic[] = [
       zh: "全市場除息後 N 日填息率,依殖利率分五層統計。",
     },
     coverage: { en: "From 2004", zh: "2004 年起" },
-    published: false,
+    published: true,
   },
 ];
