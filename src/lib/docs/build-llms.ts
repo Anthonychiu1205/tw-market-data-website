@@ -1,6 +1,7 @@
 import { DOCS_DATASET_CATALOG } from "@/src/content/docs/dataset-catalog";
 import { VERIFIED_DATASET_PARAMS } from "@/src/content/docs/verified-request-examples";
 import { datasetSeoEntries } from "@/src/content/datasets";
+import { factsTopics } from "@/src/content/facts";
 
 // Hardcoded production origin (mirrors llms-full.txt) so the agent index carries real URLs regardless
 // of the build-time NEXT_PUBLIC_SITE_URL (which is localhost in local builds).
@@ -14,6 +15,9 @@ const ORIGIN = "https://twmarketdata.com";
 
 const KEYED_VERIFIED = new Set(Object.keys(VERIFIED_DATASET_PARAMS));
 const SEO_PAGE_SLUGS = new Set(datasetSeoEntries.map((d) => d.slug));
+// Only Facts pages that are actually live (published) enter the agent index — an unpublished topic has
+// no route yet, so listing it would be a dead link.
+const PUBLISHED_FACTS = factsTopics.filter((t) => t.published);
 
 // Prefer the /datasets/<slug> SEO page where it exists; otherwise the /docs reference page (which
 // exists for every catalog slug) — so no link in the index is a 404.
@@ -44,6 +48,15 @@ export function buildLlmsText(): string {
   lines.push(`- [OpenAPI spec (YAML)](${ORIGIN}/openapi.yaml): same spec, YAML`);
   lines.push(`- [Documentation](${ORIGIN}/docs): guides and per-dataset reference`);
   lines.push(`- [Full docs bundle](${ORIGIN}/llms-full.txt): every guide + endpoint page in one file`);
+  lines.push("");
+  lines.push("## Market Facts");
+  lines.push("");
+  lines.push(
+    `- [Market Facts](${ORIGIN}/en/facts): pipeline-generated Taiwan-market statistics, each figure API-queryable and CSV-downloadable`,
+  );
+  for (const topic of PUBLISHED_FACTS) {
+    lines.push(`- [${topic.title.en}](${ORIGIN}/en/facts/${topic.slug}): ${topic.blurb.en}`);
+  }
   lines.push("");
   lines.push("## Datasets");
   lines.push("");
