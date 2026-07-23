@@ -23,31 +23,34 @@ function datasetUrl(slug: string, domain: string): string {
     : `${ORIGIN}/en/docs/api/${domain}/${slug}`;
 }
 
+// /llms.txt follows the llmstxt.org spec: an H1 title, a blockquote summary, optional prose, then
+// `##` sections whose bullets are `[title](url): notes` links. Generated from the catalog SSOT so it
+// can never drift from what the site sells.
 export function buildLlmsText(): string {
   const lines: string[] = [];
-  lines.push("Dataset Factory (machine-readable index)");
-  lines.push("not_investment_advice=true");
-  lines.push("rule:no_buy_sell_target_price_recommendation");
-  lines.push("rule:preserve_data_gaps_and_unknowns");
+  lines.push("# TW Market Data");
   lines.push("");
-  lines.push(`openapi=${ORIGIN}/openapi.json`);
-  lines.push(`openapi_yaml=${ORIGIN}/openapi.yaml`);
-  lines.push(`docs=${ORIGIN}/docs`);
-  lines.push(`llms_full=${ORIGIN}/llms-full.txt`);
+  lines.push(
+    "> Machine-readable index of Taiwan (TWSE / TPEx / TAIFEX / MOPS) market datasets for AI agents — official-sourced, coverage-honest and point-in-time safe. Not investment advice.",
+  );
   lines.push("");
-  lines.push("# Generated at build time from the storefront catalog SSOT (grade + keyed-verified), so");
-  lines.push("# this index can never drift from what the site sells. grade ∈ verified|derived|reference|");
-  lines.push("# building. production_ready=true means the dataset is verified serving against a live key.");
-  lines.push(`allowed_dataset_ids: ${DOCS_DATASET_CATALOG.length}`);
-  for (const d of DOCS_DATASET_CATALOG) {
-    lines.push(`- ${d.slug}`);
-  }
+  lines.push(
+    `Rules: no buy / sell / target-price recommendation; data gaps and unknowns are preserved, never invented. Grades are verified | derived | reference | building; production_ready=true means the dataset is verified serving against a live key. This index is generated from the storefront catalog (${DOCS_DATASET_CATALOG.length} datasets), so it always matches what the site sells.`,
+  );
   lines.push("");
-  lines.push("datasets:");
+  lines.push("## API");
+  lines.push("");
+  lines.push(`- [OpenAPI spec (JSON)](${ORIGIN}/openapi.json): all dataset endpoints`);
+  lines.push(`- [OpenAPI spec (YAML)](${ORIGIN}/openapi.yaml): same spec, YAML`);
+  lines.push(`- [Documentation](${ORIGIN}/docs): guides and per-dataset reference`);
+  lines.push(`- [Full docs bundle](${ORIGIN}/llms-full.txt): every guide + endpoint page in one file`);
+  lines.push("");
+  lines.push("## Datasets");
+  lines.push("");
   for (const d of DOCS_DATASET_CATALOG) {
     const pr = KEYED_VERIFIED.has(d.slug) ? "true" : "false";
     lines.push(
-      `- id=${d.slug}; grade=${d.grade}; production_ready=${pr}; route=/v2/datasets/${d.slug}; page=${datasetUrl(d.slug, d.domain)}`,
+      `- [${d.en}](${datasetUrl(d.slug, d.domain)}): id=${d.slug}; grade=${d.grade}; production_ready=${pr}; route=/v2/datasets/${d.slug}`,
     );
   }
   lines.push("");

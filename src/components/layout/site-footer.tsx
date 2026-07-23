@@ -24,8 +24,10 @@ export function SiteFooter({ onContactClick }: SiteFooterProps) {
   const locale = useLocale();
 
   return (
+    // min-height reserves the footer's rendered space so late font swap / link reflow / client mount
+    // cannot grow it and shift the page (CLS). Sized to the two-line disclaimer + link row on desktop.
     <footer className="border-t border-slate-200 bg-slate-50">
-      <Container className="flex flex-col items-center gap-3 py-6">
+      <Container className="flex min-h-[112px] flex-col items-center justify-center gap-3 py-6 sm:min-h-[104px]">
         <p className="text-center text-xs text-slate-500">
           {investmentDisclaimer(locale === "en" ? "en" : "zh-TW")}
         </p>
