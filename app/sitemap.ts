@@ -55,6 +55,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/connect/which-tier", changeFrequency: "monthly", priority: 0.5 },
     { path: "/docs", changeFrequency: "weekly", priority: 0.9 },
     { path: "/errata", changeFrequency: "weekly", priority: 0.5 },
+    { path: "/facts", changeFrequency: "weekly", priority: 0.7 },
     { path: "/blog", changeFrequency: "monthly", priority: 0.8 },
     { path: "/login", changeFrequency: "monthly", priority: 0.4 },
     { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
