@@ -184,6 +184,39 @@ export async function ToolsMcpContent() {
             </p>
           </ClientBlock>
 
+          <ClientBlock
+            title={en ? "Claude Desktop (via mcp-remote bridge)" : "Claude Desktop(mcp-remote 橋接)"}
+          >
+            <p>
+              {en
+                ? "Claude Desktop reaches remote MCP servers through the mcp-remote local bridge (it injects the X-API-Key header). Add to "
+                : "Claude Desktop 透過 mcp-remote 本地橋接連遠端 MCP(它會帶上 X-API-Key 標頭)。加到 "}
+              <code className="font-mono text-slate-700">claude_desktop_config.json</code>
+              {en ? ":" : ":"}
+            </p>
+            <CodeBlock
+              language="json"
+              copyButtonVariant="icon"
+              code={`{
+  "mcpServers": {
+    "tw-market-data": {
+      "command": "npx",
+      "args": [
+        "-y", "mcp-remote", "https://mcp.twmarketdata.com/mcp",
+        "--transport", "http-only",
+        "--header", "X-API-Key: sk_live_你的key"
+      ]
+    }
+  }
+}`}
+            />
+            <p>
+              {en
+                ? "Restart Claude Desktop; tw-market-data appears in the tools list (list_datasets / describe_dataset / query_dataset / find_related)."
+                : "重啟 Claude Desktop,tw-market-data 會出現在工具清單(list_datasets / describe_dataset / query_dataset / find_related)。"}
+            </p>
+          </ClientBlock>
+
           <ClientBlock title="Cursor">
             <p>
               {en ? "Edit the config file " : "編輯設定檔 "}
