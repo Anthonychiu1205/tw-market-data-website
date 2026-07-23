@@ -11991,9 +11991,9 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     label: "分類與結構",
     groupIcon: "network",
     items: [
-      { title: "產業分類", href: "/docs/api/taxonomy/theme-taxonomy", icon: "segments", status: "normalized" },
+      { title: "產業分類", href: "/docs/api/structure-reference/theme-taxonomy", icon: "segments", status: "normalized" },
       { title: "題材分類", href: "/docs/api/segments", icon: "segments", status: "normalized" },
-      { title: "指數分類", href: "/docs/api/taxonomy/index-classification", icon: "segments", status: "normalized" },
+      { title: "指數分類", href: "/docs/api/market-prices/index-classification", icon: "segments", status: "normalized" },
     ],
   },
   {
@@ -12001,9 +12001,9 @@ export const docsSidebarNav: DocsSidebarNavGroup[] = [
     label: "策略與量化",
     groupIcon: "activity",
     items: [
-      { title: "特徵資料集", href: "/docs/api/strategy-quant/features", icon: "chart", status: "normalized" },
-      { title: "AI 研究訊號", href: "/docs/api/strategy-quant/factor-data", icon: "chart", status: "normalized" },
-      { title: "回測資料準備", href: "/docs/api/strategy-quant/time-alignment", icon: "chart", status: "normalized" },
+      { title: "因子庫", href: "/docs/api/structure-reference/factor-library", icon: "chart", status: "normalized" },
+      { title: "因子報酬", href: "/docs/api/structure-reference/factor-returns", icon: "chart", status: "normalized" },
+      { title: "選股器", href: "/docs/api/structure-reference/screener", icon: "chart", status: "normalized" },
     ],
   },
   {
