@@ -140,41 +140,41 @@ const DATASET_META: Record<string, DatasetMeta> = {
 
   // ── Wave L (18 building datasets, coming soon; grade=building until 8/1 serving) ──
   // Wave L building「即將開放」— TWSE; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "price-move-context": { domain: "market-prices", zh: "大波動日情境卡", en: "Price Move Context Cards", agency: "TWSE", grade: "building" },
+  "price-move-context": { domain: "market-prices", zh: "大波動日情境卡", en: "Price Move Context Cards", agency: "TWSE", grade: "verified" },
   // Wave L building「即將開放」— TAIFEX; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "futures-daily-context": { domain: "derivatives", zh: "期貨日情境(基差/近月/法人OI)", en: "Futures Daily Context", agency: "TAIFEX", grade: "building" },
+  "futures-daily-context": { domain: "derivatives", zh: "期貨日情境(基差/近月/法人OI)", en: "Futures Daily Context", agency: "TAIFEX", grade: "verified" },
   // Wave L building「即將開放」— TWSE; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "limit-events": { domain: "market-prices", zh: "漲跌停事件", en: "Limit-Up/Down Events", agency: "TWSE", grade: "building" },
+  "limit-events": { domain: "market-prices", zh: "漲跌停事件", en: "Limit-Up/Down Events", agency: "TWSE", grade: "verified" },
   // Wave L building「即將開放」— TDCC; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "shareholding-concentration": { domain: "capital-flows", zh: "集保持股分級集中度", en: "Shareholding Concentration (TDCC tiers)", agency: "TDCC", grade: "building" },
+  "shareholding-concentration": { domain: "capital-flows", zh: "集保持股分級集中度", en: "Shareholding Concentration (TDCC tiers)", agency: "TDCC", grade: "verified" },
   // Wave L building「即將開放」— CBC; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "competitor-fx": { domain: "macro", zh: "競貨幣匯率(JPY/KRW/CNY vs TWD)", en: "Competitor FX (vs TWD)", agency: "CBC", grade: "building" },
+  "competitor-fx": { domain: "macro", zh: "競貨幣匯率(JPY/KRW/CNY vs TWD)", en: "Competitor FX (vs TWD)", agency: "CBC", grade: "verified" },
   // Wave L building「即將開放」— MOEA; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "export-orders-monthly": { domain: "macro", zh: "外銷訂單金額(按貨品別)", en: "Export Orders (by commodity)", agency: "MOEA", grade: "building" },
+  "export-orders-monthly": { domain: "macro", zh: "外銷訂單金額(按貨品別)", en: "Export Orders (by commodity)", agency: "MOEA", grade: "verified" },
   // Wave L building「即將開放」— MOEA; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "production-value-index-monthly": { domain: "macro", zh: "製造業生產價值指數", en: "Manufacturing Production-Value Index", agency: "MOEA", grade: "building" },
+  "production-value-index-monthly": { domain: "macro", zh: "製造業生產價值指數", en: "Manufacturing Production-Value Index", agency: "MOEA", grade: "verified" },
   // Wave L building「即將開放」— MOF; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "customs-trade-monthly": { domain: "macro", zh: "海關進出口貿易統計", en: "Customs Trade", agency: "MOF", grade: "building" },
+  "customs-trade-monthly": { domain: "macro", zh: "海關進出口貿易統計", en: "Customs Trade", agency: "MOF", grade: "verified" },
   // Wave L building「即將開放」— TWSE / MOPS; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "capital-formation-events": { domain: "companies-events", zh: "資本形成事件(增/減資)", en: "Capital Formation Events", agency: "TWSE / MOPS", grade: "building" },
+  "capital-formation-events": { domain: "companies-events", zh: "資本形成事件(增/減資)", en: "Capital Formation Events", agency: "TWSE / MOPS", grade: "verified" },
   // Wave L building「即將開放」— TPEx; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "industry-chain": { domain: "structure-reference", zh: "產業價值鏈成員", en: "Industry Value-Chain Membership", agency: "TPEx", grade: "building" },
+  "industry-chain": { domain: "structure-reference", zh: "產業價值鏈成員", en: "Industry Value-Chain Membership", agency: "TPEx", grade: "verified" },
   // Wave L building「即將開放」— TWSE; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "institutional-positioning": { domain: "capital-flows", zh: "法人持倉深化", en: "Institutional Positioning", agency: "TWSE", grade: "building" },
+  "institutional-positioning": { domain: "capital-flows", zh: "法人持倉深化", en: "Institutional Positioning", agency: "TWSE", grade: "verified" },
   // Wave L building「即將開放」— MOPS; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "major-event-taxonomy": { domain: "companies-events", zh: "重大訊息事件分類", en: "Major Event Taxonomy", agency: "MOPS", grade: "building" },
+  "major-event-taxonomy": { domain: "companies-events", zh: "重大訊息事件分類", en: "Major Event Taxonomy", agency: "MOPS", grade: "verified" },
   // Wave L building「即將開放」— TWSE / TPEx / MOPS; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "factor-library": { domain: "structure-reference", zh: "因子庫(座標)", en: "Factor Library", agency: "TWSE / TPEx / MOPS", grade: "building" },
+  "factor-library": { domain: "structure-reference", zh: "因子庫(座標)", en: "Factor Library", agency: "TWSE / TPEx / MOPS", grade: "verified" },
   // Wave L building「即將開放」— TWSE / TPEx / MOPS; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "factor-returns": { domain: "structure-reference", zh: "因子報酬(十分位價差)", en: "Factor Returns (decile spread)", agency: "TWSE / TPEx / MOPS", grade: "building" },
+  "factor-returns": { domain: "structure-reference", zh: "因子報酬(十分位價差)", en: "Factor Returns (decile spread)", agency: "TWSE / TPEx / MOPS", grade: "verified" },
   // Wave L building「即將開放」— TWSE; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "lending-utilization": { domain: "capital-flows", zh: "借券使用率", en: "Securities-Lending Utilization", agency: "TWSE", grade: "building" },
+  "lending-utilization": { domain: "capital-flows", zh: "借券使用率", en: "Securities-Lending Utilization", agency: "TWSE", grade: "verified" },
   // Wave L building「即將開放」— TWSE; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "margin-system-stats": { domain: "capital-flows", zh: "信用交易系統統計", en: "Margin System Statistics", agency: "TWSE", grade: "building" },
+  "margin-system-stats": { domain: "capital-flows", zh: "信用交易系統統計", en: "Margin System Statistics", agency: "TWSE", grade: "verified" },
   // Wave L building「即將開放」— TWSE; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "short-restriction-flags": { domain: "capital-flows", zh: "空方限制旗標", en: "Short-Restriction Flags", agency: "TWSE", grade: "building" },
+  "short-restriction-flags": { domain: "capital-flows", zh: "空方限制旗標", en: "Short-Restriction Flags", agency: "TWSE", grade: "verified" },
   // Wave L building「即將開放」— TWSE; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "trading-rules-reference": { domain: "structure-reference", zh: "交易制度沿革表", en: "Trading Rules Reference", agency: "TWSE", grade: "building" },
+  "trading-rules-reference": { domain: "structure-reference", zh: "交易制度沿革表", en: "Trading Rules Reference", agency: "TWSE", grade: "verified" },
 };
 
 export type DocsDatasetEntry = {
