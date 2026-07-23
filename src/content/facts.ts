@@ -46,7 +46,7 @@ export const factsTopics: readonly FactsTopic[] = [
       zh: "全市場歷年下市家數。原因分布與上市年限:源未提供,暫不列。",
     },
     coverage: { en: "Quarterly", zh: "季更" },
-    published: false,
+    published: true,
   },
   {
     slug: "fill-rate",
