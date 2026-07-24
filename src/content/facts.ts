@@ -68,4 +68,14 @@ export const factsTopics: readonly FactsTopic[] = [
     coverage: { en: "From 2004 (detected)", zh: "2004 年起(偵測)" },
     published: true,
   },
+  {
+    slug: "inst-flow-breadth-seasonality",
+    title: { en: "Institutional-flow breadth seasonality", zh: "法人買氣廣度季節性" },
+    blurb: {
+      en: "By calendar month, the share of stocks the three institutional groups were net buyers of — a breadth signal, since 2012. The signal is mild (~2pp): only December's net-buy share edges above net-sell.",
+      zh: "各曆月三大法人淨買個股的比例(買氣廣度),2012 年起。訊號溫和(~2pp):僅 12 月淨買略高於淨賣。",
+    },
+    coverage: { en: "From 2012 (~14y)", zh: "約 2012 年起(~14 年)" },
+    published: true,
+  },
 ];
