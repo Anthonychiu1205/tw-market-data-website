@@ -702,6 +702,58 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "convertible-bond-overview",
+    name: "可轉債總覽",
+    nameEn: "Convertible Bond Overview",
+    seoTitle: "台股可轉債總覽資料集(條款 / 轉換價 / 參考價)| TW Market Data",
+    seoTitleEn: "Taiwan Convertible Bond Overview Dataset (terms / conversion price) | TW Market Data",
+    seoDescription:
+      "台股可轉債總覽資料集提供上櫃可轉債每日條款看板:轉換價、參考價、標的股價、流通餘額與票面利率,一檔一日一列。轉換價值 = 標的股價 / 轉換價 × 面額;point-in-time 安全。",
+    seoDescriptionEn:
+      "The Taiwan Convertible Bond Overview dataset provides a daily terms board for TPEx convertible bonds: conversion price, reference price, underlying stock price, outstanding amount, and coupon rate — one row per bond per day. Conversion value = underlying / conversion price × par; point-in-time safe.",
+    shortDescription: "上櫃可轉債每日條款:轉換價 / 參考價 / 標的股價 / 流通餘額 / 票面利率。",
+    shortDescriptionEn:
+      "Daily TPEx convertible-bond terms: conversion / reference price, underlying, outstanding, coupon.",
+    whatItIs:
+      "可轉債總覽資料集每一列對應「一檔可轉債(cb_id)、一個交易日」的條款看板,欄位包含 cb_name(名稱)、conversion_price(轉換價)、reference_price(參考價)、underlying_stock_price(標的股價)、outstanding_amount(流通餘額)與 coupon_rate(票面利率)。標的為上櫃可轉債;轉換價值 = 標的股價 / 轉換價 × 面額。以 trade_date 為知識時間,point-in-time 安全。",
+    whatItIsEn:
+      "Each row is one convertible bond (cb_id) on one trading day, a terms board carrying cb_name, conversion_price, reference_price, underlying_stock_price, outstanding_amount, and coupon_rate. Bonds are TPEx-listed; conversion value = underlying / conversion price × par. Keyed on trade_date and point-in-time safe.",
+    useCases: [
+      "以轉換價與標的股價估算轉換價值與溢價。",
+      "篩選 CB 套利與可轉債籌資訊號。",
+      "結合法人買賣(可轉債法人買賣)分析籌碼。",
+    ],
+    useCasesEn: [
+      "Estimate conversion value and premium from conversion price and underlying.",
+      "Screen for CB arbitrage and financing signals.",
+      "Analyze positioning alongside convertible-bond institutional flow.",
+    ],
+    whyItMatters:
+      "可轉債條款分散且口徑不一;直接取用每日條款看板(轉換價 / 參考價 / 流通餘額),可一致計算溢價與轉換價值,且 point-in-time 安全。",
+    whyItMattersEn:
+      "Convertible-bond terms are scattered and inconsistently defined; a daily terms board (conversion / reference price, outstanding) lets you compute premium and conversion value consistently and point-in-time safe.",
+    coverageNote:
+      "逐可轉債逐日一列,標的為上櫃可轉債;含轉換價 / 參考價 / 標的股價 / 流通餘額 / 票面利率。以 trade_date 為知識時間,point-in-time 安全。",
+    coverageNoteEn:
+      "One row per convertible bond per day, TPEx-listed; includes conversion / reference price, underlying, outstanding, and coupon. Keyed on trade_date, point-in-time safe.",
+    freshnessNote: "日頻,隨上櫃可轉債更新。",
+    freshnessNoteEn: "Daily, updated with TPEx convertible bonds.",
+    sourcePolicyNote: "由官方 TPEx 上櫃可轉債資料提供;非投資建議。",
+    sourcePolicyNoteEn: "From official TPEx convertible-bond data; not investment advice.",
+    docsHref: "/docs/api/derivatives/convertible-bond-overview",
+    pricingHref: "/pricing",
+    keywords: ["可轉債", "轉換價", "CB 套利", "可轉債總覽", "上櫃可轉債"],
+    keywordsEn: ["convertible bond", "conversion price", "CB arbitrage", "convertible overview", "TPEx convertibles"],
+    jsonLdName: "可轉債總覽資料集",
+    jsonLdNameEn: "Convertible Bond Overview Dataset",
+    jsonLdDescription: "上櫃可轉債每日條款(轉換價 / 參考價 / 標的股價 / 流通餘額 / 票面利率),point-in-time 安全。",
+    jsonLdDescriptionEn:
+      "Daily TPEx convertible-bond terms (conversion / reference price, underlying, outstanding, coupon), point-in-time safe.",
+    sourceRole: "official_convertible_bond_overview",
+    provider: "tpex",
+    marketScope: "TWSE_TPEX",
+  },
+  {
     slug: "securities-lending",
     name: "借券資料",
     nameEn: "Securities Lending",
