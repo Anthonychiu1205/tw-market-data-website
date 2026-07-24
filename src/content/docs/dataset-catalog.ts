@@ -126,6 +126,7 @@ const DATASET_META: Record<string, DatasetMeta> = {
   // ── Derivatives & Convertibles ──
   "derivatives-market": { domain: "derivatives", zh: "期貨市場", en: "Derivatives market", agency: "TAIFEX", grade: "verified" },
   "options-daily-taifex": { domain: "derivatives", zh: "選擇權日線", en: "Options (daily)", agency: "TAIFEX", grade: "verified" },
+  "taifex-atm-iv": { domain: "derivatives", zh: "台指ATM隱含波動率", en: "TAIEX ATM Implied Volatility", agency: "TAIFEX", grade: "derived" },
   "taifex-options-settlement-price": { domain: "derivatives", zh: "選擇權結算價", en: "Options settlement price", agency: "TAIFEX", grade: "verified" },
   "taifex-institutional-flow": { domain: "derivatives", zh: "期貨法人籌碼", en: "TAIFEX institutional flow", agency: "TAIFEX", grade: "verified" },
   "convertible-bonds": { domain: "derivatives", zh: "可轉債", en: "Convertible bonds", agency: "TPEx", grade: "verified" },

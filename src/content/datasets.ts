@@ -46,6 +46,60 @@ export type DatasetSeoEntrySource = DatasetSeoEntry & {
 
 export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
   {
+    slug: "taifex-atm-iv",
+    name: "台指 ATM 隱含波動率",
+    nameEn: "TAIEX ATM Implied Volatility",
+    seoTitle: "台指 ATM 隱含波動率資料集(derived)| TW Market Data",
+    seoTitleEn: "TAIEX ATM Implied Volatility Dataset (derived) | TW Market Data",
+    seoDescription:
+      "台指 ATM 隱含波動率資料集提供每日 TAIEX 價平(ATM)隱含波動率,以 Black-Scholes 由官方 TXO 選擇權價與 TAIEX 現貨反推,一日一列(含 atm_iv、現貨、價平履約價、到期日、納入選擇權數)。derivation_verified,非官方 VIX;point-in-time 安全。",
+    seoDescriptionEn:
+      "The TAIEX ATM Implied Volatility dataset provides daily at-the-money implied volatility for the TAIEX, reverse-engineered via Black-Scholes from official TXO option prices and the TAIEX spot — one row per day (atm_iv, spot, ATM strike, expiry, number of options included). Derivation-verified, not the official VIX; point-in-time safe.",
+    shortDescription: "每日 TAIEX 價平隱含波動率,由官方選擇權價 + 現貨以 BS 反推(非官方 VIX)。",
+    shortDescriptionEn:
+      "Daily TAIEX at-the-money implied volatility, reverse-engineered via Black-Scholes from official option prices + spot (not the official VIX).",
+    whatItIs:
+      "台指 ATM 隱含波動率資料集每一列對應「一個交易日」的 TAIEX 價平隱含波動率,欄位包含 atm_iv(年化小數)、spot(TAIEX 現貨)、atm_strike(價平履約價)、expiry_date(到期日)與 n_options(納入計算的選擇權數)。數值由 Black-Scholes 從官方 TXO 選擇權價與 TAIEX 現貨反推(derivation_verified,引擎忠實重現官方輸入),為波動率的衍生指標,非官方 VIX(官方 VIX 為付費)。到期日 dte≤1 時 BS T→0 會放大,屬正常非壞值;以 trade_date 為知識時間,point-in-time 安全。",
+    whatItIsEn:
+      "Each row is one trading day of TAIEX at-the-money implied volatility, carrying atm_iv (annualized decimal), spot (TAIEX spot), atm_strike, expiry_date, and n_options (options included in the calculation). Values are reverse-engineered via Black-Scholes from official TXO option prices and the TAIEX spot (derivation-verified — the engine faithfully reproduces official inputs); it is a derived volatility measure, NOT the official VIX (which is paid). Near expiry (dte ≤ 1) BS T→0 amplifies the value — expected, not a bad reading. Keyed on trade_date and point-in-time safe.",
+    useCases: [
+      "以 ATM 隱含波動率判讀市場波動率環境(高/低波動)。",
+      "作為 VIX 代理觀察情緒與避險成本變化。",
+      "結合選擇權與現貨,分析波動率結構與到期效應。",
+    ],
+    useCasesEn: [
+      "Read the market volatility regime (high/low vol) from ATM implied volatility.",
+      "Use as a VIX proxy to watch sentiment and hedging-cost changes.",
+      "Analyze volatility structure and expiry effects alongside options and spot.",
+    ],
+    whyItMatters:
+      "官方 VIX 為付費;此資料集以官方選擇權價 derivation-verified 反推價平隱含波動率,提供可追溯、point-in-time 安全的波動率環境指標,免自行反推的計算與口徑風險。",
+    whyItMattersEn:
+      "The official VIX is paid; this dataset derivation-verifies ATM implied volatility from official option prices, giving a traceable, point-in-time-safe volatility-regime indicator without the burden and convention risk of reverse-engineering it yourself.",
+    coverageNote:
+      "逐交易日一列,標的為 TAIEX;含 atm_iv / spot / atm_strike / expiry_date / n_options。以 trade_date 為知識時間,point-in-time 安全;dte≤1 的放大屬正常。",
+    coverageNoteEn:
+      "One row per trading day for the TAIEX; includes atm_iv / spot / atm_strike / expiry_date / n_options. Keyed on trade_date, point-in-time safe; the near-expiry (dte ≤ 1) amplification is expected.",
+    freshnessNote: "日頻,隨官方選擇權與現貨更新。",
+    freshnessNoteEn: "Daily, updated with official options and spot.",
+    sourcePolicyNote:
+      "由官方 TAIFEX TXO 選擇權價 + TAIEX 現貨 derivation-verified 反推;為衍生指標,非官方 VIX,非投資建議。",
+    sourcePolicyNoteEn:
+      "Derivation-verified from official TAIFEX TXO option prices + TAIEX spot; a derived measure, not the official VIX, not investment advice.",
+    docsHref: "/docs/api/derivatives/taifex-atm-iv",
+    pricingHref: "/pricing",
+    keywords: ["台指隱含波動率", "ATM IV", "VIX 代理", "波動率環境", "台股選擇權"],
+    keywordsEn: ["TAIEX implied volatility", "ATM IV", "VIX proxy", "volatility regime", "Taiwan options"],
+    jsonLdName: "台指 ATM 隱含波動率資料集",
+    jsonLdNameEn: "TAIEX ATM Implied Volatility Dataset",
+    jsonLdDescription: "每日 TAIEX 價平隱含波動率,由官方選擇權價 derivation-verified 反推,point-in-time 安全(非官方 VIX)。",
+    jsonLdDescriptionEn:
+      "Daily TAIEX at-the-money implied volatility, derivation-verified from official option prices, point-in-time safe (not the official VIX).",
+    sourceRole: "derived_taifex_atm_iv",
+    provider: "taifex",
+    marketScope: "TWSE",
+  },
+  {
     slug: "twse-daily-price",
     name: "TWSE 日線價格",
     nameEn: "TWSE Daily Prices",

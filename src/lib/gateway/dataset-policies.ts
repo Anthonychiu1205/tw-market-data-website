@@ -83,6 +83,7 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "market-overview-snapshots": { datasetSlug: "market-overview-snapshots", backendPath: "/v2/datasets/market-overview-snapshots", requiredPlan: "pro", creditsCost: 2 },
   "price-enhanced": { datasetSlug: "price-enhanced", backendPath: "/v2/datasets/price-enhanced", requiredPlan: "starter", creditsCost: 2 },
   "stock-price-limit-daily": { datasetSlug: "stock-price-limit-daily", backendPath: "/v2/datasets/stock-price-limit-daily", requiredPlan: "pro", creditsCost: 2 },
+  "taifex-atm-iv": { datasetSlug: "taifex-atm-iv", backendPath: "/v2/datasets/taifex-atm-iv", requiredPlan: "max", creditsCost: 2 },
   "taifex-options-settlement-price": { datasetSlug: "taifex-options-settlement-price", backendPath: "/v2/datasets/taifex-options-settlement-price", requiredPlan: "pro", creditsCost: 2 },
   "valuation-core-daily": { datasetSlug: "valuation-core-daily", backendPath: "/v2/datasets/valuation-core-daily", requiredPlan: "pro", creditsCost: 2 },
   // tier aligned to read API (valuation→valuation-data = pro, explicit)

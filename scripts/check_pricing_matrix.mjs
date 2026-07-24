@@ -42,6 +42,9 @@ const NOT_IN_MATRIX = {
   "margin-system-stats": "Wave L building page (grade=building until 8/1 serving); tier pro per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
   "short-restriction-flags": "Wave L building page (grade=building until 8/1 serving); tier pro per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
   "trading-rules-reference": "Wave L building page (grade=building until 8/1 serving); tier free per WAVE_L_REGISTRY.json; not yet in / stale in the backend retier matrix — remove after infra re-vendors post-serving.",
+  // batch (a) backend-routed derivatives (taifex / convertible bond): tier from the backend registry;
+  // not yet in the vendored retier matrix — remove each once infra re-vendors.
+  "taifex-atm-iv": "batch (a) backend-routed derivative (TAIEX ATM IV, derived); tier max from backend registry; not yet in the retier matrix — remove after infra re-vendors.",
 };
 
 // Matrix entries the backend explicitly marks as not-sellable. A website slug pointing at one of these
