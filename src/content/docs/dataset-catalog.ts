@@ -111,7 +111,11 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "stock-delisting-lifecycle": { domain: "companies-events", zh: "下市生命週期", en: "Delisting lifecycle", agency: "TWSE / TPEx", grade: "reference" },
   "company-risk-events": { domain: "companies-events", zh: "公司風險事件", en: "Company risk events", agency: "TWSE / TPEx", grade: "reference" },
   "disposition-securities-period": { domain: "companies-events", zh: "處置證券期間", en: "Disposition securities period", agency: "TWSE", grade: "reference" },
-  "esg-tesg": { domain: "companies-events", zh: "ESG（TESG）", en: "ESG (TESG)", agency: "TWSE", grade: "derived" },
+  // slug stays esg-tesg (serving gateway route) but the data is GHG carbon disclosure, NOT a TESG
+  // rating — live rows: subfamily=ghg_carbon_disclosure, scope1/2/3 emissions (噸CO2e) + assurance,
+  // source_family=twse_ghg. Label corrected 2026-07-24 (禁造:標籤=實際). Canonical
+  // esg-ghg-carbon-disclosure route still 404s at the gateway; renames here once it serves 200.
+  "esg-tesg": { domain: "companies-events", zh: "GHG 碳揭露（範疇1/2/3）", en: "GHG Carbon Disclosure (Scope 1/2/3)", agency: "TWSE", grade: "derived" },
 
   // ── Market Structure & Reference ──
   "security-master": { domain: "structure-reference", zh: "股票主檔", en: "Security master", agency: "TWSE / TPEx", grade: "reference" },
