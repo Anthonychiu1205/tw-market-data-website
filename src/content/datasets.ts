@@ -2248,6 +2248,874 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     marketScope: "TWSE_TPEX",
   },
   {
+    slug: "valuation-core-daily",
+    name: "核心估值日線",
+    nameEn: "Core Valuation (daily)",
+    seoTitle: "核心估值日線資料集(derived)| TW Market Data",
+    seoTitleEn: "Core Valuation (daily) Dataset (derived) | TW Market Data",
+    seoDescription:
+      "核心估值日線資料集提供個股每日核心估值(市值、PS、每股淨值),每列對應一檔個股一日的估值,欄位含 ticker / date / close / shares_outstanding / market_cap / trailing_12m_revenue;資料來源證交所／櫃買(TWSE／TPEx)(推導型(由官方資料計算))。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Core Valuation (daily) dataset provides daily core valuation (market cap, P/S, book value per share) — one row per stock's valuation for day, with fields ticker / date / close / shares_outstanding / market_cap / trailing_12m_revenue; sourced from the TWSE / TPEx (derived (computed from official data)). Coverage taken verbatim from the backend meta.",
+    shortDescription: "個股每日核心估值(市值、PS、每股淨值),逐列 代碼、日期、收盤、流通股數、市值、近12月營收、股價營收比(PS)與每股淨值;來源證交所／櫃買(TWSE／TPEx)。",
+    shortDescriptionEn: "Daily core valuation (market cap, p/s, book value per share) — per row: ticker, date, close, shares outstanding, market cap, trailing-12m revenue, P/S, and book value per share; sourced from the TWSE / TPEx.",
+    whatItIs:
+      "核心估值日線資料集每一列對應一檔個股一日的估值,欄位包含 ticker / date / close / shares_outstanding / market_cap / trailing_12m_revenue / ps / book_value_per_share(代碼、日期、收盤、流通股數、市值、近12月營收、股價營收比(PS)與每股淨值)。資料來源為證交所／櫃買(TWSE／TPEx),分級 推導型(由官方資料計算)。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one stock's valuation for one day, carrying ticker / date / close / shares_outstanding / market_cap / trailing_12m_revenue / ps / book_value_per_share (ticker, date, close, shares outstanding, market cap, trailing-12m revenue, P/S, and book value per share). Sourced from the TWSE / TPEx, graded derived (computed from official data). The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以市值與 PS 建立每日估值橫斷面。",
+      "結合近12月營收判讀營收基礎估值。",
+      "作為選股與相對估值分析的日頻資料層。",
+    ],
+    useCasesEn: [
+      "Build a daily valuation cross-section from market cap and P/S.",
+      "Read revenue-based valuation via trailing-12m revenue.",
+      "Use as the daily layer for screening and relative-valuation analysis.",
+    ],
+    whyItMatters:
+      "估值需結合股價、股數與財報基礎;此資料集以一日一列預先算好市值、PS 與每股淨值,免自行對齊多源。",
+    whyItMattersEn:
+      "Valuation needs price, share count, and fundamentals combined; this dataset pre-computes market cap, P/S, and BVPS one row per day, no multi-source alignment.",
+    coverageNote:
+      "個股每日核心估值(市值、PS、每股淨值),每列 一檔個股一日的估值,欄位 ticker / date / close / shares_outstanding / market_cap / trailing_12m_revenue;來源證交所／櫃買(TWSE／TPEx)(分級 推導型(由官方資料計算))。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Daily core valuation (market cap, p/s, book value per share); one row per stock's valuation for day, fields ticker / date / close / shares_outstanding / market_cap / trailing_12m_revenue; sourced from the TWSE / TPEx (graded derived (computed from official data)). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所／櫃買(TWSE／TPEx)(分級 推導型(由官方資料計算));非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE / TPEx (graded derived (computed from official data)); not investment advice.",
+    docsHref: "/docs/api/market-prices/valuation-core-daily",
+    pricingHref: "/pricing",
+    keywords: [
+      "核心估值日線",
+      "台股資料集",
+      "個股每日核心估值(市值、PS、每股淨值)",
+      "證交所／櫃買(TWSE／TPEx)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Core Valuation (daily)",
+      "Taiwan stock dataset",
+      "daily core valuation (market cap, P/S, book value per share)",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "核心估值日線資料集",
+    jsonLdNameEn: "Core Valuation (daily) Dataset",
+    jsonLdDescription: "個股每日核心估值(市值、PS、每股淨值),來源證交所／櫃買(TWSE／TPEx)(推導型(由官方資料計算))。",
+    jsonLdDescriptionEn: "Daily core valuation (market cap, p/s, book value per share), sourced from the TWSE / TPEx (derived (computed from official data)).",
+    sourceRole: "derived_valuation_core_daily",
+    provider: "twse_tpex",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "stock-price-limit-daily",
+    name: "漲跌停價日線",
+    nameEn: "Price-Limit (daily)",
+    seoTitle: "漲跌停價日線資料集(verified)| TW Market Data",
+    seoTitleEn: "Price-Limit (daily) Dataset (verified) | TW Market Data",
+    seoDescription:
+      "漲跌停價日線資料集提供個股每日漲停／跌停價與參考價,每列對應一檔個股一日的漲跌停價,欄位含 trade_date / ticker / market / limit_up_price / limit_down_price / reference_price;資料來源證交所(TWSE)(官方已驗證)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Price-Limit (daily) dataset provides daily limit-up / limit-down and reference prices per stock — one row per stock's price limits for day, with fields trade_date / ticker / market / limit_up_price / limit_down_price / reference_price; sourced from the TWSE (official, verified). Coverage taken verbatim from the backend meta.",
+    shortDescription: "個股每日漲停／跌停價與參考價,逐列 交易日、代碼、市場、漲停價、跌停價與參考價;來源證交所(TWSE)。",
+    shortDescriptionEn: "Daily limit-up / limit-down and reference prices per stock — per row: trade date, ticker, market, limit-up price, limit-down price, and reference price; sourced from the TWSE.",
+    whatItIs:
+      "漲跌停價日線資料集每一列對應一檔個股一日的漲跌停價,欄位包含 trade_date / ticker / market / limit_up_price / limit_down_price / reference_price(交易日、代碼、市場、漲停價、跌停價與參考價)。資料來源為證交所(TWSE),分級 官方已驗證。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one stock's price limits for one day, carrying trade_date / ticker / market / limit_up_price / limit_down_price / reference_price (trade date, ticker, market, limit-up price, limit-down price, and reference price). Sourced from the TWSE, graded official, verified. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "取得個股每日的漲停／跌停邊界做交易性判斷。",
+      "以參考價還原漲跌幅計算基準。",
+      "偵測收盤是否貼近漲跌停(情緒與流動性訊號)。",
+    ],
+    useCasesEn: [
+      "Get each stock's daily limit-up/down bounds for tradability checks.",
+      "Recover the change-percent base via reference price.",
+      "Detect closes near the limit (a sentiment/liquidity signal).",
+    ],
+    whyItMatters:
+      "漲跌停邊界隨參考價每日變動;此資料集以官方口徑一日一列提供上下限與參考價,免自行推算。",
+    whyItMattersEn:
+      "Limit bounds move daily with the reference price; this dataset serves the official bounds and reference one row per day, no manual derivation.",
+    coverageNote:
+      "個股每日漲停／跌停價與參考價,每列 一檔個股一日的漲跌停價,欄位 trade_date / ticker / market / limit_up_price / limit_down_price / reference_price;來源證交所(TWSE)(分級 官方已驗證)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Daily limit-up / limit-down and reference prices per stock; one row per stock's price limits for day, fields trade_date / ticker / market / limit_up_price / limit_down_price / reference_price; sourced from the TWSE (graded official, verified). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所(TWSE)(分級 官方已驗證);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE (graded official, verified); not investment advice.",
+    docsHref: "/docs/api/market-prices/stock-price-limit-daily",
+    pricingHref: "/pricing",
+    keywords: [
+      "漲跌停價日線",
+      "台股資料集",
+      "個股每日漲停／跌停價與參考價",
+      "證交所(TWSE)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Price-Limit (daily)",
+      "Taiwan stock dataset",
+      "daily limit-up / limit-down and reference prices per stock",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "漲跌停價日線資料集",
+    jsonLdNameEn: "Price-Limit (daily) Dataset",
+    jsonLdDescription: "個股每日漲停／跌停價與參考價,來源證交所(TWSE)(官方已驗證)。",
+    jsonLdDescriptionEn: "Daily limit-up / limit-down and reference prices per stock, sourced from the TWSE (official, verified).",
+    sourceRole: "verified_stock_price_limit_daily",
+    provider: "twse",
+    marketScope: "TWSE",
+  },
+  {
+    slug: "taifex-institutional-flow",
+    name: "期貨法人籌碼",
+    nameEn: "TAIFEX Institutional Flow",
+    seoTitle: "期貨法人籌碼資料集(verified)| TW Market Data",
+    seoTitleEn: "TAIFEX Institutional Flow Dataset (verified) | TW Market Data",
+    seoDescription:
+      "期貨法人籌碼資料集提供三大法人在期貨／選擇權的未平倉部位,每列對應一日一商品一法人別的部位,欄位含 trade_date / product_type / market_type / product_contract / expiry_month / investor_type;資料來源期交所(TAIFEX)(官方已驗證)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The TAIFEX Institutional Flow dataset provides the three institutional groups' futures/options open interest — one row per product's positioning for investor type on day, with fields trade_date / product_type / market_type / product_contract / expiry_month / investor_type; sourced from the TAIFEX (official, verified). Coverage taken verbatim from the backend meta.",
+    shortDescription: "三大法人在期貨／選擇權的未平倉部位,逐列 交易日、商品類別、市場別、契約、到期月、法人別、多方未平倉與空方未平倉;來源期交所(TAIFEX)。",
+    shortDescriptionEn: "The three institutional groups' futures/options open interest — per row: trade date, product type, market type, contract, expiry month, investor type, long OI, and short OI; sourced from the TAIFEX.",
+    whatItIs:
+      "期貨法人籌碼資料集每一列對應一日一商品一法人別的部位,欄位包含 trade_date / product_type / market_type / product_contract / expiry_month / investor_type / long_open_interest / short_open_interest(交易日、商品類別、市場別、契約、到期月、法人別、多方未平倉與空方未平倉)。資料來源為期交所(TAIFEX),分級 官方已驗證。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one product's positioning for one investor type on one day, carrying trade_date / product_type / market_type / product_contract / expiry_month / investor_type / long_open_interest / short_open_interest (trade date, product type, market type, contract, expiry month, investor type, long OI, and short OI). Sourced from the TAIFEX, graded official, verified. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "追蹤三大法人在台指期／選的多空未平倉。",
+      "以淨未平倉判讀法人方向與轉倉。",
+      "結合到期月分析法人部位的期限結構。",
+    ],
+    useCasesEn: [
+      "Track institutional long/short OI in TAIEX futures/options.",
+      "Read institutional direction and rolls via net OI.",
+      "Analyze the term structure of positioning by expiry month.",
+    ],
+    whyItMatters:
+      "法人期貨籌碼是台股方向的重要領先訊號;此資料集以官方口徑逐日逐商品提供多空未平倉,免逐表解析。",
+    whyItMattersEn:
+      "Institutional futures positioning is a key directional signal; this dataset serves long/short OI by day and product from the official source, no report-by-report parsing.",
+    coverageNote:
+      "三大法人在期貨／選擇權的未平倉部位,每列 一日一商品一法人別的部位,欄位 trade_date / product_type / market_type / product_contract / expiry_month / investor_type;來源期交所(TAIFEX)(分級 官方已驗證)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "The three institutional groups' futures/options open interest; one row per product's positioning for investor type on day, fields trade_date / product_type / market_type / product_contract / expiry_month / investor_type; sourced from the TAIFEX (graded official, verified). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源期交所(TAIFEX)(分級 官方已驗證);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TAIFEX (graded official, verified); not investment advice.",
+    docsHref: "/docs/api/derivatives/taifex-institutional-flow",
+    pricingHref: "/pricing",
+    keywords: [
+      "期貨法人籌碼",
+      "台股資料集",
+      "三大法人在期貨／選擇權的未平倉部位",
+      "期交所(TAIFEX)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "TAIFEX Institutional Flow",
+      "Taiwan stock dataset",
+      "the three institutional groups' futures/options open interest",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "期貨法人籌碼資料集",
+    jsonLdNameEn: "TAIFEX Institutional Flow Dataset",
+    jsonLdDescription: "三大法人在期貨／選擇權的未平倉部位,來源期交所(TAIFEX)(官方已驗證)。",
+    jsonLdDescriptionEn: "The three institutional groups' futures/options open interest, sourced from the TAIFEX (official, verified).",
+    sourceRole: "verified_taifex_institutional_flow",
+    provider: "taifex",
+    marketScope: "TWSE",
+  },
+  {
+    slug: "options-daily-taifex",
+    name: "選擇權日線",
+    nameEn: "Options (daily)",
+    seoTitle: "選擇權日線資料集(verified)| TW Market Data",
+    seoTitleEn: "Options (daily) Dataset (verified) | TW Market Data",
+    seoDescription:
+      "選擇權日線資料集提供台指選擇權逐契約每日行情,每列對應一日一契約的選擇權行情,欄位含 trade_date / contract_symbol / option_type / strike_price / expiry_month / open;資料來源期交所(TAIFEX)(官方已驗證)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Options (daily) dataset provides daily per-contract TAIEX option quotes — one row per option contract's quote for day, with fields trade_date / contract_symbol / option_type / strike_price / expiry_month / open; sourced from the TAIFEX (official, verified). Coverage taken verbatim from the backend meta.",
+    shortDescription: "台指選擇權逐契約每日行情,逐列 交易日、契約代碼、買權／賣權、履約價、到期月與開高低;來源期交所(TAIFEX)。",
+    shortDescriptionEn: "Daily per-contract taiex option quotes — per row: trade date, contract symbol, call/put, strike price, expiry month, and open/high/low; sourced from the TAIFEX.",
+    whatItIs:
+      "選擇權日線資料集每一列對應一日一契約的選擇權行情,欄位包含 trade_date / contract_symbol / option_type / strike_price / expiry_month / open / high / low(交易日、契約代碼、買權／賣權、履約價、到期月與開高低)。資料來源為期交所(TAIFEX),分級 官方已驗證。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one option contract's quote for one day, carrying trade_date / contract_symbol / option_type / strike_price / expiry_month / open / high / low (trade date, contract symbol, call/put, strike price, expiry month, and open/high/low). Sourced from the TAIFEX, graded official, verified. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以逐契約行情建立選擇權波動率曲面。",
+      "分析各履約價／到期月的價格結構。",
+      "作為選擇權策略回測的官方行情層。",
+    ],
+    useCasesEn: [
+      "Build an option volatility surface from per-contract quotes.",
+      "Analyze price structure across strikes and expiries.",
+      "Use as the official quote layer for options-strategy backtests.",
+    ],
+    whyItMatters:
+      "選擇權行情逐契約龐雜;此資料集以官方口徑逐日逐契約提供開高低,免自行整併多契約檔案。",
+    whyItMattersEn:
+      "Per-contract option data is voluminous; this dataset serves daily OHLC per contract from the official source, no manual multi-contract assembly.",
+    coverageNote:
+      "台指選擇權逐契約每日行情,每列 一日一契約的選擇權行情,欄位 trade_date / contract_symbol / option_type / strike_price / expiry_month / open;來源期交所(TAIFEX)(分級 官方已驗證)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Daily per-contract taiex option quotes; one row per option contract's quote for day, fields trade_date / contract_symbol / option_type / strike_price / expiry_month / open; sourced from the TAIFEX (graded official, verified). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源期交所(TAIFEX)(分級 官方已驗證);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TAIFEX (graded official, verified); not investment advice.",
+    docsHref: "/docs/api/derivatives/options-daily-taifex",
+    pricingHref: "/pricing",
+    keywords: [
+      "選擇權日線",
+      "台股資料集",
+      "台指選擇權逐契約每日行情",
+      "期交所(TAIFEX)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Options (daily)",
+      "Taiwan stock dataset",
+      "daily per-contract TAIEX option quotes",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "選擇權日線資料集",
+    jsonLdNameEn: "Options (daily) Dataset",
+    jsonLdDescription: "台指選擇權逐契約每日行情,來源期交所(TAIFEX)(官方已驗證)。",
+    jsonLdDescriptionEn: "Daily per-contract taiex option quotes, sourced from the TAIFEX (official, verified).",
+    sourceRole: "verified_options_daily_taifex",
+    provider: "taifex",
+    marketScope: "TWSE",
+  },
+  {
+    slug: "taifex-options-settlement-price",
+    name: "選擇權結算價",
+    nameEn: "Options Settlement Price",
+    seoTitle: "選擇權結算價資料集(verified)| TW Market Data",
+    seoTitleEn: "Options Settlement Price Dataset (verified) | TW Market Data",
+    seoDescription:
+      "選擇權結算價資料集提供台指選擇權逐契約每日結算價,每列對應一日一契約的結算價,欄位含 trade_date / contract_symbol / option_type / strike_price / expiry_month / settlement_price;資料來源期交所(TAIFEX)(官方已驗證)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Options Settlement Price dataset provides daily per-contract TAIEX option settlement prices — one row per option contract's settlement price for day, with fields trade_date / contract_symbol / option_type / strike_price / expiry_month / settlement_price; sourced from the TAIFEX (official, verified). Coverage taken verbatim from the backend meta.",
+    shortDescription: "台指選擇權逐契約每日結算價,逐列 交易日、契約代碼、買權／賣權、履約價、到期月與結算價;來源期交所(TAIFEX)。",
+    shortDescriptionEn: "Daily per-contract taiex option settlement prices — per row: trade date, contract symbol, call/put, strike price, expiry month, and settlement price; sourced from the TAIFEX.",
+    whatItIs:
+      "選擇權結算價資料集每一列對應一日一契約的結算價,欄位包含 trade_date / contract_symbol / option_type / strike_price / expiry_month / settlement_price(交易日、契約代碼、買權／賣權、履約價、到期月與結算價)。資料來源為期交所(TAIFEX),分級 官方已驗證。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one option contract's settlement price for one day, carrying trade_date / contract_symbol / option_type / strike_price / expiry_month / settlement_price (trade date, contract symbol, call/put, strike price, expiry month, and settlement price). Sourced from the TAIFEX, graded official, verified. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以官方結算價評價選擇權部位(mark-to-market)。",
+      "建立跨契約的結算價序列做波動率分析。",
+      "作為選擇權清算與風控的官方基準價。",
+    ],
+    useCasesEn: [
+      "Mark option positions to the official settlement price.",
+      "Build settlement-price series across contracts for vol analysis.",
+      "Use as the official benchmark for options clearing and risk.",
+    ],
+    whyItMatters:
+      "結算價是選擇權評價與清算的官方基準;此資料集逐日逐契約提供結算價,免自行從行情推估。",
+    whyItMattersEn:
+      "Settlement price is the official basis for option valuation and clearing; this dataset serves it per contract per day, no estimation from quotes.",
+    coverageNote:
+      "台指選擇權逐契約每日結算價,每列 一日一契約的結算價,欄位 trade_date / contract_symbol / option_type / strike_price / expiry_month / settlement_price;來源期交所(TAIFEX)(分級 官方已驗證)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Daily per-contract taiex option settlement prices; one row per option contract's settlement price for day, fields trade_date / contract_symbol / option_type / strike_price / expiry_month / settlement_price; sourced from the TAIFEX (graded official, verified). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源期交所(TAIFEX)(分級 官方已驗證);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TAIFEX (graded official, verified); not investment advice.",
+    docsHref: "/docs/api/derivatives/taifex-options-settlement-price",
+    pricingHref: "/pricing",
+    keywords: [
+      "選擇權結算價",
+      "台股資料集",
+      "台指選擇權逐契約每日結算價",
+      "期交所(TAIFEX)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Options Settlement Price",
+      "Taiwan stock dataset",
+      "daily per-contract TAIEX option settlement prices",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "選擇權結算價資料集",
+    jsonLdNameEn: "Options Settlement Price Dataset",
+    jsonLdDescription: "台指選擇權逐契約每日結算價,來源期交所(TAIFEX)(官方已驗證)。",
+    jsonLdDescriptionEn: "Daily per-contract taiex option settlement prices, sourced from the TAIFEX (official, verified).",
+    sourceRole: "verified_taifex_options_settlement_price",
+    provider: "taifex",
+    marketScope: "TWSE",
+  },
+  {
+    slug: "stock-split-par-value-events",
+    name: "股票分割／面額事件",
+    nameEn: "Stock Split & Par-Value Events",
+    seoTitle: "股票分割／面額事件資料集(verified)| TW Market Data",
+    seoTitleEn: "Stock Split & Par-Value Events Dataset (verified) | TW Market Data",
+    seoDescription:
+      "股票分割／面額事件資料集提供股票分割與面額變更事件,每列對應一個分割／面額事件,欄位含 market / security_code / security_type / event_type / event_date / announcement_date;資料來源證交所／櫃買(TWSE／TPEx)(官方已驗證)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Stock Split & Par-Value Events dataset provides stock split and par-value change events — one row per split / par-value event, with fields market / security_code / security_type / event_type / event_date / announcement_date; sourced from the TWSE / TPEx (official, verified). Coverage taken verbatim from the backend meta.",
+    shortDescription: "股票分割與面額變更事件,逐列 市場、證券代碼、證券類別、事件型別、事件日、公告日、停牌日與復牌日;來源證交所／櫃買(TWSE／TPEx)。",
+    shortDescriptionEn: "Stock split and par-value change events — per row: market, security code, security type, event type, event date, announcement date, suspend and resume dates; sourced from the TWSE / TPEx.",
+    whatItIs:
+      "股票分割／面額事件資料集每一列對應一個分割／面額事件,欄位包含 market / security_code / security_type / event_type / event_date / announcement_date / suspend_trading_date / resume_trading_date(市場、證券代碼、證券類別、事件型別、事件日、公告日、停牌日與復牌日)。資料來源為證交所／櫃買(TWSE／TPEx),分級 官方已驗證。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one split / par-value event, carrying market / security_code / security_type / event_type / event_date / announcement_date / suspend_trading_date / resume_trading_date (market, security code, security type, event type, event date, announcement date, suspend and resume dates). Sourced from the TWSE / TPEx, graded official, verified. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以事件日與停復牌日校正價格序列的分割調整。",
+      "追蹤面額變更對每股數據的影響。",
+      "作為還原價格與公司行動的事件依據。",
+    ],
+    useCasesEn: [
+      "Adjust price series for splits via event and suspend/resume dates.",
+      "Track par-value changes affecting per-share figures.",
+      "Use as the event basis for adjusted prices and corporate actions.",
+    ],
+    whyItMatters:
+      "分割與面額變更會斷裂價格序列;此資料集以事件日與停復牌日一致呈現,是價格還原的必要事件層。",
+    whyItMattersEn:
+      "Splits and par-value changes break price series; this dataset presents event and suspend/resume dates consistently — the event layer price adjustment needs.",
+    coverageNote:
+      "股票分割與面額變更事件,每列 一個分割／面額事件,欄位 market / security_code / security_type / event_type / event_date / announcement_date;來源證交所／櫃買(TWSE／TPEx)(分級 官方已驗證)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Stock split and par-value change events; one row per split / par-value event, fields market / security_code / security_type / event_type / event_date / announcement_date; sourced from the TWSE / TPEx (graded official, verified). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所／櫃買(TWSE／TPEx)(分級 官方已驗證);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE / TPEx (graded official, verified); not investment advice.",
+    docsHref: "/docs/api/companies-events/stock-split-par-value-events",
+    pricingHref: "/pricing",
+    keywords: [
+      "股票分割／面額事件",
+      "台股資料集",
+      "股票分割與面額變更事件",
+      "證交所／櫃買(TWSE／TPEx)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Stock Split & Par-Value Events",
+      "Taiwan stock dataset",
+      "stock split and par-value change events",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "股票分割／面額事件資料集",
+    jsonLdNameEn: "Stock Split & Par-Value Events Dataset",
+    jsonLdDescription: "股票分割與面額變更事件,來源證交所／櫃買(TWSE／TPEx)(官方已驗證)。",
+    jsonLdDescriptionEn: "Stock split and par-value change events, sourced from the TWSE / TPEx (official, verified).",
+    sourceRole: "verified_stock_split_par_value_events",
+    provider: "twse_tpex",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "tax-business-registration",
+    name: "稅籍／商業登記",
+    nameEn: "Tax & Business Registration",
+    seoTitle: "稅籍／商業登記資料集(reference)| TW Market Data",
+    seoTitleEn: "Tax & Business Registration Dataset (reference) | TW Market Data",
+    seoDescription:
+      "稅籍／商業登記資料集提供公司稅籍與商業登記主檔,每列對應一家公司的登記資料,欄位含 company_id / business_registration_number / tax_id / company_name / registered_address / status;資料來源經濟部(MOEA)(參考／主檔型)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Tax & Business Registration dataset provides company tax and business-registration master data — one row per company's registration record, with fields company_id / business_registration_number / tax_id / company_name / registered_address / status; sourced from the Ministry of Economic Affairs (MOEA) (reference / master). Coverage taken verbatim from the backend meta.",
+    shortDescription: "公司稅籍與商業登記主檔,逐列 公司統編、商業登記號、稅籍編號、公司名稱、登記地址、狀態、代表人與設立日;來源經濟部(MOEA)。",
+    shortDescriptionEn: "Company tax and business-registration master data — per row: company ID, business registration number, tax ID, company name, registered address, status, representative, and incorporation date; sourced from the Ministry of Economic Affairs (MOEA).",
+    whatItIs:
+      "稅籍／商業登記資料集每一列對應一家公司的登記資料,欄位包含 company_id / business_registration_number / tax_id / company_name / registered_address / status / representative / incorporation_date(公司統編、商業登記號、稅籍編號、公司名稱、登記地址、狀態、代表人與設立日)。資料來源為經濟部(MOEA),分級 參考／主檔型。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one company's registration record, carrying company_id / business_registration_number / tax_id / company_name / registered_address / status / representative / incorporation_date (company ID, business registration number, tax ID, company name, registered address, status, representative, and incorporation date). Sourced from the Ministry of Economic Affairs (MOEA), graded reference / master. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以統編／稅籍串接上市櫃公司的登記主檔。",
+      "查核公司登記狀態與設立日。",
+      "作為 KYC／盡職調查的官方登記層。",
+    ],
+    useCasesEn: [
+      "Join listed companies to their registration master by company ID / tax ID.",
+      "Verify registration status and incorporation date.",
+      "Use as the official registration layer for KYC / due diligence.",
+    ],
+    whyItMatters:
+      "公司登記資料分散官方系統;此主檔以一致欄位提供統編、狀態與設立日,免逐家查登記。",
+    whyItMattersEn:
+      "Company registration data is spread across official systems; this master serves company ID, status, and incorporation date consistently, no company-by-company lookup.",
+    coverageNote:
+      "公司稅籍與商業登記主檔,每列 一家公司的登記資料,欄位 company_id / business_registration_number / tax_id / company_name / registered_address / status;來源經濟部(MOEA)(分級 參考／主檔型)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Company tax and business-registration master data; one row per company's registration record, fields company_id / business_registration_number / tax_id / company_name / registered_address / status; sourced from the Ministry of Economic Affairs (MOEA) (graded reference / master). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源經濟部(MOEA)(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the Ministry of Economic Affairs (MOEA) (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/funds-intel/tax-business-registration",
+    pricingHref: "/pricing",
+    keywords: [
+      "稅籍／商業登記",
+      "台股資料集",
+      "公司稅籍與商業登記主檔",
+      "經濟部(MOEA)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Tax & Business Registration",
+      "Taiwan stock dataset",
+      "company tax and business-registration master data",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "稅籍／商業登記資料集",
+    jsonLdNameEn: "Tax & Business Registration Dataset",
+    jsonLdDescription: "公司稅籍與商業登記主檔,來源經濟部(MOEA)(參考／主檔型)。",
+    jsonLdDescriptionEn: "Company tax and business-registration master data, sourced from the Ministry of Economic Affairs (MOEA) (reference / master).",
+    sourceRole: "reference_tax_business_registration",
+    provider: "moea",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "trading-rules-reference",
+    name: "交易制度沿革表",
+    nameEn: "Trading Rules Reference",
+    seoTitle: "交易制度沿革表資料集(reference)| TW Market Data",
+    seoTitleEn: "Trading Rules Reference Dataset (reference) | TW Market Data",
+    seoDescription:
+      "交易制度沿革表資料集提供交易制度變更的規則沿革,每列對應一條制度規則的一次變更,欄位含 rule_domain / rule_key / effective_date / end_date / prior_value / new_value;資料來源證交所(TWSE)(參考／主檔型)。以資料基準日為知識時間,point-in-time 安全;coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Trading Rules Reference dataset provides the change history of trading rules — one row per change to trading rule, with fields rule_domain / rule_key / effective_date / end_date / prior_value / new_value; sourced from the TWSE (reference / master). Keyed on the data as-of date and point-in-time safe; Coverage taken verbatim from the backend meta.",
+    shortDescription: "交易制度變更的規則沿革,逐列 規則領域、規則鍵、生效日、結束日、變更前值、變更後值、市場與說明;來源證交所(TWSE)。",
+    shortDescriptionEn: "The change history of trading rules — per row: rule domain, rule key, effective date, end date, prior value, new value, market, and description; sourced from the TWSE.",
+    whatItIs:
+      "交易制度沿革表資料集每一列對應一條制度規則的一次變更,欄位包含 rule_domain / rule_key / effective_date / end_date / prior_value / new_value / market / description(規則領域、規則鍵、生效日、結束日、變更前值、變更後值、市場與說明)。資料來源為證交所(TWSE),分級 參考／主檔型。以資料基準日為知識時間,point-in-time 安全;後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one change to one trading rule, carrying rule_domain / rule_key / effective_date / end_date / prior_value / new_value / market / description (rule domain, rule key, effective date, end date, prior value, new value, market, and description). Sourced from the TWSE, graded reference / master. Keyed on the data as-of date and point-in-time safe; The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以生效日還原任一交易日適用的制度參數(如漲跌幅)。",
+      "追蹤 tick、當沖、零股等規則的沿革。",
+      "為回測提供 point-in-time 正確的制度基準。",
+    ],
+    useCasesEn: [
+      "Recover the rule parameters (e.g. price limit) in force on any date via effective_date.",
+      "Track the history of tick, day-trading, and odd-lot rules.",
+      "Give backtests a point-in-time-correct rule baseline.",
+    ],
+    whyItMatters:
+      "制度參數隨時間改變,回測用今天規則套過去即失真;此資料集以生效／結束日提供規則沿革,point-in-time 安全。",
+    whyItMattersEn:
+      "Rule parameters change over time; applying today's rules to the past distorts backtests. This dataset serves rule history with effective/end dates, point-in-time safe.",
+    coverageNote:
+      "交易制度變更的規則沿革,每列 一條制度規則的一次變更,欄位 rule_domain / rule_key / effective_date / end_date / prior_value / new_value;來源證交所(TWSE)(分級 參考／主檔型)。以資料基準日為知識時間,point-in-time 安全;(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "The change history of trading rules; one row per change to trading rule, fields rule_domain / rule_key / effective_date / end_date / prior_value / new_value; sourced from the TWSE (graded reference / master). Keyed on the data as-of date and point-in-time safe; (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所(TWSE)(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/structure-reference/trading-rules-reference",
+    pricingHref: "/pricing",
+    keywords: [
+      "交易制度沿革表",
+      "台股資料集",
+      "交易制度變更的規則沿革",
+      "證交所(TWSE)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Trading Rules Reference",
+      "Taiwan stock dataset",
+      "the change history of trading rules",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "交易制度沿革表資料集",
+    jsonLdNameEn: "Trading Rules Reference Dataset",
+    jsonLdDescription: "交易制度變更的規則沿革,來源證交所(TWSE)(參考／主檔型)。",
+    jsonLdDescriptionEn: "The change history of trading rules, sourced from the TWSE (reference / master).",
+    sourceRole: "reference_trading_rules_reference",
+    provider: "twse",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "stock-delisting-lifecycle",
+    name: "下市生命週期",
+    nameEn: "Delisting Lifecycle",
+    seoTitle: "下市生命週期資料集(reference)| TW Market Data",
+    seoTitleEn: "Delisting Lifecycle Dataset (reference) | TW Market Data",
+    seoDescription:
+      "下市生命週期資料集提供個股下市的事件生命週期,每列對應一個下市生命週期事件,欄位含 market / code / company_name / event_type / announcement_date / suspension_date;資料來源證交所／櫃買(TWSE／TPEx)(參考／主檔型)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Delisting Lifecycle dataset provides the event lifecycle of a stock's delisting — one row per delisting-lifecycle event, with fields market / code / company_name / event_type / announcement_date / suspension_date; sourced from the TWSE / TPEx (reference / master). Coverage taken verbatim from the backend meta.",
+    shortDescription: "個股下市的事件生命週期,逐列 市場、代碼、公司名稱、事件型別、公告日、停牌日、下市日與原因摘要;來源證交所／櫃買(TWSE／TPEx)。",
+    shortDescriptionEn: "The event lifecycle of a stock's delisting — per row: market, code, company name, event type, announcement date, suspension date, delisting date, and reason summary; sourced from the TWSE / TPEx.",
+    whatItIs:
+      "下市生命週期資料集每一列對應一個下市生命週期事件,欄位包含 market / code / company_name / event_type / announcement_date / suspension_date / delisting_date / reason_summary(市場、代碼、公司名稱、事件型別、公告日、停牌日、下市日與原因摘要)。資料來源為證交所／櫃買(TWSE／TPEx),分級 參考／主檔型。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one delisting-lifecycle event, carrying market / code / company_name / event_type / announcement_date / suspension_date / delisting_date / reason_summary (market, code, company name, event type, announcement date, suspension date, delisting date, and reason summary). Sourced from the TWSE / TPEx, graded reference / master. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "建立下市個股的完整事件時間軸。",
+      "以下市日校正回測的存活者偏誤。",
+      "以原因摘要分類下市型態(如財務、合併)。",
+    ],
+    useCasesEn: [
+      "Build a full event timeline for delisted stocks.",
+      "Correct survivorship bias in backtests via delisting_date.",
+      "Classify delisting types (financial, merger) via reason summary.",
+    ],
+    whyItMatters:
+      "存活者偏誤是回測常見陷阱;此資料集以公告／停牌／下市日與原因提供下市生命週期,是校正的必要事件層。",
+    whyItMattersEn:
+      "Survivorship bias is a common backtest trap; this dataset serves the announcement/suspension/delisting timeline with reasons — the event layer needed to correct it.",
+    coverageNote:
+      "個股下市的事件生命週期,每列 一個下市生命週期事件,欄位 market / code / company_name / event_type / announcement_date / suspension_date;來源證交所／櫃買(TWSE／TPEx)(分級 參考／主檔型)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "The event lifecycle of a stock's delisting; one row per delisting-lifecycle event, fields market / code / company_name / event_type / announcement_date / suspension_date; sourced from the TWSE / TPEx (graded reference / master). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所／櫃買(TWSE／TPEx)(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE / TPEx (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/companies-events/stock-delisting-lifecycle",
+    pricingHref: "/pricing",
+    keywords: [
+      "下市生命週期",
+      "台股資料集",
+      "個股下市的事件生命週期",
+      "證交所／櫃買(TWSE／TPEx)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Delisting Lifecycle",
+      "Taiwan stock dataset",
+      "the event lifecycle of a stock's delisting",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "下市生命週期資料集",
+    jsonLdNameEn: "Delisting Lifecycle Dataset",
+    jsonLdDescription: "個股下市的事件生命週期,來源證交所／櫃買(TWSE／TPEx)(參考／主檔型)。",
+    jsonLdDescriptionEn: "The event lifecycle of a stock's delisting, sourced from the TWSE / TPEx (reference / master).",
+    sourceRole: "reference_stock_delisting_lifecycle",
+    provider: "twse_tpex",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "warrants-reference",
+    name: "權證參考主檔",
+    nameEn: "Warrants Reference (master)",
+    seoTitle: "權證參考主檔資料集(reference)| TW Market Data",
+    seoTitleEn: "Warrants Reference (master) Dataset (reference) | TW Market Data",
+    seoDescription:
+      "權證參考主檔資料集提供權證條款靜態主檔,每列對應一檔權證,欄位含 warrant_code / market / underlying_ticker / issuer / warrant_type / strike_price;資料來源證交所／櫃買(TWSE／TPEx)(參考／主檔型)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Warrants Reference (master) dataset provides the warrant terms master — one row per warrant, with fields warrant_code / market / underlying_ticker / issuer / warrant_type / strike_price; sourced from the TWSE / TPEx (reference / master). Coverage taken verbatim from the backend meta.",
+    shortDescription: "權證條款靜態主檔,逐列 權證代碼、市場、標的代碼、發行券商、權證類別、履約價、行使比例與上市日;來源證交所／櫃買(TWSE／TPEx)。",
+    shortDescriptionEn: "The warrant terms master — per row: warrant code, market, underlying ticker, issuer, warrant type, strike price, exercise ratio, and listing date; sourced from the TWSE / TPEx.",
+    whatItIs:
+      "權證參考主檔資料集每一列對應一檔權證,欄位包含 warrant_code / market / underlying_ticker / issuer / warrant_type / strike_price / exercise_ratio / listing_date(權證代碼、市場、標的代碼、發行券商、權證類別、履約價、行使比例與上市日)。資料來源為證交所／櫃買(TWSE／TPEx),分級 參考／主檔型。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one warrant, carrying warrant_code / market / underlying_ticker / issuer / warrant_type / strike_price / exercise_ratio / listing_date (warrant code, market, underlying ticker, issuer, warrant type, strike price, exercise ratio, and listing date). Sourced from the TWSE / TPEx, graded reference / master. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以 warrant_code 建立權證條款靜態對照。",
+      "反查某標的的所有在外權證。",
+      "以履約價／行使比例做權證評價前置。",
+    ],
+    useCasesEn: [
+      "Build a static terms lookup for warrants keyed on warrant_code.",
+      "Reverse-look all outstanding warrants on an underlying.",
+      "Prepare warrant valuation via strike and exercise ratio.",
+    ],
+    whyItMatters:
+      "權證條款繁多且分散;此主檔以一致欄位提供標的、履約價與行使比例,是權證分析的參考層。",
+    whyItMattersEn:
+      "Warrant terms are many and scattered; this master serves underlying, strike, and exercise ratio consistently — the reference layer for warrant analysis.",
+    coverageNote:
+      "權證條款靜態主檔,每列 一檔權證,欄位 warrant_code / market / underlying_ticker / issuer / warrant_type / strike_price;來源證交所／櫃買(TWSE／TPEx)(分級 參考／主檔型)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "The warrant terms master; one row per warrant, fields warrant_code / market / underlying_ticker / issuer / warrant_type / strike_price; sourced from the TWSE / TPEx (graded reference / master). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所／櫃買(TWSE／TPEx)(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE / TPEx (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/structure-reference/warrants-reference",
+    pricingHref: "/pricing",
+    keywords: [
+      "權證參考主檔",
+      "台股資料集",
+      "權證條款靜態主檔",
+      "證交所／櫃買(TWSE／TPEx)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Warrants Reference (master)",
+      "Taiwan stock dataset",
+      "the warrant terms master",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "權證參考主檔資料集",
+    jsonLdNameEn: "Warrants Reference (master) Dataset",
+    jsonLdDescription: "權證條款靜態主檔,來源證交所／櫃買(TWSE／TPEx)(參考／主檔型)。",
+    jsonLdDescriptionEn: "The warrant terms master, sourced from the TWSE / TPEx (reference / master).",
+    sourceRole: "reference_warrants_reference",
+    provider: "twse_tpex",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "return-index-daily",
+    name: "報酬指數日線",
+    nameEn: "Return Index (daily)",
+    seoTitle: "報酬指數日線資料集(derived)| TW Market Data",
+    seoTitleEn: "Return Index (daily) Dataset (derived) | TW Market Data",
+    seoDescription:
+      "報酬指數日線資料集提供含息報酬指數每日點位,每列對應一個指數一日的報酬點位,欄位含 trade_date / market / index_id / index_name / return_index_value / source_name;資料來源證交所(TWSE)(推導型(由官方資料計算))。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Return Index (daily) dataset provides daily total-return index levels — one row per index's return level for day, with fields trade_date / market / index_id / index_name / return_index_value / source_name; sourced from the TWSE (derived (computed from official data)). Coverage taken verbatim from the backend meta.",
+    shortDescription: "含息報酬指數每日點位,逐列 交易日、市場、指數代碼、指數名稱、報酬指數點位與來源標記;來源證交所(TWSE)。",
+    shortDescriptionEn: "Daily total-return index levels — per row: trade date, market, index id, index name, return-index value, and source tags; sourced from the TWSE.",
+    whatItIs:
+      "報酬指數日線資料集每一列對應一個指數一日的報酬點位,欄位包含 trade_date / market / index_id / index_name / return_index_value / source_name / source_url(交易日、市場、指數代碼、指數名稱、報酬指數點位與來源標記)。資料來源為證交所(TWSE),分級 推導型(由官方資料計算)。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one index's return level for one day, carrying trade_date / market / index_id / index_name / return_index_value / source_name / source_url (trade date, market, index id, index name, return-index value, and source tags). Sourced from the TWSE, graded derived (computed from official data). The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以含息報酬指數計算長期真實報酬。",
+      "對比價格指數與報酬指數的股利貢獻。",
+      "作為被動策略績效基準的官方報酬層。",
+    ],
+    useCasesEn: [
+      "Compute true long-run returns from the total-return index.",
+      "Compare price vs return index to isolate the dividend contribution.",
+      "Use as the official return benchmark for passive-strategy performance.",
+    ],
+    whyItMatters:
+      "價格指數不含股利會低估長期報酬;此資料集以官方含息報酬指數逐日提供,免自行加回股利。",
+    whyItMattersEn:
+      "A price index excludes dividends and understates long-run returns; this dataset serves the official total-return index daily, no manual dividend add-back.",
+    coverageNote:
+      "含息報酬指數每日點位,每列 一個指數一日的報酬點位,欄位 trade_date / market / index_id / index_name / return_index_value / source_name;來源證交所(TWSE)(分級 推導型(由官方資料計算))。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Daily total-return index levels; one row per index's return level for day, fields trade_date / market / index_id / index_name / return_index_value / source_name; sourced from the TWSE (graded derived (computed from official data)). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所(TWSE)(分級 推導型(由官方資料計算));非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE (graded derived (computed from official data)); not investment advice.",
+    docsHref: "/docs/api/market-prices/return-index-daily",
+    pricingHref: "/pricing",
+    keywords: [
+      "報酬指數日線",
+      "台股資料集",
+      "含息報酬指數每日點位",
+      "證交所(TWSE)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Return Index (daily)",
+      "Taiwan stock dataset",
+      "daily total-return index levels",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "報酬指數日線資料集",
+    jsonLdNameEn: "Return Index (daily) Dataset",
+    jsonLdDescription: "含息報酬指數每日點位,來源證交所(TWSE)(推導型(由官方資料計算))。",
+    jsonLdDescriptionEn: "Daily total-return index levels, sourced from the TWSE (derived (computed from official data)).",
+    sourceRole: "derived_return_index_daily",
+    provider: "twse",
+    marketScope: "TWSE",
+  },
+  {
+    slug: "shareholding-concentration",
+    name: "集保持股分級集中度",
+    nameEn: "Shareholding Concentration (TDCC tiers)",
+    seoTitle: "集保持股分級集中度資料集(derived)| TW Market Data",
+    seoTitleEn: "Shareholding Concentration (TDCC tiers) Dataset (derived) | TW Market Data",
+    seoDescription:
+      "集保持股分級集中度資料集提供集保股權分級的大戶／散戶集中度,每列對應一檔個股一期的集中度,欄位含 holder_count_total / large_holder_count_400 / large_holder_pct_400 / large_holder_pct_1000 / retail_pct / large_holder_pct_1000_wow_delta;資料來源集保結算所(TDCC)(推導型(由官方資料計算))。以資料基準日為知識時間,point-in-time 安全;coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Shareholding Concentration (TDCC tiers) dataset provides large-holder vs retail concentration from TDCC shareholding tiers — one row per stock's concentration for period, with fields holder_count_total / large_holder_count_400 / large_holder_pct_400 / large_holder_pct_1000 / retail_pct / large_holder_pct_1000_wow_delta; sourced from the TDCC (derived (computed from official data)). Keyed on the data as-of date and point-in-time safe; Coverage taken verbatim from the backend meta.",
+    shortDescription: "集保股權分級的大戶／散戶集中度,逐列 總持有人數、400 張以上大戶戶數／比例、1000 張以上大戶比例、散戶比例與週變動;來源集保結算所(TDCC)。",
+    shortDescriptionEn: "Large-holder vs retail concentration from tdcc shareholding tiers — per row: total holders, 400-lot+ large-holder count/pct, 1000-lot+ large-holder pct, retail pct, and week-over-week delta; sourced from the TDCC.",
+    whatItIs:
+      "集保持股分級集中度資料集每一列對應一檔個股一期的集中度,欄位包含 holder_count_total / large_holder_count_400 / large_holder_pct_400 / large_holder_pct_1000 / retail_pct / large_holder_pct_1000_wow_delta(總持有人數、400 張以上大戶戶數／比例、1000 張以上大戶比例、散戶比例與週變動)。資料來源為集保結算所(TDCC),分級 推導型(由官方資料計算)。以資料基準日為知識時間,point-in-time 安全;後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one stock's concentration for one period, carrying holder_count_total / large_holder_count_400 / large_holder_pct_400 / large_holder_pct_1000 / retail_pct / large_holder_pct_1000_wow_delta (total holders, 400-lot+ large-holder count/pct, 1000-lot+ large-holder pct, retail pct, and week-over-week delta). Sourced from the TDCC, graded derived (computed from official data). Keyed on the data as-of date and point-in-time safe; The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以大戶持股比例觀察籌碼集中與鬆動。",
+      "用週變動(WoW)追蹤大戶進出方向。",
+      "以散戶比例判讀籌碼結構與軋空風險。",
+    ],
+    useCasesEn: [
+      "Watch chip concentration/dispersion via large-holder pct.",
+      "Track large-holder direction via the week-over-week delta.",
+      "Read chip structure and squeeze risk via retail pct.",
+    ],
+    whyItMatters:
+      "集保分級資料需自行分層彙算;此資料集預先算好大戶／散戶比例與週變動,point-in-time 安全,免自行分級加總。",
+    whyItMattersEn:
+      "TDCC tier data needs manual layering; this dataset pre-computes large-holder/retail pct and the weekly delta, point-in-time safe, no manual tiering.",
+    coverageNote:
+      "集保股權分級的大戶／散戶集中度,每列 一檔個股一期的集中度,欄位 holder_count_total / large_holder_count_400 / large_holder_pct_400 / large_holder_pct_1000 / retail_pct / large_holder_pct_1000_wow_delta;來源集保結算所(TDCC)(分級 推導型(由官方資料計算))。以資料基準日為知識時間,point-in-time 安全;(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Large-holder vs retail concentration from tdcc shareholding tiers; one row per stock's concentration for period, fields holder_count_total / large_holder_count_400 / large_holder_pct_400 / large_holder_pct_1000 / retail_pct / large_holder_pct_1000_wow_delta; sourced from the TDCC (graded derived (computed from official data)). Keyed on the data as-of date and point-in-time safe; (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源集保結算所(TDCC)(分級 推導型(由官方資料計算));非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TDCC (graded derived (computed from official data)); not investment advice.",
+    docsHref: "/docs/api/capital-flows/shareholding-concentration",
+    pricingHref: "/pricing",
+    keywords: [
+      "集保持股分級集中度",
+      "台股資料集",
+      "集保股權分級的大戶／散戶集中度",
+      "集保結算所(TDCC)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Shareholding Concentration (TDCC tiers)",
+      "Taiwan stock dataset",
+      "large-holder vs retail concentration from TDCC shareholding tiers",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "集保持股分級集中度資料集",
+    jsonLdNameEn: "Shareholding Concentration (TDCC tiers) Dataset",
+    jsonLdDescription: "集保股權分級的大戶／散戶集中度,來源集保結算所(TDCC)(推導型(由官方資料計算))。",
+    jsonLdDescriptionEn: "Large-holder vs retail concentration from tdcc shareholding tiers, sourced from the TDCC (derived (computed from official data)).",
+    sourceRole: "derived_shareholding_concentration",
+    provider: "tdcc",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "price-move-context",
+    name: "大波動日情境卡",
+    nameEn: "Price Move Context Cards",
+    seoTitle: "大波動日情境卡資料集(derived)| TW Market Data",
+    seoTitleEn: "Price Move Context Cards Dataset (derived) | TW Market Data",
+    seoDescription:
+      "大波動日情境卡資料集提供個股大波動日的情境脈絡,每列對應一檔個股一個大波動日的情境,欄位含 pct_change / market_pct_change / relative_to_market / magnitude_bucket / hit_track / limit_move_flag;資料來源證交所(TWSE)(推導型(由官方資料計算))。以資料基準日為知識時間,point-in-time 安全;coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Price Move Context Cards dataset provides the context around a stock's large-move day — one row per stock's context for large-move day, with fields pct_change / market_pct_change / relative_to_market / magnitude_bucket / hit_track / limit_move_flag; sourced from the TWSE (derived (computed from official data)). Keyed on the data as-of date and point-in-time safe; Coverage taken verbatim from the backend meta.",
+    shortDescription: "個股大波動日的情境脈絡,逐列 個股漲跌幅、大盤漲跌幅、相對大盤、幅度分級、追蹤命中、漲跌停旗標／判定法與關聯事件;來源證交所(TWSE)。",
+    shortDescriptionEn: "The context around a stock's large-move day — per row: stock change, market change, relative-to-market, magnitude bucket, hit track, limit-move flag/method, and related events; sourced from the TWSE.",
+    whatItIs:
+      "大波動日情境卡資料集每一列對應一檔個股一個大波動日的情境,欄位包含 pct_change / market_pct_change / relative_to_market / magnitude_bucket / hit_track / limit_move_flag / limit_move_flag_method / events(個股漲跌幅、大盤漲跌幅、相對大盤、幅度分級、追蹤命中、漲跌停旗標／判定法與關聯事件)。資料來源為證交所(TWSE),分級 推導型(由官方資料計算)。以資料基準日為知識時間,point-in-time 安全;後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one stock's context for one large-move day, carrying pct_change / market_pct_change / relative_to_market / magnitude_bucket / hit_track / limit_move_flag / limit_move_flag_method / events (stock change, market change, relative-to-market, magnitude bucket, hit track, limit-move flag/method, and related events). Sourced from the TWSE, graded derived (computed from official data). Keyed on the data as-of date and point-in-time safe; The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以相對大盤區分個股特有波動與系統性波動。",
+      "用幅度分級快速篩選大波動事件。",
+      "結合關聯事件解釋波動成因。",
+    ],
+    useCasesEn: [
+      "Separate idiosyncratic from systematic moves via relative-to-market.",
+      "Screen large-move events fast via the magnitude bucket.",
+      "Explain moves by joining related events.",
+    ],
+    whyItMatters:
+      "單看漲跌幅無法判斷波動成因;此資料集以相對大盤、幅度分級與關聯事件提供情境脈絡,point-in-time 安全。",
+    whyItMattersEn:
+      "Raw change percent can't explain a move; this dataset adds relative-to-market, magnitude buckets, and related events as context, point-in-time safe.",
+    coverageNote:
+      "個股大波動日的情境脈絡,每列 一檔個股一個大波動日的情境,欄位 pct_change / market_pct_change / relative_to_market / magnitude_bucket / hit_track / limit_move_flag;來源證交所(TWSE)(分級 推導型(由官方資料計算))。以資料基準日為知識時間,point-in-time 安全;(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "The context around a stock's large-move day; one row per stock's context for large-move day, fields pct_change / market_pct_change / relative_to_market / magnitude_bucket / hit_track / limit_move_flag; sourced from the TWSE (graded derived (computed from official data)). Keyed on the data as-of date and point-in-time safe; (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所(TWSE)(分級 推導型(由官方資料計算));非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE (graded derived (computed from official data)); not investment advice.",
+    docsHref: "/docs/api/market-prices/price-move-context",
+    pricingHref: "/pricing",
+    keywords: [
+      "大波動日情境卡",
+      "台股資料集",
+      "個股大波動日的情境脈絡",
+      "證交所(TWSE)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Price Move Context Cards",
+      "Taiwan stock dataset",
+      "the context around a stock's large-move day",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "大波動日情境卡資料集",
+    jsonLdNameEn: "Price Move Context Cards Dataset",
+    jsonLdDescription: "個股大波動日的情境脈絡,來源證交所(TWSE)(推導型(由官方資料計算))。",
+    jsonLdDescriptionEn: "The context around a stock's large-move day, sourced from the TWSE (derived (computed from official data)).",
+    sourceRole: "derived_price_move_context",
+    provider: "twse",
+    marketScope: "TWSE",
+  },
+  {
+    slug: "disposition-securities-period",
+    name: "處置證券期間",
+    nameEn: "Disposition Securities Period",
+    seoTitle: "處置證券期間資料集(reference)| TW Market Data",
+    seoTitleEn: "Disposition Securities Period Dataset (reference) | TW Market Data",
+    seoDescription:
+      "處置證券期間資料集提供個股被處置的期間與類別,每列對應一段處置期間,欄位含 ticker / market / security_name / disposition_start_date / disposition_end_date / disposition_type;資料來源證交所(TWSE)(參考／主檔型)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Disposition Securities Period dataset provides the period and type of a stock's disposition — one row per disposition period, with fields ticker / market / security_name / disposition_start_date / disposition_end_date / disposition_type; sourced from the TWSE (reference / master). Coverage taken verbatim from the backend meta.",
+    shortDescription: "個股被處置的期間與類別,逐列 代碼、市場、證券名稱、處置起日、處置迄日、處置型別、處置類別與原因;來源證交所(TWSE)。",
+    shortDescriptionEn: "The period and type of a stock's disposition — per row: ticker, market, security name, disposition start/end date, disposition type, category, and reason; sourced from the TWSE.",
+    whatItIs:
+      "處置證券期間資料集每一列對應一段處置期間,欄位包含 ticker / market / security_name / disposition_start_date / disposition_end_date / disposition_type / disposition_category / reason(代碼、市場、證券名稱、處置起日、處置迄日、處置型別、處置類別與原因)。資料來源為證交所(TWSE),分級 參考／主檔型。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one disposition period, carrying ticker / market / security_name / disposition_start_date / disposition_end_date / disposition_type / disposition_category / reason (ticker, market, security name, disposition start/end date, disposition type, category, and reason). Sourced from the TWSE, graded reference / master. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "判斷個股某日是否處於處置期間。",
+      "將處置(如分盤撮合)納入交易性與流動性過濾。",
+      "以處置類別與原因評估投機過熱風險。",
+    ],
+    useCasesEn: [
+      "Determine whether a stock was under disposition on a date.",
+      "Add disposition (e.g. call-auction) as a tradability/liquidity filter.",
+      "Assess speculative-overheat risk via disposition type and reason.",
+    ],
+    whyItMatters:
+      "處置改變撮合方式與可交易性;此資料集以起迄期間與類別一致呈現,免逐則處置公告解析。",
+    whyItMattersEn:
+      "Disposition changes the matching mechanism and tradability; this dataset presents periods, types, and reasons consistently, no announcement-by-announcement parsing.",
+    coverageNote:
+      "個股被處置的期間與類別,每列 一段處置期間,欄位 ticker / market / security_name / disposition_start_date / disposition_end_date / disposition_type;來源證交所(TWSE)(分級 參考／主檔型)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "The period and type of a stock's disposition; one row per disposition period, fields ticker / market / security_name / disposition_start_date / disposition_end_date / disposition_type; sourced from the TWSE (graded reference / master). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所(TWSE)(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/companies-events/disposition-securities-period",
+    pricingHref: "/pricing",
+    keywords: [
+      "處置證券期間",
+      "台股資料集",
+      "個股被處置的期間與類別",
+      "證交所(TWSE)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Disposition Securities Period",
+      "Taiwan stock dataset",
+      "the period and type of a stock's disposition",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "處置證券期間資料集",
+    jsonLdNameEn: "Disposition Securities Period Dataset",
+    jsonLdDescription: "個股被處置的期間與類別,來源證交所(TWSE)(參考／主檔型)。",
+    jsonLdDescriptionEn: "The period and type of a stock's disposition, sourced from the TWSE (reference / master).",
+    sourceRole: "reference_disposition_securities_period",
+    provider: "twse",
+    marketScope: "TWSE_TPEX",
+  },
+  {
     slug: "market-breadth",
     name: "市場廣度",
     nameEn: "Market Breadth",

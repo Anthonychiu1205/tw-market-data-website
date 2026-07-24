@@ -146,13 +146,13 @@ const DATASET_META: Record<string, DatasetMeta> = {
 
   // ── Wave L (18 building datasets, coming soon; grade=building until 8/1 serving) ──
   // Wave L building「即將開放」— TWSE; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "price-move-context": { domain: "market-prices", zh: "大波動日情境卡", en: "Price Move Context Cards", agency: "TWSE", grade: "verified" },
+  "price-move-context": { domain: "market-prices", zh: "大波動日情境卡", en: "Price Move Context Cards", agency: "TWSE", grade: "derived" },
   // Wave L building「即將開放」— TAIFEX; grade building until 8/1 serving (WAVE_L_REGISTRY).
   "futures-daily-context": { domain: "derivatives", zh: "期貨日情境(基差/近月/法人OI)", en: "Futures Daily Context", agency: "TAIFEX", grade: "derived" },
   // Wave L building「即將開放」— TWSE; grade building until 8/1 serving (WAVE_L_REGISTRY).
   "limit-events": { domain: "market-prices", zh: "漲跌停事件", en: "Limit-Up/Down Events", agency: "TWSE", grade: "verified" },
   // Wave L building「即將開放」— TDCC; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "shareholding-concentration": { domain: "capital-flows", zh: "集保持股分級集中度", en: "Shareholding Concentration (TDCC tiers)", agency: "TDCC", grade: "verified" },
+  "shareholding-concentration": { domain: "capital-flows", zh: "集保持股分級集中度", en: "Shareholding Concentration (TDCC tiers)", agency: "TDCC", grade: "derived" },
   // Wave L building「即將開放」— CBC; grade building until 8/1 serving (WAVE_L_REGISTRY).
   "competitor-fx": { domain: "macro", zh: "競貨幣匯率(JPY/KRW/CNY vs TWD)", en: "Competitor FX (vs TWD)", agency: "CBC", grade: "derived" },
   // Wave L building「即將開放」— MOEA; grade building until 8/1 serving (WAVE_L_REGISTRY).
@@ -180,7 +180,7 @@ const DATASET_META: Record<string, DatasetMeta> = {
   // Wave L building「即將開放」— TWSE; grade building until 8/1 serving (WAVE_L_REGISTRY).
   "short-restriction-flags": { domain: "capital-flows", zh: "空方限制旗標", en: "Short-Restriction Flags", agency: "TWSE", grade: "verified" },
   // Wave L building「即將開放」— TWSE; grade building until 8/1 serving (WAVE_L_REGISTRY).
-  "trading-rules-reference": { domain: "structure-reference", zh: "交易制度沿革表", en: "Trading Rules Reference", agency: "TWSE", grade: "verified" },
+  "trading-rules-reference": { domain: "structure-reference", zh: "交易制度沿革表", en: "Trading Rules Reference", agency: "TWSE", grade: "reference" },
 };
 
 export type DocsDatasetEntry = {
