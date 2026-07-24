@@ -1,0 +1,19 @@
+# HARD-01 P0-4 (frontend): Dependabot enabled for npm dependencies and the GitHub Actions we just
+# added. Weekly cadence, grouped where sensible to keep PR noise down; security updates come through
+# regardless of the schedule.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # Batch routine dev-tooling bumps into one PR; security fixes still open individually.
+      dev-dependencies:
+        dependency-type: development
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
