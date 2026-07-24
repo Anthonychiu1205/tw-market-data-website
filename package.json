@@ -34,7 +34,7 @@
     "@neondatabase/serverless": "^1.1.0",
     "@polar-sh/checkout": "^0.4.0",
     "@polar-sh/nextjs": "^0.9.6",
-    "@polar-sh/sdk": "^0.48.1",
+    "@polar-sh/sdk": "^0.49.0",
     "@prisma/adapter-neon": "^6.9.0",
     "@prisma/client": "^6.9.0",
     "@types/ws": "^8.18.1",
