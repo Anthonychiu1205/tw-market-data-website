@@ -478,6 +478,58 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "taifex-options-delta",
+    name: "選擇權每日 Delta",
+    nameEn: "Options Daily Delta",
+    seoTitle: "台指選擇權每日 Delta 資料集 | TW Market Data",
+    seoTitleEn: "TAIFEX Options Daily Delta Dataset | TW Market Data",
+    seoDescription:
+      "台指選擇權每日 Delta 資料集提供期交所各選擇權契約 / 買賣權 / 到期 / 履約價的每日 Delta(避險比率),一列一個序列一交易日,Delta 加權即部位方向暴露。point-in-time 安全。",
+    seoDescriptionEn:
+      "The TAIFEX Options Daily Delta dataset provides the daily Delta (hedge ratio) for each option series — contract / call-put / expiry / strike — one row per series per trading day; Delta-weighted, it is directional position exposure. Point-in-time safe.",
+    shortDescription: "各選擇權契約 / 買賣權 / 到期 / 履約價的每日 Delta(避險比率)。",
+    shortDescriptionEn:
+      "Daily Delta (hedge ratio) per option contract / call-put / expiry / strike.",
+    whatItIs:
+      "選擇權每日 Delta 資料集每一列對應「一個選擇權序列(contract / call_put / contract_month_week / strike_price)、一個交易日」的 delta 值(避險比率)。資料為期交所各選擇權契約的每日 Delta;Delta 加權即部位的方向暴露。以 trade_date 為知識時間,point-in-time 安全。",
+    whatItIsEn:
+      "Each row is one option series (contract / call_put / contract_month_week / strike_price) on one trading day, carrying its delta (hedge ratio). Values are the daily Delta for each TAIFEX option contract; Delta-weighted, they express directional position exposure. Keyed on trade_date and point-in-time safe.",
+    useCases: [
+      "以 Delta 判讀選擇權部位的方向暴露與避險比率。",
+      "計算 Delta 加權部位、估算 gamma exposure。",
+      "結合選擇權行情做 greeks 與避險分析。",
+    ],
+    useCasesEn: [
+      "Read directional exposure and hedge ratio from option Deltas.",
+      "Compute Delta-weighted positions and gamma exposure.",
+      "Do greeks and hedging analysis alongside option quotes.",
+    ],
+    whyItMatters:
+      "自算 Delta 需選擇權定價模型與一致參數;直接取用期交所口徑的每日 Delta,可省去計算並確保跨序列一致、point-in-time 安全。",
+    whyItMattersEn:
+      "Computing Delta yourself needs an option-pricing model and consistent parameters; taking the daily Delta on the TAIFEX basis removes that work and keeps it consistent across series and point-in-time safe.",
+    coverageNote:
+      "逐選擇權序列逐日一列,涵蓋期交所選擇權契約(買賣權 / 到期 / 履約價)。以 trade_date 為知識時間,point-in-time 安全。",
+    coverageNoteEn:
+      "One row per option series per day, across TAIFEX option contracts (call-put / expiry / strike). Keyed on trade_date, point-in-time safe.",
+    freshnessNote: "日頻,隨期交所選擇權更新。",
+    freshnessNoteEn: "Daily, updated with TAIFEX options.",
+    sourcePolicyNote: "由官方 TAIFEX 選擇權資料提供;非投資建議。",
+    sourcePolicyNoteEn: "From official TAIFEX options data; not investment advice.",
+    docsHref: "/docs/api/derivatives/taifex-options-delta",
+    pricingHref: "/pricing",
+    keywords: ["選擇權 Delta", "避險比率", "greeks", "gamma exposure", "台指選擇權"],
+    keywordsEn: ["options Delta", "hedge ratio", "greeks", "gamma exposure", "TAIFEX options"],
+    jsonLdName: "選擇權每日 Delta 資料集",
+    jsonLdNameEn: "Options Daily Delta Dataset",
+    jsonLdDescription: "期交所各選擇權契約每日 Delta(避險比率),point-in-time 安全。",
+    jsonLdDescriptionEn:
+      "Daily Delta (hedge ratio) per TAIFEX option contract, point-in-time safe.",
+    sourceRole: "official_taifex_options_delta",
+    provider: "taifex",
+    marketScope: "TWSE",
+  },
+  {
     slug: "cash-flow-statement",
     name: "現金流量表",
     nameEn: "Cash Flow Statement",
