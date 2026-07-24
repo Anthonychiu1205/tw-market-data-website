@@ -1044,6 +1044,156 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "customs-trade-monthly",
+    name: "海關進出口貿易統計(月)",
+    nameEn: "Customs Trade Statistics (monthly)",
+    seoTitle: "台股宏觀:海關進出口貿易統計(月)資料集 | TW Market Data",
+    seoTitleEn: "Taiwan Macro: Customs Trade Statistics (monthly) Dataset | TW Market Data",
+    seoDescription:
+      "官方每月海關進出口貿易統計,每個統計項目一列,欄位含 stat_item / item_code / item_name / value / unit / attribution;數值以新臺幣千元計,來源財政部關務署。grade=official、point-in-time 安全。",
+    seoDescriptionEn:
+      "Official monthly Taiwan statistic on customs import/export trade — one row per statistical item, with fields stat_item / item_code / item_name / value / unit / attribution; values in NT$ thousand, sourced from the Customs Administration, Ministry of Finance. grade=official, point-in-time safe.",
+    shortDescription: "官方每月海關進出口貿易統計,逐項目值與單位、來源財政部關務署。",
+    shortDescriptionEn: "Official monthly customs import/export trade statistic — per-item values and units, sourced from the Customs Administration, Ministry of Finance.",
+    whatItIs:
+      "海關進出口貿易統計(月)資料集每一列對應一個統計項目,欄位包含 stat_item(統計表)、item_code(項目代碼)、item_name(項目名稱)、value(數值)、unit(單位,新臺幣千元)與 attribution(來源:財政部關務署)。為官方政府統計(grade=official),回傳最新月份的逐項目值(如出口 / 復出口 等貿易項目);以揭露為知識時間,point-in-time 安全。",
+    whatItIsEn:
+      "Each row is one statistical item, carrying stat_item, item_code, item_name, value, unit (NT$ thousand), and attribution (source: Customs Administration, Ministry of Finance). It is an official government statistic (grade=official) returning the latest month's per-item values (e.g. trade items such as exports and re-exports); point-in-time safe.",
+    useCases: [
+      "追蹤海關進出口貿易的最新官方月統計。",
+      "作為總經與產業研究的官方數據層。",
+      "以 attribution 與 item_code 對齊來源、可追溯判讀。",
+    ],
+    useCasesEn: [
+      "Track the latest official monthly figures for customs import/export trade.",
+      "Use as an official data layer for macro and industry research.",
+      "Align to source via attribution and item_code for traceable interpretation.",
+    ],
+    whyItMatters:
+      "官方月統計分散於各部會網站、格式不一;此資料集以一致結構(項目/值/單位/來源)提供海關進出口貿易的官方數據,免逐一抓取解析,且 point-in-time 安全。",
+    whyItMattersEn:
+      "Official monthly statistics are scattered across ministry sites in inconsistent formats; this dataset serves customs import/export trade in one consistent shape (item / value / unit / source), removing the scrape-and-parse work — point-in-time safe.",
+    coverageNote:
+      "官方每月海關進出口貿易統計(grade=official),每個統計項目一列,數值以新臺幣千元計,來源財政部關務署;回傳最新月份的逐項目值,以揭露為知識時間,point-in-time 安全。(後端 meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Official monthly customs import/export trade statistic (grade=official); one row per statistical item, values in NT$ thousand, sourced from the Customs Administration, Ministry of Finance; returns the latest month's per-item values, point-in-time safe. (The backend meta provides no coverage window, so none is stated.)",
+    freshnessNote: "月頻,隨官方月統計發布更新(有申報落差)。",
+    freshnessNoteEn: "Monthly, updated as the official statistic is released (with a reporting lag).",
+    sourcePolicyNote: "官方政府統計,來源財政部關務署(grade=official);非投資建議。",
+    sourcePolicyNoteEn: "Official government statistic, sourced from the Customs Administration, Ministry of Finance (grade=official); not investment advice.",
+    docsHref: "/docs/api/macro/customs-trade-monthly",
+    pricingHref: "/pricing",
+    keywords: ["海關進出口貿易", "台灣官方統計", "月統計", "總經數據", "財政部關務署"],
+    keywordsEn: ["customs import/export trade", "Taiwan official statistics", "monthly statistic", "macro data", "government statistics"],
+    jsonLdName: "海關進出口貿易統計(月)資料集",
+    jsonLdNameEn: "Customs Trade Statistics (monthly) Dataset",
+    jsonLdDescription: "官方每月海關進出口貿易統計,逐項目值與單位,來源財政部關務署,point-in-time 安全。",
+    jsonLdDescriptionEn: "Official monthly customs import/export trade statistic — per-item values and units from the Customs Administration, Ministry of Finance, point-in-time safe.",
+    sourceRole: "official_customs_trade_monthly",
+    provider: "gov",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "export-orders-monthly",
+    name: "外銷訂單金額(按貨品別,月)",
+    nameEn: "Export Orders by Product (monthly)",
+    seoTitle: "台股宏觀:外銷訂單金額(按貨品別,月)資料集 | TW Market Data",
+    seoTitleEn: "Taiwan Macro: Export Orders by Product (monthly) Dataset | TW Market Data",
+    seoDescription:
+      "官方每月外銷訂單金額(按貨品別)統計,每個統計項目一列,欄位含 stat_item / item_code / item_name / value / unit / attribution;數值以百萬美元計,來源經濟部統計處。grade=official、point-in-time 安全。",
+    seoDescriptionEn:
+      "Official monthly Taiwan statistic on export orders by product — one row per statistical item, with fields stat_item / item_code / item_name / value / unit / attribution; values in US$ million, sourced from the Department of Statistics, Ministry of Economic Affairs. grade=official, point-in-time safe.",
+    shortDescription: "官方每月外銷訂單金額(按貨品別)統計,逐項目值與單位、來源經濟部統計處。",
+    shortDescriptionEn: "Official monthly export orders by product statistic — per-item values and units, sourced from the Department of Statistics, Ministry of Economic Affairs.",
+    whatItIs:
+      "外銷訂單金額(按貨品別,月)資料集每一列對應一個統計項目,欄位包含 stat_item(統計表)、item_code(項目代碼)、item_name(項目名稱)、value(數值)、unit(單位,百萬美元)與 attribution(來源:經濟部統計處)。為官方政府統計(grade=official),回傳最新月份的逐項目值(如電子產品 等貨品別);以揭露為知識時間,point-in-time 安全。",
+    whatItIsEn:
+      "Each row is one statistical item, carrying stat_item, item_code, item_name, value, unit (US$ million), and attribution (source: Department of Statistics, Ministry of Economic Affairs). It is an official government statistic (grade=official) returning the latest month's per-item values (e.g. product categories such as electronics); point-in-time safe.",
+    useCases: [
+      "追蹤外銷訂單金額(按貨品別)的最新官方月統計。",
+      "作為總經與產業研究的官方數據層。",
+      "以 attribution 與 item_code 對齊來源、可追溯判讀。",
+    ],
+    useCasesEn: [
+      "Track the latest official monthly figures for export orders by product.",
+      "Use as an official data layer for macro and industry research.",
+      "Align to source via attribution and item_code for traceable interpretation.",
+    ],
+    whyItMatters:
+      "官方月統計分散於各部會網站、格式不一;此資料集以一致結構(項目/值/單位/來源)提供外銷訂單金額(按貨品別)的官方數據,免逐一抓取解析,且 point-in-time 安全。",
+    whyItMattersEn:
+      "Official monthly statistics are scattered across ministry sites in inconsistent formats; this dataset serves export orders by product in one consistent shape (item / value / unit / source), removing the scrape-and-parse work — point-in-time safe.",
+    coverageNote:
+      "官方每月外銷訂單金額(按貨品別)統計(grade=official),每個統計項目一列,數值以百萬美元計,來源經濟部統計處;回傳最新月份的逐項目值,以揭露為知識時間,point-in-time 安全。(後端 meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Official monthly export orders by product statistic (grade=official); one row per statistical item, values in US$ million, sourced from the Department of Statistics, Ministry of Economic Affairs; returns the latest month's per-item values, point-in-time safe. (The backend meta provides no coverage window, so none is stated.)",
+    freshnessNote: "月頻,隨官方月統計發布更新(有申報落差)。",
+    freshnessNoteEn: "Monthly, updated as the official statistic is released (with a reporting lag).",
+    sourcePolicyNote: "官方政府統計,來源經濟部統計處(grade=official);非投資建議。",
+    sourcePolicyNoteEn: "Official government statistic, sourced from the Department of Statistics, Ministry of Economic Affairs (grade=official); not investment advice.",
+    docsHref: "/docs/api/macro/export-orders-monthly",
+    pricingHref: "/pricing",
+    keywords: ["外銷訂單金額(按貨品別)", "台灣官方統計", "月統計", "總經數據", "經濟部統計處"],
+    keywordsEn: ["export orders by product", "Taiwan official statistics", "monthly statistic", "macro data", "government statistics"],
+    jsonLdName: "外銷訂單金額(按貨品別,月)資料集",
+    jsonLdNameEn: "Export Orders by Product (monthly) Dataset",
+    jsonLdDescription: "官方每月外銷訂單金額(按貨品別)統計,逐項目值與單位,來源經濟部統計處,point-in-time 安全。",
+    jsonLdDescriptionEn: "Official monthly export orders by product statistic — per-item values and units from the Department of Statistics, Ministry of Economic Affairs, point-in-time safe.",
+    sourceRole: "official_export_orders_monthly",
+    provider: "gov",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "production-value-index-monthly",
+    name: "製造業生產價值指數(月)",
+    nameEn: "Manufacturing Production Value Index (monthly)",
+    seoTitle: "台股宏觀:製造業生產價值指數(月)資料集 | TW Market Data",
+    seoTitleEn: "Taiwan Macro: Manufacturing Production Value Index (monthly) Dataset | TW Market Data",
+    seoDescription:
+      "官方每月製造業生產價值指數統計,每個統計項目一列,欄位含 stat_item / item_code / item_name / value / unit / attribution;數值以指數(110 年=100)計,來源經濟部統計處。grade=official、point-in-time 安全。",
+    seoDescriptionEn:
+      "Official monthly Taiwan statistic on the manufacturing production-value index — one row per statistical item, with fields stat_item / item_code / item_name / value / unit / attribution; values in index (2021 = 100), sourced from the Department of Statistics, Ministry of Economic Affairs. grade=official, point-in-time safe.",
+    shortDescription: "官方每月製造業生產價值指數統計,逐項目值與單位、來源經濟部統計處。",
+    shortDescriptionEn: "Official monthly the manufacturing production-value index statistic — per-item values and units, sourced from the Department of Statistics, Ministry of Economic Affairs.",
+    whatItIs:
+      "製造業生產價值指數(月)資料集每一列對應一個統計項目,欄位包含 stat_item(統計表)、item_code(項目代碼)、item_name(項目名稱)、value(數值)、unit(單位,指數(110 年=100))與 attribution(來源:經濟部統計處)。為官方政府統計(grade=official),回傳最新月份的逐項目值(如其他製造業 等行業別);以揭露為知識時間,point-in-time 安全。",
+    whatItIsEn:
+      "Each row is one statistical item, carrying stat_item, item_code, item_name, value, unit (index (2021 = 100)), and attribution (source: Department of Statistics, Ministry of Economic Affairs). It is an official government statistic (grade=official) returning the latest month's per-item values (e.g. industry categories such as other manufacturing); point-in-time safe.",
+    useCases: [
+      "追蹤製造業生產價值指數的最新官方月統計。",
+      "作為總經與產業研究的官方數據層。",
+      "以 attribution 與 item_code 對齊來源、可追溯判讀。",
+    ],
+    useCasesEn: [
+      "Track the latest official monthly figures for the manufacturing production-value index.",
+      "Use as an official data layer for macro and industry research.",
+      "Align to source via attribution and item_code for traceable interpretation.",
+    ],
+    whyItMatters:
+      "官方月統計分散於各部會網站、格式不一;此資料集以一致結構(項目/值/單位/來源)提供製造業生產價值指數的官方數據,免逐一抓取解析,且 point-in-time 安全。",
+    whyItMattersEn:
+      "Official monthly statistics are scattered across ministry sites in inconsistent formats; this dataset serves the manufacturing production-value index in one consistent shape (item / value / unit / source), removing the scrape-and-parse work — point-in-time safe.",
+    coverageNote:
+      "官方每月製造業生產價值指數統計(grade=official),每個統計項目一列,數值以指數(110 年=100)計,來源經濟部統計處;回傳最新月份的逐項目值,以揭露為知識時間,point-in-time 安全。(後端 meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Official monthly the manufacturing production-value index statistic (grade=official); one row per statistical item, values in index (2021 = 100), sourced from the Department of Statistics, Ministry of Economic Affairs; returns the latest month's per-item values, point-in-time safe. (The backend meta provides no coverage window, so none is stated.)",
+    freshnessNote: "月頻,隨官方月統計發布更新(有申報落差)。",
+    freshnessNoteEn: "Monthly, updated as the official statistic is released (with a reporting lag).",
+    sourcePolicyNote: "官方政府統計,來源經濟部統計處(grade=official);非投資建議。",
+    sourcePolicyNoteEn: "Official government statistic, sourced from the Department of Statistics, Ministry of Economic Affairs (grade=official); not investment advice.",
+    docsHref: "/docs/api/macro/production-value-index-monthly",
+    pricingHref: "/pricing",
+    keywords: ["製造業生產價值指數", "台灣官方統計", "月統計", "總經數據", "經濟部統計處"],
+    keywordsEn: ["the manufacturing production-value index", "Taiwan official statistics", "monthly statistic", "macro data", "government statistics"],
+    jsonLdName: "製造業生產價值指數(月)資料集",
+    jsonLdNameEn: "Manufacturing Production Value Index (monthly) Dataset",
+    jsonLdDescription: "官方每月製造業生產價值指數統計,逐項目值與單位,來源經濟部統計處,point-in-time 安全。",
+    jsonLdDescriptionEn: "Official monthly the manufacturing production-value index statistic — per-item values and units from the Department of Statistics, Ministry of Economic Affairs, point-in-time safe.",
+    sourceRole: "official_production_value_index_monthly",
+    provider: "gov",
+    marketScope: "TWSE_TPEX",
+  },
+  {
     slug: "market-breadth",
     name: "市場廣度",
     nameEn: "Market Breadth",
