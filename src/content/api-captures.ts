@@ -31,6 +31,192 @@ export type ApiCapture = {
 export const API_CAPTURED_AT = "2026-07-20";
 
 export const API_CAPTURES: Record<string, ApiCapture> = {
+  "index-constituents": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/index-constituents",
+  "request_id": "req_079dd795c346",
+  "plan_id": "enterprise",
+  "dataset": "index_constituents",
+  "query": {
+    "index_code": null,
+    "symbol": null,
+    "as_of_date": null,
+    "start_date": null,
+    "end_date": null,
+    "market": null,
+    "limit": 50,
+    "legacy_aliases_used": {
+      "index": false,
+      "date_from": false,
+      "date_to": false,
+      "offset": false,
+      "sort_by": false,
+      "sort_order": false
+    }
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "index_constituents",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-01.preview",
+    "release_date": "2026-07-01",
+    "data_as_of": "2026-07-01",
+    "request_context": {
+      "ticker": "",
+      "as_of_date": "2026-07-01",
+      "family": "taiwan_macro",
+      "field_group_type": "derived",
+      "dataset_view": "index_constituents_v1"
+    },
+    "data": [
+      {
+        "index_code": "櫃買公司治理",
+        "symbol": "1268",
+        "constituent_name": "漢來美食",
+        "as_of_date": "2026-07-01",
+        "market": "TPEx",
+        "source_name": "twse_official"
+      },
+      {
+        "index_code": "櫃買公司治理",
+        "symbol": "2755",
+        "constituent_name": "揚秦",
+        "as_of_date": "2026-07-01",
+        "market": "TPEx",
+        "source_name": "twse_official"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-01",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "index_constituents_items",
+      "fallback_chain": [],
+      "policy_notes": [
+        "index constituents productized table serving path",
+        "contract-aligned filters: index_code/symbol/as_of_date/start_date/end_date/market",
+        "nullable optional fields are preserved as-is"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "index_constituents",
+      "request_id": "read-api-60ed5b217eb5",
+      "blocking_gate": null
+    }
+  }
+}`,
+    en: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/index-constituents",
+  "request_id": "req_079dd795c346",
+  "plan_id": "enterprise",
+  "dataset": "index_constituents",
+  "query": {
+    "index_code": null,
+    "symbol": null,
+    "as_of_date": null,
+    "start_date": null,
+    "end_date": null,
+    "market": null,
+    "limit": 50,
+    "legacy_aliases_used": {
+      "index": false,
+      "date_from": false,
+      "date_to": false,
+      "offset": false,
+      "sort_by": false,
+      "sort_order": false
+    }
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "index_constituents",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-01.preview",
+    "release_date": "2026-07-01",
+    "data_as_of": "2026-07-01",
+    "request_context": {
+      "ticker": "",
+      "as_of_date": "2026-07-01",
+      "family": "taiwan_macro",
+      "field_group_type": "derived",
+      "dataset_view": "index_constituents_v1"
+    },
+    "data": [
+      {
+        "index_code": "<Chinese value - see the zh page>",
+        "symbol": "1268",
+        "constituent_name": "<Chinese value - see the zh page>",
+        "as_of_date": "2026-07-01",
+        "market": "TPEx",
+        "source_name": "twse_official"
+      },
+      {
+        "index_code": "<Chinese value - see the zh page>",
+        "symbol": "2755",
+        "constituent_name": "<Chinese value - see the zh page>",
+        "as_of_date": "2026-07-01",
+        "market": "TPEx",
+        "source_name": "twse_official"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-01",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "index_constituents_items",
+      "fallback_chain": [],
+      "policy_notes": [
+        "index constituents productized table serving path",
+        "contract-aligned filters: index_code/symbol/as_of_date/start_date/end_date/market",
+        "nullable optional fields are preserved as-is"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "index_constituents",
+      "request_id": "read-api-60ed5b217eb5",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
   "adjusted-prices": {
     rowsKey: "envelope.data",
     envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
