@@ -36,7 +36,7 @@
     "@polar-sh/nextjs": "^0.9.6",
     "@polar-sh/sdk": "^0.48.1",
     "@prisma/adapter-neon": "^6.9.0",
-    "@prisma/client": "^6.9.0",
+    "@prisma/client": "^7.9.0",
     "@types/ws": "^8.18.1",
     "bcryptjs": "^3.0.3",
     "jose": "^6.2.2",
