@@ -1194,6 +1194,1060 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     marketScope: "TWSE_TPEX",
   },
   {
+    slug: "bond-convertible-reference",
+    name: "可轉債參考主檔",
+    nameEn: "Convertible-Bond Reference (master)",
+    seoTitle: "可轉債參考主檔資料集(reference)| TW Market Data",
+    seoTitleEn: "Convertible-Bond Reference (master) Dataset (reference) | TW Market Data",
+    seoDescription:
+      "可轉債參考主檔資料集提供可轉換公司債參考主檔,每列對應一檔可轉債,欄位含 bond_code / market / bond_name / issuer / bond_type / issue_date;資料來源櫃買中心(TPEx)(參考／主檔型)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Convertible-Bond Reference (master) dataset provides convertible-bond reference master — one row per convertible bond, with fields bond_code / market / bond_name / issuer / bond_type / issue_date; sourced from the Taipei Exchange (TPEx) (reference / master). Coverage taken verbatim from the backend meta.",
+    shortDescription: "可轉換公司債參考主檔,逐列 債券代碼、市場、債券名稱、發行人、券種、發行日、到期日與票面利率;來源櫃買中心(TPEx)。",
+    shortDescriptionEn: "Convertible-bond reference master — per row: bond code, market, bond name, issuer, bond type, issue date, maturity date, and coupon rate; sourced from the Taipei Exchange (TPEx).",
+    whatItIs:
+      "可轉債參考主檔資料集每一列對應一檔可轉債,欄位包含 bond_code / market / bond_name / issuer / bond_type / issue_date / maturity_date / coupon_rate(債券代碼、市場、債券名稱、發行人、券種、發行日、到期日與票面利率)。資料來源為櫃買中心(TPEx),分級 參考／主檔型。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one convertible bond, carrying bond_code / market / bond_name / issuer / bond_type / issue_date / maturity_date / coupon_rate (bond code, market, bond name, issuer, bond type, issue date, maturity date, and coupon rate). Sourced from the Taipei Exchange (TPEx), graded reference / master. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以 bond_code 建立可轉債的靜態主檔對照。",
+      "串接發行人、到期日與票面利率做條款分析。",
+      "作為可轉債價量/法人資料的參考維度表。",
+    ],
+    useCasesEn: [
+      "Build a static master lookup for convertibles keyed on bond_code.",
+      "Join issuer, maturity, and coupon for terms analysis.",
+      "Use as the reference dimension for convertible price/flow data.",
+    ],
+    whyItMatters:
+      "可轉債條款分散於各次發行公告;此主檔以一致欄位提供代碼、發行人、到期與票息,免逐檔翻查公開說明書。",
+    whyItMattersEn:
+      "Convertible-bond terms are scattered across per-issue filings; this master serves code, issuer, maturity, and coupon in one consistent shape, removing prospectus lookups.",
+    coverageNote:
+      "可轉換公司債參考主檔,每列 一檔可轉債,欄位 bond_code / market / bond_name / issuer / bond_type / issue_date;來源櫃買中心(TPEx)(分級 參考／主檔型)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Convertible-bond reference master; one row per convertible bond, fields bond_code / market / bond_name / issuer / bond_type / issue_date; sourced from the Taipei Exchange (TPEx) (graded reference / master). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源櫃買中心(TPEx)(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the Taipei Exchange (TPEx) (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/derivatives/bond-convertible-reference",
+    pricingHref: "/pricing",
+    keywords: [
+      "可轉債參考主檔",
+      "台股資料集",
+      "可轉換公司債參考主檔",
+      "櫃買中心(TPEx)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Convertible-Bond Reference (master)",
+      "Taiwan stock dataset",
+      "convertible-bond reference master",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "可轉債參考主檔資料集",
+    jsonLdNameEn: "Convertible-Bond Reference (master) Dataset",
+    jsonLdDescription: "可轉換公司債參考主檔,來源櫃買中心(TPEx)(參考／主檔型)。",
+    jsonLdDescriptionEn: "Convertible-bond reference master, sourced from the Taipei Exchange (TPEx) (reference / master).",
+    sourceRole: "reference_bond_convertible_reference",
+    provider: "tpex",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "broker-branch-reference",
+    name: "券商分點參考主檔",
+    nameEn: "Broker-Branch Reference (master)",
+    seoTitle: "券商分點參考主檔資料集(reference)| TW Market Data",
+    seoTitleEn: "Broker-Branch Reference (master) Dataset (reference) | TW Market Data",
+    seoDescription:
+      "券商分點參考主檔資料集提供券商總公司與分點對照,每列對應一個券商分點,欄位含 parent_broker_code / parent_broker_name / branch_code / branch_name / market / address;資料來源證交所(TWSE)(參考／主檔型)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Broker-Branch Reference (master) dataset provides broker head-office and branch reference — one row per broker branch, with fields parent_broker_code / parent_broker_name / branch_code / branch_name / market / address; sourced from the TWSE (reference / master). Coverage taken verbatim from the backend meta.",
+    shortDescription: "券商總公司與分點對照,逐列 母券商代碼／名稱、分點代碼／名稱、市場、地址與來源標記;來源證交所(TWSE)。",
+    shortDescriptionEn: "Broker head-office and branch reference — per row: parent broker code/name, branch code/name, market, address, and source tags; sourced from the TWSE.",
+    whatItIs:
+      "券商分點參考主檔資料集每一列對應一個券商分點,欄位包含 parent_broker_code / parent_broker_name / branch_code / branch_name / market / address / source_provider / source_role(母券商代碼／名稱、分點代碼／名稱、市場、地址與來源標記)。資料來源為證交所(TWSE),分級 參考／主檔型。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one broker branch, carrying parent_broker_code / parent_broker_name / branch_code / branch_name / market / address / source_provider / source_role (parent broker code/name, branch code/name, market, address, and source tags). Sourced from the TWSE, graded reference / master. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "將分點代碼還原為券商總公司與分點名稱。",
+      "作為分點進出(broker-branch)資料的對照維度。",
+      "建立券商地理分布與分點清單。",
+    ],
+    useCasesEn: [
+      "Resolve a branch code to its parent broker and branch name.",
+      "Use as the dimension table for broker-branch flow data.",
+      "Build a broker geographic and branch inventory.",
+    ],
+    whyItMatters:
+      "分點資料只有代碼難以判讀;此主檔提供母券商、分點名稱與地址對照,是分點籌碼分析的必要參考層。",
+    whyItMattersEn:
+      "Branch data ships only as codes; this master maps parent broker, branch name, and address — the reference layer broker-branch flow analysis needs.",
+    coverageNote:
+      "券商總公司與分點對照,每列 一個券商分點,欄位 parent_broker_code / parent_broker_name / branch_code / branch_name / market / address;來源證交所(TWSE)(分級 參考／主檔型)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Broker head-office and branch reference; one row per broker branch, fields parent_broker_code / parent_broker_name / branch_code / branch_name / market / address; sourced from the TWSE (graded reference / master). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所(TWSE)(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/structure-reference/broker-branch-reference",
+    pricingHref: "/pricing",
+    keywords: [
+      "券商分點參考主檔",
+      "台股資料集",
+      "券商總公司與分點對照",
+      "證交所(TWSE)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Broker-Branch Reference (master)",
+      "Taiwan stock dataset",
+      "broker head-office and branch reference",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "券商分點參考主檔資料集",
+    jsonLdNameEn: "Broker-Branch Reference (master) Dataset",
+    jsonLdDescription: "券商總公司與分點對照,來源證交所(TWSE)(參考／主檔型)。",
+    jsonLdDescriptionEn: "Broker head-office and branch reference, sourced from the TWSE (reference / master).",
+    sourceRole: "reference_broker_branch_reference",
+    provider: "twse",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "business-indicator-monthly",
+    name: "景氣指標(月)",
+    nameEn: "Business Indicator (monthly)",
+    seoTitle: "景氣指標(月)資料集(verified)| TW Market Data",
+    seoTitleEn: "Business Indicator (monthly) Dataset (verified) | TW Market Data",
+    seoDescription:
+      "景氣指標(月)資料集提供景氣對策信號與領先／同時指標,每列對應一個月份的一項景氣指標,欄位含 indicator_month / indicator_code / indicator_name / value / value_text / value_numeric;資料來源國家發展委員會(NDC)(官方已驗證)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Business Indicator (monthly) dataset provides the business cycle signal and leading/coincident indicators — one row per business indicator for month, with fields indicator_month / indicator_code / indicator_name / value / value_text / value_numeric; sourced from the National Development Council (NDC) (official, verified). Coverage taken verbatim from the backend meta.",
+    shortDescription: "景氣對策信號與領先／同時指標,逐列 指標月份、指標代碼／名稱、數值、文字值、燈號(signal_light)與單位;來源國家發展委員會(NDC)。",
+    shortDescriptionEn: "The business cycle signal and leading/coincident indicators — per row: indicator month, indicator code/name, value, text value, signal light, and unit; sourced from the National Development Council (NDC).",
+    whatItIs:
+      "景氣指標(月)資料集每一列對應一個月份的一項景氣指標,欄位包含 indicator_month / indicator_code / indicator_name / value / value_text / value_numeric / signal_light / unit(指標月份、指標代碼／名稱、數值、文字值、燈號(signal_light)與單位)。資料來源為國家發展委員會(NDC),分級 官方已驗證。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one business indicator for one month, carrying indicator_month / indicator_code / indicator_name / value / value_text / value_numeric / signal_light / unit (indicator month, indicator code/name, value, text value, signal light, and unit). Sourced from the National Development Council (NDC), graded official, verified. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "追蹤景氣對策信號燈號(藍／黃藍／綠／黃紅／紅)。",
+      "以領先／同時指標判讀景氣循環位置。",
+      "作為總經研究的官方景氣數據層。",
+    ],
+    useCasesEn: [
+      "Track the monitoring-indicator signal light (blue/yellow-blue/green/yellow-red/red).",
+      "Read the cycle position from leading/coincident indicators.",
+      "Use as the official business-cycle layer for macro research.",
+    ],
+    whyItMatters:
+      "景氣燈號與指標是官方景氣判讀基準;此資料集以結構化欄位提供 NDC 月度指標,免抓官網 PDF。",
+    whyItMattersEn:
+      "The signal light and indicators are Taiwan's official cycle read; this dataset serves NDC's monthly figures in structured fields, no PDF scraping.",
+    coverageNote:
+      "景氣對策信號與領先／同時指標,每列 一個月份的一項景氣指標,欄位 indicator_month / indicator_code / indicator_name / value / value_text / value_numeric;來源國家發展委員會(NDC)(分級 官方已驗證)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "The business cycle signal and leading/coincident indicators; one row per business indicator for month, fields indicator_month / indicator_code / indicator_name / value / value_text / value_numeric; sourced from the National Development Council (NDC) (graded official, verified). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源國家發展委員會(NDC)(分級 官方已驗證);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the National Development Council (NDC) (graded official, verified); not investment advice.",
+    docsHref: "/docs/api/macro/business-indicator-monthly",
+    pricingHref: "/pricing",
+    keywords: [
+      "景氣指標(月)",
+      "台股資料集",
+      "景氣對策信號與領先／同時指標",
+      "國家發展委員會(NDC)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Business Indicator (monthly)",
+      "Taiwan stock dataset",
+      "the business cycle signal and leading/coincident indicators",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "景氣指標(月)資料集",
+    jsonLdNameEn: "Business Indicator (monthly) Dataset",
+    jsonLdDescription: "景氣對策信號與領先／同時指標,來源國家發展委員會(NDC)(官方已驗證)。",
+    jsonLdDescriptionEn: "The business cycle signal and leading/coincident indicators, sourced from the National Development Council (NDC) (official, verified).",
+    sourceRole: "verified_business_indicator_monthly",
+    provider: "ndc",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "capital-formation-events",
+    name: "資本形成事件(增／減資)",
+    nameEn: "Capital Formation Events",
+    seoTitle: "資本形成事件(增／減資)資料集(verified)| TW Market Data",
+    seoTitleEn: "Capital Formation Events Dataset (verified) | TW Market Data",
+    seoDescription:
+      "資本形成事件(增／減資)資料集提供現金增資、減資等資本形成事件,每列對應一個資本形成事件,欄位含 ticker / market / event_date / event_type / event_subtype / announcement_date;資料來源證交所／公開資訊觀測站(TWSE／MOPS)(官方已驗證)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Capital Formation Events dataset provides capital-raising and reduction events — one row per capital-formation event, with fields ticker / market / event_date / event_type / event_subtype / announcement_date; sourced from the TWSE / MOPS (official, verified). Coverage taken verbatim from the backend meta.",
+    shortDescription: "現金增資、減資等資本形成事件,逐列 代碼、市場、事件日、事件型別／子型別、公告日、生效日與金額;來源證交所／公開資訊觀測站(TWSE／MOPS)。",
+    shortDescriptionEn: "Capital-raising and reduction events — per row: ticker, market, event date, event type/subtype, announcement date, effective date, and amount; sourced from the TWSE / MOPS.",
+    whatItIs:
+      "資本形成事件(增／減資)資料集每一列對應一個資本形成事件,欄位包含 ticker / market / event_date / event_type / event_subtype / announcement_date / effective_date / cash_amount(代碼、市場、事件日、事件型別／子型別、公告日、生效日與金額)。資料來源為證交所／公開資訊觀測站(TWSE／MOPS),分級 官方已驗證。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one capital-formation event, carrying ticker / market / event_date / event_type / event_subtype / announcement_date / effective_date / cash_amount (ticker, market, event date, event type/subtype, announcement date, effective date, and amount). Sourced from the TWSE / MOPS, graded official, verified. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "追蹤增資／減資事件與生效時程。",
+      "以 announcement_date 對齊事件的知識時間做回測。",
+      "監控股本變動對每股數據的影響。",
+    ],
+    useCasesEn: [
+      "Track capital increase/reduction events and their effective timeline.",
+      "Align backtests to announcement_date as the event's knowledge time.",
+      "Monitor share-count changes affecting per-share figures.",
+    ],
+    whyItMatters:
+      "資本形成事件改變股本與每股基準;此資料集以事件型別、公告日與生效日一致呈現,免逐則重大訊息解析。",
+    whyItMattersEn:
+      "Capital-formation events reset share count and per-share bases; this dataset presents type, announcement, and effective dates consistently, no filing-by-filing parsing.",
+    coverageNote:
+      "現金增資、減資等資本形成事件,每列 一個資本形成事件,欄位 ticker / market / event_date / event_type / event_subtype / announcement_date;來源證交所／公開資訊觀測站(TWSE／MOPS)(分級 官方已驗證)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Capital-raising and reduction events; one row per capital-formation event, fields ticker / market / event_date / event_type / event_subtype / announcement_date; sourced from the TWSE / MOPS (graded official, verified). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所／公開資訊觀測站(TWSE／MOPS)(分級 官方已驗證);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE / MOPS (graded official, verified); not investment advice.",
+    docsHref: "/docs/api/companies-events/capital-formation-events",
+    pricingHref: "/pricing",
+    keywords: [
+      "資本形成事件(增／減資)",
+      "台股資料集",
+      "現金增資、減資等資本形成事件",
+      "證交所／公開資訊觀測站(TWSE／MOPS)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Capital Formation Events",
+      "Taiwan stock dataset",
+      "capital-raising and reduction events",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "資本形成事件(增／減資)資料集",
+    jsonLdNameEn: "Capital Formation Events Dataset",
+    jsonLdDescription: "現金增資、減資等資本形成事件,來源證交所／公開資訊觀測站(TWSE／MOPS)(官方已驗證)。",
+    jsonLdDescriptionEn: "Capital-raising and reduction events, sourced from the TWSE / MOPS (official, verified).",
+    sourceRole: "verified_capital_formation_events",
+    provider: "twse_mops",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "company-risk-events",
+    name: "公司風險事件",
+    nameEn: "Company Risk Events",
+    seoTitle: "公司風險事件資料集(reference)| TW Market Data",
+    seoTitleEn: "Company Risk Events Dataset (reference) | TW Market Data",
+    seoDescription:
+      "公司風險事件資料集提供處置、警示、裁罰等公司風險事件,每列對應一個公司風險事件,欄位含 ticker / market / event_date / event_type / event_subtype / authority;資料來源證交所／櫃買(TWSE／TPEx)(參考／主檔型)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Company Risk Events dataset provides disposition, alert, and penalty risk events — one row per company risk event, with fields ticker / market / event_date / event_type / event_subtype / authority; sourced from the TWSE / TPEx (reference / master). Coverage taken verbatim from the backend meta.",
+    shortDescription: "處置、警示、裁罰等公司風險事件,逐列 代碼、市場、事件日、事件型別／子型別、主管機關、摘要與裁罰金額;來源證交所／櫃買(TWSE／TPEx)。",
+    shortDescriptionEn: "Disposition, alert, and penalty risk events — per row: ticker, market, event date, event type/subtype, authority, summary, and penalty amount; sourced from the TWSE / TPEx.",
+    whatItIs:
+      "公司風險事件資料集每一列對應一個公司風險事件,欄位包含 ticker / market / event_date / event_type / event_subtype / authority / summary / penalty_amount(代碼、市場、事件日、事件型別／子型別、主管機關、摘要與裁罰金額)。資料來源為證交所／櫃買(TWSE／TPEx),分級 參考／主檔型。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one company risk event, carrying ticker / market / event_date / event_type / event_subtype / authority / summary / penalty_amount (ticker, market, event date, event type/subtype, authority, summary, and penalty amount). Sourced from the TWSE / TPEx, graded reference / master. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "建立個股風險事件的時間軸與型別分布。",
+      "以 authority 與 penalty_amount 評估監理風險。",
+      "作為風控與盡職調查的事件資料層。",
+    ],
+    useCasesEn: [
+      "Build a per-stock risk-event timeline and type distribution.",
+      "Assess regulatory risk via authority and penalty_amount.",
+      "Use as the event layer for risk control and due diligence.",
+    ],
+    whyItMatters:
+      "處置／裁罰資訊散落各公告;此資料集以一致型別與主管機關欄位彙整風險事件,便於風控篩選。",
+    whyItMattersEn:
+      "Disposition/penalty notices are scattered; this dataset consolidates risk events with consistent type and authority fields for risk screening.",
+    coverageNote:
+      "處置、警示、裁罰等公司風險事件,每列 一個公司風險事件,欄位 ticker / market / event_date / event_type / event_subtype / authority;來源證交所／櫃買(TWSE／TPEx)(分級 參考／主檔型)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Disposition, alert, and penalty risk events; one row per company risk event, fields ticker / market / event_date / event_type / event_subtype / authority; sourced from the TWSE / TPEx (graded reference / master). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所／櫃買(TWSE／TPEx)(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE / TPEx (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/companies-events/company-risk-events",
+    pricingHref: "/pricing",
+    keywords: [
+      "公司風險事件",
+      "台股資料集",
+      "處置、警示、裁罰等公司風險事件",
+      "證交所／櫃買(TWSE／TPEx)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Company Risk Events",
+      "Taiwan stock dataset",
+      "disposition, alert, and penalty risk events",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "公司風險事件資料集",
+    jsonLdNameEn: "Company Risk Events Dataset",
+    jsonLdDescription: "處置、警示、裁罰等公司風險事件,來源證交所／櫃買(TWSE／TPEx)(參考／主檔型)。",
+    jsonLdDescriptionEn: "Disposition, alert, and penalty risk events, sourced from the TWSE / TPEx (reference / master).",
+    sourceRole: "reference_company_risk_events",
+    provider: "twse_tpex",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "competitor-fx",
+    name: "競貨幣匯率(JPY／KRW／CNY vs TWD)",
+    nameEn: "Competitor FX (vs TWD)",
+    seoTitle: "競貨幣匯率(JPY／KRW／CNY vs TWD)資料集(derived)| TW Market Data",
+    seoTitleEn: "Competitor FX (vs TWD) Dataset (derived) | TW Market Data",
+    seoDescription:
+      "競貨幣匯率(JPY／KRW／CNY vs TWD)資料集提供日圓／韓元／人民幣對美元及對新臺幣匯率,每列對應一個交易日的競貨幣匯率,欄位含 usd_jpy / usd_krw / usd_cny / usd_twd / jpy_per_twd / krw_per_twd;資料來源中央銀行(CBC)(推導型(由官方資料計算))。以資料基準日為知識時間,point-in-time 安全;coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Competitor FX (vs TWD) dataset provides JPY/KRW/CNY rates vs USD and vs TWD — one row per trading day of competitor FX, with fields usd_jpy / usd_krw / usd_cny / usd_twd / jpy_per_twd / krw_per_twd; sourced from the Central Bank (CBC) (derived (computed from official data)). Keyed on the data as-of date and point-in-time safe; Coverage taken verbatim from the backend meta.",
+    shortDescription: "日圓／韓元／人民幣對美元及對新臺幣匯率,逐列 usd_jpy／usd_krw／usd_cny／usd_twd 與換算後的 jpy_per_twd／krw_per_twd／cny_per_twd;來源中央銀行(CBC)。",
+    shortDescriptionEn: "Jpy/krw/cny rates vs usd and vs twd — per row: usd_jpy / usd_krw / usd_cny / usd_twd and the derived jpy_per_twd / krw_per_twd / cny_per_twd; sourced from the Central Bank (CBC).",
+    whatItIs:
+      "競貨幣匯率(JPY／KRW／CNY vs TWD)資料集每一列對應一個交易日的競貨幣匯率,欄位包含 usd_jpy / usd_krw / usd_cny / usd_twd / jpy_per_twd / krw_per_twd / cny_per_twd(usd_jpy／usd_krw／usd_cny／usd_twd 與換算後的 jpy_per_twd／krw_per_twd／cny_per_twd)。資料來源為中央銀行(CBC),分級 推導型(由官方資料計算)。以資料基準日為知識時間,point-in-time 安全;後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one trading day of competitor FX, carrying usd_jpy / usd_krw / usd_cny / usd_twd / jpy_per_twd / krw_per_twd / cny_per_twd (usd_jpy / usd_krw / usd_cny / usd_twd and the derived jpy_per_twd / krw_per_twd / cny_per_twd). Sourced from the Central Bank (CBC), graded derived (computed from official data). Keyed on the data as-of date and point-in-time safe; The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "比較台幣與日韓貨幣的相對強弱(出口競爭力)。",
+      "以競貨幣交叉匯率觀察區域競貶壓力。",
+      "作為出口導向產業研究的匯率環境層。",
+    ],
+    useCasesEn: [
+      "Compare TWD strength against JPY/KRW (export competitiveness).",
+      "Watch regional competitive-devaluation pressure via cross rates.",
+      "Use as the FX layer for export-oriented industry research.",
+    ],
+    whyItMatters:
+      "台股出口鏈對競貨幣匯率敏感;此資料集以官方匯率提供競貨幣對台幣交叉匯率,point-in-time 安全,免自行換算。",
+    whyItMattersEn:
+      "Taiwan's export chain is sensitive to competitor FX; this dataset serves official cross rates vs TWD, point-in-time safe, with no manual conversion.",
+    coverageNote:
+      "日圓／韓元／人民幣對美元及對新臺幣匯率,每列 一個交易日的競貨幣匯率,欄位 usd_jpy / usd_krw / usd_cny / usd_twd / jpy_per_twd / krw_per_twd;來源中央銀行(CBC)(分級 推導型(由官方資料計算))。以資料基準日為知識時間,point-in-time 安全;(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Jpy/krw/cny rates vs usd and vs twd; one row per trading day of competitor FX, fields usd_jpy / usd_krw / usd_cny / usd_twd / jpy_per_twd / krw_per_twd; sourced from the Central Bank (CBC) (graded derived (computed from official data)). Keyed on the data as-of date and point-in-time safe; (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源中央銀行(CBC)(分級 推導型(由官方資料計算));非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the Central Bank (CBC) (graded derived (computed from official data)); not investment advice.",
+    docsHref: "/docs/api/macro/competitor-fx",
+    pricingHref: "/pricing",
+    keywords: [
+      "競貨幣匯率(JPY／KRW／CNY vs TWD)",
+      "台股資料集",
+      "日圓／韓元／人民幣對美元及對新臺幣匯率",
+      "中央銀行(CBC)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Competitor FX (vs TWD)",
+      "Taiwan stock dataset",
+      "JPY/KRW/CNY rates vs USD and vs TWD",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "競貨幣匯率(JPY／KRW／CNY vs TWD)資料集",
+    jsonLdNameEn: "Competitor FX (vs TWD) Dataset",
+    jsonLdDescription: "日圓／韓元／人民幣對美元及對新臺幣匯率,來源中央銀行(CBC)(推導型(由官方資料計算))。",
+    jsonLdDescriptionEn: "Jpy/krw/cny rates vs usd and vs twd, sourced from the Central Bank (CBC) (derived (computed from official data)).",
+    sourceRole: "derived_competitor_fx",
+    provider: "cbc",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "day-trading-suspension",
+    name: "現股當沖暫停",
+    nameEn: "Day-Trading Suspension",
+    seoTitle: "現股當沖暫停資料集(reference)| TW Market Data",
+    seoTitleEn: "Day-Trading Suspension Dataset (reference) | TW Market Data",
+    seoDescription:
+      "現股當沖暫停資料集提供個股現股當沖暫停期間,每列對應一段當沖暫停期間,欄位含 ticker / market / security_name / suspension_start_date / suspension_end_date / event_indicator;資料來源證交所(TWSE)(參考／主檔型)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Day-Trading Suspension dataset provides per-stock day-trading suspension periods — one row per day-trading suspension period, with fields ticker / market / security_name / suspension_start_date / suspension_end_date / event_indicator; sourced from the TWSE (reference / master). Coverage taken verbatim from the backend meta.",
+    shortDescription: "個股現股當沖暫停期間,逐列 代碼、市場、證券名稱、暫停起／迄日、事件旗標與事件名稱;來源證交所(TWSE)。",
+    shortDescriptionEn: "Per-stock day-trading suspension periods — per row: ticker, market, security name, suspension start/end date, event indicator, and event name; sourced from the TWSE.",
+    whatItIs:
+      "現股當沖暫停資料集每一列對應一段當沖暫停期間,欄位包含 ticker / market / security_name / suspension_start_date / suspension_end_date / event_indicator / event_name / source_family(代碼、市場、證券名稱、暫停起／迄日、事件旗標與事件名稱)。資料來源為證交所(TWSE),分級 參考／主檔型。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one day-trading suspension period, carrying ticker / market / security_name / suspension_start_date / suspension_end_date / event_indicator / event_name / source_family (ticker, market, security name, suspension start/end date, event indicator, and event name). Sourced from the TWSE, graded reference / master. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "判斷個股某日是否處於當沖暫停期間。",
+      "將當沖暫停納入交易性策略的可交易性過濾。",
+      "監控被列入處置／暫停名單的個股。",
+    ],
+    useCasesEn: [
+      "Determine whether a stock was under day-trading suspension on a date.",
+      "Add suspension as a tradability filter to intraday strategies.",
+      "Monitor stocks placed on disposition/suspension lists.",
+    ],
+    whyItMatters:
+      "當沖暫停直接影響策略可交易性;此資料集以起迄期間一致呈現,免逐日比對處置公告。",
+    whyItMattersEn:
+      "Suspension directly gates strategy tradability; this dataset presents start/end periods consistently, no daily cross-check of disposition notices.",
+    coverageNote:
+      "個股現股當沖暫停期間,每列 一段當沖暫停期間,欄位 ticker / market / security_name / suspension_start_date / suspension_end_date / event_indicator;來源證交所(TWSE)(分級 參考／主檔型)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Per-stock day-trading suspension periods; one row per day-trading suspension period, fields ticker / market / security_name / suspension_start_date / suspension_end_date / event_indicator; sourced from the TWSE (graded reference / master). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所(TWSE)(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/capital-flows/day-trading-suspension",
+    pricingHref: "/pricing",
+    keywords: [
+      "現股當沖暫停",
+      "台股資料集",
+      "個股現股當沖暫停期間",
+      "證交所(TWSE)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Day-Trading Suspension",
+      "Taiwan stock dataset",
+      "per-stock day-trading suspension periods",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "現股當沖暫停資料集",
+    jsonLdNameEn: "Day-Trading Suspension Dataset",
+    jsonLdDescription: "個股現股當沖暫停期間,來源證交所(TWSE)(參考／主檔型)。",
+    jsonLdDescriptionEn: "Per-stock day-trading suspension periods, sourced from the TWSE (reference / master).",
+    sourceRole: "reference_day_trading_suspension",
+    provider: "twse",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "etf-holdings",
+    name: "ETF 持股明細",
+    nameEn: "ETF Holdings",
+    seoTitle: "ETF 持股明細資料集(reference)| TW Market Data",
+    seoTitleEn: "ETF Holdings Dataset (reference) | TW Market Data",
+    seoDescription:
+      "ETF 持股明細資料集提供ETF 成分持股與權重,每列對應一檔 ETF 的一筆持股,欄位含 etf_code / etf_name / issuer / market / as_of_date / holding_ticker;資料來源各 ETF 發行人(參考／主檔型)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The ETF Holdings dataset provides ETF constituent holdings and weights — one row per holding of ETF, with fields etf_code / etf_name / issuer / market / as_of_date / holding_ticker; sourced from ETF issuers (reference / master). Coverage taken verbatim from the backend meta.",
+    shortDescription: "ETF 成分持股與權重,逐列 ETF 代碼／名稱、發行人、市場、資料基準日、持股代碼／名稱與權重;來源各 ETF 發行人。",
+    shortDescriptionEn: "Etf constituent holdings and weights — per row: ETF code/name, issuer, market, as-of date, holding ticker/name, and weight; sourced from ETF issuers.",
+    whatItIs:
+      "ETF 持股明細資料集每一列對應一檔 ETF 的一筆持股,欄位包含 etf_code / etf_name / issuer / market / as_of_date / holding_ticker / holding_name / holding_weight(ETF 代碼／名稱、發行人、市場、資料基準日、持股代碼／名稱與權重)。資料來源為各 ETF 發行人,分級 參考／主檔型。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one holding of one ETF, carrying etf_code / etf_name / issuer / market / as_of_date / holding_ticker / holding_name / holding_weight (ETF code/name, issuer, market, as-of date, holding ticker/name, and weight). Sourced from ETF issuers, graded reference / master. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "拆解 ETF 的成分持股與權重分布。",
+      "以 holding_ticker 反查個股被哪些 ETF 持有。",
+      "建立 ETF 重疊度與集中度分析。",
+    ],
+    useCasesEn: [
+      "Decompose an ETF into its constituent holdings and weights.",
+      "Reverse-look which ETFs hold a given stock via holding_ticker.",
+      "Build ETF overlap and concentration analysis.",
+    ],
+    whyItMatters:
+      "ETF 持股揭露格式各發行人不一;此資料集以一致欄位(as_of_date + 權重)提供成分明細,免逐家發行人抓檔。",
+    whyItMattersEn:
+      "ETF holdings disclosures vary by issuer; this dataset serves constituents in one shape (as_of_date + weight), no per-issuer scraping.",
+    coverageNote:
+      "ETF 成分持股與權重,每列 一檔 ETF 的一筆持股,欄位 etf_code / etf_name / issuer / market / as_of_date / holding_ticker;來源各 ETF 發行人(分級 參考／主檔型)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Etf constituent holdings and weights; one row per holding of ETF, fields etf_code / etf_name / issuer / market / as_of_date / holding_ticker; sourced from ETF issuers (graded reference / master). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源各 ETF 發行人(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from ETF issuers (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/funds-intel/etf-holdings",
+    pricingHref: "/pricing",
+    keywords: [
+      "ETF 持股明細",
+      "台股資料集",
+      "ETF 成分持股與權重",
+      "各 ETF 發行人",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "ETF Holdings",
+      "Taiwan stock dataset",
+      "ETF constituent holdings and weights",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "ETF 持股明細資料集",
+    jsonLdNameEn: "ETF Holdings Dataset",
+    jsonLdDescription: "ETF 成分持股與權重,來源各 ETF 發行人(參考／主檔型)。",
+    jsonLdDescriptionEn: "Etf constituent holdings and weights, sourced from ETF issuers (reference / master).",
+    sourceRole: "reference_etf_holdings",
+    provider: "issuer",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "fund-etf-metadata",
+    name: "基金／ETF 主檔",
+    nameEn: "Fund / ETF Metadata",
+    seoTitle: "基金／ETF 主檔資料集(reference)| TW Market Data",
+    seoTitleEn: "Fund / ETF Metadata Dataset (reference) | TW Market Data",
+    seoDescription:
+      "基金／ETF 主檔資料集提供基金與 ETF 的靜態主檔,每列對應一檔基金／ETF,欄位含 fund_code / market / fund_name / issuer / listing_date / fund_type;資料來源各基金／ETF 發行人(參考／主檔型)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Fund / ETF Metadata dataset provides the fund and ETF static master — one row per fund / ETF, with fields fund_code / market / fund_name / issuer / listing_date / fund_type; sourced from fund / ETF issuers (reference / master). Coverage taken verbatim from the backend meta.",
+    shortDescription: "基金與 ETF 的靜態主檔,逐列 基金代碼、市場、名稱、發行人、上市日、基金型別、追蹤指數與計價幣別;來源各基金／ETF 發行人。",
+    shortDescriptionEn: "The fund and etf static master — per row: fund code, market, name, issuer, listing date, fund type, underlying index, and currency; sourced from fund / ETF issuers.",
+    whatItIs:
+      "基金／ETF 主檔資料集每一列對應一檔基金／ETF,欄位包含 fund_code / market / fund_name / issuer / listing_date / fund_type / underlying_index / currency(基金代碼、市場、名稱、發行人、上市日、基金型別、追蹤指數與計價幣別)。資料來源為各基金／ETF 發行人,分級 參考／主檔型。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one fund / ETF, carrying fund_code / market / fund_name / issuer / listing_date / fund_type / underlying_index / currency (fund code, market, name, issuer, listing date, fund type, underlying index, and currency). Sourced from fund / ETF issuers, graded reference / master. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以 fund_code 建立基金／ETF 的靜態對照。",
+      "依 fund_type 與 underlying_index 篩選標的。",
+      "作為 ETF 持股／淨值資料的主檔維度。",
+    ],
+    useCasesEn: [
+      "Build a static fund/ETF lookup keyed on fund_code.",
+      "Filter by fund_type and underlying_index.",
+      "Use as the master dimension for ETF holdings/NAV data.",
+    ],
+    whyItMatters:
+      "基金／ETF 屬性分散各發行人;此主檔以一致欄位提供型別、追蹤指數與幣別,是基金分析的參考層。",
+    whyItMattersEn:
+      "Fund/ETF attributes are spread across issuers; this master serves type, index, and currency consistently — the reference layer for fund analysis.",
+    coverageNote:
+      "基金與 ETF 的靜態主檔,每列 一檔基金／ETF,欄位 fund_code / market / fund_name / issuer / listing_date / fund_type;來源各基金／ETF 發行人(分級 參考／主檔型)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "The fund and etf static master; one row per fund / ETF, fields fund_code / market / fund_name / issuer / listing_date / fund_type; sourced from fund / ETF issuers (graded reference / master). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源各基金／ETF 發行人(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from fund / ETF issuers (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/funds-intel/fund-etf-metadata",
+    pricingHref: "/pricing",
+    keywords: [
+      "基金／ETF 主檔",
+      "台股資料集",
+      "基金與 ETF 的靜態主檔",
+      "各基金／ETF 發行人",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Fund / ETF Metadata",
+      "Taiwan stock dataset",
+      "the fund and ETF static master",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "基金／ETF 主檔資料集",
+    jsonLdNameEn: "Fund / ETF Metadata Dataset",
+    jsonLdDescription: "基金與 ETF 的靜態主檔,來源各基金／ETF 發行人(參考／主檔型)。",
+    jsonLdDescriptionEn: "The fund and etf static master, sourced from fund / ETF issuers (reference / master).",
+    sourceRole: "reference_fund_etf_metadata",
+    provider: "issuer",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "futures-daily-context",
+    name: "期貨日情境(基差／近月／法人 OI)",
+    nameEn: "Futures Daily Context",
+    seoTitle: "期貨日情境(基差／近月／法人 OI)資料集(derived)| TW Market Data",
+    seoTitleEn: "Futures Daily Context Dataset (derived) | TW Market Data",
+    seoDescription:
+      "期貨日情境(基差／近月／法人 OI)資料集提供期貨收盤、現貨、基差與未平倉的每日情境,每列對應一個交易日的期貨情境,欄位含 futures_close / spot_close / basis / basis_pct / open_interest / oi_delta;資料來源期交所(TAIFEX)(推導型(由官方資料計算))。以資料基準日為知識時間,point-in-time 安全;coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Futures Daily Context dataset provides daily futures close, spot, basis, and open-interest context — one row per trading day of futures context, with fields futures_close / spot_close / basis / basis_pct / open_interest / oi_delta; sourced from the TAIFEX (derived (computed from official data)). Keyed on the data as-of date and point-in-time safe; Coverage taken verbatim from the backend meta.",
+    shortDescription: "期貨收盤、現貨、基差與未平倉的每日情境,逐列 期貨收盤、現貨收盤、基差、基差百分比、未平倉、OI 變動、距結算天數與結算旗標;來源期交所(TAIFEX)。",
+    shortDescriptionEn: "Daily futures close, spot, basis, and open-interest context — per row: futures close, spot close, basis, basis %, open interest, OI change, days-to-settlement, and settlement flag; sourced from the TAIFEX.",
+    whatItIs:
+      "期貨日情境(基差／近月／法人 OI)資料集每一列對應一個交易日的期貨情境,欄位包含 futures_close / spot_close / basis / basis_pct / open_interest / oi_delta / days_to_settlement / settlement_flag(期貨收盤、現貨收盤、基差、基差百分比、未平倉、OI 變動、距結算天數與結算旗標)。資料來源為期交所(TAIFEX),分級 推導型(由官方資料計算)。以資料基準日為知識時間,point-in-time 安全;後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one trading day of futures context, carrying futures_close / spot_close / basis / basis_pct / open_interest / oi_delta / days_to_settlement / settlement_flag (futures close, spot close, basis, basis %, open interest, OI change, days-to-settlement, and settlement flag). Sourced from the TAIFEX, graded derived (computed from official data). Keyed on the data as-of date and point-in-time safe; The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以基差(basis／basis_pct)判讀多空與轉倉成本。",
+      "結合 OI 變動觀察部位堆疊與結算效應。",
+      "將距結算天數納入到期日附近的策略。",
+    ],
+    useCasesEn: [
+      "Read positioning and roll cost via basis / basis_pct.",
+      "Watch position build-up and settlement effects via OI change.",
+      "Factor days-to-settlement into expiry-window strategies.",
+    ],
+    whyItMatters:
+      "基差與 OI 分散於多份期交所報表;此資料集以一日一列彙整期貨情境,point-in-time 安全,免自行對齊多源。",
+    whyItMattersEn:
+      "Basis and OI live across multiple TAIFEX reports; this dataset consolidates futures context one row per day, point-in-time safe.",
+    coverageNote:
+      "期貨收盤、現貨、基差與未平倉的每日情境,每列 一個交易日的期貨情境,欄位 futures_close / spot_close / basis / basis_pct / open_interest / oi_delta;來源期交所(TAIFEX)(分級 推導型(由官方資料計算))。以資料基準日為知識時間,point-in-time 安全;(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Daily futures close, spot, basis, and open-interest context; one row per trading day of futures context, fields futures_close / spot_close / basis / basis_pct / open_interest / oi_delta; sourced from the TAIFEX (graded derived (computed from official data)). Keyed on the data as-of date and point-in-time safe; (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源期交所(TAIFEX)(分級 推導型(由官方資料計算));非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TAIFEX (graded derived (computed from official data)); not investment advice.",
+    docsHref: "/docs/api/derivatives/futures-daily-context",
+    pricingHref: "/pricing",
+    keywords: [
+      "期貨日情境(基差／近月／法人 OI)",
+      "台股資料集",
+      "期貨收盤、現貨、基差與未平倉的每日情境",
+      "期交所(TAIFEX)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Futures Daily Context",
+      "Taiwan stock dataset",
+      "daily futures close, spot, basis, and open-interest context",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "期貨日情境(基差／近月／法人 OI)資料集",
+    jsonLdNameEn: "Futures Daily Context Dataset",
+    jsonLdDescription: "期貨收盤、現貨、基差與未平倉的每日情境,來源期交所(TAIFEX)(推導型(由官方資料計算))。",
+    jsonLdDescriptionEn: "Daily futures close, spot, basis, and open-interest context, sourced from the TAIFEX (derived (computed from official data)).",
+    sourceRole: "derived_futures_daily_context",
+    provider: "taifex",
+    marketScope: "TWSE",
+  },
+  {
+    slug: "industry-chain",
+    name: "產業價值鏈成員",
+    nameEn: "Industry Value-Chain Membership",
+    seoTitle: "產業價值鏈成員資料集(reference)| TW Market Data",
+    seoTitleEn: "Industry Value-Chain Membership Dataset (reference) | TW Market Data",
+    seoDescription:
+      "產業價值鏈成員資料集提供個股在產業價值鏈中的節點歸屬,每列對應一個個股-鏈節點歸屬,欄位含 ticker / chain_name / node_name / node_position / market / capture_date;資料來源櫃買中心(TPEx)產業價值鏈(參考／主檔型)。以資料基準日為知識時間,point-in-time 安全;coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Industry Value-Chain Membership dataset provides a stock's node membership in industry value chains — one row per stock-to-chain-node membership, with fields ticker / chain_name / node_name / node_position / market / capture_date; sourced from the TPEx industry value-chain (reference / master). Keyed on the data as-of date and point-in-time safe; Coverage taken verbatim from the backend meta.",
+    shortDescription: "個股在產業價值鏈中的節點歸屬,逐列 代碼、價值鏈名稱、節點名稱、節點位置(上／中／下游)、市場與擷取日;來源櫃買中心(TPEx)產業價值鏈。",
+    shortDescriptionEn: "A stock's node membership in industry value chains — per row: ticker, chain name, node name, node position (up/mid/downstream), market, and capture date; sourced from the TPEx industry value-chain.",
+    whatItIs:
+      "產業價值鏈成員資料集每一列對應一個個股-鏈節點歸屬,欄位包含 ticker / chain_name / node_name / node_position / market / capture_date(代碼、價值鏈名稱、節點名稱、節點位置(上／中／下游)、市場與擷取日)。資料來源為櫃買中心(TPEx)產業價值鏈,分級 參考／主檔型。以資料基準日為知識時間,point-in-time 安全;後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one stock-to-chain-node membership, carrying ticker / chain_name / node_name / node_position / market / capture_date (ticker, chain name, node name, node position (up/mid/downstream), market, and capture date). Sourced from the TPEx industry value-chain, graded reference / master. Keyed on the data as-of date and point-in-time safe; The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以價值鏈節點建立產業上中下游對照。",
+      "反查某節點(如晶圓代工)的成員個股。",
+      "做供應鏈與題材輪動的結構分析。",
+    ],
+    useCasesEn: [
+      "Map upstream/mid/downstream via value-chain nodes.",
+      "Reverse-look member stocks of a node (e.g. foundry).",
+      "Analyze supply chains and thematic rotation structurally.",
+    ],
+    whyItMatters:
+      "產業鏈歸屬是題材與供應鏈分析的骨架;此資料集以節點位置一致呈現成員關係,point-in-time 安全。",
+    whyItMattersEn:
+      "Value-chain membership is the backbone of thematic and supply-chain work; this dataset presents node positions consistently, point-in-time safe.",
+    coverageNote:
+      "個股在產業價值鏈中的節點歸屬,每列 一個個股-鏈節點歸屬,欄位 ticker / chain_name / node_name / node_position / market / capture_date;來源櫃買中心(TPEx)產業價值鏈(分級 參考／主檔型)。以資料基準日為知識時間,point-in-time 安全;(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "A stock's node membership in industry value chains; one row per stock-to-chain-node membership, fields ticker / chain_name / node_name / node_position / market / capture_date; sourced from the TPEx industry value-chain (graded reference / master). Keyed on the data as-of date and point-in-time safe; (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源櫃買中心(TPEx)產業價值鏈(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TPEx industry value-chain (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/structure-reference/industry-chain",
+    pricingHref: "/pricing",
+    keywords: [
+      "產業價值鏈成員",
+      "台股資料集",
+      "個股在產業價值鏈中的節點歸屬",
+      "櫃買中心(TPEx)產業價值鏈",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Industry Value-Chain Membership",
+      "Taiwan stock dataset",
+      "a stock's node membership in industry value chains",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "產業價值鏈成員資料集",
+    jsonLdNameEn: "Industry Value-Chain Membership Dataset",
+    jsonLdDescription: "個股在產業價值鏈中的節點歸屬,來源櫃買中心(TPEx)產業價值鏈(參考／主檔型)。",
+    jsonLdDescriptionEn: "A stock's node membership in industry value chains, sourced from the TPEx industry value-chain (reference / master).",
+    sourceRole: "reference_industry_chain",
+    provider: "tpex",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "insider-director-holdings",
+    name: "董監持股",
+    nameEn: "Insider & Director Holdings",
+    seoTitle: "董監持股資料集(verified)| TW Market Data",
+    seoTitleEn: "Insider & Director Holdings Dataset (verified) | TW Market Data",
+    seoDescription:
+      "董監持股資料集提供董事、監察人與內部人持股,每列對應一位持有人的一筆持股揭露,欄位含 ticker / market / source_as_of_date / holder_name / holder_role / holder_category;資料來源公開資訊觀測站(MOPS)(官方已驗證)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Insider & Director Holdings dataset provides director, supervisor, and insider holdings — one row per holder's holdings disclosure, with fields ticker / market / source_as_of_date / holder_name / holder_role / holder_category; sourced from MOPS (official, verified). Coverage taken verbatim from the backend meta.",
+    shortDescription: "董事、監察人與內部人持股,逐列 代碼、市場、資料基準日、持有人姓名、角色、類別、持股數與持股比率;來源公開資訊觀測站(MOPS)。",
+    shortDescriptionEn: "Director, supervisor, and insider holdings — per row: ticker, market, as-of date, holder name, role, category, holding shares, and holding ratio; sourced from MOPS.",
+    whatItIs:
+      "董監持股資料集每一列對應一位持有人的一筆持股揭露,欄位包含 ticker / market / source_as_of_date / holder_name / holder_role / holder_category / holding_shares / holding_ratio(代碼、市場、資料基準日、持有人姓名、角色、類別、持股數與持股比率)。資料來源為公開資訊觀測站(MOPS),分級 官方已驗證。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one holder's holdings disclosure, carrying ticker / market / source_as_of_date / holder_name / holder_role / holder_category / holding_shares / holding_ratio (ticker, market, as-of date, holder name, role, category, holding shares, and holding ratio). Sourced from MOPS, graded official, verified. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "追蹤董監與內部人持股比率變化。",
+      "以 holder_role 區分董事／監察人／經理人持股。",
+      "監控內部人持股集中度與質押觀察前置。",
+    ],
+    useCasesEn: [
+      "Track director/insider holding-ratio changes.",
+      "Split holdings by holder_role (director/supervisor/manager).",
+      "Monitor insider concentration as a governance signal.",
+    ],
+    whyItMatters:
+      "董監持股是治理與內部人訊號的核心;此資料集以基準日與比率一致呈現,免逐月抓 MOPS 申報。",
+    whyItMattersEn:
+      "Insider holdings are a core governance signal; this dataset presents as-of date and ratio consistently, no monthly MOPS scraping.",
+    coverageNote:
+      "董事、監察人與內部人持股,每列 一位持有人的一筆持股揭露,欄位 ticker / market / source_as_of_date / holder_name / holder_role / holder_category;來源公開資訊觀測站(MOPS)(分級 官方已驗證)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Director, supervisor, and insider holdings; one row per holder's holdings disclosure, fields ticker / market / source_as_of_date / holder_name / holder_role / holder_category; sourced from MOPS (graded official, verified). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源公開資訊觀測站(MOPS)(分級 官方已驗證);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from MOPS (graded official, verified); not investment advice.",
+    docsHref: "/docs/api/capital-flows/insider-director-holdings",
+    pricingHref: "/pricing",
+    keywords: [
+      "董監持股",
+      "台股資料集",
+      "董事、監察人與內部人持股",
+      "公開資訊觀測站(MOPS)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Insider & Director Holdings",
+      "Taiwan stock dataset",
+      "director, supervisor, and insider holdings",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "董監持股資料集",
+    jsonLdNameEn: "Insider & Director Holdings Dataset",
+    jsonLdDescription: "董事、監察人與內部人持股,來源公開資訊觀測站(MOPS)(官方已驗證)。",
+    jsonLdDescriptionEn: "Director, supervisor, and insider holdings, sourced from MOPS (official, verified).",
+    sourceRole: "verified_insider_director_holdings",
+    provider: "mops",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "macro-global",
+    name: "全球總經",
+    nameEn: "Global Macro",
+    seoTitle: "全球總經資料集(verified)| TW Market Data",
+    seoTitleEn: "Global Macro Dataset (verified) | TW Market Data",
+    seoDescription:
+      "全球總經資料集提供全球利率、匯率、物價等總經時間序列,每列對應一個序列的一個觀測值,欄位含 series_id / series_name / obs_date / value / unit / freq;資料來源國際官方統計來源(如 FRED)(官方已驗證)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Global Macro dataset provides global rate, FX, and price macro series — one row per observation of series, with fields series_id / series_name / obs_date / value / unit / freq; sourced from official international sources (e.g. FRED) (official, verified). Coverage taken verbatim from the backend meta.",
+    shortDescription: "全球利率、匯率、物價等總經時間序列,逐列 序列代碼／名稱、觀測日、數值、單位、頻率、來源群組與釋出角色;來源國際官方統計來源(如 FRED)。",
+    shortDescriptionEn: "Global rate, fx, and price macro series — per row: series id/name, observation date, value, unit, frequency, source group, and release role; sourced from official international sources (e.g. FRED).",
+    whatItIs:
+      "全球總經資料集每一列對應一個序列的一個觀測值,欄位包含 series_id / series_name / obs_date / value / unit / freq / source_group / release_role(序列代碼／名稱、觀測日、數值、單位、頻率、來源群組與釋出角色)。資料來源為國際官方統計來源(如 FRED),分級 官方已驗證。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one observation of one series, carrying series_id / series_name / obs_date / value / unit / freq / source_group / release_role (series id/name, observation date, value, unit, frequency, source group, and release role). Sourced from official international sources (e.g. FRED), graded official, verified. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以 series_id 取全球總經序列(利率／匯率／物價)。",
+      "對齊 obs_date 做跨國總經比較。",
+      "作為台股總經連動分析的外部變數層。",
+    ],
+    useCasesEn: [
+      "Pull global macro series (rates/FX/prices) by series_id.",
+      "Align on obs_date for cross-country macro comparison.",
+      "Use as the external-variable layer for macro linkage.",
+    ],
+    whyItMatters:
+      "全球總經序列來源與頻率不一;此資料集以一致 series 結構彙整,免各官網逐一抓取解析。",
+    whyItMattersEn:
+      "Global macro series vary by source and frequency; this dataset unifies them in one series shape, no site-by-site scraping.",
+    coverageNote:
+      "全球利率、匯率、物價等總經時間序列,每列 一個序列的一個觀測值,欄位 series_id / series_name / obs_date / value / unit / freq;來源國際官方統計來源(如 FRED)(分級 官方已驗證)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Global rate, fx, and price macro series; one row per observation of series, fields series_id / series_name / obs_date / value / unit / freq; sourced from official international sources (e.g. FRED) (graded official, verified). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源國際官方統計來源(如 FRED)(分級 官方已驗證);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from official international sources (e.g. FRED) (graded official, verified); not investment advice.",
+    docsHref: "/docs/api/macro/macro-global",
+    pricingHref: "/pricing",
+    keywords: [
+      "全球總經",
+      "台股資料集",
+      "全球利率、匯率、物價等總經時間序列",
+      "國際官方統計來源(如 FRED)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Global Macro",
+      "Taiwan stock dataset",
+      "global rate, FX, and price macro series",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "全球總經資料集",
+    jsonLdNameEn: "Global Macro Dataset",
+    jsonLdDescription: "全球利率、匯率、物價等總經時間序列,來源國際官方統計來源(如 FRED)(官方已驗證)。",
+    jsonLdDescriptionEn: "Global rate, fx, and price macro series, sourced from official international sources (e.g. FRED) (official, verified).",
+    sourceRole: "verified_macro_global",
+    provider: "intl",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "macro-worldbank",
+    name: "世界銀行總經",
+    nameEn: "World Bank Macro",
+    seoTitle: "世界銀行總經資料集(verified)| TW Market Data",
+    seoTitleEn: "World Bank Macro Dataset (verified) | TW Market Data",
+    seoDescription:
+      "世界銀行總經資料集提供世界銀行各國年度總經指標,每列對應一國一指標一年的觀測值,欄位含 country_iso / country_name / indicator_code / indicator_name / year / value;資料來源世界銀行(World Bank)(官方已驗證)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The World Bank Macro dataset provides World Bank annual macro indicators by country — one row per country-indicator-year observation, with fields country_iso / country_name / indicator_code / indicator_name / year / value; sourced from the World Bank (official, verified). Coverage taken verbatim from the backend meta.",
+    shortDescription: "世界銀行各國年度總經指標,逐列 國別 ISO／名稱、指標代碼／名稱、年度、數值、來源群組與授權;來源世界銀行(World Bank)。",
+    shortDescriptionEn: "World bank annual macro indicators by country — per row: country ISO/name, indicator code/name, year, value, source group, and license; sourced from the World Bank.",
+    whatItIs:
+      "世界銀行總經資料集每一列對應一國一指標一年的觀測值,欄位包含 country_iso / country_name / indicator_code / indicator_name / year / value / source_group / license(國別 ISO／名稱、指標代碼／名稱、年度、數值、來源群組與授權)。資料來源為世界銀行(World Bank),分級 官方已驗證。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one country-indicator-year observation, carrying country_iso / country_name / indicator_code / indicator_name / year / value / source_group / license (country ISO/name, indicator code/name, year, value, source group, and license). Sourced from the World Bank, graded official, verified. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以指標代碼取各國年度總經數據做跨國比較。",
+      "建立台灣 vs 競爭國的長期結構對照。",
+      "作為總經研究的官方跨國資料層。",
+    ],
+    useCasesEn: [
+      "Pull annual country indicators by code for cross-country comparison.",
+      "Build long-run Taiwan-vs-peers structural views.",
+      "Use as the official cross-country layer for macro research.",
+    ],
+    whyItMatters:
+      "世界銀行資料 API 分散;此資料集以一致國別-指標-年度結構提供,附授權欄位,免自行整併。",
+    whyItMattersEn:
+      "World Bank data spans many API calls; this dataset serves it in one country-indicator-year shape with license fields, no manual assembly.",
+    coverageNote:
+      "世界銀行各國年度總經指標,每列 一國一指標一年的觀測值,欄位 country_iso / country_name / indicator_code / indicator_name / year / value;來源世界銀行(World Bank)(分級 官方已驗證)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "World bank annual macro indicators by country; one row per country-indicator-year observation, fields country_iso / country_name / indicator_code / indicator_name / year / value; sourced from the World Bank (graded official, verified). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源世界銀行(World Bank)(分級 官方已驗證);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the World Bank (graded official, verified); not investment advice.",
+    docsHref: "/docs/api/macro/macro-worldbank",
+    pricingHref: "/pricing",
+    keywords: [
+      "世界銀行總經",
+      "台股資料集",
+      "世界銀行各國年度總經指標",
+      "世界銀行(World Bank)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "World Bank Macro",
+      "Taiwan stock dataset",
+      "World Bank annual macro indicators by country",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "世界銀行總經資料集",
+    jsonLdNameEn: "World Bank Macro Dataset",
+    jsonLdDescription: "世界銀行各國年度總經指標,來源世界銀行(World Bank)(官方已驗證)。",
+    jsonLdDescriptionEn: "World bank annual macro indicators by country, sourced from the World Bank (official, verified).",
+    sourceRole: "verified_macro_worldbank",
+    provider: "worldbank",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "major-event-taxonomy",
+    name: "重大訊息事件分類",
+    nameEn: "Major Event Taxonomy",
+    seoTitle: "重大訊息事件分類資料集(reference)| TW Market Data",
+    seoTitleEn: "Major Event Taxonomy Dataset (reference) | TW Market Data",
+    seoDescription:
+      "重大訊息事件分類資料集提供重大訊息的事件分類標記,每列對應一則被分類的重大訊息,欄位含 event_class / subject / event_time / confidence / rule_version;資料來源公開資訊觀測站(MOPS)重大訊息(參考／主檔型)。以資料基準日為知識時間,point-in-time 安全;coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Major Event Taxonomy dataset provides a classification taxonomy over material announcements — one row per classified material announcement, with fields event_class / subject / event_time / confidence / rule_version; sourced from MOPS material announcements (reference / master). Keyed on the data as-of date and point-in-time safe; Coverage taken verbatim from the backend meta.",
+    shortDescription: "重大訊息的事件分類標記,逐列 事件類別、主體、事件時間、信心值(confidence)與規則版本(rule_version);來源公開資訊觀測站(MOPS)重大訊息。",
+    shortDescriptionEn: "A classification taxonomy over material announcements — per row: event class, subject, event time, confidence, and rule version; sourced from MOPS material announcements.",
+    whatItIs:
+      "重大訊息事件分類資料集每一列對應一則被分類的重大訊息,欄位包含 event_class / subject / event_time / confidence / rule_version(事件類別、主體、事件時間、信心值(confidence)與規則版本(rule_version))。資料來源為公開資訊觀測站(MOPS)重大訊息,分級 參考／主檔型。以資料基準日為知識時間,point-in-time 安全;後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one classified material announcement, carrying event_class / subject / event_time / confidence / rule_version (event class, subject, event time, confidence, and rule version). Sourced from MOPS material announcements, graded reference / master. Keyed on the data as-of date and point-in-time safe; The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以 event_class 將重大訊息歸類成可分析事件流。",
+      "用 confidence 過濾分類可信度。",
+      "以 rule_version 追蹤分類規則沿革做可重現分析。",
+    ],
+    useCasesEn: [
+      "Group material announcements into an analyzable event stream via event_class.",
+      "Filter by confidence for classification reliability.",
+      "Track rule_version for reproducible, versioned classification.",
+    ],
+    whyItMatters:
+      "重大訊息是自由文字難以彙總;此資料集以規則化分類(附信心值與規則版本)結構化事件,point-in-time 安全。",
+    whyItMattersEn:
+      "Material announcements are free text; this dataset structures them via a versioned taxonomy with confidence, point-in-time safe.",
+    coverageNote:
+      "重大訊息的事件分類標記,每列 一則被分類的重大訊息,欄位 event_class / subject / event_time / confidence / rule_version;來源公開資訊觀測站(MOPS)重大訊息(分級 參考／主檔型)。以資料基準日為知識時間,point-in-time 安全;(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "A classification taxonomy over material announcements; one row per classified material announcement, fields event_class / subject / event_time / confidence / rule_version; sourced from MOPS material announcements (graded reference / master). Keyed on the data as-of date and point-in-time safe; (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源公開資訊觀測站(MOPS)重大訊息(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from MOPS material announcements (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/companies-events/major-event-taxonomy",
+    pricingHref: "/pricing",
+    keywords: [
+      "重大訊息事件分類",
+      "台股資料集",
+      "重大訊息的事件分類標記",
+      "公開資訊觀測站(MOPS)重大訊息",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Major Event Taxonomy",
+      "Taiwan stock dataset",
+      "a classification taxonomy over material announcements",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "重大訊息事件分類資料集",
+    jsonLdNameEn: "Major Event Taxonomy Dataset",
+    jsonLdDescription: "重大訊息的事件分類標記,來源公開資訊觀測站(MOPS)重大訊息(參考／主檔型)。",
+    jsonLdDescriptionEn: "A classification taxonomy over material announcements, sourced from MOPS material announcements (reference / master).",
+    sourceRole: "reference_major_event_taxonomy",
+    provider: "mops",
+    marketScope: "TWSE_TPEX",
+  },
+  {
+    slug: "margin-system-stats",
+    name: "信用交易系統統計",
+    nameEn: "Margin System Statistics",
+    seoTitle: "信用交易系統統計資料集(derived)| TW Market Data",
+    seoTitleEn: "Margin System Statistics Dataset (derived) | TW Market Data",
+    seoDescription:
+      "信用交易系統統計資料集提供全市場融資融券系統彙總統計,每列對應一個交易日的系統統計,欄位含 margin_purchase_balance_total / short_sale_balance_total / short_to_margin_balance_ratio / margin_net_flow / maintenance_ratio;資料來源證交所(TWSE)(推導型(由官方資料計算))。以資料基準日為知識時間,point-in-time 安全;coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Margin System Statistics dataset provides market-wide margin and short-sale system statistics — one row per trading day of system statistics, with fields margin_purchase_balance_total / short_sale_balance_total / short_to_margin_balance_ratio / margin_net_flow / maintenance_ratio; sourced from the TWSE (derived (computed from official data)). Keyed on the data as-of date and point-in-time safe; Coverage taken verbatim from the backend meta.",
+    shortDescription: "全市場融資融券系統彙總統計,逐列 融資餘額總額、融券餘額總額、券資比、融資淨流與整體維持率;來源證交所(TWSE)。",
+    shortDescriptionEn: "Market-wide margin and short-sale system statistics — per row: total margin balance, total short balance, short-to-margin ratio, margin net flow, and maintenance ratio; sourced from the TWSE.",
+    whatItIs:
+      "信用交易系統統計資料集每一列對應一個交易日的系統統計,欄位包含 margin_purchase_balance_total / short_sale_balance_total / short_to_margin_balance_ratio / margin_net_flow / maintenance_ratio(融資餘額總額、融券餘額總額、券資比、融資淨流與整體維持率)。資料來源為證交所(TWSE),分級 推導型(由官方資料計算)。以資料基準日為知識時間,point-in-time 安全;後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one trading day of system statistics, carrying margin_purchase_balance_total / short_sale_balance_total / short_to_margin_balance_ratio / margin_net_flow / maintenance_ratio (total margin balance, total short balance, short-to-margin ratio, margin net flow, and maintenance ratio). Sourced from the TWSE, graded derived (computed from official data). Keyed on the data as-of date and point-in-time safe; The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以券資比與維持率觀察全市場槓桿與斷頭風險。",
+      "追蹤融資淨流判讀散戶槓桿情緒。",
+      "作為信用交易系統性風險的監控層。",
+    ],
+    useCasesEn: [
+      "Watch market leverage and margin-call risk via short-to-margin and maintenance ratios.",
+      "Track margin net flow as a retail-leverage sentiment read.",
+      "Use as the systemic-risk monitor for margin trading.",
+    ],
+    whyItMatters:
+      "融資融券系統統計分散於多份日報;此資料集以一日一列彙整槓桿指標(含維持率),point-in-time 安全。",
+    whyItMattersEn:
+      "Margin/short system stats span several daily reports; this dataset consolidates leverage metrics (incl. maintenance ratio) one row per day, point-in-time safe.",
+    coverageNote:
+      "全市場融資融券系統彙總統計,每列 一個交易日的系統統計,欄位 margin_purchase_balance_total / short_sale_balance_total / short_to_margin_balance_ratio / margin_net_flow / maintenance_ratio;來源證交所(TWSE)(分級 推導型(由官方資料計算))。以資料基準日為知識時間,point-in-time 安全;(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Market-wide margin and short-sale system statistics; one row per trading day of system statistics, fields margin_purchase_balance_total / short_sale_balance_total / short_to_margin_balance_ratio / margin_net_flow / maintenance_ratio; sourced from the TWSE (graded derived (computed from official data)). Keyed on the data as-of date and point-in-time safe; (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所(TWSE)(分級 推導型(由官方資料計算));非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE (graded derived (computed from official data)); not investment advice.",
+    docsHref: "/docs/api/capital-flows/margin-system-stats",
+    pricingHref: "/pricing",
+    keywords: [
+      "信用交易系統統計",
+      "台股資料集",
+      "全市場融資融券系統彙總統計",
+      "證交所(TWSE)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Margin System Statistics",
+      "Taiwan stock dataset",
+      "market-wide margin and short-sale system statistics",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "信用交易系統統計資料集",
+    jsonLdNameEn: "Margin System Statistics Dataset",
+    jsonLdDescription: "全市場融資融券系統彙總統計,來源證交所(TWSE)(推導型(由官方資料計算))。",
+    jsonLdDescriptionEn: "Market-wide margin and short-sale system statistics, sourced from the TWSE (derived (computed from official data)).",
+    sourceRole: "derived_margin_system_stats",
+    provider: "twse",
+    marketScope: "TWSE",
+  },
+  {
+    slug: "market-overview-snapshots",
+    name: "市場概況快照",
+    nameEn: "Market Overview Snapshots",
+    seoTitle: "市場概況快照資料集(reference)| TW Market Data",
+    seoTitleEn: "Market Overview Snapshots Dataset (reference) | TW Market Data",
+    seoDescription:
+      "市場概況快照資料集提供全市場指數與漲跌家數的每日快照,每列對應一個市場一日的概況快照,欄位含 market_code / as_of_date / index_level / index_change / index_change_pct / advancers;資料來源證交所(TWSE)(參考／主檔型)。coverage 逐字帶後端 meta。",
+    seoDescriptionEn:
+      "The Market Overview Snapshots dataset provides daily market-wide index and advance/decline snapshots — one row per market's daily overview snapshot, with fields market_code / as_of_date / index_level / index_change / index_change_pct / advancers; sourced from the TWSE (reference / master). Coverage taken verbatim from the backend meta.",
+    shortDescription: "全市場指數與漲跌家數的每日快照,逐列 市場代碼、基準日、指數點位、漲跌點、漲跌幅、上漲／下跌／平盤家數;來源證交所(TWSE)。",
+    shortDescriptionEn: "Daily market-wide index and advance/decline snapshots — per row: market code, as-of date, index level, index change, change %, advancers, decliners, and unchanged; sourced from the TWSE.",
+    whatItIs:
+      "市場概況快照資料集每一列對應一個市場一日的概況快照,欄位包含 market_code / as_of_date / index_level / index_change / index_change_pct / advancers / decliners / unchanged(市場代碼、基準日、指數點位、漲跌點、漲跌幅、上漲／下跌／平盤家數)。資料來源為證交所(TWSE),分級 參考／主檔型。後端 /v2/datasets meta 僅提供 grade／tier／point-in-time,未提供涵蓋視窗,故此頁不列具體起訖。",
+    whatItIsEn:
+      "Each row is one market's daily overview snapshot, carrying market_code / as_of_date / index_level / index_change / index_change_pct / advancers / decliners / unchanged (market code, as-of date, index level, index change, change %, advancers, decliners, and unchanged). Sourced from the TWSE, graded reference / master. The backend /v2/datasets meta exposes only grade / tier / point-in-time and no coverage window, so none is stated here.",
+    useCases: [
+      "以漲跌家數快速判讀市場廣度與情緒。",
+      "追蹤指數點位與漲跌幅的每日概況。",
+      "作為儀表板頂層的市場概覽資料。",
+    ],
+    useCasesEn: [
+      "Read breadth and sentiment quickly via advancers/decliners.",
+      "Track daily index level and change context.",
+      "Use as the top-level market overview for dashboards.",
+    ],
+    whyItMatters:
+      "市場概況需彙整指數與漲跌家數;此資料集以一致快照欄位一次提供,免自行加總。",
+    whyItMattersEn:
+      "A market overview needs index plus advance/decline aggregated; this dataset serves it in one snapshot shape, no manual tallying.",
+    coverageNote:
+      "全市場指數與漲跌家數的每日快照,每列 一個市場一日的概況快照,欄位 market_code / as_of_date / index_level / index_change / index_change_pct / advancers;來源證交所(TWSE)(分級 參考／主檔型)。(後端 /v2/datasets meta 未提供涵蓋視窗,故不列具體起訖。)",
+    coverageNoteEn:
+      "Daily market-wide index and advance/decline snapshots; one row per market's daily overview snapshot, fields market_code / as_of_date / index_level / index_change / index_change_pct / advancers; sourced from the TWSE (graded reference / master). (The backend /v2/datasets meta provides no coverage window, so none is stated.)",
+    freshnessNote: "隨後端資料更新;實際頻率依來源發布節奏。",
+    freshnessNoteEn: "Updated as the backend refreshes; cadence follows the source's release schedule.",
+    sourcePolicyNote: "來源證交所(TWSE)(分級 參考／主檔型);非投資建議。",
+    sourcePolicyNoteEn: "Sourced from the TWSE (graded reference / master); not investment advice.",
+    docsHref: "/docs/api/market-prices/market-overview-snapshots",
+    pricingHref: "/pricing",
+    keywords: [
+      "市場概況快照",
+      "台股資料集",
+      "全市場指數與漲跌家數的每日快照",
+      "證交所(TWSE)",
+      "TW Market Data",
+    ],
+    keywordsEn: [
+      "Market Overview Snapshots",
+      "Taiwan stock dataset",
+      "daily market-wide index and advance/decline snapshots",
+      "market data API",
+      "TW Market Data",
+    ],
+    jsonLdName: "市場概況快照資料集",
+    jsonLdNameEn: "Market Overview Snapshots Dataset",
+    jsonLdDescription: "全市場指數與漲跌家數的每日快照,來源證交所(TWSE)(參考／主檔型)。",
+    jsonLdDescriptionEn: "Daily market-wide index and advance/decline snapshots, sourced from the TWSE (reference / master).",
+    sourceRole: "reference_market_overview_snapshots",
+    provider: "twse",
+    marketScope: "TWSE_TPEX",
+  },
+  {
     slug: "market-breadth",
     name: "市場廣度",
     nameEn: "Market Breadth",
