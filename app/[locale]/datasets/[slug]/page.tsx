@@ -12,6 +12,8 @@ import { Link } from "@/src/i18n/navigation";
 import type { AppLocale } from "@/src/i18n/locales";
 import { buildAlternates, OG_LOCALE } from "@/src/i18n/seo";
 import { getDatasetReconciliation } from "@/src/lib/reconciliation/dataset-reconciliation";
+import { DATASET_ACCESS_POLICIES } from "@/src/lib/gateway/dataset-policies";
+import { getPricingPlanView, isPlanCode, type PricingPlanCode } from "@/src/lib/billing/plans";
 
 type PageProps = {
   params: Promise<{ slug: string; locale: string }>;
@@ -78,6 +80,18 @@ export default async function DatasetSlugPage({ params }: PageProps) {
 
   // Trust badge state (null until the backend reconciliation record lands → badge hidden).
   const reconciliation = await getDatasetReconciliation(dataset.slug);
+
+  // Tier badge + sample gate, both from the pricing SSOT. The public /v2/datasets endpoint is keyless
+  // only for the free tier; premium tiers 401 without a key — so the zero-registration sample CSV is
+  // shown ONLY when the dataset is free-tier (keyless). For premium datasets we hide it rather than
+  // link a button that 401s (this also retro-fixes the existing SEO pages whose sample link broke when
+  // the API started requiring a key for paid tiers).
+  const requiredPlan = DATASET_ACCESS_POLICIES[dataset.slug]?.requiredPlan;
+  const tierCode = (requiredPlan && (isPlanCode(requiredPlan) || requiredPlan === "free")
+    ? requiredPlan
+    : undefined) as PricingPlanCode | undefined;
+  const tierLabel = tierCode ? getPricingPlanView(tierCode, appLocale).displayName : null;
+  const isKeylessSample = tierCode === "free";
 
   const pageUrl = `https://twmarketdata.com/datasets/${dataset.slug}`;
   const docsUrl = `https://twmarketdata.com${dataset.docsHref}`;
@@ -165,22 +179,33 @@ export default async function DatasetSlugPage({ params }: PageProps) {
         </nav>
 
         <header className="space-y-4 rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("datasetEyebrow")}</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("datasetEyebrow")}</p>
+            {tierLabel ? (
+              <span className="inline-flex items-center rounded-full border border-slate-300 bg-slate-50 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
+                {tierLabel}
+              </span>
+            ) : null}
+          </div>
           <h1 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">{dataset.name}</h1>
           <p className="max-w-3xl text-base leading-7 text-slate-600">{dataset.shortDescription}</p>
           <div className="flex flex-wrap gap-3 pt-1">
             <Link href={dataset.docsHref} className={buttonClass("primary")}>{t("viewApiDocs")}</Link>
-            {/* B-4 (FRICTION-01): zero-registration sample CSV via the no-key free symbol 2330. */}
-            <a
-              href={`https://api.twmarketdata.com/v2/datasets/${dataset.slug}?symbol=2330&format=csv&limit=50`}
-              className={buttonClass("secondary")}
-              rel="noopener"
-            >
-              {t("downloadSampleCsv")}
-            </a>
+            {/* B-4 (FRICTION-01): zero-registration sample CSV via the no-key free symbol 2330 — shown
+                ONLY for keyless (free-tier) datasets; premium tiers 401 without a key, so we omit it
+                rather than link a broken button. */}
+            {isKeylessSample ? (
+              <a
+                href={`https://api.twmarketdata.com/v2/datasets/${dataset.slug}?symbol=2330&format=csv&limit=50`}
+                className={buttonClass("secondary")}
+                rel="noopener"
+              >
+                {t("downloadSampleCsv")}
+              </a>
+            ) : null}
             <Link href={dataset.pricingHref} className={buttonClass("secondary")}>{t("viewPricing")}</Link>
           </div>
-          <p className="text-xs text-slate-500">{t("sampleCaption")}</p>
+          {isKeylessSample ? <p className="text-xs text-slate-500">{t("sampleCaption")}</p> : null}
         </header>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-7 sm:p-9">
