@@ -317,6 +317,58 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "financial-metrics",
+    name: "財務比率指標",
+    nameEn: "Financial Metrics",
+    seoTitle: "財務比率指標資料集(ROE / ROA / 毛利率 / 負債比)| TW Market Data",
+    seoTitleEn: "Financial Metrics Dataset (ROE / ROA / margins / debt ratio) | TW Market Data",
+    seoDescription:
+      "財務比率指標資料集提供台股上市櫃公司每季 ROE / ROA、毛利率 / 營益率與負債比等比率,由財報三表衍生,一列一個 (ticker, fiscal_year, fiscal_quarter),支援品質、獲利與選股因子。以揭露日為知識時間(非 point-in-time 安全,回測需依 disclosure_date 過濾)。",
+    seoDescriptionEn:
+      "The Financial Metrics dataset provides quarterly ROE / ROA, gross / operating margin, and debt ratio for Taiwan listed companies, derived from the three financial statements — one row per (ticker, fiscal_year, fiscal_quarter) — for quality, profitability, and screening factors. Keyed on the disclosure date (NOT point-in-time safe; filter by disclosure_date for backtests).",
+    shortDescription: "上市櫃公司每季 ROE/ROA、毛利/營益率、負債比等財務比率,由三表衍生。",
+    shortDescriptionEn:
+      "Quarterly ROE/ROA, gross/operating margin, and debt ratio per listed company, derived from the three statements.",
+    whatItIs:
+      "財務比率指標資料集每一列對應「一家公司、一個會計年度、一個會計季度」的比率,欄位包含 roe / roa(股東/資產報酬率)、gross_margin / op_margin(毛利/營益率)與 debt_ratio(負債比)等,由損益、資產負債與現金流量三表衍生。以 disclosure_date(揭露日)為知識時間——【非 point-in-time 安全】:回測務必以揭露日過濾,避免用到當時尚未公布的財報而產生未來函數。",
+    whatItIsEn:
+      "Each row is one company, one fiscal year, one fiscal quarter, carrying roe / roa (return on equity / assets), gross_margin / op_margin, and debt_ratio, derived from the income, balance-sheet, and cash-flow statements. Keyed on disclosure_date — NOT point-in-time safe: backtests must filter by the disclosure date so a not-yet-published report never leaks into the past (look-ahead).",
+    useCases: [
+      "以 ROE / 毛利率 / 負債比等比率建構品質與獲利選股因子。",
+      "免自算三表比率,直接取用一致口徑的衍生指標。",
+      "依 disclosure_date 過濾,確保回測不含未公布財報的未來函數。",
+    ],
+    useCasesEn: [
+      "Build quality and profitability factors from ROE / margins / debt ratio.",
+      "Skip computing ratios yourself — take consistently derived metrics.",
+      "Filter by disclosure_date to keep backtests free of unpublished-report look-ahead.",
+    ],
+    whyItMatters:
+      "財報比率的口徑與揭露時點若處理不當,極易在回測中引入未來函數;直接取用附揭露日、口徑一致的比率,可省去計算並正確對齊 point-in-time。",
+    whyItMattersEn:
+      "Mishandling ratio conventions and disclosure timing easily leaks look-ahead into backtests; taking consistently defined ratios stamped with their disclosure date removes that work and aligns point-in-time correctly.",
+    coverageNote:
+      "逐公司逐季,涵蓋上市櫃公司;由財報三表衍生。以 disclosure_date 為知識時間,非 point-in-time 安全——回測需依揭露日過濾。",
+    coverageNoteEn:
+      "Per company, per quarter, across listed companies; derived from the three financial statements. Keyed on disclosure_date, NOT point-in-time safe — filter by disclosure date for backtests.",
+    freshnessNote: "季頻,隨財報揭露更新(有申報落差)。",
+    freshnessNoteEn: "Quarterly, updated as filings are disclosed (with a reporting lag).",
+    sourcePolicyNote: "由 MOPS 官方財報三表衍生;非投資建議。",
+    sourcePolicyNoteEn: "Derived from official MOPS financial statements; not investment advice.",
+    docsHref: "/docs/api/financials/financial-metrics",
+    pricingHref: "/pricing",
+    keywords: ["財務比率", "ROE", "ROA", "毛利率", "負債比", "台股基本面因子"],
+    keywordsEn: ["financial metrics", "ROE", "ROA", "gross margin", "debt ratio", "Taiwan fundamental factors"],
+    jsonLdName: "財務比率指標資料集",
+    jsonLdNameEn: "Financial Metrics Dataset",
+    jsonLdDescription: "台股上市櫃公司每季財務比率(ROE/ROA/毛利率/負債比),由三表衍生,以揭露日為知識時間。",
+    jsonLdDescriptionEn:
+      "Quarterly financial ratios (ROE/ROA/margins/debt ratio) for Taiwan listed companies, derived from the three statements, keyed on disclosure date.",
+    sourceRole: "derived_financial_ratios",
+    provider: "twse_official",
+    marketScope: "TWSE_TPEX",
+  },
+  {
     slug: "balance-sheet",
     name: "資產負債表",
     nameEn: "Balance Sheet",
