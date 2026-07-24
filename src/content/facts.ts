@@ -58,4 +58,14 @@ export const factsTopics: readonly FactsTopic[] = [
     coverage: { en: "From 2004", zh: "2004 年起" },
     published: true,
   },
+  {
+    slug: "limit-events",
+    title: { en: "Limit-up / limit-down events", zh: "漲跌停家數" },
+    blurb: {
+      en: "How many stocks closed locked at their daily price limit each year, up vs down, since 2004. Detected via era price-limit bands — approximate, not officially confirmed.",
+      zh: "台股逐年收盤鎖住漲跌停的個股家數(漲/跌),2004 年起。以各時期漲跌幅帶偵測——近似值,非官方確認。",
+    },
+    coverage: { en: "From 2004 (detected)", zh: "2004 年起(偵測)" },
+    published: true,
+  },
 ];
