@@ -629,6 +629,58 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     provider: "twse_official",
     marketScope: "TWSE",
   },
+  {
+    slug: "technical-indicators",
+    name: "技術指標",
+    nameEn: "Technical Indicators",
+    seoTitle: "技術指標資料集(MA / RSI / MACD)| TW Market Data",
+    seoTitleEn: "Technical Indicators Dataset (MA / RSI / MACD) | TW Market Data",
+    seoDescription:
+      "技術指標資料集提供台股個股每日移動平均(MA 5 / 20 / 60)、RSI(14)與 MACD(line / signal / hist),由官方日線價格衍生,point-in-time 安全,適合動能、趨勢跟隨與均值回歸研究。",
+    seoDescriptionEn:
+      "The Technical Indicators dataset provides daily moving averages (MA 5 / 20 / 60), RSI (14), and MACD (line / signal / hist) for Taiwan stocks, derived from official daily prices and point-in-time safe — for momentum, trend-following, and mean-reversion research.",
+    shortDescription: "個股每日 MA / RSI / MACD 技術指標,由日線價格衍生,標明還原/未還原基準。",
+    shortDescriptionEn:
+      "Daily MA / RSI / MACD technical indicators per stock, derived from daily prices, with the adjusted/unadjusted basis labeled.",
+    whatItIs:
+      "技術指標資料集每一列對應「一檔證券、一個交易日、一個計算基準」的指標值,欄位包含移動平均(ma_5 / ma_20 / ma_60)、相對強弱(rsi_14)與 MACD(macd_line / macd_signal / macd_hist),並以 indicator_basis 標明採用還原(close)或未還原(close_unadjusted)收盤價。指標由 equity_daily_prices 日線價格衍生;序列起點會有 warmup 期的 null(屬正常)。以 trade_date 為知識時間,point-in-time 安全。",
+    whatItIsEn:
+      "Each row is one security on one trading day for one calculation basis, carrying moving averages (ma_5 / ma_20 / ma_60), relative strength (rsi_14), and MACD (macd_line / macd_signal / macd_hist), with indicator_basis marking whether the adjusted (close) or unadjusted (close_unadjusted) close was used. Indicators are derived from equity_daily_prices; the series start carries warmup nulls (expected). Keyed on trade_date and point-in-time safe.",
+    useCases: [
+      "以 MA 交叉、RSI 超買超賣讀取趨勢與動能。",
+      "回測動能、趨勢跟隨與均值回歸策略。",
+      "確保還原/未還原基準一致,避免除權息造成的指標失真。",
+    ],
+    useCasesEn: [
+      "Read trend and momentum from MA crossovers and RSI overbought/oversold.",
+      "Backtest momentum, trend-following, and mean-reversion strategies.",
+      "Keep the adjusted/unadjusted basis consistent to avoid ex-rights distortion.",
+    ],
+    whyItMatters:
+      "自算技術指標容易在還原價、warmup 與參數上出錯;直接取用一致口徑、point-in-time 安全的指標,可省去計算並確保回測不含未來函數。",
+    whyItMattersEn:
+      "Computing indicators yourself invites errors in price adjustment, warmup, and parameters; taking a consistent, point-in-time-safe series removes that work and keeps backtests free of look-ahead.",
+    coverageNote:
+      "逐檔逐日,涵蓋 TWSE / TPEx 上市櫃個股;每列標明計算基準(還原/未還原)。以 trade_date 為知識時間,point-in-time 安全;序列起點有 warmup null。",
+    coverageNoteEn:
+      "Per ticker, per trading day, across TWSE / TPEx listed stocks; every row states its calculation basis (adjusted / unadjusted). Keyed on trade_date, point-in-time safe; warmup nulls at series start.",
+    freshnessNote: "日頻,隨日線價格更新。",
+    freshnessNoteEn: "Daily, updated alongside daily prices.",
+    sourcePolicyNote: "由官方 TWSE / TPEx 日線價格衍生;非投資建議。",
+    sourcePolicyNoteEn: "Derived from official TWSE / TPEx daily prices; not investment advice.",
+    docsHref: "/docs/api/market-prices/technical-indicators",
+    pricingHref: "/pricing",
+    keywords: ["技術指標 API", "移動平均", "RSI", "MACD", "台股動能", "技術分析"],
+    keywordsEn: ["technical indicators API", "moving average", "RSI", "MACD", "Taiwan momentum", "technical analysis"],
+    jsonLdName: "技術指標資料集",
+    jsonLdNameEn: "Technical Indicators Dataset",
+    jsonLdDescription: "台股個股每日 MA / RSI / MACD 技術指標,由官方日線價格衍生,point-in-time 安全。",
+    jsonLdDescriptionEn:
+      "Daily MA / RSI / MACD technical indicators for Taiwan stocks, derived from official daily prices, point-in-time safe.",
+    sourceRole: "derived_technical_indicators",
+    provider: "twse_official",
+    marketScope: "TWSE_TPEX",
+  },
 ] as const;
 
 export const datasetSlugSet = new Set(datasetSeoEntries.map((item) => item.slug));
