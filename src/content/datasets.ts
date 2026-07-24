@@ -735,6 +735,60 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     provider: "twse_official",
     marketScope: "TWSE_TPEX",
   },
+  {
+    slug: "factor-returns",
+    name: "因子報酬(十分位價差)",
+    nameEn: "Factor Returns (decile spread)",
+    seoTitle: "因子報酬資料集(十分位價差)| TW Market Data",
+    seoTitleEn: "Factor Returns Dataset (decile spread) | TW Market Data",
+    seoDescription:
+      "因子報酬資料集提供台股各因子的已實現十分位價差報酬——每列一個 (factor_name, date, horizon),含最高十分位報酬、最低十分位報酬與其價差,以及 universe 家數與報酬口徑。純統計事實,不含好壞標籤;point-in-time 安全。",
+    seoDescriptionEn:
+      "The Factor Returns dataset provides realized decile-spread returns per factor for Taiwan equities — one row per (factor_name, date, horizon) with the top-decile return, bottom-decile return, and their spread, plus the universe count and return basis. A statistical fact, no good/bad label; point-in-time safe.",
+    shortDescription: "各因子已實現十分位價差報酬(top−bottom),附 universe 家數與報酬口徑,純統計事實。",
+    shortDescriptionEn:
+      "Realized decile-spread (top−bottom) returns per factor, with universe count and return basis — a statistical fact.",
+    whatItIs:
+      "因子報酬資料集每一列對應「一個因子、一個交易日、一個持有期(horizon)」,欄位包含 decile_spread_return(最高−最低十分位,恆等式)、top_decile_return、bottom_decile_return、n_universe(母體家數)、return_basis(報酬口徑)與 forward_end_date(已實現持有期結束日)。此為由因子庫計算的【已實現統計事實】,不含好壞或買賣標籤;以 trade_date 為知識時間,point-in-time 安全。",
+    whatItIsEn:
+      "Each row is one factor, one trading day, one horizon, carrying decile_spread_return (top minus bottom decile, an identity), top_decile_return, bottom_decile_return, n_universe (universe size), return_basis, and forward_end_date (the realized horizon end). It is a REALIZED statistical fact computed from the factor library — no good/bad or buy/sell label. Keyed on trade_date and point-in-time safe.",
+    useCases: [
+      "評估各因子在不同持有期的歷史十分位價差表現。",
+      "以 n_universe 與 return_basis 檢視樣本廣度與報酬口徑,做穩健比較。",
+      "結合因子庫(factor-library)座標,回溯因子暴露到已實現報酬的關聯。",
+    ],
+    useCasesEn: [
+      "Assess each factor's historical decile-spread behaviour across horizons.",
+      "Check breadth and return basis via n_universe and return_basis for robust comparison.",
+      "Trace factor exposure (Factor Library) to realized returns.",
+    ],
+    whyItMatters:
+      "自算因子報酬容易在十分位切法、母體與報酬口徑上不一致;直接取用附 universe 與口徑的已實現價差,可做跨因子、跨期的可比較評估,且無未來函數。",
+    whyItMattersEn:
+      "Computing factor returns yourself invites inconsistency in decile cuts, universe, and return basis; taking realized spreads that carry universe and basis enables comparable cross-factor, cross-horizon evaluation, look-ahead-free.",
+    coverageNote:
+      "逐因子逐日逐持有期,涵蓋因子庫所定義的因子;每列附 n_universe、return_basis 與 forward_end_date。以 trade_date 為知識時間,point-in-time 安全。",
+    coverageNoteEn:
+      "Per factor, per trading day, per horizon, across the factors defined in the Factor Library; every row carries n_universe, return_basis, and forward_end_date. Keyed on trade_date, point-in-time safe.",
+    freshnessNote: "日頻,隨已實現持有期更新。",
+    freshnessNoteEn: "Daily, updated as horizons realize.",
+    sourcePolicyNote:
+      "由 TWSE / TPEx / MOPS 官方來源經因子庫計算;為統計事實,非訊號、非投資建議。",
+    sourcePolicyNoteEn:
+      "Computed from the Factor Library over official TWSE / TPEx / MOPS sources; a statistical fact, not a signal, not investment advice.",
+    docsHref: "/docs/api/structure-reference/factor-returns",
+    pricingHref: "/pricing",
+    keywords: ["因子報酬", "十分位價差", "decile spread", "因子績效", "台股 quant"],
+    keywordsEn: ["factor returns", "decile spread", "top minus bottom", "factor performance", "Taiwan quant"],
+    jsonLdName: "因子報酬資料集",
+    jsonLdNameEn: "Factor Returns Dataset",
+    jsonLdDescription: "台股各因子已實現十分位價差報酬,附 universe 與報酬口徑,point-in-time 安全。",
+    jsonLdDescriptionEn:
+      "Realized decile-spread returns per factor for Taiwan equities, with universe and return basis, point-in-time safe.",
+    sourceRole: "derived_factor_returns",
+    provider: "twse_official",
+    marketScope: "TWSE_TPEX",
+  },
 ] as const;
 
 export const datasetSlugSet = new Set(datasetSeoEntries.map((item) => item.slug));
