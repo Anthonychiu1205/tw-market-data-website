@@ -31,6 +31,1002 @@ export type ApiCapture = {
 export const API_CAPTURED_AT = "2026-07-20";
 
 export const API_CAPTURES: Record<string, ApiCapture> = {
+  "index-classification": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/index-classification",
+  "request_id": "req_9f14fd74762f",
+  "plan_id": "enterprise",
+  "dataset": "index_classification",
+  "query": {
+    "index_code": null,
+    "market": "TWSE",
+    "index_type": null,
+    "sector": null,
+    "industry": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "as_of_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 5,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "index_classification",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-05-28.preview",
+    "release_date": "2026-05-28",
+    "data_as_of": "2026-05-28",
+    "request_context": {
+      "ticker": null,
+      "as_of_date": "2026-05-28",
+      "family": "market_structure_corporate_actions",
+      "field_group_type": "derived",
+      "dataset_view": "index_classification_v1",
+      "supported_sort_by": [
+        "as_of_date",
+        "index_code"
+      ],
+      "supported_filter_fields": [
+        "index_code",
+        "market",
+        "index_type"
+      ]
+    },
+    "data": [
+      {
+        "index_code": "TWSE_TAIEX",
+        "market": "TWSE",
+        "as_of_date": "2026-05-28",
+        "classification_version": "v1",
+        "index_name": "TWSE Capitalization Weighted Stock Index",
+        "index_type": "broad_market",
+        "sector": null,
+        "industry": null,
+        "parent_index_code": null,
+        "is_sector_index": false,
+        "is_broad_market_index": true,
+        "theme_primary": null,
+        "theme_secondary": null,
+        "classification_source": "index_code_mapping_v1",
+        "provider": "twse_official",
+        "source_role": "official_twse_mi_index",
+        "lineage": {
+          "source_key": {
+            "market": "TWSE",
+            "as_of_date": "2026-05-28",
+            "index_code": "TWSE_TAIEX"
+          },
+          "mapping_rule": "deterministic index_code mapping v1 only",
+          "source_table": "index_data_items",
+          "upstream_lineage": {
+            "source": "TWSE_MI_INDEX",
+            "source_date": "2026-05-28",
+            "source_type": "ALLBUT0999",
+            "special_note": null,
+            "identity_rule": "exact_index_name_match",
+            "source_lineage": {
+              "row_number": 1,
+              "table_index": 0,
+              "table_title": "115年05月28日 價格指數(臺灣證券交易所)"
+            },
+            "source_table_id": "table_0",
+            "turnover_lineage": {
+              "stat_item": "1.一般股票",
+              "row_number": 0,
+              "table_index": 6,
+              "table_title": "115年05月28日 大盤統計資訊"
+            }
+          },
+          "classification_version": "v1",
+          "excluded_fields_reason": "ai/theme confidence/ranking/regime fields excluded by deterministic policy"
+        },
+        "updated_at": "2026-06-17T05:21:52.769338"
+      },
+      {
+        "index_code": "TWSE_TAIEX",
+        "market": "TWSE",
+        "as_of_date": "2026-05-27",
+        "classification_version": "v1",
+        "index_name": "TWSE Capitalization Weighted Stock Index",
+        "index_type": "broad_market",
+        "sector": null,
+        "industry": null,
+        "parent_index_code": null,
+        "is_sector_index": false,
+        "is_broad_market_index": true,
+        "theme_primary": null,
+        "theme_secondary": null,
+        "classification_source": "index_code_mapping_v1",
+        "provider": "twse_official",
+        "source_role": "official_twse_mi_index",
+        "lineage": {
+          "source_key": {
+            "market": "TWSE",
+            "as_of_date": "2026-05-27",
+            "index_code": "TWSE_TAIEX"
+          },
+          "mapping_rule": "deterministic index_code mapping v1 only",
+          "source_table": "index_data_items",
+          "upstream_lineage": {
+            "source": "TWSE_MI_INDEX",
+            "source_date": "2026-05-27",
+            "source_type": "ALLBUT0999",
+            "special_note": null,
+            "identity_rule": "exact_index_name_match",
+            "source_lineage": {
+              "row_number": 1,
+              "table_index": 0,
+              "table_title": "115年05月27日 價格指數(臺灣證券交易所)"
+            },
+            "source_table_id": "table_0",
+            "turnover_lineage": {
+              "stat_item": "1.一般股票",
+              "row_number": 0,
+              "table_index": 6,
+              "table_title": "115年05月27日 大盤統計資訊"
+            }
+          },
+          "classification_version": "v1",
+          "excluded_fields_reason": "ai/theme confidence/ranking/regime fields excluded by deterministic policy"
+        },
+        "updated_at": "2026-06-17T05:21:52.769338"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-05-28",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "index_classification_items",
+      "fallback_chain": [
+        "index_data_items",
+        "issuer_classification_map"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "index classification facts mapped deterministically from canonical index/classification sources",
+        "ai/rank/regime fields excluded from public contract"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "index_classification",
+      "request_id": "read-api-6cb41730c4c6",
+      "blocking_gate": null
+    }
+  }
+}`,
+    en: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/index-classification",
+  "request_id": "req_9f14fd74762f",
+  "plan_id": "enterprise",
+  "dataset": "index_classification",
+  "query": {
+    "index_code": null,
+    "market": "TWSE",
+    "index_type": null,
+    "sector": null,
+    "industry": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "as_of_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 5,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "index_classification",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-05-28.preview",
+    "release_date": "2026-05-28",
+    "data_as_of": "2026-05-28",
+    "request_context": {
+      "ticker": null,
+      "as_of_date": "2026-05-28",
+      "family": "market_structure_corporate_actions",
+      "field_group_type": "derived",
+      "dataset_view": "index_classification_v1",
+      "supported_sort_by": [
+        "as_of_date",
+        "index_code"
+      ],
+      "supported_filter_fields": [
+        "index_code",
+        "market",
+        "index_type"
+      ]
+    },
+    "data": [
+      {
+        "index_code": "TWSE_TAIEX",
+        "market": "TWSE",
+        "as_of_date": "2026-05-28",
+        "classification_version": "v1",
+        "index_name": "TWSE Capitalization Weighted Stock Index",
+        "index_type": "broad_market",
+        "sector": null,
+        "industry": null,
+        "parent_index_code": null,
+        "is_sector_index": false,
+        "is_broad_market_index": true,
+        "theme_primary": null,
+        "theme_secondary": null,
+        "classification_source": "index_code_mapping_v1",
+        "provider": "twse_official",
+        "source_role": "official_twse_mi_index",
+        "lineage": {
+          "source_key": {
+            "market": "TWSE",
+            "as_of_date": "2026-05-28",
+            "index_code": "TWSE_TAIEX"
+          },
+          "mapping_rule": "deterministic index_code mapping v1 only",
+          "source_table": "index_data_items",
+          "upstream_lineage": {
+            "source": "TWSE_MI_INDEX",
+            "source_date": "2026-05-28",
+            "source_type": "ALLBUT0999",
+            "special_note": null,
+            "identity_rule": "exact_index_name_match",
+            "source_lineage": {
+              "row_number": 1,
+              "table_index": 0,
+              "table_title": "<Chinese value - see the zh page>"
+            },
+            "source_table_id": "table_0",
+            "turnover_lineage": {
+              "stat_item": "<Chinese value - see the zh page>",
+              "row_number": 0,
+              "table_index": 6,
+              "table_title": "<Chinese value - see the zh page>"
+            }
+          },
+          "classification_version": "v1",
+          "excluded_fields_reason": "ai/theme confidence/ranking/regime fields excluded by deterministic policy"
+        },
+        "updated_at": "2026-06-17T05:21:52.769338"
+      },
+      {
+        "index_code": "TWSE_TAIEX",
+        "market": "TWSE",
+        "as_of_date": "2026-05-27",
+        "classification_version": "v1",
+        "index_name": "TWSE Capitalization Weighted Stock Index",
+        "index_type": "broad_market",
+        "sector": null,
+        "industry": null,
+        "parent_index_code": null,
+        "is_sector_index": false,
+        "is_broad_market_index": true,
+        "theme_primary": null,
+        "theme_secondary": null,
+        "classification_source": "index_code_mapping_v1",
+        "provider": "twse_official",
+        "source_role": "official_twse_mi_index",
+        "lineage": {
+          "source_key": {
+            "market": "TWSE",
+            "as_of_date": "2026-05-27",
+            "index_code": "TWSE_TAIEX"
+          },
+          "mapping_rule": "deterministic index_code mapping v1 only",
+          "source_table": "index_data_items",
+          "upstream_lineage": {
+            "source": "TWSE_MI_INDEX",
+            "source_date": "2026-05-27",
+            "source_type": "ALLBUT0999",
+            "special_note": null,
+            "identity_rule": "exact_index_name_match",
+            "source_lineage": {
+              "row_number": 1,
+              "table_index": 0,
+              "table_title": "<Chinese value - see the zh page>"
+            },
+            "source_table_id": "table_0",
+            "turnover_lineage": {
+              "stat_item": "<Chinese value - see the zh page>",
+              "row_number": 0,
+              "table_index": 6,
+              "table_title": "<Chinese value - see the zh page>"
+            }
+          },
+          "classification_version": "v1",
+          "excluded_fields_reason": "ai/theme confidence/ranking/regime fields excluded by deterministic policy"
+        },
+        "updated_at": "2026-06-17T05:21:52.769338"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-05-28",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "index_classification_items",
+      "fallback_chain": [
+        "index_data_items",
+        "issuer_classification_map"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "index classification facts mapped deterministically from canonical index/classification sources",
+        "ai/rank/regime fields excluded from public contract"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "index_classification",
+      "request_id": "read-api-6cb41730c4c6",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
+  "index-data": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/index-data",
+  "request_id": "req_b7d42f1b239c",
+  "plan_id": "enterprise",
+  "dataset": "index_data",
+  "query": {
+    "index_code": null,
+    "market": "TWSE",
+    "as_of_date": null,
+    "date_from": null,
+    "date_to": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "as_of_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "index_data",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-17.preview",
+    "release_date": "2026-07-17",
+    "data_as_of": "2026-07-17",
+    "request_context": {
+      "ticker": "TWSE",
+      "as_of_date": "2026-07-17",
+      "family": "taiwan_macro",
+      "field_group_type": "derived",
+      "dataset_view": "index_data_v1",
+      "supported_filter_fields": [
+        "index_code",
+        "market",
+        "as_of_date"
+      ],
+      "supported_sort_by": [
+        "as_of_date"
+      ]
+    },
+    "data": [
+      {
+        "index_code": "TWSE_TAIEX",
+        "market": "TWSE",
+        "as_of_date": "2026-07-17",
+        "index_version": "v1",
+        "index_level": 42671.27,
+        "index_return_pct": -6.47,
+        "index_change": -2953.71,
+        "turnover_value": 1112606276770,
+        "volume_shares": 6545776248,
+        "advancers": null,
+        "decliners": null,
+        "unchanged": null,
+        "provider": "twse_official",
+        "source_role": "official_twse_mi_index",
+        "lineage": {
+          "source": "TWSE_MI_INDEX",
+          "source_date": "2026-07-17",
+          "source_type": "ALLBUT0999",
+          "special_note": null,
+          "identity_rule": "exact_index_name_match",
+          "source_lineage": {
+            "row_number": 1,
+            "table_index": 0,
+            "table_title": "115年07月17日 價格指數(臺灣證券交易所)"
+          },
+          "source_table_id": "table_0",
+          "turnover_lineage": {
+            "stat_item": "1.一般股票",
+            "row_number": 0,
+            "table_index": 6,
+            "table_title": "115年07月17日 大盤統計資訊"
+          }
+        },
+        "updated_at": "2026-07-20T04:43:10.099503+00:00"
+      },
+      {
+        "index_code": "TWSE_TAIEX",
+        "market": "TWSE",
+        "as_of_date": "2026-07-16",
+        "index_version": "v1",
+        "index_level": 45624.98,
+        "index_return_pct": -0.01,
+        "index_change": -6.61,
+        "turnover_value": 868077385100,
+        "volume_shares": 5342533123,
+        "advancers": null,
+        "decliners": null,
+        "unchanged": null,
+        "provider": "twse_official",
+        "source_role": "official_twse_mi_index",
+        "lineage": {
+          "source": "TWSE_MI_INDEX",
+          "source_date": "2026-07-16",
+          "source_type": "ALLBUT0999",
+          "special_note": null,
+          "identity_rule": "exact_index_name_match",
+          "source_lineage": {
+            "row_number": 1,
+            "table_index": 0,
+            "table_title": "115年07月16日 價格指數(臺灣證券交易所)"
+          },
+          "source_table_id": "table_0",
+          "turnover_lineage": {
+            "stat_item": "1.一般股票",
+            "row_number": 0,
+            "table_index": 6,
+            "table_title": "115年07月16日 大盤統計資訊"
+          }
+        },
+        "updated_at": "2026-07-18T03:26:16.188174+00:00"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-17",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "twse_official",
+      "fallback_chain": [
+        "tpex_official",
+        "data_gov_mirror"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "index_data derived from market_overview snapshots with deterministic index_code mapping",
+        "unstable fields excluded from public contract (e.g., composite_market_score)"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "index_data",
+      "request_id": "read-api-bdde2d64402a",
+      "blocking_gate": null
+    }
+  }
+}`,
+    en: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/index-data",
+  "request_id": "req_b7d42f1b239c",
+  "plan_id": "enterprise",
+  "dataset": "index_data",
+  "query": {
+    "index_code": null,
+    "market": "TWSE",
+    "as_of_date": null,
+    "date_from": null,
+    "date_to": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "as_of_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "index_data",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-17.preview",
+    "release_date": "2026-07-17",
+    "data_as_of": "2026-07-17",
+    "request_context": {
+      "ticker": "TWSE",
+      "as_of_date": "2026-07-17",
+      "family": "taiwan_macro",
+      "field_group_type": "derived",
+      "dataset_view": "index_data_v1",
+      "supported_filter_fields": [
+        "index_code",
+        "market",
+        "as_of_date"
+      ],
+      "supported_sort_by": [
+        "as_of_date"
+      ]
+    },
+    "data": [
+      {
+        "index_code": "TWSE_TAIEX",
+        "market": "TWSE",
+        "as_of_date": "2026-07-17",
+        "index_version": "v1",
+        "index_level": 42671.27,
+        "index_return_pct": -6.47,
+        "index_change": -2953.71,
+        "turnover_value": 1112606276770,
+        "volume_shares": 6545776248,
+        "advancers": null,
+        "decliners": null,
+        "unchanged": null,
+        "provider": "twse_official",
+        "source_role": "official_twse_mi_index",
+        "lineage": {
+          "source": "TWSE_MI_INDEX",
+          "source_date": "2026-07-17",
+          "source_type": "ALLBUT0999",
+          "special_note": null,
+          "identity_rule": "exact_index_name_match",
+          "source_lineage": {
+            "row_number": 1,
+            "table_index": 0,
+            "table_title": "<Chinese value - see the zh page>"
+          },
+          "source_table_id": "table_0",
+          "turnover_lineage": {
+            "stat_item": "<Chinese value - see the zh page>",
+            "row_number": 0,
+            "table_index": 6,
+            "table_title": "<Chinese value - see the zh page>"
+          }
+        },
+        "updated_at": "2026-07-20T04:43:10.099503+00:00"
+      },
+      {
+        "index_code": "TWSE_TAIEX",
+        "market": "TWSE",
+        "as_of_date": "2026-07-16",
+        "index_version": "v1",
+        "index_level": 45624.98,
+        "index_return_pct": -0.01,
+        "index_change": -6.61,
+        "turnover_value": 868077385100,
+        "volume_shares": 5342533123,
+        "advancers": null,
+        "decliners": null,
+        "unchanged": null,
+        "provider": "twse_official",
+        "source_role": "official_twse_mi_index",
+        "lineage": {
+          "source": "TWSE_MI_INDEX",
+          "source_date": "2026-07-16",
+          "source_type": "ALLBUT0999",
+          "special_note": null,
+          "identity_rule": "exact_index_name_match",
+          "source_lineage": {
+            "row_number": 1,
+            "table_index": 0,
+            "table_title": "<Chinese value - see the zh page>"
+          },
+          "source_table_id": "table_0",
+          "turnover_lineage": {
+            "stat_item": "<Chinese value - see the zh page>",
+            "row_number": 0,
+            "table_index": 6,
+            "table_title": "<Chinese value - see the zh page>"
+          }
+        },
+        "updated_at": "2026-07-18T03:26:16.188174+00:00"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-17",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "twse_official",
+      "fallback_chain": [
+        "tpex_official",
+        "data_gov_mirror"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "index_data derived from market_overview snapshots with deterministic index_code mapping",
+        "unstable fields excluded from public contract (e.g., composite_market_score)"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "index_data",
+      "request_id": "read-api-bdde2d64402a",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
+  "market-breadth": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/market-breadth",
+  "request_id": "req_0049b2ae14ff",
+  "plan_id": "enterprise",
+  "dataset": "market_breadth",
+  "query": {
+    "market": "TWSE",
+    "as_of_date": null,
+    "date_from": null,
+    "date_to": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "as_of_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "market_breadth",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-16.preview",
+    "release_date": "2026-07-16",
+    "data_as_of": "2026-07-16",
+    "request_context": {
+      "ticker": "TWSE",
+      "as_of_date": "2026-07-16",
+      "family": "taiwan_macro",
+      "field_group_type": "derived",
+      "dataset_view": "market_breadth_v1",
+      "supported_filter_fields": [
+        "market",
+        "as_of_date",
+        "date_from"
+      ],
+      "supported_sort_by": [
+        "as_of_date"
+      ]
+    },
+    "data": [
+      {
+        "market": "TWSE",
+        "as_of_date": "2026-07-16",
+        "breadth_version": "v1",
+        "advancers": 371,
+        "decliners": 597,
+        "unchanged": 81,
+        "limit_up_count": 17,
+        "limit_down_count": 7,
+        "advance_decline_ratio": 0.621441,
+        "breadth_ratio": -0.215443,
+        "total_traded_value": null,
+        "total_volume": null,
+        "provider": "twse_official",
+        "source_role": "derived_market_breadth",
+        "lineage": {
+          "derived_from": "twse_mi_index_market_breadth",
+          "upstream_lineage": {
+            "request_type": "MS",
+            "parser_source_date": "2026-07-16",
+            "source_lineage_rows": [
+              {
+                "row_number": 0,
+                "table_index": 7,
+                "table_title": "漲跌證券數合計"
+              },
+              {
+                "row_number": 1,
+                "table_index": 7,
+                "table_title": "漲跌證券數合計"
+              },
+              {
+                "row_number": 2,
+                "table_index": 7,
+                "table_title": "漲跌證券數合計"
+              }
+            ]
+          }
+        },
+        "updated_at": "2026-07-17T17:34:12.204238"
+      },
+      {
+        "market": "TWSE",
+        "as_of_date": "2026-07-15",
+        "breadth_version": "v1",
+        "advancers": 893,
+        "decliners": 125,
+        "unchanged": 42,
+        "limit_up_count": 36,
+        "limit_down_count": 0,
+        "advance_decline_ratio": 7.144,
+        "breadth_ratio": 0.724528,
+        "total_traded_value": null,
+        "total_volume": null,
+        "provider": "twse_official",
+        "source_role": "derived_market_breadth",
+        "lineage": {
+          "derived_from": "twse_mi_index_market_breadth",
+          "upstream_lineage": {
+            "request_type": "MS",
+            "parser_source_date": "2026-07-15",
+            "source_lineage_rows": [
+              {
+                "row_number": 0,
+                "table_index": 7,
+                "table_title": "漲跌證券數合計"
+              },
+              {
+                "row_number": 1,
+                "table_index": 7,
+                "table_title": "漲跌證券數合計"
+              },
+              {
+                "row_number": 2,
+                "table_index": 7,
+                "table_title": "漲跌證券數合計"
+              }
+            ]
+          }
+        },
+        "updated_at": "2026-07-17T17:34:12.204238"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-16",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "twse_official",
+      "fallback_chain": [
+        "tpex_official",
+        "data_gov_mirror"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "market_breadth derived from market_overview snapshots with deterministic formulas",
+        "unstable fields excluded from public contract (e.g., market_sentiment_score)"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "market_breadth",
+      "request_id": "read-api-02d97798eeb6",
+      "blocking_gate": null
+    }
+  }
+}`,
+    en: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/market-breadth",
+  "request_id": "req_0049b2ae14ff",
+  "plan_id": "enterprise",
+  "dataset": "market_breadth",
+  "query": {
+    "market": "TWSE",
+    "as_of_date": null,
+    "date_from": null,
+    "date_to": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "as_of_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "market_breadth",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-16.preview",
+    "release_date": "2026-07-16",
+    "data_as_of": "2026-07-16",
+    "request_context": {
+      "ticker": "TWSE",
+      "as_of_date": "2026-07-16",
+      "family": "taiwan_macro",
+      "field_group_type": "derived",
+      "dataset_view": "market_breadth_v1",
+      "supported_filter_fields": [
+        "market",
+        "as_of_date",
+        "date_from"
+      ],
+      "supported_sort_by": [
+        "as_of_date"
+      ]
+    },
+    "data": [
+      {
+        "market": "TWSE",
+        "as_of_date": "2026-07-16",
+        "breadth_version": "v1",
+        "advancers": 371,
+        "decliners": 597,
+        "unchanged": 81,
+        "limit_up_count": 17,
+        "limit_down_count": 7,
+        "advance_decline_ratio": 0.621441,
+        "breadth_ratio": -0.215443,
+        "total_traded_value": null,
+        "total_volume": null,
+        "provider": "twse_official",
+        "source_role": "derived_market_breadth",
+        "lineage": {
+          "derived_from": "twse_mi_index_market_breadth",
+          "upstream_lineage": {
+            "request_type": "MS",
+            "parser_source_date": "2026-07-16",
+            "source_lineage_rows": [
+              {
+                "row_number": 0,
+                "table_index": 7,
+                "table_title": "<Chinese value - see the zh page>"
+              },
+              {
+                "row_number": 1,
+                "table_index": 7,
+                "table_title": "<Chinese value - see the zh page>"
+              },
+              {
+                "row_number": 2,
+                "table_index": 7,
+                "table_title": "<Chinese value - see the zh page>"
+              }
+            ]
+          }
+        },
+        "updated_at": "2026-07-17T17:34:12.204238"
+      },
+      {
+        "market": "TWSE",
+        "as_of_date": "2026-07-15",
+        "breadth_version": "v1",
+        "advancers": 893,
+        "decliners": 125,
+        "unchanged": 42,
+        "limit_up_count": 36,
+        "limit_down_count": 0,
+        "advance_decline_ratio": 7.144,
+        "breadth_ratio": 0.724528,
+        "total_traded_value": null,
+        "total_volume": null,
+        "provider": "twse_official",
+        "source_role": "derived_market_breadth",
+        "lineage": {
+          "derived_from": "twse_mi_index_market_breadth",
+          "upstream_lineage": {
+            "request_type": "MS",
+            "parser_source_date": "2026-07-15",
+            "source_lineage_rows": [
+              {
+                "row_number": 0,
+                "table_index": 7,
+                "table_title": "<Chinese value - see the zh page>"
+              },
+              {
+                "row_number": 1,
+                "table_index": 7,
+                "table_title": "<Chinese value - see the zh page>"
+              },
+              {
+                "row_number": 2,
+                "table_index": 7,
+                "table_title": "<Chinese value - see the zh page>"
+              }
+            ]
+          }
+        },
+        "updated_at": "2026-07-17T17:34:12.204238"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-16",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "twse_official",
+      "fallback_chain": [
+        "tpex_official",
+        "data_gov_mirror"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "market_breadth derived from market_overview snapshots with deterministic formulas",
+        "unstable fields excluded from public contract (e.g., market_sentiment_score)"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "market_breadth",
+      "request_id": "read-api-02d97798eeb6",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
   "company-risk-events": {
     rowsKey: "data",
     envelopeKeys: ["api_version","data","data_count","data_gaps","dataset","dataset_id","endpoint","envelope","error","known_gaps","lineage","meta","plan_id","quality","query","request_context","request_id","warnings"],
