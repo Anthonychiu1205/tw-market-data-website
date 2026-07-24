@@ -121,6 +121,7 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "ownership-distribution": { datasetSlug: "ownership-distribution", backendPath: "/v2/datasets/ownership-distribution", requiredPlan: "pro", creditsCost: 3 },
   "screener": { datasetSlug: "screener", backendPath: "/v2/datasets/screener", requiredPlan: "pro", creditsCost: 3 },
   // tier aligned to read API (taifex_inst_oi→taifex-institutional-flow = max, explicit)
+  "taifex-put-call-ratio": { datasetSlug: "taifex-put-call-ratio", backendPath: "/v2/datasets/taifex-put-call-ratio", requiredPlan: "max", creditsCost: 2 },
   "taifex-institutional-flow": { datasetSlug: "taifex-institutional-flow", backendPath: "/v2/datasets/taifex-institutional-flow", requiredPlan: "max", creditsCost: 3 },
   "financials": { datasetSlug: "financials", backendPath: "/v2/datasets/financials", requiredPlan: "pro", creditsCost: 4 },
   "broker-branch-reference": { datasetSlug: "broker-branch-reference", backendPath: "/v2/datasets/broker-branch-reference", requiredPlan: "free", creditsCost: 4 },

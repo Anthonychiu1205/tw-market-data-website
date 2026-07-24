@@ -82,6 +82,7 @@ const DATASET_META: Record<string, DatasetMeta> = {
 
   // ── Capital Flows ──
   "institutional-flow": { domain: "capital-flows", zh: "三大法人買賣", en: "Institutional flow", agency: "TWSE", grade: "verified" },
+  "taifex-put-call-ratio": { domain: "derivatives", zh: "選擇權Put/Call Ratio", en: "Options Put/Call Ratio", agency: "TAIFEX", grade: "verified" },
   "institutional-flow-market-aggregate": { domain: "capital-flows", zh: "法人市場匯總", en: "Institutional flow (market aggregate)", agency: "TWSE", grade: "derived" },
   "margin-short": { domain: "capital-flows", zh: "融資融券", en: "Margin & short", agency: "TWSE", grade: "reference" },
   // crosswalk-verified 2026-07-21: returns rows (enterprise 實打, compute-on-fly) — legitimately `derived`, not empty.

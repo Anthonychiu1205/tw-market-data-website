@@ -590,6 +590,58 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "taifex-put-call-ratio",
+    name: "選擇權 Put/Call Ratio",
+    nameEn: "Options Put/Call Ratio",
+    seoTitle: "台指選擇權 Put/Call Ratio 資料集 | TW Market Data",
+    seoTitleEn: "TAIFEX Options Put/Call Ratio Dataset | TW Market Data",
+    seoDescription:
+      "台指選擇權 Put/Call Ratio 資料集提供期交所每日選擇權成交量 Put/Call 比與未平倉 Put/Call 比,含賣權 / 買權成交量,一日一列。市場級情緒指標(常作反向觀察),point-in-time 安全。",
+    seoDescriptionEn:
+      "The TAIFEX Options Put/Call Ratio dataset provides the daily volume and open-interest put/call ratios plus put and call volumes — one row per day. A market-level sentiment indicator (often read contrarian); point-in-time safe.",
+    shortDescription: "每日選擇權成交量與未平倉 Put/Call 比(市場情緒指標)。",
+    shortDescriptionEn:
+      "Daily options volume and open-interest put/call ratios (a sentiment indicator).",
+    whatItIs:
+      "選擇權 Put/Call Ratio 資料集每一列對應「一個交易日」全市場的選擇權 Put/Call 情緒,欄位包含 put_call_volume_ratio(成交量比)、put_call_oi_ratio(未平倉比)、put_volume(賣權成交量)與 call_volume(買權成交量)。為市場級情緒指標,PCR 偏高常視為偏空(且常作反向觀察);以 trade_date 為知識時間,point-in-time 安全。",
+    whatItIsEn:
+      "Each row is one trading day of market-wide option put/call sentiment, carrying put_call_volume_ratio, put_call_oi_ratio, put_volume, and call_volume. It is a market-level sentiment indicator — a high PCR is typically read as bearish (and often contrarian). Keyed on trade_date and point-in-time safe.",
+    useCases: [
+      "以 PCR 判讀市場情緒與極端偏空 / 偏多。",
+      "作為反向指標觀察情緒轉折。",
+      "結合大盤與波動率做情緒面濾網。",
+    ],
+    useCasesEn: [
+      "Read market sentiment and bearish/bullish extremes from the PCR.",
+      "Use as a contrarian indicator for sentiment turns.",
+      "Layer sentiment onto the index and volatility as a filter.",
+    ],
+    whyItMatters:
+      "PCR 的成交量比與未平倉比口徑若不一致,情緒判讀會失真;直接取用期交所口徑的每日 PCR,可做一致、point-in-time 安全的情緒面分析。",
+    whyItMattersEn:
+      "Inconsistent volume vs open-interest conventions distort PCR-based sentiment; taking the daily PCR on the TAIFEX basis gives consistent, point-in-time-safe sentiment analysis.",
+    coverageNote:
+      "逐交易日一列,含成交量比 / 未平倉比與賣買權成交量。以 trade_date 為知識時間,point-in-time 安全。",
+    coverageNoteEn:
+      "One row per trading day, with volume and open-interest ratios and put/call volumes. Keyed on trade_date, point-in-time safe.",
+    freshnessNote: "日頻,隨期交所選擇權更新。",
+    freshnessNoteEn: "Daily, updated with TAIFEX options.",
+    sourcePolicyNote: "由官方 TAIFEX 選擇權資料提供;為情緒指標,非投資建議。",
+    sourcePolicyNoteEn: "From official TAIFEX options data; a sentiment indicator, not investment advice.",
+    docsHref: "/docs/api/derivatives/taifex-put-call-ratio",
+    pricingHref: "/pricing",
+    keywords: ["Put Call Ratio", "PCR", "市場情緒", "反向指標", "台指選擇權"],
+    keywordsEn: ["put call ratio", "PCR", "market sentiment", "contrarian indicator", "TAIFEX options"],
+    jsonLdName: "選擇權 Put/Call Ratio 資料集",
+    jsonLdNameEn: "Options Put/Call Ratio Dataset",
+    jsonLdDescription: "期交所每日選擇權 Put/Call 成交量比與未平倉比,point-in-time 安全。",
+    jsonLdDescriptionEn:
+      "Daily TAIFEX options put/call volume and open-interest ratios, point-in-time safe.",
+    sourceRole: "official_taifex_put_call_ratio",
+    provider: "taifex",
+    marketScope: "TWSE",
+  },
+  {
     slug: "institutional-flow",
     name: "三大法人買賣超",
     nameEn: "Institutional Net Buy/Sell",
