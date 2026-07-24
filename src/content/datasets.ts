@@ -927,6 +927,58 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "convertible-bond-monthly",
+    name: "可轉債集保月報",
+    nameEn: "Convertible Bond Custody (Monthly)",
+    seoTitle: "台股可轉債集保月報資料集(TDCC 庫存 / 帳戶)| TW Market Data",
+    seoTitleEn: "Taiwan Convertible Bond Custody Monthly Dataset (TDCC) | TW Market Data",
+    seoDescription:
+      "台股可轉債集保月報資料集提供 TDCC 每月可轉債集保庫存餘額、當月異動與集保帳戶數,一檔一月一列。月頻、次月上旬揭露有落差——非 point-in-time 安全,回測需依 as_of 對齊。",
+    seoDescriptionEn:
+      "The Taiwan Convertible Bond Custody Monthly dataset provides TDCC monthly custody balance, monthly change, and custody-account count for convertible bonds — one row per bond per month. Monthly with an early-next-month disclosure lag — NOT point-in-time safe; align by as_of for backtests.",
+    shortDescription: "TDCC 每月可轉債集保庫存餘額 / 異動 / 集保帳戶數。",
+    shortDescriptionEn:
+      "TDCC monthly convertible-bond custody balance / change / account count.",
+    whatItIs:
+      "可轉債集保月報資料集每一列對應「一檔可轉債(cb_id)、一個資料年月(data_month)」的集保分布,欄位包含 custody_balance(集保庫存餘額)、change_amount(當月異動)與 custody_accounts(集保帳戶數),來源 TDCC。月頻、次月上旬揭露有落差——以 data_month 為知識時間,【非 point-in-time 安全】:回測務必依 as_of 對齊,避免用到當時尚未揭露的月報。",
+    whatItIsEn:
+      "Each row is one convertible bond (cb_id) for one data month (data_month), carrying custody_balance, change_amount, and custody_accounts, sourced from TDCC. Monthly with an early-next-month disclosure lag — keyed on data_month and NOT point-in-time safe: align by as_of so a not-yet-disclosed monthly report never leaks into the past.",
+    useCases: [
+      "觀察可轉債集保庫存與帳戶數的月度變化。",
+      "追蹤籌碼分布趨勢與持有結構。",
+      "依 as_of 對齊,確保回測不含未揭露月報的未來函數。",
+    ],
+    useCasesEn: [
+      "Watch monthly changes in convertible-bond custody balance and account count.",
+      "Track positioning-distribution trends and holding structure.",
+      "Align by as_of to keep backtests free of undisclosed-report look-ahead.",
+    ],
+    whyItMatters:
+      "月報有揭露落差,誤用揭露時點易引入未來函數;直接取用附 data_month 的集保庫存,可正確對齊 point-in-time。",
+    whyItMattersEn:
+      "Monthly reports have a disclosure lag; mishandling timing leaks look-ahead — taking custody balances stamped with data_month aligns point-in-time correctly.",
+    coverageNote:
+      "逐可轉債逐月一列,來源 TDCC;含集保庫存餘額 / 當月異動 / 集保帳戶數。以 data_month 為知識時間,非 point-in-time 安全——回測需依 as_of 對齊。",
+    coverageNoteEn:
+      "One row per convertible bond per month from TDCC; custody balance / monthly change / account count. Keyed on data_month, NOT point-in-time safe — align by as_of for backtests.",
+    freshnessNote: "月頻,次月上旬揭露(有落差)。",
+    freshnessNoteEn: "Monthly, disclosed early the following month (with a lag).",
+    sourcePolicyNote: "由官方 TDCC 集保資料提供;非投資建議。",
+    sourcePolicyNoteEn: "From official TDCC custody data; not investment advice.",
+    docsHref: "/docs/api/derivatives/convertible-bond-monthly",
+    pricingHref: "/pricing",
+    keywords: ["可轉債集保", "TDCC 月報", "集保庫存", "可轉債籌碼分布", "上櫃可轉債"],
+    keywordsEn: ["convertible bond custody", "TDCC monthly", "custody balance", "CB distribution", "TPEx convertibles"],
+    jsonLdName: "可轉債集保月報資料集",
+    jsonLdNameEn: "Convertible Bond Custody Monthly Dataset",
+    jsonLdDescription: "TDCC 每月可轉債集保庫存 / 異動 / 帳戶數,以 data_month 為知識時間(非 PIT-safe)。",
+    jsonLdDescriptionEn:
+      "TDCC monthly convertible-bond custody balance / change / accounts, keyed on data_month (not PIT-safe).",
+    sourceRole: "official_convertible_bond_monthly",
+    provider: "tdcc",
+    marketScope: "TWSE_TPEX",
+  },
+  {
     slug: "total-margin-short",
     name: "整體融資融券",
     nameEn: "Aggregate Margin & Short",
