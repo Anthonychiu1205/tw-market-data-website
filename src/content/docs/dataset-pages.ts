@@ -53,6 +53,44 @@ export const REFERENCE_PARAMS: ParamDoc[] = [
   { name: "limit", required: false, type: "integer", desc: { en: "Maximum rows to return.", zh: "回傳筆數上限。" } },
 ];
 
+// DEMO-FIX 2026-07-24: these five endpoints do NOT accept `symbol` — sending it returns
+// 400 missing_required_filter. Real required filters confirmed from the backend handler code.
+export const INDEX_DATA_PARAMS: ParamDoc[] = [
+  { name: "index_code", required: true, type: "string", desc: { en: "Index code, e.g. IX0001 (TAIEX). Required — or pass `market` instead.", zh: "指數代碼,如 IX0001(TAIEX)。必填——或改用 market。" } },
+  { name: "market", required: false, type: "string", desc: { en: "Market (TWSE / TPEX); an alternative to index_code.", zh: "市場別(TWSE／TPEX);index_code 的替代。" } },
+  { name: "start_date", required: false, type: "string (YYYY-MM-DD)", desc: { en: "Start of the query range.", zh: "查詢起始日期。" } },
+  { name: "end_date", required: false, type: "string (YYYY-MM-DD)", desc: { en: "End of the query range.", zh: "查詢結束日期。" } },
+  { name: "limit", required: false, type: "integer", desc: { en: "Maximum rows to return.", zh: "回傳筆數上限。" } },
+];
+export const INDEX_CLASSIFICATION_PARAMS: ParamDoc[] = [
+  { name: "market", required: true, type: "string", desc: { en: "Market (TWSE / TPEX). At least one filter (market / index_code / index_type / sector / industry) is required.", zh: "市場別(TWSE／TPEX)。至少需一個篩選(market／index_code／index_type／sector／industry)。" } },
+  { name: "index_code", required: false, type: "string", desc: { en: "Filter by index code.", zh: "以指數代碼篩選。" } },
+  { name: "index_type", required: false, type: "string", desc: { en: "Filter by index type.", zh: "以指數類型篩選。" } },
+  { name: "sector", required: false, type: "string", desc: { en: "Filter by sector.", zh: "以類股篩選。" } },
+  { name: "industry", required: false, type: "string", desc: { en: "Filter by industry.", zh: "以產業篩選。" } },
+  { name: "limit", required: false, type: "integer", desc: { en: "Maximum rows to return.", zh: "回傳筆數上限。" } },
+];
+export const MARKET_BREADTH_PARAMS: ParamDoc[] = [
+  { name: "market", required: true, type: "string", desc: { en: "Market / board (TWSE / TPEX). Required — or pass a date range (as_of, or start_date + end_date).", zh: "市場別(TWSE／TPEX)。必填——或改用日期區間(as_of,或 start_date + end_date)。" } },
+  { name: "as_of", required: false, type: "string (YYYY-MM-DD)", desc: { en: "Single as-of date.", zh: "單一資料基準日。" } },
+  { name: "start_date", required: false, type: "string (YYYY-MM-DD)", desc: { en: "Start of the query range.", zh: "查詢起始日期。" } },
+  { name: "end_date", required: false, type: "string (YYYY-MM-DD)", desc: { en: "End of the query range.", zh: "查詢結束日期。" } },
+  { name: "limit", required: false, type: "integer", desc: { en: "Maximum rows to return.", zh: "回傳筆數上限。" } },
+];
+export const EVENTS_PARAMS: ParamDoc[] = [
+  { name: "ticker", required: true, type: "string", desc: { en: "Ticker, e.g. 2330. Required — or pass event_type, or a date range. NOTE: this endpoint does NOT accept `market`.", zh: "股票代碼,如 2330。必填——或改用 event_type 或日期區間。注意:此端點不吃 market。" } },
+  { name: "event_type", required: false, type: "string", desc: { en: "Filter by event type.", zh: "以事件類型篩選。" } },
+  { name: "start_date", required: false, type: "string (YYYY-MM-DD)", desc: { en: "Start of the query range.", zh: "查詢起始日期。" } },
+  { name: "end_date", required: false, type: "string (YYYY-MM-DD)", desc: { en: "End of the query range.", zh: "查詢結束日期。" } },
+  { name: "limit", required: false, type: "integer", desc: { en: "Maximum rows to return.", zh: "回傳筆數上限。" } },
+];
+export const SCREENER_PARAMS: ParamDoc[] = [
+  { name: "market", required: true, type: "string", desc: { en: "Market (TWSE / TPEX). At least one filter (market / industry / sector / a min-max range) is required.", zh: "市場別(TWSE／TPEX)。至少需一個篩選(market／industry／sector／各種 min-max 區間)。" } },
+  { name: "industry", required: false, type: "string", desc: { en: "Filter by industry.", zh: "以產業篩選。" } },
+  { name: "sector", required: false, type: "string", desc: { en: "Filter by sector.", zh: "以類股篩選。" } },
+  { name: "limit", required: false, type: "integer", desc: { en: "Maximum rows to return.", zh: "回傳筆數上限。" } },
+];
+
 const twse = coverageFacts.twseDailyPrice;
 const rev = coverageFacts.monthlyRevenue;
 const fmt = (n: number) => n.toLocaleString("en-US");
@@ -236,7 +274,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       en: "TODO — exact event counts and the coverage window are pending a measured snapshot; the source is the official MOPS / TWSE / TPEx announcement venues (present through the latest disclosure).",
       zh: "TODO — 精確事件數與涵蓋視窗待量測快照;來源為官方 MOPS／TWSE／TPEx 公告管道(涵蓋至最新揭露)。",
     },
-    params: STANDARD_PARAMS,
+    params: EVENTS_PARAMS,
   },
 
   // 7) derivatives — data exists but the doc-build key is not entitled to query → coverage TODO
@@ -799,7 +837,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       en: "TODO — the size of the screenable universe and the data window are pending a measured snapshot; the screen is computed over official TWSE / TPEx market and financial data (current trading day).",
       zh: "TODO — 可篩選宇宙的規模與資料視窗待量測快照;篩選係在官方 TWSE／TPEx 市場與財務資料上計算(當前交易日)。",
     },
-    params: REFERENCE_PARAMS,
+    params: SCREENER_PARAMS,
     notes: [
       {
         en: "Derived / computed convenience over official data — not itself an official published list. Results depend on the filters and the as_of data date; reproduce a screen by pinning as_of.",
@@ -1009,8 +1047,8 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
     params: STANDARD_PARAMS,
     notes: [
       {
-        en: "For this dataset the symbol param is an index code (e.g. IX0001 for TAIEX), not a stock ticker.",
-        zh: "此資料集的 symbol 參數為指數代碼（如 IX0001 代表 TAIEX），非股票代碼。",
+        en: "This endpoint filters by `index_code` (e.g. IX0001 for TAIEX) or `market` — not by a stock `symbol`.",
+        zh: "此端點以 index_code(如 IX0001 代表 TAIEX)或 market 篩選,非股票 symbol。",
       },
     ],
   },
@@ -1041,11 +1079,11 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       en: "TODO — exact index / row counts and the coverage window are pending a measured snapshot; the source is the official TWSE index publication (present through the latest trading day). No counts are shown rather than fabricated ones.",
       zh: "TODO — 精確指數／列數與涵蓋視窗待量測快照;來源為官方 TWSE 指數發布(涵蓋至最新交易日)。寧不顯示計數也不捏造。",
     },
-    params: STANDARD_PARAMS,
+    params: INDEX_DATA_PARAMS,
     notes: [
       {
-        en: "For this dataset the symbol param is an index code (e.g. IX0001 for TAIEX), not a stock ticker.",
-        zh: "此資料集的 symbol 參數為指數代碼（如 IX0001 代表 TAIEX），非股票代碼。",
+        en: "This endpoint filters by `index_code` (e.g. IX0001 for TAIEX) or `market` — not by a stock `symbol`.",
+        zh: "此端點以 index_code(如 IX0001 代表 TAIEX)或 market 篩選,非股票 symbol。",
       },
     ],
   },
@@ -1075,7 +1113,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       en: "TODO — exact index counts and the classification-snapshot window are pending a measured snapshot; the source is the official TWSE index register (current published indices).",
       zh: "TODO — 精確指數數與分類快照視窗待量測快照;來源為官方 TWSE 指數登記(現行公布指數)。",
     },
-    params: REFERENCE_PARAMS,
+    params: INDEX_CLASSIFICATION_PARAMS,
     notes: [
       {
         en: "Reference lookup snapshot — not a time series; it does not reconstruct how an index was classified at a past date.",
@@ -1248,7 +1286,7 @@ export const DATASET_DOC_CONTENT: Record<string, DatasetDocContent> = {
       en: "TODO — exact row counts and the coverage window are pending a measured snapshot; the metrics are computed from the official TWSE / TPEx per-security daily prices. Coverage is partial while the historical backfill is completed, so no counts are shown rather than fabricated ones.",
       zh: "TODO — 精確列數與涵蓋視窗待量測快照;指標由官方 TWSE／TPEx 逐檔日價格計算。歷史回補完成前涵蓋為部分,寧不顯示計數也不捏造。",
     },
-    params: STANDARD_PARAMS,
+    params: MARKET_BREADTH_PARAMS,
     notes: [
       {
         en: "Derived and partially covered: breadth is computed from the official per-security prices and the historical window is still being backfilled, so it may be shorter than the price datasets it is built from.",

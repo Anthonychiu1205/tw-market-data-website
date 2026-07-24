@@ -73,9 +73,12 @@ function authHeaders(): Record<string, string> {
   // REJECT it with 401 (which silently broke every demo panel). Set DEMO_DATASETS_API_KEY (or the
   // existing TW_FEATURE_ENGINE_API_KEY) to a service key that carries dataset entitlement.
   //
-  // When no entitled key is set we send NO auth: the keyless demo endpoints (twse-daily-price,
-  // monthly-revenue, market-index) still return real data, while keyed datasets 401 and their panel
-  // degrades honestly (never fabricates). The moment the key is provisioned, every panel goes real.
+  // When no entitled key is set we send NO auth. Measured against the live gateway 2026-07-24: ONLY
+  // `twse-daily-price` is keyless (200 without a key); monthly-revenue / income-statement /
+  // technical-indicators / valuation-data / institutional-flow / day-trading-suspension ALL 401
+  // without a key (the gateway now keys every premium dataset). So a bare/free-plan key leaves those
+  // panels degraded — the DEMO_DATASETS_API_KEY must carry entitlement for the keyed demo datasets
+  // (pro/max) for those panels to go real. Panels still degrade honestly (never fabricate) when 401.
   const key = process.env.DEMO_DATASETS_API_KEY?.trim() || process.env.TW_FEATURE_ENGINE_API_KEY?.trim();
   if (key) headers["x-api-key"] = key;
   return headers;
