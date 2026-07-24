@@ -31,6 +31,1424 @@ export type ApiCapture = {
 export const API_CAPTURED_AT = "2026-07-20";
 
 export const API_CAPTURES: Record<string, ApiCapture> = {
+  "company-risk-events": {
+    rowsKey: "data",
+    envelopeKeys: ["api_version","data","data_count","data_gaps","dataset","dataset_id","endpoint","envelope","error","known_gaps","lineage","meta","plan_id","quality","query","request_context","request_id","warnings"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/company-risk-events",
+  "request_id": "req_a76fc6f3d527",
+  "plan_id": "enterprise",
+  "dataset": "company_risk_events",
+  "dataset_id": "company_risk_events",
+  "request_context": {
+    "scope": "structured_adverse_risk_penalty_taxonomy_only",
+    "coverage_type": "current_structured_snapshot",
+    "filters": {
+      "ticker": null,
+      "market": null,
+      "event_type": null,
+      "event_subtype": null,
+      "source_family": null,
+      "source_provider": null,
+      "date_from": null,
+      "date_to": null,
+      "limit": 50
+    },
+    "min_event_date": "2026-06-05",
+    "max_event_date": "2026-06-30"
+  },
+  "quality": {
+    "row_count": 50,
+    "penalty_extension_included": true,
+    "raw_payload_exposed": false
+  },
+  "lineage": {
+    "source_providers": [
+      "FSC",
+      "tpex_official"
+    ],
+    "source_roles": [
+      "company_risk_events",
+      "official_fsc_mops_penalty"
+    ],
+    "source_families": [
+      "FSC_MOPS_LEGAL_RISK",
+      "tpex_esg_litigation",
+      "tpex_risk_policy"
+    ]
+  },
+  "error": null,
+  "data": [
+    {
+      "ticker": null,
+      "market": "TW",
+      "event_date": "2026-06-30",
+      "event_type": "regulatory_penalty",
+      "event_subtype": "540",
+      "authority": null,
+      "summary": null,
+      "penalty_amount": null,
+      "source_event_ref": "FSC:202606300001",
+      "source_provider": "FSC",
+      "source_role": "official_fsc_mops_penalty",
+      "source_family": "FSC_MOPS_LEGAL_RISK",
+      "lineage": {
+        "row_index": 0,
+        "source_hash": "legal_risk_bulk",
+        "payload_date": "20260630",
+        "request_date": "2026-06-30",
+        "endpoint_name": "legal_risk",
+        "source_authority": "FSC RSS 10292 / MOPS 22817"
+      },
+      "data_gaps": []
+    },
+    {
+      "ticker": "1240",
+      "market": "TPEx",
+      "event_date": "2026-06-05",
+      "event_type": "litigation_or_risk_management_summary",
+      "event_subtype": "anti_competition_litigation_loss",
+      "authority": "TPEx ESG disclosure",
+      "summary": "anti-competition litigation monetary loss summary",
+      "penalty_amount": null,
+      "source_event_ref": "22b9b719e2f0089d7c5d029d",
+      "source_provider": "tpex_official",
+      "source_role": "company_risk_events",
+      "source_family": "tpex_esg_litigation",
+      "lineage": {
+        "row_index": 0,
+        "source_url": "https://www.tpex.org.tw/openapi/v1/t187ap46_O_20",
+        "report_year": 2024
+      },
+      "data_gaps": [
+        "amount_not_disclosed_or_zero"
+      ]
+    }
+  ],
+  "data_count": 50,
+  "known_gaps": [
+    "current_structured_snapshot_only",
+    "taxonomy_limited",
+    "penalty_events_expanded_extension_included"
+  ],
+  "data_gaps": [
+    "current_structured_snapshot_only",
+    "taxonomy_limited",
+    "penalty_events_expanded_extension_included"
+  ],
+  "query": {
+    "ticker": null,
+    "market": null,
+    "event_type": null,
+    "event_subtype": null,
+    "source_family": null,
+    "source_provider": null,
+    "date_from": null,
+    "date_to": null,
+    "limit": 50
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "data",
+      "error",
+      "lineage"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "warnings": [
+    "not_investment_advice",
+    "not_legal_advice"
+  ],
+  "envelope": {
+    "dataset_id": "company_risk_events",
+    "request_context": {
+      "scope": "structured_adverse_risk_penalty_taxonomy_only",
+      "coverage_type": "current_structured_snapshot",
+      "filters": {
+        "ticker": null,
+        "market": null,
+        "event_type": null,
+        "event_subtype": null,
+        "source_family": null,
+        "source_provider": null,
+        "date_from": null,
+        "date_to": null,
+        "limit": 50
+      },
+      "min_event_date": "2026-06-05",
+      "max_event_date": "2026-06-30"
+    },
+    "quality": {
+      "row_count": 50,
+      "penalty_extension_included": true,
+      "raw_payload_exposed": false
+    },
+    "lineage": {
+      "source_providers": [
+        "FSC",
+        "tpex_official"
+      ],
+      "source_roles": [
+        "company_risk_events",
+        "official_fsc_mops_penalty"
+      ],
+      "source_families": [
+        "FSC_MOPS_LEGAL_RISK",
+        "tpex_esg_litigation",
+        "tpex_risk_policy"
+      ]
+    },
+    "error": null,
+    "data": [
+      {
+        "ticker": null,
+        "market": "TW",
+        "event_date": "2026-06-30",
+        "event_type": "regulatory_penalty",
+        "event_subtype": "540",
+        "authority": null,
+        "summary": null,
+        "penalty_amount": null,
+        "source_event_ref": "FSC:202606300001",
+        "source_provider": "FSC",
+        "source_role": "official_fsc_mops_penalty",
+        "source_family": "FSC_MOPS_LEGAL_RISK",
+        "lineage": {
+          "row_index": 0,
+          "source_hash": "legal_risk_bulk",
+          "payload_date": "20260630",
+          "request_date": "2026-06-30",
+          "endpoint_name": "legal_risk",
+          "source_authority": "FSC RSS 10292 / MOPS 22817"
+        },
+        "data_gaps": []
+      },
+      {
+        "ticker": "1240",
+        "market": "TPEx",
+        "event_date": "2026-06-05",
+        "event_type": "litigation_or_risk_management_summary",
+        "event_subtype": "anti_competition_litigation_loss",
+        "authority": "TPEx ESG disclosure",
+        "summary": "anti-competition litigation monetary loss summary",
+        "penalty_amount": null,
+        "source_event_ref": "22b9b719e2f0089d7c5d029d",
+        "source_provider": "tpex_official",
+        "source_role": "company_risk_events",
+        "source_family": "tpex_esg_litigation",
+        "lineage": {
+          "row_index": 0,
+          "source_url": "https://www.tpex.org.tw/openapi/v1/t187ap46_O_20",
+          "report_year": 2024
+        },
+        "data_gaps": [
+          "amount_not_disclosed_or_zero"
+        ]
+      }
+    ],
+    "known_gaps": [
+      "current_structured_snapshot_only",
+      "taxonomy_limited",
+      "penalty_events_expanded_extension_included"
+    ],
+    "warnings": [
+      "not_investment_advice",
+      "not_legal_advice"
+    ],
+    "envelope": {
+      "dataset_id": "company_risk_events",
+      "scope": "structured_adverse_risk_penalty_taxonomy_only",
+      "row_count": 50
+    }
+  }
+}`,
+  },
+  "corporate-actions": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/corporate-actions",
+  "request_id": "req_1c4571e27c49",
+  "plan_id": "enterprise",
+  "dataset": "corporate_actions",
+  "query": {
+    "ticker": null,
+    "action_type": null,
+    "date_from": null,
+    "date_to": "2026-07-24",
+    "limit": 50
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "corporate_actions",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-24.preview",
+    "release_date": "2026-07-24",
+    "data_as_of": "2026-07-24",
+    "request_context": {
+      "ticker": "1464",
+      "as_of_date": "2026-07-24",
+      "family": "market_structure_corporate_actions",
+      "field_group_type": "canonical",
+      "dataset_view": "market_corporate_actions_aggregate_v1"
+    },
+    "data": [
+      {
+        "ticker": "1464",
+        "action_type": "ex_dividend",
+        "effective_date": "2026-07-20",
+        "announcement_date": null,
+        "record_date": null,
+        "ex_date": "2026-07-20",
+        "cash_dividend": null,
+        "stock_dividend": null,
+        "capital_reduction_ratio": null,
+        "source_id": "1464,20260720",
+        "quality_flag": "ok",
+        "market": "TWSE",
+        "provider": "twse_official",
+        "source_role": "historical_ex_right_ex_dividend_reference_price",
+        "lineage": {
+          "row_index": 560,
+          "detail_ref": "1464,20260720",
+          "endpoint_name": "TWT49U",
+          "payload_status": "OK",
+          "request_end_date": "20260930",
+          "request_start_date": "20260601"
+        },
+        "split_ratio": null,
+        "rights_ratio": null,
+        "rights_price": null,
+        "par_value_ratio": null,
+        "par_value_from": null,
+        "par_value_to": null
+      },
+      {
+        "ticker": "2211",
+        "action_type": "ex_dividend",
+        "effective_date": "2026-07-20",
+        "announcement_date": null,
+        "record_date": null,
+        "ex_date": "2026-07-20",
+        "cash_dividend": null,
+        "stock_dividend": null,
+        "capital_reduction_ratio": null,
+        "source_id": "2211,20260720",
+        "quality_flag": "ok",
+        "market": "TWSE",
+        "provider": "twse_official",
+        "source_role": "historical_ex_right_ex_dividend_reference_price",
+        "lineage": {
+          "row_index": 561,
+          "detail_ref": "2211,20260720",
+          "endpoint_name": "TWT49U",
+          "payload_status": "OK",
+          "request_end_date": "20260930",
+          "request_start_date": "20260601"
+        },
+        "split_ratio": null,
+        "rights_ratio": null,
+        "rights_price": null,
+        "par_value_ratio": null,
+        "par_value_from": null,
+        "par_value_to": null
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-24",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "twse_official",
+      "fallback_chain": [
+        "tpex_official",
+        "data_gov_mirror"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "market-structure canonical aggregate first",
+        "no Yahoo canonical dependency"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "corporate_actions",
+      "request_id": "read-api-b5e2104c748e",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
+  "dividends": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/dividends",
+  "request_id": "req_c9401bf804a4",
+  "plan_id": "enterprise",
+  "dataset": "dividends",
+  "query": {
+    "ticker": "2330",
+    "announcement_date_from": null,
+    "announcement_date_to": null,
+    "ex_dividend_date_from": null,
+    "ex_dividend_date_to": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "announcement_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 2,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "dividends",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-05-12.preview",
+    "release_date": "2026-05-12",
+    "data_as_of": "2026-05-12",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-05-12",
+      "family": "market_structure_corporate_actions",
+      "field_group_type": "event_fact_current_snapshot",
+      "dataset_view": "dividends_corporate_actions_enhanced_v1",
+      "coverage_type": "current_snapshot",
+      "market_scope": "TWSE",
+      "historical_coverage_status": "blocked_not_proven",
+      "supported_sort_by": [
+        "announcement_date"
+      ],
+      "supported_filter_fields": [
+        "ticker",
+        "announcement_date_from",
+        "announcement_date_to"
+      ],
+      "known_gaps": [
+        "current_snapshot_only_no_historical_2020_2026_claim",
+        "partial_ex_date_coverage",
+        "security_master_gaps_preferred_special_variants=32"
+      ]
+    },
+    "data": [
+      {
+        "ticker": "2330",
+        "market": "TWSE",
+        "announcement_date": "2026-05-12",
+        "source_event_ref": "twse_dividend_snapshot|2330|115|1",
+        "cash_dividend": 7,
+        "stock_dividend": 0,
+        "ex_dividend_date": "2026-06-11",
+        "ex_rights_date": null,
+        "record_date": null,
+        "payment_date": null,
+        "dividend_type": "cash",
+        "fiscal_period": null,
+        "event_status": "announced",
+        "provider": "twse_official",
+        "source_role": "current_snapshot_dividend_distribution",
+        "lineage": {
+          "data_gaps": [],
+          "row_index": 288,
+          "source_family": "twse_dividend_distribution_open_data_t187ap45_l",
+          "joined_ex_date_source_family": "twse_exright_exdividend_schedule_twt48u_all",
+          "current_snapshot_controlled_write_ts": "20260604T143239Z"
+        },
+        "updated_at": "2026-06-04T14:32:49.575532"
+      },
+      {
+        "ticker": "2330",
+        "market": "TWSE",
+        "announcement_date": "2026-02-10",
+        "source_event_ref": "twse_dividend_snapshot|2330|114|1",
+        "cash_dividend": 6.000036,
+        "stock_dividend": 0,
+        "ex_dividend_date": "2026-06-11",
+        "ex_rights_date": null,
+        "record_date": null,
+        "payment_date": null,
+        "dividend_type": "cash",
+        "fiscal_period": null,
+        "event_status": "announced",
+        "provider": "twse_official",
+        "source_role": "current_snapshot_dividend_distribution",
+        "lineage": {
+          "data_gaps": [],
+          "row_index": 289,
+          "source_family": "twse_dividend_distribution_open_data_t187ap45_l",
+          "joined_ex_date_source_family": "twse_exright_exdividend_schedule_twt48u_all",
+          "current_snapshot_controlled_write_ts": "20260604T143239Z"
+        },
+        "updated_at": "2026-06-04T14:32:49.575532"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-05-12",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "twse_official",
+      "fallback_chain": [
+        "twse_exright_exdividend_schedule_twt48u_all_optional_join"
+      ],
+      "policy_notes": [
+        "official/public-first current snapshot",
+        "twse_only_current_snapshot_boundary",
+        "historical_2020_2026_not_proven"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "dividends",
+      "request_id": "read-api-61f81733b1fb",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
+  "financial-metrics": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/financial-metrics",
+  "request_id": "req_1e4ea8eed6b1",
+  "plan_id": "enterprise",
+  "dataset": "financial_metrics",
+  "query": {
+    "ticker": "2330",
+    "as_of_date": null,
+    "fiscal_period": null,
+    "period_type": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "as_of_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "financial_metrics",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-05-15.preview",
+    "release_date": "2026-05-15",
+    "data_as_of": "2026-05-15",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-05-15",
+      "family": "fundamentals",
+      "field_group_type": "derived",
+      "dataset_view": "financial_metrics_v1",
+      "supported_sort_by": [
+        "as_of_date"
+      ],
+      "supported_filter_fields": [
+        "ticker",
+        "as_of_date",
+        "fiscal_period"
+      ]
+    },
+    "data": [
+      {
+        "ticker": "2330",
+        "market": "TW",
+        "as_of_date": "2026-05-15",
+        "fiscal_year": 2026,
+        "quarter": 1,
+        "revenue": 1134103440,
+        "gross_profit": 751295421,
+        "operating_income": 658966142,
+        "net_income": 572801304,
+        "eps": 22.08,
+        "gross_margin": 0.662458,
+        "operating_margin": 0.581046,
+        "net_margin": 0.50507,
+        "roe_q": 0.096555,
+        "roa_q": 0.066136,
+        "total_assets": 8660949685,
+        "total_liabilities": 2728560764,
+        "total_equity": 5932388921,
+        "debt_ratio": 0.315042,
+        "current_ratio": 2.488262,
+        "bvps": 227.17,
+        "provider": "twse_official",
+        "source_role": "derived_financial_ratios",
+        "lineage": {
+          "row_index": 275,
+          "source_hash": "finratio:2330:2026:1",
+          "payload_date": "20260702",
+          "request_date": "2026-07-02",
+          "endpoint_name": "opendata_t187ap06_07",
+          "source_authority": "TWSE/TPEx t187ap06+07 (綜合損益+資產負債) derived ratios"
+        },
+        "updated_at": "2026-07-02T03:28:03.070574+00:00"
+      },
+      {
+        "ticker": "2330",
+        "market": null,
+        "as_of_date": "2026-03-31",
+        "fiscal_year": 2025,
+        "quarter": 4,
+        "revenue": 3809054272,
+        "gross_profit": 2281293979,
+        "operating_income": 1936091677,
+        "net_income": 1715396780,
+        "eps": 66.26,
+        "gross_margin": 0.5989134877309514,
+        "operating_margin": 0.5082867133797562,
+        "net_margin": 0.45034716165892424,
+        "roe_q": 0.3141294795174251,
+        "roa_q": 0.21623491954400492,
+        "total_assets": 7933023878,
+        "total_liabilities": 2472228595,
+        "total_equity": 5460795283,
+        "debt_ratio": 0.3116376091916258,
+        "current_ratio": 2.61802490940845,
+        "bvps": 208.99,
+        "provider": "derived_from_fundamentals",
+        "source_role": "derived_cache",
+        "lineage": null,
+        "updated_at": "2026-07-09T06:15:12.780218+00:00"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-05-15",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "mops_official",
+      "fallback_chain": [
+        "data_gov_mirror",
+        "finmind_legacy"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "financial_metrics derived from normalized fundamentals + valuation core",
+        "unstable fields excluded from public contract (analyst/non-gaap/custom scoring)"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "financial_metrics",
+      "request_id": "read-api-b1790764c953",
+      "blocking_gate": null
+    }
+  }
+}`,
+    en: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/financial-metrics",
+  "request_id": "req_1e4ea8eed6b1",
+  "plan_id": "enterprise",
+  "dataset": "financial_metrics",
+  "query": {
+    "ticker": "2330",
+    "as_of_date": null,
+    "fiscal_period": null,
+    "period_type": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "as_of_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "financial_metrics",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-05-15.preview",
+    "release_date": "2026-05-15",
+    "data_as_of": "2026-05-15",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-05-15",
+      "family": "fundamentals",
+      "field_group_type": "derived",
+      "dataset_view": "financial_metrics_v1",
+      "supported_sort_by": [
+        "as_of_date"
+      ],
+      "supported_filter_fields": [
+        "ticker",
+        "as_of_date",
+        "fiscal_period"
+      ]
+    },
+    "data": [
+      {
+        "ticker": "2330",
+        "market": "TW",
+        "as_of_date": "2026-05-15",
+        "fiscal_year": 2026,
+        "quarter": 1,
+        "revenue": 1134103440,
+        "gross_profit": 751295421,
+        "operating_income": 658966142,
+        "net_income": 572801304,
+        "eps": 22.08,
+        "gross_margin": 0.662458,
+        "operating_margin": 0.581046,
+        "net_margin": 0.50507,
+        "roe_q": 0.096555,
+        "roa_q": 0.066136,
+        "total_assets": 8660949685,
+        "total_liabilities": 2728560764,
+        "total_equity": 5932388921,
+        "debt_ratio": 0.315042,
+        "current_ratio": 2.488262,
+        "bvps": 227.17,
+        "provider": "twse_official",
+        "source_role": "derived_financial_ratios",
+        "lineage": {
+          "row_index": 275,
+          "source_hash": "finratio:2330:2026:1",
+          "payload_date": "20260702",
+          "request_date": "2026-07-02",
+          "endpoint_name": "opendata_t187ap06_07",
+          "source_authority": "<Chinese value - see the zh page>"
+        },
+        "updated_at": "2026-07-02T03:28:03.070574+00:00"
+      },
+      {
+        "ticker": "2330",
+        "market": null,
+        "as_of_date": "2026-03-31",
+        "fiscal_year": 2025,
+        "quarter": 4,
+        "revenue": 3809054272,
+        "gross_profit": 2281293979,
+        "operating_income": 1936091677,
+        "net_income": 1715396780,
+        "eps": 66.26,
+        "gross_margin": 0.5989134877309514,
+        "operating_margin": 0.5082867133797562,
+        "net_margin": 0.45034716165892424,
+        "roe_q": 0.3141294795174251,
+        "roa_q": 0.21623491954400492,
+        "total_assets": 7933023878,
+        "total_liabilities": 2472228595,
+        "total_equity": 5460795283,
+        "debt_ratio": 0.3116376091916258,
+        "current_ratio": 2.61802490940845,
+        "bvps": 208.99,
+        "provider": "derived_from_fundamentals",
+        "source_role": "derived_cache",
+        "lineage": null,
+        "updated_at": "2026-07-09T06:15:12.780218+00:00"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-05-15",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "mops_official",
+      "fallback_chain": [
+        "data_gov_mirror",
+        "finmind_legacy"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "financial_metrics derived from normalized fundamentals + valuation core",
+        "unstable fields excluded from public contract (analyst/non-gaap/custom scoring)"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "financial_metrics",
+      "request_id": "read-api-b1790764c953",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
+  "macro-worldbank": {
+    rowsKey: "data",
+    envelopeKeys: ["api_version","data","data_count","data_gaps","dataset","dataset_id","endpoint","envelope","error","known_gaps","lineage","meta","plan_id","quality","query","request_context","request_id","warnings"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/macro-worldbank",
+  "request_id": "req_04abb9f71ec8",
+  "plan_id": "enterprise",
+  "dataset": "macro_worldbank",
+  "dataset_id": "macro_worldbank",
+  "request_context": {
+    "scope": "worldbank_wdi_country_indicator_panel",
+    "coverage_type": "worldbank_open_data_wdi_ccby",
+    "filters": {
+      "country_iso": null,
+      "indicator_code": null,
+      "indicator_name": null,
+      "year_from": null,
+      "year_to": null,
+      "limit": 50
+    },
+    "min_year": 2025,
+    "max_year": 2025
+  },
+  "quality": {
+    "row_count": 50,
+    "country_count": 2,
+    "indicator_count": 50,
+    "raw_payload_exposed": false
+  },
+  "lineage": {
+    "source_groups": [
+      "WorldBank"
+    ],
+    "source_providers": [
+      "worldbank_open_data"
+    ],
+    "source_families": [
+      "WorldBank_WDI"
+    ],
+    "license": "CC-BY"
+  },
+  "error": null,
+  "data": [
+    {
+      "country_iso": "ABW",
+      "country_name": "Aruba",
+      "indicator_code": "FI.RES.TOTL.CD",
+      "indicator_name": "Total reserves (includes gold, current US$)",
+      "year": 2025,
+      "value": 2231431960,
+      "source_group": "WorldBank",
+      "license": "CC-BY",
+      "lineage": {
+        "source": "worldbank_wdi_v2",
+        "endpoint": "api.worldbank.org"
+      }
+    },
+    {
+      "country_iso": "ABW",
+      "country_name": "Aruba",
+      "indicator_code": "FI.RES.XGLD.CD",
+      "indicator_name": "Total reserves minus gold (current US$)",
+      "year": 2025,
+      "value": 1794651960,
+      "source_group": "WorldBank",
+      "license": "CC-BY",
+      "lineage": {
+        "source": "worldbank_wdi_v2",
+        "endpoint": "api.worldbank.org"
+      }
+    }
+  ],
+  "data_count": 50,
+  "known_gaps": [
+    "worldbank_wdi_annual_panel",
+    "taiwan_absent_worldbank_non_member_use_business_indicator",
+    "not_taiwan_market_data"
+  ],
+  "data_gaps": [
+    "worldbank_wdi_annual_panel",
+    "taiwan_absent_worldbank_non_member_use_business_indicator",
+    "not_taiwan_market_data"
+  ],
+  "query": {
+    "country_iso": null,
+    "indicator_code": null,
+    "indicator_name": null,
+    "year_from": null,
+    "year_to": null,
+    "limit": 50
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "data",
+      "error",
+      "lineage"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "warnings": [
+    "not_investment_advice"
+  ],
+  "envelope": {
+    "dataset_id": "macro_worldbank",
+    "request_context": {
+      "scope": "worldbank_wdi_country_indicator_panel",
+      "coverage_type": "worldbank_open_data_wdi_ccby",
+      "filters": {
+        "country_iso": null,
+        "indicator_code": null,
+        "indicator_name": null,
+        "year_from": null,
+        "year_to": null,
+        "limit": 50
+      },
+      "min_year": 2025,
+      "max_year": 2025
+    },
+    "quality": {
+      "row_count": 50,
+      "country_count": 2,
+      "indicator_count": 50,
+      "raw_payload_exposed": false
+    },
+    "lineage": {
+      "source_groups": [
+        "WorldBank"
+      ],
+      "source_providers": [
+        "worldbank_open_data"
+      ],
+      "source_families": [
+        "WorldBank_WDI"
+      ],
+      "license": "CC-BY"
+    },
+    "error": null,
+    "data": [
+      {
+        "country_iso": "ABW",
+        "country_name": "Aruba",
+        "indicator_code": "FI.RES.TOTL.CD",
+        "indicator_name": "Total reserves (includes gold, current US$)",
+        "year": 2025,
+        "value": 2231431960,
+        "source_group": "WorldBank",
+        "license": "CC-BY",
+        "lineage": {
+          "source": "worldbank_wdi_v2",
+          "endpoint": "api.worldbank.org"
+        }
+      },
+      {
+        "country_iso": "ABW",
+        "country_name": "Aruba",
+        "indicator_code": "FI.RES.XGLD.CD",
+        "indicator_name": "Total reserves minus gold (current US$)",
+        "year": 2025,
+        "value": 1794651960,
+        "source_group": "WorldBank",
+        "license": "CC-BY",
+        "lineage": {
+          "source": "worldbank_wdi_v2",
+          "endpoint": "api.worldbank.org"
+        }
+      }
+    ],
+    "known_gaps": [
+      "worldbank_wdi_annual_panel",
+      "taiwan_absent_worldbank_non_member_use_business_indicator",
+      "not_taiwan_market_data"
+    ],
+    "warnings": [
+      "not_investment_advice"
+    ],
+    "envelope": {
+      "dataset_id": "macro_worldbank",
+      "scope": "worldbank_wdi_country_indicator_panel",
+      "row_count": 50
+    }
+  }
+}`,
+  },
+  "price-enhanced": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/price-enhanced",
+  "request_id": "req_9ad9817a3812",
+  "plan_id": "enterprise",
+  "dataset": "price_enhanced",
+  "query": {
+    "ticker": "2330",
+    "date_from": null,
+    "date_to": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "trade_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 44,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "price_enhanced",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-06-11.preview",
+    "release_date": "2026-06-11",
+    "data_as_of": "2026-06-11",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-06-11",
+      "family": "market_technical",
+      "field_group_type": "derived",
+      "dataset_view": "price_enhanced_v1",
+      "supported_sort_by": [
+        "trade_date"
+      ],
+      "supported_filter_fields": [
+        "ticker",
+        "date_from",
+        "date_to"
+      ],
+      "price_basis": "close"
+    },
+    "data": [
+      {
+        "ticker": "2330",
+        "market": "TWSE",
+        "trade_date": "2026-06-11",
+        "event_type": "ex_dividend",
+        "factor": 0.99733481,
+        "pre_event_close": 2255,
+        "reference_price": 2248.99,
+        "provider": "twse_official",
+        "source_role": "derived_price_adjustment",
+        "lineage": {
+          "row_index": 6874,
+          "source_hash": "padj:2330:2026-06-11:ex_dividend",
+          "payload_date": "20260611",
+          "request_date": "2026-06-11",
+          "endpoint_name": "twse_exchangeReport_TWT49U",
+          "source_authority": "TWSE TWT49U 除權除息計算結果 (derived back-adjustment factor)"
+        },
+        "updated_at": "2026-07-02T03:27:19.920375+00:00"
+      },
+      {
+        "ticker": "2330",
+        "market": "TWSE",
+        "trade_date": "2026-03-17",
+        "event_type": "ex_dividend",
+        "factor": 0.99674255,
+        "pre_event_close": 1845,
+        "reference_price": 1838.99,
+        "provider": "twse_official",
+        "source_role": "derived_price_adjustment",
+        "lineage": {
+          "row_index": 6635,
+          "source_hash": "padj:2330:2026-03-17:ex_dividend",
+          "payload_date": "20260317",
+          "request_date": "2026-03-17",
+          "endpoint_name": "twse_exchangeReport_TWT49U",
+          "source_authority": "TWSE TWT49U 除權除息計算結果 (derived back-adjustment factor)"
+        },
+        "updated_at": "2026-07-02T03:27:10.904277+00:00"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-06-11",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "twse_official",
+      "fallback_chain": [
+        "tpex_official",
+        "data_gov_mirror"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "price_enhanced derived from normalized official daily prices with deterministic return/volatility formulas",
+        "unstable fields excluded from public contract (signal/label/score/custom factor and non-stable turnover_ratio)"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "price_enhanced",
+      "request_id": "read-api-dd6a141cdabc",
+      "blocking_gate": null
+    }
+  }
+}`,
+    en: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/price-enhanced",
+  "request_id": "req_9ad9817a3812",
+  "plan_id": "enterprise",
+  "dataset": "price_enhanced",
+  "query": {
+    "ticker": "2330",
+    "date_from": null,
+    "date_to": null,
+    "limit": 50,
+    "offset": 0,
+    "sort_by": "trade_date",
+    "sort_order": "desc"
+  },
+  "meta": {
+    "rows_returned": 44,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "price_enhanced",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-06-11.preview",
+    "release_date": "2026-06-11",
+    "data_as_of": "2026-06-11",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-06-11",
+      "family": "market_technical",
+      "field_group_type": "derived",
+      "dataset_view": "price_enhanced_v1",
+      "supported_sort_by": [
+        "trade_date"
+      ],
+      "supported_filter_fields": [
+        "ticker",
+        "date_from",
+        "date_to"
+      ],
+      "price_basis": "close"
+    },
+    "data": [
+      {
+        "ticker": "2330",
+        "market": "TWSE",
+        "trade_date": "2026-06-11",
+        "event_type": "ex_dividend",
+        "factor": 0.99733481,
+        "pre_event_close": 2255,
+        "reference_price": 2248.99,
+        "provider": "twse_official",
+        "source_role": "derived_price_adjustment",
+        "lineage": {
+          "row_index": 6874,
+          "source_hash": "padj:2330:2026-06-11:ex_dividend",
+          "payload_date": "20260611",
+          "request_date": "2026-06-11",
+          "endpoint_name": "twse_exchangeReport_TWT49U",
+          "source_authority": "<Chinese value - see the zh page>"
+        },
+        "updated_at": "2026-07-02T03:27:19.920375+00:00"
+      },
+      {
+        "ticker": "2330",
+        "market": "TWSE",
+        "trade_date": "2026-03-17",
+        "event_type": "ex_dividend",
+        "factor": 0.99674255,
+        "pre_event_close": 1845,
+        "reference_price": 1838.99,
+        "provider": "twse_official",
+        "source_role": "derived_price_adjustment",
+        "lineage": {
+          "row_index": 6635,
+          "source_hash": "padj:2330:2026-03-17:ex_dividend",
+          "payload_date": "20260317",
+          "request_date": "2026-03-17",
+          "endpoint_name": "twse_exchangeReport_TWT49U",
+          "source_authority": "<Chinese value - see the zh page>"
+        },
+        "updated_at": "2026-07-02T03:27:10.904277+00:00"
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-06-11",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "twse_official",
+      "fallback_chain": [
+        "tpex_official",
+        "data_gov_mirror"
+      ],
+      "policy_notes": [
+        "official/public-first canonical",
+        "price_enhanced derived from normalized official daily prices with deterministic return/volatility formulas",
+        "unstable fields excluded from public contract (signal/label/score/custom factor and non-stable turnover_ratio)"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "price_enhanced",
+      "request_id": "read-api-dd6a141cdabc",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
+  "securities-lending": {
+    rowsKey: "envelope.data",
+    envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
+    zh: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/chip-deep-securities-lending-daily",
+  "request_id": "req_8f56c4f7bbae",
+  "plan_id": "enterprise",
+  "dataset": "securities_lending",
+  "query": {
+    "symbol": "2330",
+    "as_of_date": null,
+    "start_date": null,
+    "end_date": null,
+    "market": null,
+    "limit": 50,
+    "legacy_aliases_used": {
+      "ticker": false,
+      "date_from": false,
+      "date_to": false,
+      "offset": false,
+      "sort_by": false,
+      "sort_order": false
+    }
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "securities_lending",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-17.preview",
+    "release_date": "2026-07-17",
+    "data_as_of": "2026-07-17",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-07-17",
+      "family": "chip_deep",
+      "field_group_type": "canonical",
+      "dataset_view": "securities_lending_v1"
+    },
+    "data": [
+      {
+        "symbol": "2330",
+        "as_of_date": "2026-07-17",
+        "market": "TWSE",
+        "prev_lending_balance": 263097000,
+        "borrowed_volume": 824000,
+        "returned_volume": 670000,
+        "lending_balance": 263251000,
+        "close_price": 2290,
+        "market_value": 602844790000
+      },
+      {
+        "symbol": "2330",
+        "as_of_date": "2026-07-16",
+        "market": "TWSE",
+        "prev_lending_balance": 262443000,
+        "borrowed_volume": 1442000,
+        "returned_volume": 788000,
+        "lending_balance": 263097000,
+        "close_price": 2470,
+        "market_value": 649849590000
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-17",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "securities_lending_items",
+      "fallback_chain": [],
+      "policy_notes": [
+        "securities lending daily (TWT72U 借券) productized serving path",
+        "contract-aligned filters: symbol/as_of_date/start_date/end_date/market",
+        "nullable optional fields are preserved as-is"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "securities_lending",
+      "request_id": "read-api-318fd704c45e",
+      "blocking_gate": null
+    }
+  }
+}`,
+    en: `{
+  "api_version": "v2",
+  "endpoint": "/v2/datasets/chip-deep-securities-lending-daily",
+  "request_id": "req_8f56c4f7bbae",
+  "plan_id": "enterprise",
+  "dataset": "securities_lending",
+  "query": {
+    "symbol": "2330",
+    "as_of_date": null,
+    "start_date": null,
+    "end_date": null,
+    "market": null,
+    "limit": 50,
+    "legacy_aliases_used": {
+      "ticker": false,
+      "date_from": false,
+      "date_to": false,
+      "offset": false,
+      "sort_by": false,
+      "sort_order": false
+    }
+  },
+  "meta": {
+    "rows_returned": 50,
+    "mandatory_contract_fields_present": [
+      "api_version",
+      "data",
+      "data_as_of"
+    ],
+    "plan": "enterprise",
+    "row_limit": 100000,
+    "is_limited": false
+  },
+  "envelope": {
+    "api_version": "v2",
+    "dataset": "securities_lending",
+    "dataset_version": "v2.0.0-preview",
+    "release_version": "v2.2026-07-17.preview",
+    "release_date": "2026-07-17",
+    "data_as_of": "2026-07-17",
+    "request_context": {
+      "ticker": "2330",
+      "as_of_date": "2026-07-17",
+      "family": "chip_deep",
+      "field_group_type": "canonical",
+      "dataset_view": "securities_lending_v1"
+    },
+    "data": [
+      {
+        "symbol": "2330",
+        "as_of_date": "2026-07-17",
+        "market": "TWSE",
+        "prev_lending_balance": 263097000,
+        "borrowed_volume": 824000,
+        "returned_volume": 670000,
+        "lending_balance": 263251000,
+        "close_price": 2290,
+        "market_value": 602844790000
+      },
+      {
+        "symbol": "2330",
+        "as_of_date": "2026-07-16",
+        "market": "TWSE",
+        "prev_lending_balance": 262443000,
+        "borrowed_volume": 1442000,
+        "returned_volume": 788000,
+        "lending_balance": 263097000,
+        "close_price": 2470,
+        "market_value": 649849590000
+      }
+    ],
+    "quality": {
+      "freshness_state": "fresh",
+      "freshness_as_of": "2026-07-17",
+      "completeness_ratio": 1,
+      "quality_status": "ready"
+    },
+    "lineage": {
+      "source_role": "canonical",
+      "selected_source": "securities_lending_items",
+      "fallback_chain": [],
+      "policy_notes": [
+        "<Chinese value - see the zh page>",
+        "contract-aligned filters: symbol/as_of_date/start_date/end_date/market",
+        "nullable optional fields are preserved as-is"
+      ]
+    },
+    "error": {
+      "error_code": null,
+      "error_message": null,
+      "dataset": "securities_lending",
+      "request_id": "read-api-318fd704c45e",
+      "blocking_gate": null
+    }
+  }
+}`,
+  },
   "index-constituents": {
     rowsKey: "envelope.data",
     envelopeKeys: ["api_version","dataset","endpoint","envelope","meta","plan_id","query","request_id"],
