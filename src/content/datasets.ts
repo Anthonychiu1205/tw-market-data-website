@@ -101,6 +101,60 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "factor-library",
+    name: "因子庫(座標)",
+    nameEn: "Factor Library",
+    seoTitle: "因子庫資料集(size / value / momentum / quality / low-vol)| TW Market Data",
+    seoTitleEn: "Factor Library Dataset (size / value / momentum / quality / low-vol) | TW Market Data",
+    seoDescription:
+      "因子庫資料集提供台股橫斷面因子「數值座標」——size / value / momentum / quality / low-vol 家族,每列一個 (ticker, date, factor_name),附 factor_value、定義與公式版本。純座標,不含訊號、評分或買賣標籤;point-in-time 安全。",
+    seoDescriptionEn:
+      "The Factor Library dataset provides cross-sectional factor VALUE coordinates for Taiwan equities — size / value / momentum / quality / low-vol families — one row per (ticker, date, factor_name) with its factor_value, definition, and formula version. Coordinates only: no signal, score, or buy/sell label; point-in-time safe.",
+    shortDescription: "台股橫斷面因子數值座標(五大家族),每列附定義與公式版本,純座標無訊號。",
+    shortDescriptionEn:
+      "Cross-sectional factor value coordinates for Taiwan equities (five families), each with definition and formula version — coordinates only, no signal.",
+    whatItIs:
+      "因子庫資料集每一列對應「一檔證券、一個交易日、一個因子」,欄位包含 factor_value(原始座標值)、factor_family(size / value / momentum / quality / low_vol)、factor_definition 與 formula_version,並以 as_of_source_date 標明 point-in-time 輸入日。因子值僅為【座標】——不含訊號、評分或買賣標籤;以 trade_date 為知識時間,point-in-time 安全。",
+    whatItIsEn:
+      "Each row is one security, one trading day, one factor, carrying factor_value (the raw coordinate), factor_family (size / value / momentum / quality / low_vol), factor_definition, and formula_version, with as_of_source_date marking the point-in-time input date. Factor values are COORDINATES only — no signal, score, or buy/sell label. Keyed on trade_date and point-in-time safe.",
+    useCases: [
+      "以一致定義的因子座標建構橫斷面選股與因子模型。",
+      "對齊 formula_version 與 as_of_source_date,做可重現、無未來函數的回測。",
+      "結合因子報酬(factor-returns)評估各因子的歷史十分位價差。",
+    ],
+    useCasesEn: [
+      "Build cross-sectional stock selection and factor models on consistently defined coordinates.",
+      "Align formula_version and as_of_source_date for reproducible, look-ahead-free backtests.",
+      "Pair with Factor Returns to assess each factor's historical decile spread.",
+    ],
+    whyItMatters:
+      "自建因子容易在定義、口徑與 point-in-time 對齊上分歧;直接取用附定義、公式版本與輸入日的座標,可確保跨研究一致且無未來函數。",
+    whyItMattersEn:
+      "Home-grown factors drift in definition, convention, and point-in-time alignment; taking coordinates that carry their definition, formula version, and input date keeps research consistent and look-ahead-free.",
+    coverageNote:
+      "逐檔逐日逐因子,涵蓋 size / value / momentum / quality / low-vol 家族;每列附 factor_definition、formula_version 與 as_of_source_date。以 trade_date 為知識時間,point-in-time 安全。",
+    coverageNoteEn:
+      "Per ticker, per trading day, per factor, across the size / value / momentum / quality / low-vol families; every row carries factor_definition, formula_version, and as_of_source_date. Keyed on trade_date, point-in-time safe.",
+    freshnessNote: "日頻,隨橫斷面輸入更新。",
+    freshnessNoteEn: "Daily, updated with the cross-sectional inputs.",
+    sourcePolicyNote:
+      "由 TWSE / TPEx / MOPS 官方來源衍生;因子值為座標,非訊號、非投資建議。",
+    sourcePolicyNoteEn:
+      "Derived from official TWSE / TPEx / MOPS sources; factor values are coordinates, not signals, not investment advice.",
+    docsHref: "/docs/api/structure-reference/factor-library",
+    pricingHref: "/pricing",
+    keywords: ["因子庫", "選股因子", "value momentum quality", "橫斷面因子", "台股 quant"],
+    keywordsEn: ["factor library", "equity factors", "value momentum quality low-vol", "cross-sectional factors", "Taiwan quant"],
+    jsonLdName: "因子庫資料集",
+    jsonLdNameEn: "Factor Library Dataset",
+    jsonLdDescription: "台股橫斷面因子數值座標(size/value/momentum/quality/low-vol),附定義與公式版本,point-in-time 安全。",
+    jsonLdDescriptionEn:
+      "Cross-sectional factor value coordinates for Taiwan equities (size/value/momentum/quality/low-vol), with definitions and formula versions, point-in-time safe.",
+    sourceRole: "derived_factor_library",
+    provider: "twse_official",
+    marketScope: "TWSE_TPEX",
+  },
+  {
     slug: "monthly-revenue",
     name: "月營收",
     nameEn: "Monthly Revenue",
