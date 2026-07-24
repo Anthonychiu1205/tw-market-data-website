@@ -92,6 +92,7 @@ const DATASET_META: Record<string, DatasetMeta> = {
   "total-margin-short": { domain: "capital-flows", zh: "整體融資融券匯總", en: "Total margin & short", agency: "TWSE", grade: "reference" },
   "convertible-bond-monthly": { domain: "derivatives", zh: "可轉債集保月報", en: "Convertible Bond Custody (Monthly)", agency: "TDCC", grade: "verified" },
   "securities-lending": { domain: "capital-flows", zh: "借券資料", en: "Securities lending", agency: "TWSE", grade: "verified" },
+  "securities-lending-available": { domain: "capital-flows", zh: "可借券賣出股數 (TWT96U)", en: "Securities Lending — Borrowable (TWT96U)", agency: "TWSE", grade: "verified" },
   // chip-flows: live 端點實測回 0 列(籌碼流向聚合 ETL 尚在建置)→ 標 building「即將開放」,不列
   // verified、不填假涵蓋;ETL backfill 後升回真分級。owner ruling 2026-07-22。
   "chip-flows": { domain: "capital-flows", zh: "籌碼流向", en: "Chip flows", agency: "TWSE", grade: "building" },
