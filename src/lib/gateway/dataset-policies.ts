@@ -72,6 +72,7 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "business-indicator-monthly": { datasetSlug: "business-indicator-monthly", backendPath: "/v2/datasets/business-indicator-monthly", requiredPlan: "max", creditsCost: 2 },
   "convertible-bond-overview": { datasetSlug: "convertible-bond-overview", backendPath: "/v2/datasets/convertible-bond-overview", requiredPlan: "pro", creditsCost: 2 },
   "corporate-actions-enhanced": { datasetSlug: "corporate-actions-enhanced", backendPath: "/v2/datasets/corporate-actions-enhanced", requiredPlan: "pro", creditsCost: 2 },
+  "convertible-bond-institutional": { datasetSlug: "convertible-bond-institutional", backendPath: "/v2/datasets/convertible-bond-institutional", requiredPlan: "pro", creditsCost: 2 },
   "day-trading-suspension": { datasetSlug: "day-trading-suspension", backendPath: "/v2/datasets/day-trading-suspension", requiredPlan: "pro", creditsCost: 2 },
   // tier aligned to read API (attention_disposal→disposition-securities-period = pro, explicit)
   "disposition-securities-period": { datasetSlug: "disposition-securities-period", backendPath: "/v2/datasets/disposition-securities-period", requiredPlan: "pro", creditsCost: 2 },

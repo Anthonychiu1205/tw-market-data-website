@@ -815,6 +815,58 @@ export const datasetSeoEntries: readonly DatasetSeoEntrySource[] = [
     marketScope: "TWSE",
   },
   {
+    slug: "convertible-bond-institutional",
+    name: "可轉債法人買賣",
+    nameEn: "Convertible Bond Institutional Flow",
+    seoTitle: "台股可轉債法人買賣資料集(外資 / 投信 / 自營)| TW Market Data",
+    seoTitleEn: "Taiwan Convertible Bond Institutional Flow Dataset | TW Market Data",
+    seoDescription:
+      "台股可轉債法人買賣資料集提供上櫃可轉債每日外資 / 投信 / 自營商買賣超淨額與三大法人合計,一檔一日一列。連續買超常視為看多轉換;point-in-time 安全。",
+    seoDescriptionEn:
+      "The Taiwan Convertible Bond Institutional Flow dataset provides daily foreign / trust / dealer net buys and their total for TPEx convertible bonds — one row per bond per day. Sustained net buying is often read as bullish on conversion; point-in-time safe.",
+    shortDescription: "上櫃可轉債每日外資 / 投信 / 自營商買賣超與三大法人合計。",
+    shortDescriptionEn:
+      "Daily foreign / trust / dealer net buys and the total for TPEx convertible bonds.",
+    whatItIs:
+      "可轉債法人買賣資料集每一列對應「一檔可轉債(cb_id)、一個交易日」的三大法人買賣超,欄位包含 foreign_net(外資淨額)、trust_net(投信淨額)、dealer_net(自營商淨額)與 total_net(三大法人合計淨額)。標的為上櫃可轉債;連續買超常視為看多轉換。以 trade_date 為知識時間,point-in-time 安全。",
+    whatItIsEn:
+      "Each row is one convertible bond (cb_id) on one trading day of institutional net buys, carrying foreign_net, trust_net, dealer_net, and total_net. Bonds are TPEx-listed; sustained net buying is often read as bullish on conversion. Keyed on trade_date and point-in-time safe.",
+    useCases: [
+      "追蹤可轉債的法人籌碼與買賣動向。",
+      "以連續買超觀察對轉換的偏多訊號。",
+      "結合可轉債總覽的條款分析籌碼與價格。",
+    ],
+    useCasesEn: [
+      "Track institutional positioning and flow in convertible bonds.",
+      "Watch sustained net buying as a bullish conversion signal.",
+      "Combine with the overview's terms to analyze positioning and price.",
+    ],
+    whyItMatters:
+      "可轉債籌碼分散難追;直接取用每日三大法人買賣超,可一致觀察法人動向,且 point-in-time 安全。",
+    whyItMattersEn:
+      "Convertible-bond positioning is hard to track; daily institutional net buys give a consistent view of flow, point-in-time safe.",
+    coverageNote:
+      "逐可轉債逐日一列,標的為上櫃可轉債;含外資 / 投信 / 自營淨額與合計。以 trade_date 為知識時間,point-in-time 安全。",
+    coverageNoteEn:
+      "One row per convertible bond per day, TPEx-listed; foreign / trust / dealer nets and total. Keyed on trade_date, point-in-time safe.",
+    freshnessNote: "日頻,隨上櫃可轉債更新。",
+    freshnessNoteEn: "Daily, updated with TPEx convertible bonds.",
+    sourcePolicyNote: "由官方 TPEx 上櫃可轉債資料提供;非投資建議。",
+    sourcePolicyNoteEn: "From official TPEx convertible-bond data; not investment advice.",
+    docsHref: "/docs/api/derivatives/convertible-bond-institutional",
+    pricingHref: "/pricing",
+    keywords: ["可轉債法人", "可轉債籌碼", "外資投信自營", "可轉債買賣超", "上櫃可轉債"],
+    keywordsEn: ["convertible bond institutional", "CB positioning", "foreign trust dealer", "CB net buys", "TPEx convertibles"],
+    jsonLdName: "可轉債法人買賣資料集",
+    jsonLdNameEn: "Convertible Bond Institutional Flow Dataset",
+    jsonLdDescription: "上櫃可轉債每日三大法人買賣超,point-in-time 安全。",
+    jsonLdDescriptionEn:
+      "Daily institutional net buys for TPEx convertible bonds, point-in-time safe.",
+    sourceRole: "official_convertible_bond_institutional",
+    provider: "tpex",
+    marketScope: "TWSE_TPEX",
+  },
+  {
     slug: "margin-short",
     name: "融資融券",
     nameEn: "Margin Trading & Short Selling",
