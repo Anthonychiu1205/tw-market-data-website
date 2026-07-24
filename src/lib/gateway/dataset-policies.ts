@@ -95,6 +95,7 @@ export const DATASET_ACCESS_POLICIES: Record<string, DatasetPolicy> = {
   "technical-indicators": { datasetSlug: "technical-indicators", backendPath: "/v2/datasets/technical-indicators", requiredPlan: "max", creditsCost: 3 },
   "balance-sheet": { datasetSlug: "balance-sheet", backendPath: "/v2/datasets/balance-sheet", requiredPlan: "pro", creditsCost: 2 },
   "cash-flow-statement": { datasetSlug: "cash-flow-statement", backendPath: "/v2/datasets/cash-flow-statement", requiredPlan: "pro", creditsCost: 2 },
+  "taifex-options-delta": { datasetSlug: "taifex-options-delta", backendPath: "/v2/datasets/taifex-options-delta", requiredPlan: "max", creditsCost: 2 },
   "convertible-bonds": { datasetSlug: "convertible-bonds", backendPath: "/v2/datasets/convertible-bonds", requiredPlan: "pro", creditsCost: 2 },
   "derivatives-market": { datasetSlug: "derivatives-market", backendPath: "/v2/datasets/derivatives-market", requiredPlan: "max", creditsCost: 2 },
   "etf-holdings": { datasetSlug: "etf-holdings", backendPath: "/v2/datasets/etf-holdings", requiredPlan: "pro", creditsCost: 2 },
